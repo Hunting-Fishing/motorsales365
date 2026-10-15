@@ -15,10 +15,16 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
-1. Preserve the approved converter-only live restriction. Helper-candidate PR
-   #18 passed all six CI gates at `88a8977`; a single separate owner decision for
-   bootstrap/totals containment is pending. Do not treat the earlier approval as
-   authority for those helpers or the remaining quote-conversion path.
+1. Preserve the approved converter live restriction. The owner now separately
+   approved both PR #18 bootstrap/totals EXECUTE restrictions; PR #18 `88a8977`
+   passed all six CI gates. Both approved restrictions were individually applied
+   through tested/reviewed trusted-path envelopes and verified at 2026-10-15
+   02:11:58 UTC. Preserve all three restrictions; do not reapply them. PR #42
+   records remote versions `20261015021118` and `20261015021145`, exact stored
+   envelope/embedded-source mappings and permission-only postflight deltas.
+   See `evidence/APPROVED_HELPER_EXECUTE_RELEASE.md` for current state. This newer
+   decision supersedes historical pending-helper notes below, not their evidence,
+   and does not authorize quote conversion or native table/role changes.
 2. Continue native migration/authority work in parallel: the operator-private
    identity count review queries are implemented/tested offline, not executed
    against production. Unchanged staff/chat/native offboarding transactions are
@@ -36,7 +42,8 @@ Security reconciliation branch: `completion/365-security`.
    tested in draft PR #39, with no adopted privileged positive branches. Next
    build the deny-only direct native profile/user-role write prototype. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
-   PR #41, memory-only and unapplied; verify its latest checks. PR #40 composes
+   PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
+   (`38667796510`). PR #40 composes
    selected current policies and confirms profile scope pivots/global catalog-role
    effects offline. Neither is production authority acceptance.
    PR #40 docs `e97baca` passed all six CI gates (run `38664876182`), verified
@@ -884,20 +891,24 @@ separately labelled. Review caught/fixed wrong-kind lock scope, observation boun
 and an actual initial SQL parse defect before the final passing runs. No old SQL
 or constraints were rewritten to make tests pass.
 
-Code CI `38667600224` and separate hosting build
-`2ca956a1-037d-467d-bb89-0567e521298a` are pending at this checkpoint. Wrapper
-`38667600239` skips migrations/production deployment; wrapper success is not an
-upload. The subsequent documentation head requires its own check. Exact pins,
+Code CI `38667600224` was superseded (unit job cancelled). Docs `5ab35ef` passed
+all six CI gates in `38667796510`, verified on the approved-helper follow-up.
+Separate hosting builds `2ca956a1-037d-467d-bb89-0567e521298a` and
+`8b2bea0a-4be0-43d4-869b-4854281a6b7b` failed. Wrappers `38667600239` and
+`38667796672` skip migrations/production deployment; wrapper success is not an
+upload. Exact pins,
 scope and next proposal: `evidence/NATIVE_ROLE_CATALOG_CONTAINMENT_CANDIDATE.md`.
 Application source is unchanged from the 986-test CI-verified parent.
 
 Migration impact: none. Deployment/live mutation: none. Converter-only approved
-restriction is preserved; pending PR #18 decision remains unchanged/not asked
-again. Baseline/parity/replay/release flags stay false, correspondence 404/423
+restriction is preserved. A later owner decision explicitly approves both PR #18
+helper restrictions only; its live release state is tracked separately in
+`evidence/APPROVED_HELPER_EXECUTE_RELEASE.md`. This table remains unapproved.
+Baseline/parity/replay/release flags stay false, correspondence 404/423
 with19 unclassified and selected unknowns unchanged. No data repair, paid resource,
 customer communication or sparse-checkout deployment.
 
-Exact next action: verify PR #41 latest checks, then implement/test an offline
+Exact next native action (PR #41 docs checks now verified): implement/test an offline
 deny-only direct write prototype on `shop_manager.profiles` and `user_roles`,
 removing authenticated I/U/D on both while preserving SELECT/policies/legacy rows.
 No contact or native-admin/owner-role exception: successful phone-update policy
@@ -921,6 +932,67 @@ memory receipt is not enough and no approval is requested prematurely. Full
 baseline/storage recovery, consent/tenure, real API/JWT/concurrency, OCR/mobile/
 owner pilot, configuration and hosting gates remain open. Continue safe independent
 work while release decisions are pending; no duplicate heartbeat or reminders.
+
+## Approved helper restriction release checkpoint (2026-10-15)
+
+The owner separately answered "Approve both helper restrictions". Draft PR #42,
+branch `security/approved-helper-execution`, code
+`9bad6b2f26b77fa92a78a191c7e9fcd5bff5821c`, is stacked on PR #41 docs `5ab35ef`.
+It records the unchanged original PR #18 SQL, a separately pinned atomic trusted-
+path postgres-only execution envelope, catalog-only review query and release
+evidence. Original historical UNAPPROVED comments and prior invoice provenance
+remain unchanged. New approval does not include native tables/roles, quote
+conversion, unsafe recovery or application deployment.
+
+Verification: original helper suite 17/17 (49.916s), new envelope proof 7/7
+(4.938s), metadata query 8/8 (1.119s), combined new sequential run 15/15
+(5.964s), no failures/skips/cancellations; lint/format/diff and independent review
+pass. After release, seven additional file-only evidence checks pass; final
+combined three-suite run is 22/22 (6.146s), no failures/skips/cancellations. These
+are immutable recorded-evidence consistency checks, not current live truth or
+independent provenance. Independent artifact review confirms the intended deltas
+and mappings without another database audit. Hostile operator/temp-type/catalog/hash paths and genuine post-inner outer
+rollback controls are rehearsed with synthetic data, not live business calls.
+PR #18's six gates remain verified; PR #42 code `9bad6b2` also passed all six
+(`38669588329`), including the new regression step/full unit gate. Latest PR #42
+documentation/evidence-test CI needs its own next-resume check. Hosting build
+`994a4f64-94a7-4679-abe7-685b8fef64dc` failed; wrapper `38669588369` skipped
+migrations/production deployment. PR #41 docs passed all six gates (`38667796510`);
+its roles candidate remains unapplied.
+
+Fresh immediate read-only preflight at 02:11:11 UTC matched four routine
+definitions/headers/config/ACLs and four roles, zero selected helper history rows
+and the intact invoice restriction/history. Each approved envelope was applied
+once through `apply_migration`, followed by narrow postflight. Both are verified
+at 02:11:58 UTC: anon/authenticated EXECUTE false, postgres/service true, exact
+restricted ACLs, unchanged definitions/body/header/config and other selected
+metadata. Invoice remains restricted; quote remains publicly executable and can
+still reach totals indirectly. No business rows/counts/RPCs, data repair, unsafe
+recovery, merge or application deployment occurred.
+
+Migration impact: actual new remote versions `20261015021118` (bootstrap) and
+`20261015021145` (totals), each exactly one stored statement matching its checked-
+in execution-envelope SHA-256/bytes. The unchanged original local candidate is an
+exact embedded byte slice, not the stored whole statement. Preserve generated
+versions without history repair. Full selected before/intermediate/after and
+source/offset mappings: `evidence/approved-helper-execution-2026-10-15.json`;
+operator narrative: `evidence/APPROVED_HELPER_EXECUTE_RELEASE.md`.
+
+Global composer remains unchanged at 404/423 with 19 unclassified; do not silently
+promote counts or classify either original whole-file candidate as applied. This
+new envelope evidence requires separate formal composition. Baseline/parity/
+replay/release acceptance all remain false; full restore/private storage, real
+API/JWT/concurrency, consent/tenure, OCR/mobile/owner pilot and full-media hosting
+remain open. The sparse checkout must not be deployed.
+
+Exact next action: verify PR #42 latest head/checks and preserve all three live
+restrictions without rerunning them. Continue the offline deny-only direct
+profiles/user_roles prototype outlined above, preserving SELECT/policies/legacy
+rows and forbidding contact/admin/owner exceptions or canonicalization. Reuse
+completed bootstrap/roster evidence. Then close trusted indirect writer/ownership/
+team/shift/audit boundaries before positive authority or atomic offboarding.
+Quote hardening/containment is a separate unresolved decision, not covered by
+these two approvals. The existing heartbeat remains active; no duplicate reminder.
 
 ## Recovery evidence (original scope, retained below)
 

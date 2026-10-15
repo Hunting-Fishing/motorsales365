@@ -1,0 +1,1222 @@
+{
+  "schemaVersion": 1,
+  "project_id": "wjxaajgvddtrxxtocxen",
+  "observedOn": "2026-10-15",
+  "verifiedAtUtc": "2026-10-15 02:11:58.84888",
+  "authority": {
+    "source": "Direct human reply in this chat",
+    "answer": "Approve both helper restrictions",
+    "scope": "Temporary direct EXECUTE restrictions on shop_manager.ensure_profile_for(uuid) and shop_manager.calculate_work_order_totals(uuid), preserving postgres/service access. Quote conversion, native tables/roles, unsafe recovery, application deployment and data/history repairs excluded."
+  },
+  "source_commit": "9bad6b2f26b77fa92a78a191c7e9fcd5bff5821c",
+  "pull_request": "https://github.com/Hunting-Fishing/motorsales365/pull/42",
+  "query": {
+    "file": "docs/evidence/approved-helpers-catalog-review.sql",
+    "sha256_utf8_lf": "cf43f4db6719fa9ecf1e787349710203c82cb80f6a75df2e702795186879bf7a",
+    "bytes": 10504
+  },
+  "execution": {
+    "method": "Supabase apply_migration; one distinct trusted-path postgres-only atomic outer DO per approved helper",
+    "raw_source_comment_status": "Historical UNAPPROVED comments retained unchanged; superseded only by the new direct scoped owner approval",
+    "recovery_executed": false,
+    "business_functions_invoked": false,
+    "business_rows_read": false,
+    "application_deployed": false,
+    "history_repaired": false
+  },
+  "source_mappings": [
+    {
+      "migration": {
+        "name": "contain_legacy_profile_bootstrap_execute",
+        "version": "20261015021118",
+        "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+        "source_bytes_lf": 6741,
+        "statement_count": 1,
+        "statement_metadata": [
+          {
+            "is_null": false,
+            "position": 1,
+            "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+            "source_bytes_lf": 6741
+          }
+        ],
+        "statements_array_is_null": false
+      },
+      "stored_statement_file": "docs/evidence/approved-helper-profile_bootstrap-execution.sql",
+      "stored_statement_sha256_utf8_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+      "stored_statement_bytes": 6741,
+      "embedded_original_file": "supabase/migrations/20261014185003_contain_legacy_profile_bootstrap_execute.sql",
+      "embedded_original_sha256_raw_and_utf8_lf": "53c9081e23d9a31846f39a730a5c7cb5bd589716f224d11a7ed9a76e73d00aba",
+      "embedded_original_bytes": 6295,
+      "embedded_byte_start": 357,
+      "embedded_byte_end_exclusive": 6652,
+      "inner_delimiter": "$approved_profile_bootstrap_53c9081e23d9a318$",
+      "relationship": "Stored single statement equals the checked-in execution envelope, NOT the original migration file. The exact original raw file is the indicated zero-based UTF-8 byte slice inside that statement. Generated remote version intentionally differs from local original timestamp.",
+      "apply_tool_reported_success": true
+    },
+    {
+      "migration": {
+        "name": "contain_legacy_work_order_totals_execute",
+        "version": "20261015021145",
+        "sql_sha256_lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+        "source_bytes_lf": 6753,
+        "statement_count": 1,
+        "statement_metadata": [
+          {
+            "is_null": false,
+            "position": 1,
+            "sql_sha256_lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+            "source_bytes_lf": 6753
+          }
+        ],
+        "statements_array_is_null": false
+      },
+      "stored_statement_file": "docs/evidence/approved-helper-work_order_totals-execution.sql",
+      "stored_statement_sha256_utf8_lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+      "stored_statement_bytes": 6753,
+      "embedded_original_file": "supabase/migrations/20261014185052_contain_legacy_work_order_totals_execute.sql",
+      "embedded_original_sha256_raw_and_utf8_lf": "f87c6852dce4cff8be7f33d97aeadceddd223c2e4a3f310185f149a60297baf7",
+      "embedded_original_bytes": 6307,
+      "embedded_byte_start": 357,
+      "embedded_byte_end_exclusive": 6664,
+      "inner_delimiter": "$approved_work_order_totals_f87c6852dce4cff8$",
+      "relationship": "Stored single statement equals the checked-in execution envelope, NOT the original migration file. The exact original raw file is the indicated zero-based UTF-8 byte slice inside that statement. Generated remote version intentionally differs from local original timestamp.",
+      "apply_tool_reported_success": true
+    }
+  ],
+  "preApplyObservation": {
+    "project_ref": "wjxaajgvddtrxxtocxen",
+    "observed_at_utc": "2026-10-15 02:11:11.50546",
+    "execution_context": {
+      "database": "postgres",
+      "search_path": "pg_catalog, pg_temp",
+      "current_user": "postgres",
+      "lock_timeout": "5s",
+      "session_user": "postgres",
+      "server_version": "17.6",
+      "temp_schema_oid": "0",
+      "temp_schema_name": null,
+      "statement_timeout": "15s",
+      "server_version_num": "170006",
+      "transaction_read_only": "on",
+      "effective_search_schemas": ["pg_catalog"]
+    },
+    "roles": [
+      {
+        "role": "anon",
+        "found": true
+      },
+      {
+        "role": "authenticated",
+        "found": true
+      },
+      {
+        "role": "postgres",
+        "found": true
+      },
+      {
+        "role": "service_role",
+        "found": true
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "ensure_profile_for",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.ensure_profile_for(uuid)",
+        "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+        "volatility": "v",
+        "body_md5_lf": "ec9ce0a3dc3bcd576cef57c5ea347d58",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_user_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "77cb775bfedfb78996b31fcbdd3ada4c",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_user_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+          }
+        ],
+        "requested_signature": "shop_manager.ensure_profile_for(pg_catalog.uuid)",
+        "selected_header_md5": "4819569f1f75a75317bc650bce5a183a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "calculate_work_order_totals",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.calculate_work_order_totals(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "d5e17459c7a69975b494a3be2e4cd560",
+        "config_keys": ["search_path"],
+        "return_type": "numeric",
+        "returns_set": false,
+        "return_shape": "numeric",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1119dd7abe3e643d8d0c6979f19fc2a1",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.calculate_work_order_totals(pg_catalog.uuid)",
+        "selected_header_md5": "edfece0d869ca3ba6e38f42f560b499f",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_work_order_to_invoice",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_work_order_to_invoice(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "c3ef84a1dfa61850a0135fdc66eb9f40",
+        "config_keys": ["search_path"],
+        "return_type": "text",
+        "returns_set": false,
+        "return_shape": "text",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "e590e08f9f68cc5fdead8a853af670b9",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_work_order_to_invoice(pg_catalog.uuid)",
+        "selected_header_md5": "d9f9834946c04e6c58c71629ca068da1",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_quote_to_work_order",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_quote_to_work_order(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "4c02e0ec5af35136eaf483b7950ac1c4",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_quote_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1080a60b75ddd930e541297dda1e17dc",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_quote_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_quote_to_work_order(pg_catalog.uuid)",
+        "selected_header_md5": "cd3ba223d340d3be89cc468a31c2e71a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      }
+    ],
+    "migration_history": [
+      {
+        "rows": [],
+        "row_count": 0,
+        "requested_name": "contain_legacy_profile_bootstrap_execute"
+      },
+      {
+        "rows": [],
+        "row_count": 0,
+        "requested_name": "contain_legacy_work_order_totals_execute"
+      },
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_invoice_conversion_execute",
+            "version": "20261014180351",
+            "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+            "source_bytes_lf": 3914,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+                "source_bytes_lf": 3914
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_invoice_conversion_execute"
+      }
+    ]
+  },
+  "afterProfileObservation": {
+    "project_ref": "wjxaajgvddtrxxtocxen",
+    "observed_at_utc": "2026-10-15 02:11:38.980018",
+    "execution_context": {
+      "database": "postgres",
+      "search_path": "pg_catalog, pg_temp",
+      "current_user": "postgres",
+      "lock_timeout": "5s",
+      "session_user": "postgres",
+      "server_version": "17.6",
+      "temp_schema_oid": "0",
+      "temp_schema_name": null,
+      "statement_timeout": "15s",
+      "server_version_num": "170006",
+      "transaction_read_only": "on",
+      "effective_search_schemas": ["pg_catalog"]
+    },
+    "roles": [
+      {
+        "role": "anon",
+        "found": true
+      },
+      {
+        "role": "authenticated",
+        "found": true
+      },
+      {
+        "role": "postgres",
+        "found": true
+      },
+      {
+        "role": "service_role",
+        "found": true
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "ensure_profile_for",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.ensure_profile_for(uuid)",
+        "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+        "volatility": "v",
+        "body_md5_lf": "ec9ce0a3dc3bcd576cef57c5ea347d58",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_user_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "77cb775bfedfb78996b31fcbdd3ada4c",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_user_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+          }
+        ],
+        "requested_signature": "shop_manager.ensure_profile_for(pg_catalog.uuid)",
+        "selected_header_md5": "4819569f1f75a75317bc650bce5a183a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "calculate_work_order_totals",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.calculate_work_order_totals(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "d5e17459c7a69975b494a3be2e4cd560",
+        "config_keys": ["search_path"],
+        "return_type": "numeric",
+        "returns_set": false,
+        "return_shape": "numeric",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1119dd7abe3e643d8d0c6979f19fc2a1",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.calculate_work_order_totals(pg_catalog.uuid)",
+        "selected_header_md5": "edfece0d869ca3ba6e38f42f560b499f",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_work_order_to_invoice",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_work_order_to_invoice(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "c3ef84a1dfa61850a0135fdc66eb9f40",
+        "config_keys": ["search_path"],
+        "return_type": "text",
+        "returns_set": false,
+        "return_shape": "text",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "e590e08f9f68cc5fdead8a853af670b9",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_work_order_to_invoice(pg_catalog.uuid)",
+        "selected_header_md5": "d9f9834946c04e6c58c71629ca068da1",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_quote_to_work_order",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_quote_to_work_order(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "4c02e0ec5af35136eaf483b7950ac1c4",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_quote_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1080a60b75ddd930e541297dda1e17dc",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_quote_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_quote_to_work_order(pg_catalog.uuid)",
+        "selected_header_md5": "cd3ba223d340d3be89cc468a31c2e71a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      }
+    ],
+    "migration_history": [
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_profile_bootstrap_execute",
+            "version": "20261015021118",
+            "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+            "source_bytes_lf": 6741,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+                "source_bytes_lf": 6741
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_profile_bootstrap_execute"
+      },
+      {
+        "rows": [],
+        "row_count": 0,
+        "requested_name": "contain_legacy_work_order_totals_execute"
+      },
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_invoice_conversion_execute",
+            "version": "20261014180351",
+            "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+            "source_bytes_lf": 3914,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+                "source_bytes_lf": 3914
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_invoice_conversion_execute"
+      }
+    ]
+  },
+  "finalObservation": {
+    "project_ref": "wjxaajgvddtrxxtocxen",
+    "observed_at_utc": "2026-10-15 02:11:58.84888",
+    "execution_context": {
+      "database": "postgres",
+      "search_path": "pg_catalog, pg_temp",
+      "current_user": "postgres",
+      "lock_timeout": "5s",
+      "session_user": "postgres",
+      "server_version": "17.6",
+      "temp_schema_oid": "0",
+      "temp_schema_name": null,
+      "statement_timeout": "15s",
+      "server_version_num": "170006",
+      "transaction_read_only": "on",
+      "effective_search_schemas": ["pg_catalog"]
+    },
+    "roles": [
+      {
+        "role": "anon",
+        "found": true
+      },
+      {
+        "role": "authenticated",
+        "found": true
+      },
+      {
+        "role": "postgres",
+        "found": true
+      },
+      {
+        "role": "service_role",
+        "found": true
+      }
+    ],
+    "functions": [
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "ensure_profile_for",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.ensure_profile_for(uuid)",
+        "config_md5": "8506a0911fb3ebfe6f35ed71d4100474",
+        "volatility": "v",
+        "body_md5_lf": "ec9ce0a3dc3bcd576cef57c5ea347d58",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_user_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "77cb775bfedfb78996b31fcbdd3ada4c",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_user_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "db11771cee5fd39f92dfba5c83d713f3"
+          }
+        ],
+        "requested_signature": "shop_manager.ensure_profile_for(pg_catalog.uuid)",
+        "selected_header_md5": "4819569f1f75a75317bc650bce5a183a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "calculate_work_order_totals",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.calculate_work_order_totals(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "d5e17459c7a69975b494a3be2e4cd560",
+        "config_keys": ["search_path"],
+        "return_type": "numeric",
+        "returns_set": false,
+        "return_shape": "numeric",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1119dd7abe3e643d8d0c6979f19fc2a1",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.calculate_work_order_totals(pg_catalog.uuid)",
+        "selected_header_md5": "edfece0d869ca3ba6e38f42f560b499f",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_work_order_to_invoice",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_work_order_to_invoice(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "c3ef84a1dfa61850a0135fdc66eb9f40",
+        "config_keys": ["search_path"],
+        "return_type": "text",
+        "returns_set": false,
+        "return_shape": "text",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": false,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_work_order_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "e590e08f9f68cc5fdead8a853af670b9",
+        "normalized_acl": [
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_work_order_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_work_order_to_invoice(pg_catalog.uuid)",
+        "selected_header_md5": "d9f9834946c04e6c58c71629ca068da1",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      },
+      {
+        "acl": "{=X/postgres,postgres=X/postgres,service_role=X/postgres}",
+        "cost": 100,
+        "kind": "f",
+        "name": "convert_quote_to_work_order",
+        "rows": 0,
+        "found": true,
+        "owner": "postgres",
+        "schema": "shop_manager",
+        "strict": false,
+        "language": "plpgsql",
+        "parallel": "u",
+        "leakproof": false,
+        "signature": "shop_manager.convert_quote_to_work_order(uuid)",
+        "config_md5": "99561468bf13765311feedc9488b1871",
+        "volatility": "v",
+        "body_md5_lf": "4c02e0ec5af35136eaf483b7950ac1c4",
+        "config_keys": ["search_path"],
+        "return_type": "uuid",
+        "returns_set": false,
+        "return_shape": "uuid",
+        "effective_acl": [
+          {
+            "role": "anon",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "authenticated",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "postgres",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          },
+          {
+            "role": "service_role",
+            "execute": true,
+            "role_found": true,
+            "schema_usage": true
+          }
+        ],
+        "variadic_type": null,
+        "argument_count": 1,
+        "argument_modes": null,
+        "argument_names": ["_quote_id"],
+        "argument_types": ["uuid"],
+        "definition_md5": "1080a60b75ddd930e541297dda1e17dc",
+        "normalized_acl": [
+          "PUBLIC/postgres/EXECUTE/false",
+          "postgres/postgres/EXECUTE/false",
+          "service_role/postgres/EXECUTE/false"
+        ],
+        "security_definer": true,
+        "all_argument_types": null,
+        "identity_arguments": "_quote_id uuid",
+        "config_value_hashes": [
+          {
+            "key": "search_path",
+            "value_md5": "301f05ce9cb30013bfbd6c04787a5e81"
+          }
+        ],
+        "requested_signature": "shop_manager.convert_quote_to_work_order(pg_catalog.uuid)",
+        "selected_header_md5": "cd3ba223d340d3be89cc468a31c2e71a",
+        "argument_defaults_md5": null,
+        "argument_defaults_count": 0
+      }
+    ],
+    "migration_history": [
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_profile_bootstrap_execute",
+            "version": "20261015021118",
+            "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+            "source_bytes_lf": 6741,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+                "source_bytes_lf": 6741
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_profile_bootstrap_execute"
+      },
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_work_order_totals_execute",
+            "version": "20261015021145",
+            "sql_sha256_lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+            "source_bytes_lf": 6753,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+                "source_bytes_lf": 6753
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_work_order_totals_execute"
+      },
+      {
+        "rows": [
+          {
+            "name": "contain_legacy_invoice_conversion_execute",
+            "version": "20261014180351",
+            "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+            "source_bytes_lf": 3914,
+            "statement_count": 1,
+            "statement_metadata": [
+              {
+                "is_null": false,
+                "position": 1,
+                "sql_sha256_lf": "a0a4132c9f17eb4df1d49f0ff735a3da651728b8d1d4d81e979a4e5bc033c1f0",
+                "source_bytes_lf": 3914
+              }
+            ],
+            "statements_array_is_null": false
+          }
+        ],
+        "row_count": 1,
+        "requested_name": "contain_legacy_invoice_conversion_execute"
+      }
+    ]
+  },
+  "acceptance": {
+    "scope": "Exact two ACL actions and selected stored-source correspondence only",
+    "global_source_evidence_composer_updated": false,
+    "global_correspondence_retained": "404/423; 19 unclassified in the previously composed evidence; these new envelope mappings require separate formal incorporation and do not adopt either original whole-file candidate",
+    "baselineAccepted": false,
+    "parityAccepted": false,
+    "replayAccepted": false,
+    "releaseAccepted": false,
+    "quoteIndirectPathContained": false
+  }
+}

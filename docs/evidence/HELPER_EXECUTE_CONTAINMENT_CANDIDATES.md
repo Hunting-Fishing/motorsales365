@@ -1,10 +1,13 @@
-# Legacy helper EXECUTE containment: unapproved candidates
+# Legacy helper EXECUTE containment: original candidates and scoped approval
 
-Updated 2026-10-15 Asia/Manila. **Prepared and isolated-tested; not applied.**
-The owner's prior approval was converter-only. It does not authorize these two
-new changes, quote conversion, staff/profile policies, role provisioning or an
-application deployment. Require separately explicit scoped approval and passing
-CI before either candidate is considered for live execution.
+Updated 2026-10-15 Asia/Manila. The owner now separately answered **"Approve both
+helper restrictions"** after PR #18 passed all six CI gates. Current release
+state, fresh preflight, tested execution envelopes and exact provenance are in
+`APPROVED_HELPER_EXECUTE_RELEASE.md`. That newer record supersedes historical
+pending-helper status below, not the original SQL bytes or observations.
+Quote conversion, staff/profile policies, role provisioning, unsafe recovery and
+application deployment remain outside this scope. Retain the original SQL's
+historical UNAPPROVED comments unchanged; they are not the current authority record.
 
 ## Exact proposed scope
 
@@ -104,7 +107,14 @@ Running it would reopen an observed risk; it requires a new operator/owner
 decision, not automatic authorization from a containment approval. No recovery
 was run live. Broader database/private-storage restore readiness remains open.
 
-## Live gate and exact next action
+## Original live gate checklist (now superseded by release evidence)
+
+The two helper restrictions are now individually applied and verified in
+`APPROVED_HELPER_EXECUTE_RELEASE.md` / draft PR #42. Actual remote versions are
+`20261015021118` and `20261015021145`; each stored single statement is the pinned
+trusted-path execution envelope containing the exact original source bytes,
+not the original candidate whole file. Do not replay either applied action or
+restore unsafe access. The original preparation checklist follows for context.
 
 Publish/review these sources and tests, require CI, obtain explicit scope approval,
 refresh exact complete ACL/definition/effective roles, confirm the approved
