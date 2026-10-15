@@ -15,6 +15,40 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest provider uid/staff Auth prerequisite slice: draft PR #63, code `d59b24e`.
+One READ ONLY source diagnostic at `10:40:55.605099` UTC recovers only actual
+auth.uid(), gated by the complete prior reviewed envelope plus independent
+privacy/size/literal checks, reviewed before retention. Exact 274-byte definition/
+body/header/provider owner/current ACL/effective execute matches locally; no
+Auth/app/config rows/counts, live settings/JWT/sequence values or helper execution
+read. Role flags/schema grants in its disposable component are explicit lab
+supports, unsigned GUCs are not verified sessions/original actors, not the old stub.
+Separately, actual staff Auth SQL executes against unchanged PR #62 full schema:
+missing canonical/metadata manager fails a genuine FK, actual manager/config org
+inputs and original defaults recover, all eighteen tables/Auth rows roll back,
+local sequence gaps survive. Current source can flag unconfirmed staff, store
+private/buyer/founding Bronze, accept an ordinary manager UUID and leave roles/
+staff/partners unprovisioned even after confirmation. These are characterized
+authority/intent/entitlement gaps, not adopted professional role policy. Earlier
+staff seller NULL/enum concern is not reproduced by this current Auth branch;
+do not claim all legacy variants fixed. Twenty-six focused pass (23.084 seconds),
+syntax/lint/format/canonical JSON/diff/primary review pass; full serial tooling
+628/628 passes (508.675 seconds), then 10/10 receipt assets (0.298 seconds):
+638 aggregate, zero failures/skips/cancellations. No fresh application suite
+claimed; PR #54 remains parent evidence. Evidence:
+`evidence/PROVIDER_UID_STAFF_AUTH_PREREQUISITES.md`. New PR #63 needs latest checks.
+Next compose actual remaining staff audit/sales profile/territory full tables,
+role/staff writer functions/attachments (PR #50/#54) with PR #62 full Auth and this
+actual provider uid. Do not repeat source/prerequisite/ordinary/financial/schema
+recovery, use identity/helper stubs, or label unsigned lab subjects trusted actors.
+Keep genuine canonical-manager/org inputs, all constraints, real late rollback/
+sequence gaps; role provisioning remains a separate actual write, not automatic
+confirmed signup. Then original actor/revisions/common locks/offboarding/native
+acceptance. Source/baseline/replay/parity/release and all financial/consent/privacy/
+recovery/receipt/mobile/owner/full-media/hosting gates unchanged. Zero production
+mutation/migration/deploy, paid resource, customer message, data deletion, PR merge
+or restriction replay; single recurring continuation active, no duplicate automation.
+
 Newest full nonstaff Auth/referral/partner-intent slice: draft PR #62, code
 `8906446`, composes actual Auth INSERT through full profile/org/owner/Bronze/
 intent-audit/referral/bounty/assignment, plus real nonempty partner intent UPDATE/
@@ -35,11 +69,11 @@ suite claimed; PR #54 remains parent evidence. Real partner rename leaves old-co
 intent stale, DELETE cascades ledger while referral/assignment remain, and target-
 actor/mislabeled active-change/audit swallowing persist. These and all prior
 financial/authority gaps remain characterized blockers, not adopted rules.
-Evidence: `evidence/AUTH_REFERRAL_INTENT_BOOTSTRAP.md`. PR #62 needs latest checks.
-Next actual staff-domain Auth → platform role/staff/partner with genuine canonical
-org/manager prerequisites, full schemas and real writer fanouts. Recover/match
-provider Auth uid only if reached, not the old GUC shim; test genuine failures
-and late rollback. Then original actor/revision/common locks/offboarding/native
+Evidence: `evidence/AUTH_REFERRAL_INTENT_BOOTSTRAP.md`. PR #62 docs `9425099` now
+passed all six CI gates (`38721062998`); hosting failed separately, migrations/
+production skipped. Actual provider uid and genuine staff Auth manager/org
+prerequisites are recovered/rehearsed in PR #63 above. Next real role/staff/sales/
+partner writer composition, then original actor/revision/common locks/offboarding/native
 acceptance. Do not repeat completed ordinary full Auth/referral/intent/financial/
 schema/org recovery. Static canonical admin/editable manager, staff seller NULL/
 enum/trial ANY and all prior receipt/mobile/owner/consent/private-history/recovery/

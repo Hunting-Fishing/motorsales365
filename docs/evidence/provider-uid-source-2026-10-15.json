@@ -1,0 +1,39 @@
+{
+  "mode": "read-only-selected-provider-source-not-history",
+  "limits": "Exactly auth.uid() previously fingerprinted in the reviewed referral financial capture. No app/Auth/config rows/counts, helper execution, settings values, arbitrary source, sequence, mutation or original history/baseline/JWT/session/actor adoption. Matching full envelope plus independent privacy/size/literal guards required. Manual review before source retention. Provider role flags and schema are not recovered.",
+  "functions": [
+    {
+      "envelope": {
+        "acl": "{=X/supabase_auth_admin,supabase_auth_admin=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+        "kind": "f",
+        "owner": "supabase_auth_admin",
+        "strict": false,
+        "defaults": 0,
+        "language": "sql",
+        "bodyMd5Lf": "cdef18c69c4f4cbbced2eaf81e628b49",
+        "configMd5": null,
+        "signature": "auth.uid()",
+        "configKeys": [],
+        "resultType": "uuid",
+        "returnsSet": false,
+        "volatility": "s",
+        "anonExecute": true,
+        "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+        "argumentModes": null,
+        "argumentNames": null,
+        "definitionMd5": "ea3b41bf29e2ad573067939329aa088e",
+        "serviceExecute": true,
+        "definitionBytes": 274,
+        "postgresExecute": true,
+        "securityDefiner": false,
+        "authenticatedExecute": true
+      },
+      "permitted": true,
+      "signature": "auth.uid()",
+      "definition": "CREATE OR REPLACE FUNCTION auth.uid()\n RETURNS uuid\n LANGUAGE sql\n STABLE\nAS $function$\n  select \n  coalesce(\n    nullif(current_setting('request.jwt.claim.sub', true), ''),\n    (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')\n  )::uuid\n$function$\n"
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "observedAtUtc": "2026-10-15T10:40:55.605099",
+  "serverVersion": "17.6"
+}
