@@ -194,3 +194,9 @@ Initial code CI `38706672417` has all six gates pending. Hosting
 `f3b62436-0494-488e-b3a9-3fcd34cee668` failed separately; wrapper `38706672435`
 skipped migrations/production deployment. Verify the later documentation HEAD
 separately rather than carrying forward this initial snapshot or parent green checks.
+
+Follow-up: PR #58 docs `018fd26` now passed all six CI gates (`38706843133`).
+Hosting `da136074-79ba-4d3b-88e7-272b67d1bd26` failed separately; wrapper
+`38706843108` skipped migrations and production deployment. The full business-read/
+audit structural frontier is now documented in `BOOTSTRAP_BUSINESS_AUDIT_STRUCTURE.md`.
+Current core source/capture/fixture pins remain unchanged. No release is inferred.
