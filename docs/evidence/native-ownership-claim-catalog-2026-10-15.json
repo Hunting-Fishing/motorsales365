@@ -1,0 +1,1125 @@
+{
+  "mode": "read-only-catalog",
+  "scope": "Seven selected function signatures; three selected relations, all their policies/noninternal attachments, claim/audit critical shape, and only twelve named business columns. No business rows or whole-schema/applied-history acceptance.",
+  "limits": "Catalog metadata only. Missing signatures remain missing, not stubbed current functions. No customer/auth/business/claim/audit content or row counts, callable application behavior, full writer closure, concurrent sessions, authenticated API, migration provenance, baseline/parity or release acceptance.",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_claim_audit",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "schema": "public",
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_claim_requests",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "schema": "public",
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "businesses",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true
+        }
+      ],
+      "schema": "public",
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "default": "gen_random_uuid()",
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "claim_id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "default": null,
+      "notNull": true,
+      "position": 2,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "actor_user_id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "default": null,
+      "notNull": false,
+      "position": 3,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "action",
+      "type": "text",
+      "table": "business_claim_audit",
+      "default": null,
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "business_claim_audit",
+      "default": null,
+      "notNull": false,
+      "position": 5,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "details",
+      "type": "jsonb",
+      "table": "business_claim_audit",
+      "default": "'{}'::jsonb",
+      "notNull": true,
+      "position": 6,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_audit",
+      "default": "now()",
+      "notNull": true,
+      "position": 7,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "default": "gen_random_uuid()",
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "business_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": true,
+      "position": 2,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "claimant_user_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": true,
+      "position": 3,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "contact_method",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "contact_value",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 5,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "evidence_url",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 6,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 7,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": "'pending'::text",
+      "notNull": true,
+      "position": 8,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "reviewer_user_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 9,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "reviewer_notes",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 10,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "decided_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "default": null,
+      "notNull": false,
+      "position": 11,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "default": "now()",
+      "notNull": true,
+      "position": 12,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "default": "now()",
+      "notNull": true,
+      "position": 13,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "kind",
+      "type": "text",
+      "table": "business_claim_requests",
+      "default": "'claim'::text",
+      "notNull": true,
+      "position": 14,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "businesses",
+      "default": "gen_random_uuid()",
+      "notNull": true,
+      "position": 1,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "owner_id",
+      "type": "uuid",
+      "table": "businesses",
+      "default": null,
+      "notNull": false,
+      "position": 2,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "name",
+      "type": "text",
+      "table": "businesses",
+      "default": null,
+      "notNull": true,
+      "position": 4,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "public.business_status",
+      "table": "businesses",
+      "default": "'pending'::public.business_status",
+      "notNull": true,
+      "position": 22,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "featured",
+      "type": "boolean",
+      "table": "businesses",
+      "default": "false",
+      "notNull": true,
+      "position": 23,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "default": "now()",
+      "notNull": true,
+      "position": 26,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "default": "now()",
+      "notNull": true,
+      "position": 27,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "source",
+      "type": "text",
+      "table": "businesses",
+      "default": "'manual'::text",
+      "notNull": true,
+      "position": 32,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "source_external_id",
+      "type": "text",
+      "table": "businesses",
+      "default": null,
+      "notNull": false,
+      "position": 33,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "subscription_tier",
+      "type": "public.business_tier",
+      "table": "businesses",
+      "default": "'free'::public.business_tier",
+      "notNull": true,
+      "position": 34,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "featured_until",
+      "type": "timestamp with time zone",
+      "table": "businesses",
+      "default": null,
+      "notNull": false,
+      "position": 35,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    },
+    {
+      "acl": null,
+      "name": "claim_state",
+      "type": "text",
+      "table": "businesses",
+      "default": "'owned'::text",
+      "notNull": true,
+      "position": 48,
+      "authenticatedInsert": true,
+      "authenticatedSelect": true,
+      "authenticatedUpdate": true
+    }
+  ],
+  "policies": [
+    {
+      "name": "Block direct inserts",
+      "check": "false",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_audit",
+      "using": null,
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Read own claim audit or mod",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_audit",
+      "using": "(public.can_moderate(auth.uid()) OR (EXISTS ( SELECT 1\n   FROM public.business_claim_requests c\n  WHERE ((c.id = business_claim_audit.claim_id) AND (c.claimant_user_id = auth.uid())))))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Staff update claims",
+      "check": "public.can_moderate(auth.uid())",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "using": "public.can_moderate(auth.uid())",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users read own claims",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "using": "((claimant_user_id = auth.uid()) OR public.can_moderate(auth.uid()))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users submit own claim",
+      "check": "((claimant_user_id = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM public.businesses b\n  WHERE ((b.id = business_claim_requests.business_id) AND (((business_claim_requests.kind = 'claim'::text) AND (b.claim_state = ANY (ARRAY['unclaimed'::text, 'claim_pending'::text])) AND (b.owner_id IS NULL)) OR ((business_claim_requests.kind = 'transfer'::text) AND (b.owner_id IS NOT NULL) AND (b.owner_id <> auth.uid())))))))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "using": null,
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Active businesses public read",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "using": "(status = 'active'::public.business_status)",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Business owners can read own businesses",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "using": "(auth.uid() = owner_id)",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Moderators manage businesses",
+      "check": "public.can_moderate(auth.uid())",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "using": "public.can_moderate(auth.uid())",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Owners delete own businesses",
+      "check": null,
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "using": "(auth.uid() = owner_id)",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Owners insert businesses",
+      "check": "((auth.uid() = owner_id) AND (status = 'pending'::public.business_status))",
+      "roles": [
+        "public"
+      ],
+      "table": "businesses",
+      "using": null,
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Owners update own businesses",
+      "check": "(auth.uid() = owner_id)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "businesses",
+      "using": "(auth.uid() = owner_id)",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can resolve verified custom domains",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "businesses",
+      "using": "((custom_domain IS NOT NULL) AND (custom_domain_status = 'verified'::text))",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "trg_bcr_touch",
+      "table": "business_claim_requests",
+      "enabled": "O",
+      "function": "public.touch_updated_at()",
+      "definition": "CREATE TRIGGER trg_bcr_touch BEFORE UPDATE ON public.business_claim_requests FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "9baf00d43cdeb2cd0e55c1de045be21b",
+      "functionDefinitionMd5": "30625488571141c913d7e14bea920178",
+      "functionSecurityDefiner": false
+    },
+    {
+      "name": "trg_claim_audit_status",
+      "table": "business_claim_requests",
+      "enabled": "O",
+      "function": "public.tg_claim_audit_status()",
+      "definition": "CREATE TRIGGER trg_claim_audit_status AFTER INSERT OR UPDATE ON public.business_claim_requests FOR EACH ROW EXECUTE FUNCTION public.tg_claim_audit_status()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "a0c7fa189dec91f4024670da5bc71214",
+      "functionDefinitionMd5": "1705bd5e18801272e87b99fb97855f1d",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "business_team_thread_on_create",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.trg_business_created_team_thread()",
+      "definition": "CREATE TRIGGER business_team_thread_on_create AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.trg_business_created_team_thread()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "d13017c493f1ab0e1788022d6030130a",
+      "functionDefinitionMd5": "3176f1c2c3d3abeb3f01b0c44d8817d9",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "businesses_recompute_intent",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.trg_businesses_recompute_intent()",
+      "definition": "CREATE TRIGGER businesses_recompute_intent AFTER INSERT OR DELETE OR UPDATE OF owner_id ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.trg_businesses_recompute_intent()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "46b92e78631dff66834b7e4035b4e251",
+      "functionDefinitionMd5": "6d715f23167595b07aaddd268ee3bf25",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "set_businesses_updated_at",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.tg_set_updated_at()",
+      "definition": "CREATE TRIGGER set_businesses_updated_at BEFORE UPDATE ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_set_updated_at()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "301a884953d37769916294bb60562e05",
+      "functionDefinitionMd5": "494198e1eb8f9c98c4cf075ed9d79bb9",
+      "functionSecurityDefiner": false
+    },
+    {
+      "name": "trg_block_internal_staff_business",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.block_internal_staff_business()",
+      "definition": "CREATE TRIGGER trg_block_internal_staff_business BEFORE INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.block_internal_staff_business()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "4013bf118428ed2335d0889a2ba185af",
+      "functionDefinitionMd5": "dd3c9c1ebddb7e68cadf8dec69fac26a",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_enforce_business_custom_domain",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.enforce_business_custom_domain()",
+      "definition": "CREATE TRIGGER trg_enforce_business_custom_domain BEFORE INSERT OR UPDATE OF custom_domain, custom_domain_status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.enforce_business_custom_domain()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "201a674653b4a01175449620008f8e77",
+      "functionDefinitionMd5": "6a0a444bec960647f537c9248de872b5",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_guard_business_owner_update",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.guard_business_owner_update()",
+      "definition": "CREATE TRIGGER trg_guard_business_owner_update BEFORE UPDATE ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.guard_business_owner_update()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "8cb2be4c21b728a5a86e9b06fcf6e94b",
+      "functionDefinitionMd5": "e56525d41e0d9ec0cd6608873fc6b714",
+      "functionSecurityDefiner": false
+    },
+    {
+      "name": "trg_notify_business_approved",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_approved()",
+      "definition": "CREATE TRIGGER trg_notify_business_approved AFTER UPDATE OF status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_approved()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "fda41e1bcd640b80cce098c2ee02064f",
+      "functionDefinitionMd5": "ce4d2adb4953337c22c5e6bc95753002",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_notify_business_archive_change",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_archive_change()",
+      "definition": "CREATE TRIGGER trg_notify_business_archive_change AFTER UPDATE OF status ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_archive_change()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "00dda14f4b2e8a8662ff9676b03da004",
+      "functionDefinitionMd5": "16cd3c2fa08e8300e63558d6bc873c29",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_notify_business_submitted",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.tg_notify_business_submitted()",
+      "definition": "CREATE TRIGGER trg_notify_business_submitted AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.tg_notify_business_submitted()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "11b19dbfb5155289054dc6aa181ac502",
+      "functionDefinitionMd5": "6b5be7e69a5385a130d4de9ef16b1201",
+      "functionSecurityDefiner": true
+    },
+    {
+      "name": "trg_pp_business_signup_bounty",
+      "table": "businesses",
+      "enabled": "O",
+      "function": "public.pp_business_signup_bounty()",
+      "definition": "CREATE TRIGGER trg_pp_business_signup_bounty AFTER INSERT ON public.businesses FOR EACH ROW EXECUTE FUNCTION public.pp_business_signup_bounty()",
+      "functionAcl": "{postgres=X/postgres,service_role=X/postgres}",
+      "functionOwner": "postgres",
+      "functionConfig": [
+        "search_path=public"
+      ],
+      "functionBodyMd5Lf": "6ff565d45c820cd0b7134f5e2977cea1",
+      "functionDefinitionMd5": "654d0ac0cb383be9796d3883cd6168b7",
+      "functionSecurityDefiner": true
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "void",
+      "strict": false,
+      "language": "plpgsql",
+      "arguments": "_claim_id uuid, _auto boolean",
+      "bodyMd5Lf": "bad56233bdb5168c543db21995aa5ed6",
+      "signature": "public.approve_business_claim(uuid,boolean)",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "e920491d076114fcd68cfef040693f52",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "strict": false,
+      "language": "sql",
+      "arguments": "_user_id uuid",
+      "bodyMd5Lf": "995bf3deb59ebb7314cadfb102c0ec7c",
+      "signature": "public.can_moderate(uuid)",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "definitionMd5": "f7e561172cb3ff6dd98ffdb015066c3c",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "8cb2be4c21b728a5a86e9b06fcf6e94b",
+      "signature": "public.guard_business_owner_update()",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "e56525d41e0d9ec0cd6608873fc6b714",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "strict": false,
+      "language": "sql",
+      "arguments": "_user_id uuid, _role public.app_role",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "a0c7fa189dec91f4024670da5bc71214",
+      "signature": "public.tg_claim_audit_status()",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "1705bd5e18801272e87b99fb97855f1d",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "9baf00d43cdeb2cd0e55c1de045be21b",
+      "signature": "public.touch_updated_at()",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "30625488571141c913d7e14bea920178",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "strict": false,
+      "language": "plpgsql",
+      "arguments": "",
+      "bodyMd5Lf": "5b733ab523bad442e4b10f836de9e4ba",
+      "signature": "public.update_updated_at_column()",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "definitionMd5": "47b72756852a143198dccf4db5943afc",
+      "serviceExecute": true,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "business_claim_audit_action_check",
+      "type": "c",
+      "table": "business_claim_audit",
+      "validated": true,
+      "definition": "CHECK ((action = ANY (ARRAY['submitted'::text, 'resubmitted'::text, 'approved'::text, 'auto_approved'::text, 'rejected'::text, 'evidence_added'::text, 'evidence_removed'::text, 'reviewer_note'::text])))"
+    },
+    {
+      "name": "business_claim_audit_claim_id_fkey",
+      "type": "f",
+      "table": "business_claim_audit",
+      "validated": true,
+      "definition": "FOREIGN KEY (claim_id) REFERENCES public.business_claim_requests(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "business_claim_audit_pkey",
+      "type": "p",
+      "table": "business_claim_audit",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "business_claim_requests_business_id_fkey",
+      "type": "f",
+      "table": "business_claim_requests",
+      "validated": true,
+      "definition": "FOREIGN KEY (business_id) REFERENCES public.businesses(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "business_claim_requests_contact_method_check",
+      "type": "c",
+      "table": "business_claim_requests",
+      "validated": true,
+      "definition": "CHECK ((contact_method = ANY (ARRAY['email'::text, 'phone'::text, 'document'::text, 'social'::text])))"
+    },
+    {
+      "name": "business_claim_requests_kind_check",
+      "type": "c",
+      "table": "business_claim_requests",
+      "validated": true,
+      "definition": "CHECK ((kind = ANY (ARRAY['claim'::text, 'transfer'::text])))"
+    },
+    {
+      "name": "business_claim_requests_pkey",
+      "type": "p",
+      "table": "business_claim_requests",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "business_claim_requests_status_check",
+      "type": "c",
+      "table": "business_claim_requests",
+      "validated": true,
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'auto_approved'::text])))"
+    },
+    {
+      "name": "businesses_claim_state_check",
+      "type": "c",
+      "table": "businesses",
+      "validated": true,
+      "definition": "CHECK ((claim_state = ANY (ARRAY['owned'::text, 'unclaimed'::text, 'claim_pending'::text])))"
+    },
+    {
+      "name": "businesses_featured_video_provider_check",
+      "type": "c",
+      "table": "businesses",
+      "validated": true,
+      "definition": "CHECK (((featured_video_provider IS NULL) OR (featured_video_provider = ANY (ARRAY['youtube'::text, 'vimeo'::text, 'facebook'::text]))))"
+    },
+    {
+      "name": "businesses_network_exposure_reviewed_by_fkey",
+      "type": "f",
+      "table": "businesses",
+      "validated": true,
+      "definition": "FOREIGN KEY (network_exposure_reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "businesses_network_exposure_status_check",
+      "type": "c",
+      "table": "businesses",
+      "validated": true,
+      "definition": "CHECK ((network_exposure_status = ANY (ARRAY['none'::text, 'pending'::text, 'approved'::text, 'revoked'::text])))"
+    },
+    {
+      "name": "businesses_organization_id_fkey",
+      "type": "f",
+      "table": "businesses",
+      "validated": true,
+      "definition": "FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "businesses_pkey",
+      "type": "p",
+      "table": "businesses",
+      "validated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "businesses_slug_key",
+      "type": "u",
+      "table": "businesses",
+      "validated": true,
+      "definition": "UNIQUE (slug)"
+    },
+    {
+      "name": "businesses_type_slug_fkey",
+      "type": "f",
+      "table": "businesses",
+      "validated": true,
+      "definition": "FOREIGN KEY (type_slug) REFERENCES public.business_types(slug)"
+    },
+    {
+      "name": "businesses_vanity_slug_format_chk",
+      "type": "c",
+      "table": "businesses",
+      "validated": true,
+      "definition": "CHECK (((vanity_slug IS NULL) OR (vanity_slug ~ '^[a-z0-9]([a-z0-9-]{1,30})[a-z0-9]$'::text)))"
+    }
+  ],
+  "observedAtUtc": "2026-10-15T03:28:20.852805",
+  "serverVersion": "17.6"
+}
