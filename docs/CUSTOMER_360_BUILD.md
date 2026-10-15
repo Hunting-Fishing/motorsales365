@@ -1147,3 +1147,38 @@ failed separately, wrapper`38735096472` preview passed/production-migrations ski
 Verify latest PR #66 HEAD, superseding earlier`040599a` run, before claiming CI.
 No paid resource/tier, production setting or source/authority/release flag changed.
 Next companion revision/invalidation model remains as above; continuation active.
+
+Disposable revision/invalidation follow-up: code `c03fede`, branch
+`security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`. The
+UNWIRED private two-table/five-invoker-function/nine-attachment model now captures
+actual full-fixture claim, evidence and owner metadata changes, reopen/reparent/
+ABA/delete-recreate and legacy approval/transfer/sibling paths. Unknown preexisting
+bindings remain NULL, never initialized to a fabricated trusted zero. Monotonic
+tombstones and exact decimal bigint binding/snapshots survive genuine rollback;
+unsupported rekeys/TRUNCATE and overflow fail closed. Twenty-five focused tests
+pass (46.926 seconds), syntax/lint/format/diff/primary review pass. Full serial
+tooling701/701 passes (761.866 seconds), then receipt assets10/10 (0.228 seconds):
+711 aggregate, zero failures/skips/cancellations, focused included/not double-
+counted. No fresh application run claimed; publication-head verification pending.
+Disposable PostgreSQL18.6 is not live17.6/independent-session parity. Evidence:
+`evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`.
+
+Private schema/ACL/invoker restrictions and isolated real-constraint rollback
+checks follow the Supabase/PostgreSQL skills. This is not a migration, original-
+human/fresh-session/role/tenant authorization, private evidence-byte attestation,
+atomic executor/ledger or independent-session concurrency proof. Seven omitted
+business attachments and bypass/verified epoch initialization still require closure.
+Parent PR #65 `3040a1e` and PR #66 `02cb49f` now passed all six CI gates
+(`38735096453`/`38735428535`); hosting failed separately, migration/production
+deployment skipped. Verify this slice's publication HEAD separately.
+
+Next trusted original-reviewer custody/fresh authority, all-writer/epoch/private-
+object closure, then UNWIRED atomic pending/current-owner/attempt/evidence/tenure/
+payload-ledger/audit-receipt executor and common lock protocol. Native/team/
+offboarding/private-storage/recovery/runtime/independent-PostgreSQL-session and
+all prior Customer 360 consent/history release gates remain open. Do not repeat
+completed model/codec/recovery or adopt legacy positives. Safe internal-staff
+caller acknowledgment/lifetime remains independent. Source404/423,19 unclassified;
+all baseline/replay/parity/release flags unchanged. No live query/mutation/migration/
+deploy, paid resource, customer communication, production deletion, restriction
+replay, PR merge or duplicate automation; single continuation active.
