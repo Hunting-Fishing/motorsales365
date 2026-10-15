@@ -29,10 +29,11 @@ Security reconciliation branch: `completion/365-security`.
    offline policy proof distinguishes raw constant writes from filtered/returning
    commands. Six chat writers and real message/notification attachments are now
    rehearsed with their selected current metadata, including dual fanouts,
-   invoker timestamp behavior and void no-ops. Next implement the separate caller
-   acknowledgement/error/late-result contract without treating void as a confirmed
-   mutation, then define/test
-   the companion authority contract; resolve the initial
+   invoker timestamp behavior and void no-ops. The separate caller acknowledgement/
+   error/late-result contract is now implemented locally without treating void as
+   a confirmed mutation (draft PR #38); verify its remote checks, then implement
+   the separate disposable companion-candidate negative controls from the new
+   proposed authority contract. Resolve the initial
    dependency inventory's identity, role/module helper and trigger/security
    attachment closure; rehearse the companion roster/native guard with actual
    constraints and all trigger effects. Keep unknown bindings and offboarding
@@ -55,16 +56,18 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #32, documentation head `9edbd21`, all six
-CI gates passed (run `38646246443`),723 application tests. These are review
+Latest fully CI-verified application code slice: PR #38, code head `22c2724`, all six
+CI gates passed (run `38659076609`), 986 application tests. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
-Latest application candidate: draft PR #32, code `dff0aa8`,723 application tests
-across47 files and full TypeScript pass; all six CI gates verified above. It switches
-reminder reads to the caller-only single-RPC API and keeps writes gated. The API
-is unapplied: do not ship the consumer before compatible database, native
-authority and recovery release prerequisites.
+Latest application candidate: draft PR #38, code `22c2724`, 986 application tests
+across 53 files and full TypeScript pass. It hardens six chat command callers and
+their UI lifetimes without changing database authority; all six code-head gates
+passed, and the following documentation head requires its own next-run check.
+PR #32's reminder consumer is retained in this stack and its
+API remains unapplied: do not ship before compatible database, native authority
+and recovery release prerequisites. No application candidate is deployed.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
@@ -597,8 +600,9 @@ is explicitly fixture-only; auth/session/business/public_profiles READ supports
 are synthetic. Current public_profiles/view/profile RLS, full original-human/
 role/default privilege/writer closure, hosted API and concurrency remain unverified.
 Exact evidence and test/source pins: `evidence/NATIVE_CHAT_WRITER_COMPOSITION_PROOF.md`.
-Remote CI awaits verification on the published documentation head; application
-source remains the previously CI-verified 723-test parent.
+Documentation head `1abcab4` passed all six CI gates (run `38656320823`), verified
+on this resume; application source remains the previously CI-verified723-test
+parent. Independent hosting still fails; the green preview wrapper is not upload.
 
 Migration impact: none. Deployment: none; no production permissions/data/history/
 platform mutation. Selected inventory and global correspondence remain unchanged
@@ -607,18 +611,89 @@ promoted. Separate hosting failure/skipped production migrations/deploy persist;
 sparse artifacts must not deploy. Pending bootstrap/totals approval is unchanged,
 with no repeated prompt or automatic application.
 
-Exact next action: verify PR #37 checks, then implement/test bounded messaging
-caller acknowledgement and context handling: stop automatic read-state success
-after resolved RPC errors, strictly validate create UUID/invite counts, suppress
-late account/thread callbacks and avoid claiming void results confirm a row
-transition. Preserve ambiguity after dispatched failures: refresh before retry,
-no automatic mutation retries, no service fallback or fabricated success.
+The following bounded messaging caller acknowledgement/context slice is now
+implemented locally (see next checkpoint): no automatic read-state success after
+resolved errors, strict UUID/count results, late-context suppression and explicit
+void-unverified acknowledgements. Dispatched failures remain ambiguous: refresh
+before retry, no automatic mutation retries, service fallback or fabricated success.
 Continue the offline native companion immutable-identity/self-shift/owner/
 delegation/provenance/valid-offboarding/multi-roster/original-actor audit contract
 and independent-session concurrency; selected chat proof does not resolve all
 authority or adopt a production bypass. Keep separate baseline/forward/private
 storage recovery, actual API/JWT/role/load, consent/tenure/retention, OCR recovery/
 owner/mobile pilot, trusted entry/invoicing/retail/recruitment and hosting gates.
+
+## Latest messaging request-confirmation checkpoint (2026-10-15)
+
+Draft PR #38 (`https://github.com/Hunting-Fishing/motorsales365/pull/38`), code
+`22c2724f6607a9a4b69986d4b4d269eafb219149`, branch
+`completion/messaging-request-confirmation`, stacked on verified PR #37 docs
+`1abcab4` (all six CI gates, run `38656320823`). Six chat callers now use a strict
+fixed-bearer server POST transport preserving original HTTP status. Local locked
+SDK inspection found empty HTTP404 normalized to error-null/204; the new transport
+rejects that without reading private error bodies or retrying. Modern publishable
+keys/hosted HTTPS Supabase origins are required; actual server configuration and
+HTTP/JWT acceptance remain unverified. No generated auth middleware is changed.
+
+Create UUID/invite count (valid zero included) are validated at server/client.
+Void is explicitly acknowledged/effect-unverified, not joined/left/read success.
+Dialogs and route fence synchronous duplicate submits, close/reopen, account/
+thread A-B-A, cancellation/unmount and late failures/successes. Automatic read
+does not fabricate browser timestamps/membership or retry the same watermark;
+manual unread is not immediately undone. Complete/latest browser snapshots
+replace staged publications; resolved errors are generic and failed refresh
+hides old rows/maps. Route group actions wait during refresh, but the prior
+same-account snapshot remains visible while pending. Browser/RLS/cap/non-atomic
+limitations and DM/offer/upload/thread-state/direct-message exclusions are explicit
+in `evidence/MESSAGING_REQUEST_CONFIRMATION.md`.
+
+Verification: 263 new focused tests (176 adapter/parser, 43 dialog, 26 hook,
+18 route/reader); full application 986/986 across 53 files (79.00s), report checker
+exit 0/no quarantined failures. Final stable full TypeScript passes. Lint-only
+stable alias cleanup additionally passes all 10 route tests. Focused ESLint zero
+errors/10 explicit native-schema/legacy `any` warnings; formatting/diff pass.
+Independent source review found and corrected the late-consumer check and manual
+unread auto-undo defects; bounded re-review is clean. All transport/UI reads and
+writes in new tests are mocks, not live API/SQL/delivery/concurrency acceptance.
+No SQL tooling changed. Full sequential tooling was re-run on this candidate:
+259/259 pass (157.79s), including immutable source/provenance/security/OCR/PDF
+checks and memory-only SQL proofs, not live database acceptance.
+Code head `22c2724` passed all six CI gates (run `38659076609`), verified before
+documentation publication. Deploy wrapper `38659076487` has preview-wrapper
+success, production migration/deploy skipped, separate Workers Builds failure
+`a9ef2dc0-2476-4978-92dc-807fd9b94321` and Supabase Preview skipped. The new
+documentation head's checks require separate verification on the next resume.
+
+Migration impact: none. Deployment: none. No live business records/counts,
+application RPCs/messages, grants/history repair, paid resources or platform
+mutation. Approved converter-only containment is not modified; the separate
+bootstrap/totals decision remains pending and was not re-requested. Global
+404/423 correspondence with 19 unclassified sources, selected-inventory unknowns
+and all false release/parity/replay/baseline flags remain unchanged. Sparse local
+artifacts must not deploy; separate hosting failure/skipped production release
+cannot be replaced by CI or the green preview wrapper.
+
+The next phase's `evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md` is now drafted
+and reviewed as **design-only, not adopted/implemented/applied**. It separates
+identity-value freeze/unchanged upsert keys/legacy IDs, privileged no-op targets,
+harmless active self-shift, independently evaluated ownership, unresolved
+delegation/invitation provenance, trusted business-team classification and valid
+atomic offboarding/multi-roster/original-actor recovery/concurrency requirements.
+Writing `left` alone does not fix raw self reentry/retargeting. No new schema or
+production guard is supplied and no unresolved decision is adopted.
+
+Exact next action: verify PR #38 latest head/checks, then implement one separate
+disposable companion candidate with pinned actual constraints/all three staff
+attachments. Start identity-value freeze and harmless active-self-shift controls,
+preserving unchanged authorized conflict keys and legacy IDs, plus privileged
+no-op negative controls. Keep unresolved owner/delegation/provenance/multi-roster
+positive cases gated; do not insert permissive supporting authority stubs or
+declare existing characterization a fix. Continue native ownership/provisioning/
+role and trusted team writer closure, then valid atomic offboarding and independently
+reviewed transaction/real-session concurrency/recovery. Keep baseline/storage,
+consent/tenure, actual role/API/config/load, receipt/mobile pilot, trusted entry/
+invoicing/retail/recruitment and hosting acceptance open. The heartbeat stays
+active; no duplicate automation or repeated unchanged owner prompt is created.
 
 ## Recovery evidence (original scope, retained below)
 
