@@ -145,6 +145,9 @@ jobs:
       - name: Nonempty referral bounty and assignment actual forward (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/referral-financial-forward.test.mjs
 
+      - name: Full nonstaff Auth referral and real partner intent forward (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/auth-referral-intent-bootstrap.test.mjs
+
       - name: Claim review current caller and unwired command contracts (never quarantined)
         run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
 
