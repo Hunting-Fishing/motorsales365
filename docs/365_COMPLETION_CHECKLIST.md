@@ -48,8 +48,15 @@ Security reconciliation branch: `completion/365-security`.
    offline in draft PR #44 (`aad4f26`), with 19 focused and 375 total tooling/
    receipt-asset tests. It is not trusted
    original-actor authority, a complete roster guard or production mitigation.
-   Verify its latest checks, then recover the ownership-claim/transfer guard/audit
-   chain before owner positives and close trusted team/ownership/
+   Its documentation head `14e92c9` passed all six CI gates (`38675678245`),
+   verified on the ownership follow-up; hosting remains separately failed.
+   The selected ownership-claim/guard/audit composition is now implemented/tested
+   offline in draft PR #45 (`340f2ca`): 19 focused and 394 tooling/receipt-asset
+   tests pass. Read-only catalog recovery confirms approval remains service-only;
+   zero-row approvals and attribution/repetition gaps are rehearsed, not repaired.
+   Eight business attachments remain excluded, especially owner-intent/global
+   profile/audit recomputation. Verify latest checks and close that chain before
+   owner positives, then close trusted team/ownership/
    shift/audit dependencies before adopting privileged positives. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
    PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
@@ -1104,6 +1111,11 @@ Hosting `d6a78c2b-157f-4d13-8904-2300c7c91cd2` failed separately; wrapper
 `fc69c404-608a-4572-b6ed-4d719328ba50` failed separately and wrapper
 `38675228305` skipped migrations/production deployment. Later documentation head
 needs its own next-resume check; no preview-wrapper upload evidence is inferred.
+That later documentation head `14e92c9` now passed all six CI gates
+(`38675678245`), verified on the ownership follow-up. Hosting
+`48a25fc2-0fc3-4c5e-aa08-d3fad494bc49` failed separately and wrapper
+`38675678310` skipped migrations/production deployment; native candidate/release
+authority remains unchanged.
 
 This **memory-only, unapplied, non-adopted selected-writer prototype** inserts
 one unconditional distinctive 42501 before the latest native sync member's first
@@ -1183,6 +1195,78 @@ restore, real JWT/API/role/session/concurrency, consent/tenure, OCR/mobile/owner
 pilot and full-media hosting remain open. No paid resources, communications,
 data/history repair or sparse deployment. Existing heartbeat stays active without
 duplicate automation or premature live approval requests.
+
+## Selected ownership-claim composition checkpoint (2026-10-15)
+
+Draft PR #45, code `340f2ca6748bba195ab668f5d42b0feff4409361`, branch
+`security/native-ownership-claim-composition`, stacked on PR #44 docs `14e92c9`.
+The parent passed all six CI gates (`38675678245`). Initial code CI
+`38677704083` has five gates passed/unit pending at capture; hosting
+`7d3c4c7b-d199-43f2-9d9e-1f0128a74613` failed separately and wrapper
+`38677704186` skipped migrations/production deployment. Subsequent docs head
+needs its own next-resume check. No preview-wrapper upload evidence is inferred.
+
+One reviewed READ ONLY catalog transaction at 03:28:20.852805 UTC (PG 17.6)
+recovered seven function signatures, three relations, 33 selected columns,
+twelve policies and twelve noninternal attachments. No customer/business/auth/
+claim/audit rows or business counts, application helper call, DDL, privilege or
+data/history change. Exact query/dated JSON pins and five static contracts are
+retained. Approval remains postgres/service-only; an August skip-revoke list is
+not a GRANT. Raw broad ALL table rights are distinguished from RLS row-command
+authorization; non-row privilege/API reachability is not accepted by this proof.
+
+The unchanged-source disposable fixture composes 11 whole-source pins, 34 bounded
+sections, six functions, twelve actual policy renderings and four attachments.
+Actual claim/audit columns/defaults/CHECKs/PKs/FKs match dated metadata; each
+ignored PG18 NOT NULL entry is first validated as single-key/validated/backed by
+the exact same-table not-null column. Five full selected function contracts and
+the actual business timestamp's body/full-definition/raw ACL match; no extra
+dated effective-rights contract is inferred for that timestamp. Business/auth/
+public-role storage supports remain reduced/synthetic, no invented identity FKs.
+Eight business attachments, including owner-intent recomputation, are excluded
+and never permissively stubbed. This is not complete ownership transaction/
+writer/role/incoming-attachment closure or native reconciliation.
+
+Verification: 19/19 focused (12.841s); final full tooling in consecutive serial
+commands, 384/384 scripts/ci (308.755s) and 10/10 receipt assets (2.559s), 394 total,
+no failures/skips/cancellations. Syntax/lint/format/diff and independent metadata/
+query plus main source/test/document review pass. A dedicated never-quarantined
+memory-only CI gate is added; application changes are a separate slice.
+
+New controls show ordinary owned-business zero-row approval still approves/
+rejects siblings; transfers overwrite owner and add explicit NULL-actor entries;
+rejected/repeated approvals lack preconditions/idempotency. Stored reviewer or
+synthetic subject attribution is not original-human proof. Separate later reviewer
+stamping cannot retroactively attribute the decision, and its failure does not
+undo the earlier committed outcome. Source-pinned server ordering is a two-request
+SQL analogue, not handler execution. Actual protected-field guard behavior and
+real late audit CHECK rollback preserve selected state, without widening CHECKs
+or repairing original SQL. No currently observed production business incident is
+claimed; role/settings fixtures are not hosted JWT/API/session evidence.
+
+Migration impact: none. One live read-only catalog call; live business/helper
+execution, mutations/deployment: none. Preserve all three applied legacy
+restrictions without replay. Global composer remains 404/423 with 19 unclassified;
+baseline/replay/parity/release flags stay false. Source and artifact pins/limits:
+`evidence/NATIVE_OWNERSHIP_CLAIM_COMPOSITION_PROOF.md`.
+
+Exact next action: verify latest PR #45 head/checks; finish the separately tested
+browser returned-row/prior-owner/lifetime hardening without broadening RLS or
+claiming audited/native transfer. Then recover and compose the actual owner-intent
+trigger → recompute_signup_intent → derive_signup_intent → global role/profile/
+admin-audit dependencies, reusing existing incoming inventory. Its effects and
+audit-failure handling remain outside this proof. Resolve original actor,
+pending/current-owner conflict, atomic reviewer stamping, idempotent outcomes and
+independent-session/recovery/operator prerequisites before an authorized forward
+claim/transfer candidate or native owner positives. The unmapped has_role body
+is not executed or silently substituted; actual can_moderate reads public roles
+directly. Native and platform role authority are different unresolved boundaries.
+
+Trusted team/raw reentry, management/delegation/invitation/multi-roster policy,
+shift/audit/other privileged writers, full DB/private-storage restore, consent/
+tenure, real API/session/concurrency, receipt/mobile/owner pilot and full-media
+hosting remain open. No paid resources, customer communications, data/history
+repair or sparse deployment; existing heartbeat stays active without duplication.
 
 ## Recovery evidence (original scope, retained below)
 

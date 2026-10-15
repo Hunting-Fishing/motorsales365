@@ -456,11 +456,37 @@ Identity/shift-only chat bypasses remain explicit; PR #39 composition has a test
 specific install/recovery order, not automatic ACL-prototype adoption.
 
 See `evidence/NATIVE_STAFF_SYNC_CONTAINMENT_CANDIDATE.md` for pins and limits.
-PR #43 docs `3bf5f43` passed all six gates; this latest slice still needs its own
-head check. Migration impact/live DB calls/deployment: none. Preserve the three
+PR #43 docs `3bf5f43` passed all six gates; PR #44 docs `14e92c9` now also passed
+all six (`38675678245`), verified on the ownership follow-up. Hosting remains
+separately failed and migrations/production deployment skipped. Migration
+impact/live DB calls/deployment for that prototype: none. Preserve the three
 applied helper restrictions without replay. Next recover and compose ownership-
 claim/transfer guard/audit provenance before native owner positives, then trusted
 team/original-actor shift/audit and other writers. Error-free zero-row browser
 transfer and later unchecked reviewer stamping are not confirmed/audited transfer.
 No baseline/parity/release flag changes; all existing recovery/consent/tenure/
 API/session/concurrency/OCR/mobile/full-media hosting gates remain open.
+
+Draft PR #45 (code `340f2ca`) now characterizes the selected unchanged ownership-
+claim/guard/audit path offline. One read-only catalog transaction confirms approval
+is still service/SQL-owner only and records selected current metadata; no customer
+rows/counts, business helper call, DDL/grant/data/history change or deployment.
+19 focused tests and 394 full tooling/receipt-asset tests pass in consecutive
+serial commands (384 CI-tooling plus 10 assets). Main source/test and independent
+metadata/document review pass; latest CI needs its own head verification.
+
+Zero-row ordinary approval, repeated/rejected approval and NULL/stored-reviewer
+attribution are source behaviors, not accepted business policy or production
+incidents. The actual claim/audit constraints, twelve policies and four selected
+attachments remain unchanged. Eight other business attachments—including the
+owner-intent/global profile/audit chain—are excluded rather than stubbed, so full
+owner transaction/native reconciliation is not established. No original-human
+authority, migration provenance or baseline/parity/release flag is promoted.
+
+See `evidence/NATIVE_OWNERSHIP_CLAIM_COMPOSITION_PROOF.md` for exact scope/pins.
+Next complete the separate browser confirmation/lifetime slice, then actual
+owner-intent/derive/global-role/profile/audit and atomic attributable claim/transfer
+dependencies before native owner positives. All recovery/consent/tenure/role/API/
+session/concurrency/OCR/mobile/full-media hosting gates remain open. Preserve the
+three applied legacy restrictions without replay; recurring continuation remains
+active without duplicate automation.
