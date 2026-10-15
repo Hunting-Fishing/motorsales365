@@ -328,5 +328,29 @@ role controls. Reuse completed bootstrap evidence rather than repeating it; no
 current effective policy/ACL or applied-history acceptance is implied. Then close
 ownership claim/transfer, team membership and original-actor shift/audit writers
 before approving privileged positives or atomic offboarding. PR #39 code `62f4c4b`
-passed all six CI gates (run `38661636502`); the subsequent documentation head
-requires its own next-run check. Hosting remains separately failed; no deployment.
+passed all six CI gates (run `38661636502`); docs `6bfde57` also passed all six
+(run `38662121967`), verified on the profile/role follow-up. Hosting remains
+separately failed; migrations/production deployment skip and no deployment is claimed.
+
+Draft PR #40 (`58a63d6`) now composes the selected current native profile/role
+policy boundary with unchanged source and actual relevant constraints. One
+reviewed catalog-only SELECT confirms three tables, three helpers and no selected
+noninternal attachments; no business rows/counts or application RPCs were read.
+The actual roles catalog policy is FOR ALL/non-NULL-current-shop with client CRUD,
+not the original SELECT-only policy. Offline profile pivots and catalog-label
+changes affect helper authority; this is a security gate, not a fix or live exploit.
+
+22/22 focused and 299/299 full sequential tooling tests pass, plus lint/format/
+diff and independent bounded review. Publication CI `38664737680` is pending at
+this checkpoint; wrapper migrations/production deployment skip. See
+`evidence/NATIVE_PROFILE_ROLE_POLICY_PROOF.md` for exact pins, PG18 NOT NULL/
+OID-header normalization and synthetic/legacy/incoming-FK/indirect-writer limits.
+Application source remains unchanged from the CI-verified 986-test parent.
+
+Next: verify PR #40's latest checks, then prepare/test the narrow offline native
+roles-catalog write restriction with exact preconditions, preserved SELECT and
+explicit guarded recovery. It requires separate live approval only after readiness;
+the prior converter approval does not apply. Then close mutable profile/bootstrap,
+claim/team and shift/audit writers before accepting tenant authority or offboarding.
+All baseline/storage, consent/tenure, actual API/concurrency, OCR/mobile/owner pilot
+and hosting release gates remain open; no migration or deployment occurs.
