@@ -159,6 +159,13 @@ or annotations. Wrapper `38778102490` preview passed, migration/production skipp
 The new publication needs its own exact-head checks; prior CI is not current
 source, deployment or live behavior.
 
+Follow-up before the next list publication: exact invoice evidence head
+`86c10c1d2777031be0786acc97e57dbbee049688` passed all six CI gates in
+`38784952101`. Independent hosting `9e90f3b6-f999-4ed0-b77c-6da1a6d250c7`
+failed with ID/link only and no root-cause text/annotations. Wrapper `38784952185`
+preview used its configured `DEPLOY_VIA_ACTIONS` skip path; migrations/production
+skipped. This supersedes the pending invoice-head check state, not live acceptance.
+
 Migration impact/deployment: none. Sole hosted 365 backend remains
 `wjxaajgvddtrxxtocxen`; 366 AI and Barangay Buddy remain untouched. No SQL/history
 repair, restriction replay, live financial/Auth mutation, provider/email change,

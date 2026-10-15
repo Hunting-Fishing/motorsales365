@@ -1435,3 +1435,33 @@ tracked public Git/source/output checks pass at `0c23d336`; changed-line lint
 has zero errors/warnings. Source guards 103/103 and release/report/inventory/assets
 75/75 pass (five inventory tests overlap). Build warnings remain; no application
 upload or live acceptance is inferred.
+
+## Native commerce lists and confirmed relationship selection (2026-10-16)
+
+Same branch/draft PR #68, source `8302c62d`: quote and work-order list readers now
+require current signed-in/account/per-mount lifetimes, bounded visible counts,
+generic manual retries and no stale/false-empty private records. Native UUID/
+date/received amount handling is explicit; hidden nullable joins are unavailable,
+not absent. Scoped work-order detail callbacks refresh current-account list
+lifetimes and customer/vehicle histories. Four duplicated relationship names were
+confirmed by read-only system-catalog metadata, and list/detail select explicit
+existing FK hints. No SQL write, relationship removal or business/Auth data read.
+
+138 new list tests (93 quote +45 work-order), focused integration 152/152 including
+14 strengthened existing detail tests (11.03s), full application 2,314/2,314 across
+76 files (124.92s), full TypeScript/report/format checks and independent review
+pass. Six existing CI gates pin an OS family with two offline wiring guards;
+release/migration freezes and provider settings unchanged. Selected column metadata
+also confirms current quote-conversion labor/part payload mismatches and required
+part_type omission. No conversion or live transaction was executed. This remains
+next work alongside quote-detail/creation and original-human/fresh role/shop,
+atomic money/stock/dedupe/recovery acceptance, not a complete financial flow.
+Evidence/limits/next dependency: `evidence/NATIVE_COMMERCE_LIST_LIFETIMES.md` plus
+its two canonical catalog JSON captures. New email modules remain inactive; other
+projects are untouched. No staging/owner/live or whole-schema/replay claim follows.
+Fresh complete build/Worker/canonical backend/OCR/PDF/server boundary and all 214
+tracked public Git/source/output checks pass at `8302c62d`; seven-file changed-line
+lint has zero errors/warnings, with 15 older findings outside changed lines.
+Source guards 103/103, release/report/inventory/assets 75/75 and new CI wiring
+guards 2/2 pass (five inventory tests overlap). Build/accessibility warnings and
+real-role/financial/private-storage/recovery/owner acceptance remain open.

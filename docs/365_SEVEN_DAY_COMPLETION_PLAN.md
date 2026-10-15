@@ -72,8 +72,15 @@ Private read lifetimes, complete visible-row counts and every retained follow-up
 acknowledgment are checked; uncertainty is not success. Separate writes remain
 non-atomic. Quote/work-order list/create/conversion bindings, authorized atomic
 money/stock writers and connected refund execution are concrete Day 2/3 dependencies.
-Next safe slice is C3.01–C3.04 quote/work-order callers, not another email-only
-proof or a claim that passing UI tests satisfy financial/recovery acceptance.
+Quote/work-order list readers and explicit verified relationships at `8302c62d`
+add 138 tests; full application 2,314/2,314 and TypeScript pass. Native date/UUID/
+amount compatibility and RLS-visible count/cached-read boundaries are explicit.
+Two narrow canonical catalog reads confirm duplicate FK names and incorrect
+quote-conversion child fields, not runtime/schema/baseline acceptance. Six CI
+jobs pin Ubuntu24.04 for candidate stability; deployment/migration gates unchanged.
+Next safe slice is quote-detail lifetimes/complete items and schema-correct,
+current-shop-bound C3.02–C3.04 creation/conversion, alongside actual atomic financial/
+stock writers and recovery. Passing lists do not satisfy the end-to-end flow.
 
 Independent hosting failure still needs authenticated diagnostic/configuration
 access. Local synthetic API/Auth/private-storage/transaction and restore acceptance

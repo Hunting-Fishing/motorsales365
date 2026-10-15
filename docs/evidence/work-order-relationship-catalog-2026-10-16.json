@@ -1,0 +1,41 @@
+{
+  "formatVersion": 1,
+  "mode": "read-only-selected-system-catalog",
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOnAsiaManila": "2026-10-16",
+  "repositoryHeadAtObservation": "86c10c1d2777031be0786acc97e57dbbee049688",
+  "checkoutHadUncommittedImplementation": true,
+  "scope": "Only four work_orders foreign-key definitions from pg_catalog. No business rows, Auth rows, private objects, stored-function bodies or server files read; no write or schema change.",
+  "query": "SELECT con.conname AS constraint_name, con.conrelid::regclass::text AS source_table, con.confrelid::regclass::text AS target_table, pg_catalog.pg_get_constraintdef(con.oid) AS definition FROM pg_catalog.pg_constraint AS con WHERE con.contype = 'f' AND con.conrelid = 'shop_manager.work_orders'::regclass AND con.confrelid IN ('shop_manager.customers'::regclass, 'shop_manager.vehicles'::regclass) ORDER BY con.conname LIMIT 10;",
+  "rows": [
+    {
+      "constraint_name": "fk_work_orders_customer",
+      "source_table": "shop_manager.work_orders",
+      "target_table": "shop_manager.customers",
+      "definition": "FOREIGN KEY (customer_id) REFERENCES shop_manager.customers(id) ON DELETE SET NULL"
+    },
+    {
+      "constraint_name": "fk_work_orders_vehicle",
+      "source_table": "shop_manager.work_orders",
+      "target_table": "shop_manager.vehicles",
+      "definition": "FOREIGN KEY (vehicle_id) REFERENCES shop_manager.vehicles(id) ON DELETE SET NULL"
+    },
+    {
+      "constraint_name": "work_orders_customer_id_fkey",
+      "source_table": "shop_manager.work_orders",
+      "target_table": "shop_manager.customers",
+      "definition": "FOREIGN KEY (customer_id) REFERENCES shop_manager.customers(id) ON DELETE SET NULL"
+    },
+    {
+      "constraint_name": "work_orders_vehicle_id_fkey",
+      "source_table": "shop_manager.work_orders",
+      "target_table": "shop_manager.vehicles",
+      "definition": "FOREIGN KEY (vehicle_id) REFERENCES shop_manager.vehicles(id) ON DELETE SET NULL"
+    }
+  ],
+  "limits": [
+    "Selected metadata confirms relationship names only, not API schema-cache resolution or real-role/JWT/RLS behavior.",
+    "No global schema, ACL, trigger, data, baseline, migration replay, recovery, owner, deployment or live acceptance is established.",
+    "Duplicate constraints are preserved; explicit reader hints are a source fix, not authorization to delete constraints or change production."
+  ]
+}

@@ -40,7 +40,46 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest invoice caller slice: `0c23d336`, same branch/draft PR #68. List/detail
+Latest quote/work-order list slice: `8302c62d`, same branch/draft PR #68. Both
+readers now use Auth-loading/account/per-mount private lifetimes, fixed 101/100
+visible-row bounds, qualified counts, generic manual retry and no stale/false-empty
+views. Native UUID aliases, received amounts and native date/time cohorts are
+handled without invented financial/date policies. Hidden/null customer/vehicle
+embeds are unavailable, not absent; matched IDs alone get links. The obsolete
+legacy-source/new-form advice is removed without claiming form acceptance.
+
+Two bounded read-only catalog checks on the sole 365 project verified duplicate
+work-order customer/vehicle FK pairs and selected quote-conversion child columns.
+List/detail readers use explicit confirmed relationship names; no constraints,
+schema or business/Auth rows were changed or read. Quote conversion still sends
+nonexistent labor/part columns and omits required part_type, with four separate
+writes and unfenced callbacks. Correct mappings alone would not make it atomic.
+
+138 new tests (93 quote +45 work-order list), focused integration 152/152 including
+14 strengthened existing detail tests (11.03s), fresh full application 2,314/2,314
+across 76 files (124.92s), full TypeScript/report/format checks pass; zero failures/
+skips/quarantine. Six CI jobs pin Ubuntu24.04 with two offline guards, preserving
+Node22/Postgres17/job count and release/migration freezes. It is an OS-family pin,
+not immutable image proof. Existing any/dialog/build warnings remain. Evidence:
+`evidence/NATIVE_COMMERCE_LIST_LIFETIMES.md` and two dated catalog JSON captures.
+
+Fresh complete build/Worker/canonical backend/OCR/PDF/server boundary and all 214
+tracked public Git/source/output checks pass at `8302c62d`. Changed-line lint
+across seven files has zero errors/warnings and 15 pre-existing findings outside
+changed lines. Source guards 103/103, release/report/inventory/assets 75/75 and
+new CI wiring guards 2/2 pass; five inventory tests overlap. This is local artifact/
+source evidence, not API/private-storage/financial/recovery/owner acceptance.
+
+Prior published invoice head `86c10c1d` passed all six CI gates (`38784952101`).
+Independent hosting `9e90f3b6-f999-4ed0-b77c-6da1a6d250c7` failed with ID/link
+only, no diagnostics. Wrapper `38784952185` preview used its configured skip path;
+migrations/production skipped. New head needs exact checks. Next safe dependency
+is quote-detail private lifetimes/complete items, then schema-correct current-shop
+create/conversion acknowledgments plus actual atomic financial/stock writers.
+No deployment, migration, restriction replay, provider activation, customer send
+or resource creation. Real-role/API/private-storage/recovery/owner gates remain.
+
+Previous invoice caller slice: `0c23d336`, same branch/draft PR #68. List/detail
 reads now require current account and per-mount lifetimes, matching private rows,
 explicit visible-row completeness and independent generic retries. Unknown/capped
 reads are not empty or complete; recorded payment entries are not settlement.
@@ -336,11 +375,12 @@ further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
 without repeating it or adopting future proposals. Complete action-level feature
 acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
 The inactive native reservation/provider boundary is implemented at `0271fc09`;
-invoice C3.10–C3.12 caller acknowledgments/lifetimes are hardened at `0c23d336`.
+invoice C3.10–C3.12 caller acknowledgments/lifetimes are hardened at `0c23d336`,
+and C3.01/C3.04 list readers plus explicit work-order relationships at `8302c62d`.
 Do not repeat those slices or infer durable/live acceptance. Next safe integrated
-source work is C3.01–C3.04 quote/work-order list/create/conversion binding,
-starting with the read-only quote list's lifetime/completeness/error tests, then
-readiness and acknowledgment tests using the existing real QueryClient/deferred
+source work is quote-detail private lifetimes and complete source items, then
+C3.02–C3.04 schema-correct current-shop create/conversion bindings and
+acknowledgment tests using the existing real QueryClient/deferred
 SDK harness, while replacing separate writes with authorized atomic commands.
 In parallel, close actual atomic Auth ingress/lease/fenced completion, consent
 and financial/stock writers with isolated transaction/recovery acceptance.
@@ -359,7 +399,8 @@ recovery boundaries as the staging integration path, not an endless lab chain.
 Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration
 impact/deployment none; zero live business/Auth mutation, restriction replay,
 history repair, customer message, paid resource, PR merge or duplicate automation.
-No live project/business data was read for the current invoice caller slice. The heartbeat remains active.
+Current list slice read only two bounded system-catalog selections on the canonical
+project, no business/Auth rows or private objects. The heartbeat remains active.
 
 Published/attached draft PR #68:
 `https://github.com/Hunting-Fishing/motorsales365/pull/68`, base PR #67 branch
