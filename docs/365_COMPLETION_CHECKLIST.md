@@ -15,6 +15,30 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed core structural slice: draft PR #58, code `734d3b4`, recovers
+profiles/internal settings/plans/subscriptions at `08:23:01.783433` UTC: 4 tables,
+90 columns, 17 critical constraints, 16 indexes/policies, 10 attachments and 165
+guarded structural pieces. All facets/function/type fingerprints match PR #55;
+no app/Auth/config rows/counts, raw function bodies, helper calls or live sequence
+values. Composes unchanged PR #57 structures into seven empty public tables:
+129 columns/27 critical constraints/24 indexes and exact PR #55 sequence
+configuration. Policies/functions/attachments deliberately not installed; both
+public and synthetic Auth tables must stay empty. Not signup/authority, original
+migration, single atomic production baseline or release acceptance.
+Thirteen focused and 532 tooling/assets pass (522 serial plus separate 10), zero
+failures/skips/cancellations; syntax/lint/format/canonical JSON/diff/primary review
+pass. One core READ ONLY execution, zero migrations/mutation/deployment.
+Evidence: `evidence/BOOTSTRAP_CORE_STRUCTURE_RECOVERY.md`. New PR #58 requires
+its own latest-head checks. Next close actual business-owner read/admin-audit
+metadata/source, then ordinary no-referral Auth bootstrap with all real effects,
+tier/plan/configuration/sequence prerequisites and critical constraints. Do not
+repeat core/org/tier/three-function recovery, substitute helpers, strip constraints
+or adopt catalog-derived DDL as original migration history. Nonempty referral
+writers and known trial ANY/staff seller NULL-enum problems remain separate open
+release blockers. All remaining authority/recovery/receipt/mobile/owner/full-media
+gates stay open; no sparse deploy, helper replay, paid resource, customer message,
+data deletion, PR merge or duplicate automation. Existing single continuation active.
+
 Newest completed structural slice: draft PR #57, code `e859bed`, recovers current
 org/member/tier structure at `07:59:37.940729` UTC: 3 tables/39 columns/10 critical
 constraints/8 indexes/9 policies/3 attachments/78 guarded pieces. Reproduces actual
@@ -24,9 +48,10 @@ helpers/attachments intentionally not installed; fixture rejects persistent writ
 so no signup/authority success is inferred. Twelve focused and 519 tooling/assets
 pass (509 plus separate 10); syntax/lint/format/canonical JSON/diff/primary review
 pass. One read-only catalog recovery, zero migration/mutation/deployment. Evidence:
-`evidence/ORG_TIER_STRUCTURE_RECOVERY.md`. New PR #57 CI needs its own checks.
-Next recover full profiles/settings/plans/subscriptions structure, then ordinary
-no-referral bootstrap with actual business-read/intent/admin-audit/sequence and all
+`evidence/ORG_TIER_STRUCTURE_RECOVERY.md`. PR #57 docs `27b3d70` now passed all six
+CI gates (`38704489116`); hosting failed separately, production/migrations skipped.
+The full profile/settings/plan/subscription structure is now recovered in PR #58.
+Continue ordinary no-referral bootstrap with actual business-read/intent/admin-audit/sequence and all
 critical constraints/default prerequisites. Original DDL/history and authority
 remain unadopted; do not repeat current org/tier/three-function recovery.
 

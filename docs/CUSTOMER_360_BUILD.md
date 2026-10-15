@@ -833,3 +833,37 @@ source as original history. Actor/revision/locks/offboarding/native/consent/priv
 history/recovery/receipt/mobile/owner/full-media/release gates remain open. No live
 migration/mutation/deploy, paid resource, customer communication, data deletion, PR
 merge, restriction replay or duplicate automation; single continuation stays active.
+
+PR #57 documentation head `27b3d70` now passed all six CI gates (`38704489116`);
+hosting failed separately, migrations/production skipped. Draft PR #58 (`734d3b4`)
+then recovers the remaining profiles/settings/plans/subscriptions structure:
+4 tables/90 columns/17 critical constraints/16 indexes/16 policies/10 attachments/
+29 function envelopes/5 enums/165 guarded pieces, all prior facets unchanged.
+One READ ONLY diagnostic at `08:23:01.783433` UTC, reviewed before retention;
+no app/Auth/config rows/counts, raw function bodies, helper/sequence operations,
+settings values or mutation. No source history or authority adoption.
+
+The new empty disposable fixture composes unchanged PR #57 org/member/tier
+structure with the four core tables: seven tables/129 columns/27 critical
+constraints/24 indexes and exact PR #55 sequence configuration/ownership/ACL.
+All genuine defaults/NOT NULL/FKs/CHECKs/UNIQUEs remain; only validated backed
+PG18 NOT NULL catalog normalization. No policies/helpers/attachments installed;
+public and synthetic Auth tables must stay empty. No signup/authority acceptance
+or single atomic production baseline is inferred. Thirteen focused and 532
+tooling/assets pass (522 serial plus separate 10), zero failures/skips/cancellations;
+syntax/lint/source+Markdown format/canonical JSON/diff/primary review pass. No fresh
+application run claimed; PR #54's 1,207 tests/TypeScript remain parent evidence.
+New PR #58 requires latest-head checks. Evidence:
+`evidence/BOOTSTRAP_CORE_STRUCTURE_RECOVERY.md`. Zero migration/mutation/deployment.
+
+Exact next dependency: close actual business-owner read and admin-audit metadata/
+source, then compose ordinary no-referral Auth bootstrap with actual profile/org/
+membership/subscription/intent/audit effects and tier/plan/sequence prerequisites.
+Do not repeat completed core/org/tier/three-function recovery, erase FKs, replay
+configuration seeds or substitute success helpers. Business-trial ANY logic and
+staff seller NULL/enum mismatch stay uncorrected release blockers. Nonempty referral
+writers, trusted actor/revisions/common writer locks/offboarding/native/consent/
+private-history/recovery/receipt/mobile/owner/full-media/hosting acceptance remain
+open; source/baseline/replay/parity/release flags unchanged. No sparse deploy,
+helper replay, paid resource, customer message, data deletion, PR merge or duplicate
+automation; existing single continuation remains active.
