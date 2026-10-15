@@ -15,6 +15,21 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed structural slice: draft PR #57, code `e859bed`, recovers current
+org/member/tier structure at `07:59:37.940729` UTC: 3 tables/39 columns/10 critical
+constraints/8 indexes/9 policies/3 attachments/78 guarded pieces. Reproduces actual
+current columns/defaults/constraints/indexes/enums/ACL/RLS in empty discarded DBs,
+using retained tier CREATE and labeled current-catalog org/member DDL. Policies/
+helpers/attachments intentionally not installed; fixture rejects persistent writes,
+so no signup/authority success is inferred. Twelve focused and 519 tooling/assets
+pass (509 plus separate 10); syntax/lint/format/canonical JSON/diff/primary review
+pass. One read-only catalog recovery, zero migration/mutation/deployment. Evidence:
+`evidence/ORG_TIER_STRUCTURE_RECOVERY.md`. New PR #57 CI needs its own checks.
+Next recover full profiles/settings/plans/subscriptions structure, then ordinary
+no-referral bootstrap with actual business-read/intent/admin-audit/sequence and all
+critical constraints/default prerequisites. Original DDL/history and authority
+remain unadopted; do not repeat current org/tier/three-function recovery.
+
 Newest completed reference-source slice: draft PR #56, code `51cb641`, recovers
 exact current definitions for can_manage_org, is_org_member and the creator-owner
 trigger behind pinned fingerprint/header/privacy gates. One READ ONLY execution
@@ -25,7 +40,8 @@ authority acceptance. Creator conflict updates membership to owner, not DO NOTHI
 Evidence: `evidence/ORG_FUNCTION_SOURCE_RECOVERY.md`. Next recover selected current
 org/member/org-role structure and real member-tier metadata/source, preserving
 the tier default `common`, then compose full actual no-referral bootstrap. Do not
-re-read these three definitions or invent stubs. New PR #56 needs its own checks.
+re-read these three definitions or invent stubs. PR #56 docs `7b46012` now passed
+all six CI gates (`38701375439`); hosting failed separately, production/migrations skipped.
 No migration/deployment/production change; single recurring continuation active.
 
 Newest completed inventory slice: draft PR #55, code `34cea88`, retains the
