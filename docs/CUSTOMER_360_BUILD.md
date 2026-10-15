@@ -972,3 +972,37 @@ Source/baseline/replay/parity/release flags and receipt/mobile/owner/consent/pri
 history/recovery/full-media/hosting gates unchanged. No sparse deploy, approved
 restriction replay, paid resource, customer message, data deletion, PR merge or
 duplicate automation; single recurring continuation stays active.
+
+PR #61 docs `e9de502` passed all six CI gates (`38717396103`); hosting failed
+separately and production/migrations skipped. Draft PR #62, code `8906446`, now
+composes actual ordinary nonstaff Auth INSERT through full profile/org/owner/
+Bronze/intent-audit/referral/bounty/assignment and actual nonempty partner-intent
+callbacks. Immutable PR #60/#61 source/structures yield 18 actual public tables,
+322 columns/72 critical constraints/74 indexes/26 full public function envelopes/
+22 attachments. No reduced profiles or Auth uid/JWT/has_role/intent success stub.
+Four-field Auth/tier/plan supports and preexisting fixture referrer role/staff/
+accreditation inputs remain explicit, not hosted provider/client/staff provisioning
+or trusted/native authority. Zero live query/mutation/migration/deployment.
+
+Twenty focused pass (36.407 seconds); full serial tooling 602/602 passes
+(485.089 seconds), then 10/10 receipt assets (0.325 seconds): 612 aggregate, zero
+failures/skips/cancellations. Syntax/lint/format/diff/primary review pass. No fresh
+application suite claimed; PR #54 remains parent evidence. Late bounty/assignment
+failures restore all eighteen public tables/Auth rows, local sequence gaps remain
+visible and original configuration/defaults recover. Full-profile/Auth/FK/sequence/
+ACL/attachment/policy/shim postflight guards precede rollback. Real partner rename
+can leave old-code intent stale; DELETE cascades commission ledger while keeping
+referral/assignment; audit target-as-actor/active-change mislabeled/audit swallowing
+and previous financial/authority gaps remain blockers, not approved rules.
+Evidence: `evidence/AUTH_REFERRAL_INTENT_BOOTSTRAP.md`. PR #62 needs latest checks.
+
+Next actual staff-domain Auth/platform-role/staff/partner/canonical-org/manager
+composition with genuine prerequisites and complete schemas/writer attachments.
+Recover actual provider Auth uid if reached, not a GUC substitute; test genuine
+late failures/rollback. Then original actor/revisions/common locks/offboarding/
+native acceptance. Ordinary full Auth/referral/partner intent and financial/full-
+schema/org recovery need not repeat. Static canonical admin/editable manager/staff
+seller enum/trial ANY, source/baseline/replay/parity/release and receipt/mobile/
+owner/consent/private-history/recovery/full-media/hosting gates remain open. No
+sparse deploy, restriction replay, paid resource, customer message, data deletion,
+PR merge or duplicate automation; single recurring continuation stays active.
