@@ -15,6 +15,19 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest completed reference-source slice: draft PR #56, code `51cb641`, recovers
+exact current definitions for can_manage_org, is_org_member and the creator-owner
+trigger behind pinned fingerprint/header/privacy gates. One READ ONLY execution
+at `07:38:31.452256` UTC, no rows/helper calls/sequence/config values or mutation.
+11 focused and 507 tooling/assets pass (497 plus separate 10), no failures/skips.
+It closes the current-definition gap, NOT original history/DDL provenance or
+authority acceptance. Creator conflict updates membership to owner, not DO NOTHING.
+Evidence: `evidence/ORG_FUNCTION_SOURCE_RECOVERY.md`. Next recover selected current
+org/member/org-role structure and real member-tier metadata/source, preserving
+the tier default `common`, then compose full actual no-referral bootstrap. Do not
+re-read these three definitions or invent stubs. New PR #56 needs its own checks.
+No migration/deployment/production change; single recurring continuation active.
+
 Newest completed inventory slice: draft PR #55, code `34cea88`, retains the
 privacy-reviewed auth/bootstrap catalog at `07:22:41.479679` UTC (six tables,
 123 columns, 25 constraints, 15 triggers, 29 functions, exact sequence metadata).
@@ -26,7 +39,8 @@ reads; first unpublished bigint-rounded artifact discarded before exact-text
 capture. No migration, deployment or mutation. Evidence and exact next action:
 `evidence/AUTH_BOOTSTRAP_DEPENDENCY_FRONTIER.md`. Prepare selected privacy-gated
 definition recovery, then compose actual bootstrap dependencies; do not invent
-helpers or strip constraints. New PR #55 CI requires its own verification.
+helpers or strip constraints. PR #55 docs `ec8ea7a` now passed all six CI gates
+(`38699776700`); hosting failed separately, migration/production skipped.
 
 Newest completed bounded behavioral slice: draft PR #54, code `e4348cf`, composes the actual
 staff-domain partner forward chain with an actual empty user-referrals table in

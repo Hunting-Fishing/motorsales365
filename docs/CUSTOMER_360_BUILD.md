@@ -778,3 +778,29 @@ signup/production acceptance. Original actor/revisions/locks/offboarding/native/
 consent/recovery/receipt/mobile/owner/full-media gates remain open; no sparse deploy,
 helper restriction replay, paid resource, customer message, data deletion or
 duplicate automation. Source/replay/baseline/parity/release flags stay unchanged.
+
+PR #55 docs `ec8ea7a` now passed all six CI gates (`38699776700`); hosting
+failed separately and migration/production deployment skipped. Draft PR #56
+(code `51cb641`) then recovers exactly the three missing current org function
+definitions behind pinned fingerprint/header/privacy guards. One successful READ
+ONLY source recovery at `07:38:31.452256` UTC, reviewed before retention, no
+app/auth rows/counts/helper/sequence/settings/config values or mutation. This
+logical heartbeat totals three successful read-only diagnostic executions across
+the two slices, not live application behavior. Eleven focused and 507 tooling/
+receipt-assets pass (497 plus separate 10), zero failures/skips/cancellations;
+syntax/lint/source+Markdown format/canonical JSON/diff/primary review pass.
+No fresh application suite is claimed for these source-only changes; PR #54's
+1,207 tests/TypeScript remain verified parent evidence. Newest PR #56 CI needs
+its own verification. Evidence: `evidence/ORG_FUNCTION_SOURCE_RECOVERY.md`.
+
+Current-source gap closed, original migration/DDL provenance still open: owner/
+admin membership management and creator conflict UPDATE-to-owner are actual
+source behavior, not authorized business/native authority. Next selected current
+org/member/org-role structure and member-tier metadata/source, including actual
+`common` tier default, then no-referral bootstrap with real critical constraints,
+plans/subscriptions/sequence/intent/admin-audit effects. Do not re-recover the three
+definitions, remove FKs or substitute helpers. Nonempty referrals, trusted actor/
+revision/locks/offboarding/native/consent/private-history/recovery/receipt/mobile/
+owner/full-media/release acceptance stay open. No deployment, migration, paid
+resource, customer message, data deletion, PR merge, restriction replay or duplicate
+automation; the existing single recurring continuation remains active.
