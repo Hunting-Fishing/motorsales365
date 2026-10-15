@@ -1347,3 +1347,34 @@ diagnostic/root-cause text. New publication needs exact-head verification. Next
 implement the nonactivated Auth payload-to-plan adapter and atomic delivery/consent
 contracts, while continuing the shared authority/private-custody/transaction/
 recovery path. Do not promote source tests to production readiness.
+
+## Native Auth command planning and first email (2026-10-16)
+
+Same integration branch/PR #68, source `0dfac563`. The inactive planner validates
+actual verifier-instance provenance, explicit canonical policy, native payload/
+API-base/website callback boundaries and secure current/new recipient/token/hash
+mapping. Phone-only accounts with explicit empty current email receive a bounded
+first-address plan in either configured mode; missing/null fields or partial
+secure pairs do not downgrade policy. Actual HTML/plain-text rendering now has
+correct first-address copy without an empty/from link, while both existing
+recipient halves preserve current-to-new wording.
+
+Plans have immutable stable event/recipient keys and raw-body/policy fingerprints.
+Record compatibility is comparison only, not storage proof, atomic reservation,
+enqueue or exactly-once delivery. Six existing actions are supported; eight other
+documented actions, actual secret/project/provider/Auth settings, callback/cohort
+coverage and consent/suppression/backlog/recovery remain activation gates. No
+Customer 360, reminder or transactional-email authority is inferred.
+
+Focused 352/352 (212 new planner + seven render + 133 existing verifier), fresh full
+application 1,845/1,845 across 70 files (144.15s), report checker/full TypeScript/
+targeted lint/format/diff and independent review pass. Source guards 103/103 and
+release/report/inventory/assets 75/75 pass (five inventory tests overlap); no new
+SQL or live write/provider setting/email/application upload. Artifact and exact-
+head CI/hosting evidence: `evidence/NATIVE_AUTH_EMAIL_PLAN.md`. Continue atomic
+delivery/consent and bounded fake-provider contracts alongside shared fresh
+authority/native-team/private-custody/financial/recovery acceptance. The sole
+hosted 365 backend and approved restrictions remain unchanged.
+Fresh complete build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked
+public Git/source/output checks pass at `0dfac563`, with zero changed-line lint
+errors/warnings. Existing build warnings and wider live acceptance gates remain.

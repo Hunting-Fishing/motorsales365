@@ -14,7 +14,8 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest source slices: `5e5d5f8a` (unwired webhook verifier), `65475626`
+Latest source slice: `0dfac563` (unwired native Auth planner/first-email rendering).
+Prior source slices: `5e5d5f8a` (unwired webhook verifier), `65475626`
 (unsubscribe acknowledgment/UI), test-type follow-up `3f829a6b`.
 Prior slices: `f46b048d` (unused cloud-auth retirement), `a420a44d`
 (Parts reference recovery), `2350e403` (remaining-source ledger/CI).
@@ -25,8 +26,8 @@ staff slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
 Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
-stacked on PR #67 at `576fb17d`. Prior head `e72553b6` passed all six CI gates
-(`38764688404`); independent hosting failed. New email-safety publication needs
+stacked on PR #67 at `576fb17d`. Prior head `67f81e7e` passed all six CI gates
+(`38769939396`); independent hosting failed. New native Auth publication needs
 its own exact latest-head checks. No upload or new-head pass is claimed.
 
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
@@ -74,7 +75,7 @@ route is not evidence that the changed candidate has passed those gates.
 | U4 / pipelines/UI  | Learn, partner/franchise and staff academy, `src/routes/learn.index.tsx`, `src/routes/franchise.apply.tsx`, `src/routes/dashboard.partner.tsx`                     | Existing surfaces included; external program proposals remain separate                                      | Not run | Pending | Not verified | Enumerate and test current enrollment/content/progress/application/referral/admin actions and entitlements. Licensed repair feeds, government/insurer feeds, hardware and new-country programs need separate decisions/access.                                                                                                                          |
 | U5 / pipelines/UI  | Existing billing/entitlements, `src/lib/billing.functions.ts`, `src/routes/dashboard.business.$businessId.billing.tsx`                                             | Existing billing/checkout code included; provider/cutover PR #9 not reconciled                              | Blocked | Pending | Not verified | Verify test-mode subscription/entitlement/checkout/webhook/refund and financial reconciliation with approved configuration. No real charges, new settlement/legal model or customer communications.                                                                                                                                                     |
 | U6 / pipelines/UI  | Professional role-based UI, staff view and all above journeys                                                                                                      | Staff labels, error/loading/private-context behavior improved; full visual/accessibility work unfinished    | Not run | Pending | Not verified | Owner/manager/advisor/parts/technician/permitted-admin desktop/phone journeys, keyboard/accessibility, navigation, loading/error/empty states, account-switch privacy and performance. Component mocks are not visual/mobile acceptance.                                                                                                                |
-| U7 / providers     | Native Auth/transactional email and unsubscribe, `src/lib/webhooks/standard-webhooks.server.ts`, `src/routes/email/unsubscribe.ts`                                 | Bounded signature helper unwired; unsubscribe returned-evidence/status/lifetime fixes integrated            | Blocked | Pending | Not verified | Nonactivated Auth payload/action/URL/project planner, secure email-change mapping, atomic event/slot/consent writers, suppression/backlog classification, bounded provider acknowledgments and delivery-event correlation, sender/hook/controlled-recipient/recovery acceptance. No email cutover or live send.                                         |
+| U7 / providers     | Native Auth/transactional email and unsubscribe, `src/lib/webhooks/standard-webhooks.server.ts`, `src/routes/email/unsubscribe.ts`                                 | Bounded verifier/planner unwired; first-email template and unsubscribe acknowledgment fixes integrated      | Blocked | Pending | Not verified | Atomic event/slot/consent writers, complete action/callback/native-setting coverage, suppression/backlog classification, bounded provider acknowledgments and delivery-event correlation, sender/hook/controlled-recipient/recovery acceptance. No email cutover or live send.                                                                          |
 | R4 / release       | Final owner/staff pilot, monitoring/support/release                                                                                                                | Seven-day plan saved and candidate established; release prerequisites open                                  | Blocked | Pending | Not verified | Name pilot/test accounts, run financial/stock/privacy/recovery acceptance on one full candidate, obtain required release approval, deploy through gated full-artifact workflow and check actual live behavior.                                                                                                                                          |
 
 Lane assignments describe sequencing, not guaranteed builder capacity. Three
@@ -84,6 +85,29 @@ Do not promise parallel throughput or continuous execution
 between scheduled turns.
 
 ## Current verified slice
+
+Native Auth command planning and first-address rendering are implemented at
+`0dfac563`, intentionally unwired. The planner uses current verifier-instance
+provenance, explicit snapshotted canonical policy, native action/recipient/URL
+validation, secure and first-email mappings, immutable commands and stable
+body/policy/event/recipient identities. Its comparison helper is not a durable
+reservation, storage proof or enqueue. Six actions are supported; eight documented
+other/notification actions and remaining callback/cohort coverage are activation
+gates. Actual secret/project/sender/Auth-setting ownership remains unverified.
+
+Focused 352/352 (212 new planner + seven new render + 133 existing verifier), full
+application 1,845/1,845 across 70 files (144.15s), report checker/full TypeScript/
+targeted lint/format/diff and independent review pass. All 219 new tests are included
+in the full total, not added twice. Source guards 103/103 and release/report/
+inventory/assets 75/75 pass (five inventory tests overlap). See
+`evidence/NATIVE_AUTH_EMAIL_PLAN.md` for artifact verification and native-source
+mapping. No SQL, native hook activation, provider change, live write or deploy.
+Fresh complete build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked
+public Git/source/output checks pass at `0dfac563`; changed-line lint has zero
+errors/warnings. Existing build warnings remain; local artifact verification is
+not upload or live acceptance.
+
+### Previous email acknowledgment slice
 
 Native email authenticity and unsubscribe acknowledgment slices have focused
 133/133 and 62/62 tests respectively. The verifier uses actual WebCrypto and
@@ -183,13 +207,15 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 ## Next actions and owner dependencies
 
 1. Verify existing PR #68's exact latest published CI head; continue on the same
-   branch/PR. Do not substitute prior `e72553b6` green CI for new-head checks.
+   branch/PR. Do not substitute prior `67f81e7e` green CI for new-head checks.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
-   `.env` contents or bulk merge the provider cleanup. Continue native email with
-   the nonactivated Auth payload/URL/action/secure-email-change planner, stable
-   event/recipient identity and atomic consent/delivery contracts. Do not repeat
-   completed signature work or enable delivery. Use the recovered PR #2
+   `.env` contents or bulk merge the provider cleanup. Next native email work is
+   the atomic event/recipient reservation and enqueue/acknowledgment contract plus
+   bounded fake-transport provider adapter. Complete action/callback/cohort and
+   actual project/secret/sender/Auth-setting coverage; keep consent/suppression/
+   backlog/recovery gates explicit. Do not repeat completed verifier/planner work
+   or enable delivery. Use the recovered PR #2
    source/crosswalk; formal baseline/activation acceptance is not granted.
 3. Complete action-level feature acceptance. Use the pinned 12/5/2 remaining-source
    ledger for a reviewed forward/recovery path; preserve exact 404/423 and do not

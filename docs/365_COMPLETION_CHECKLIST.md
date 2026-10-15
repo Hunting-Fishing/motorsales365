@@ -40,7 +40,41 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest email-safety slices: bounded raw-byte webhook verifier `5e5d5f8a` and
+Latest native Auth plan slice: `0dfac563`, same branch/draft PR #68. The planner
+requires a current verifier-instance result, explicit canonical-project/site/
+secure-change policy and fresh bounded native payloads. It produces immutable
+commands only, with stable event/recipient identities, exact-body/policy
+fingerprints and a strict record comparison; no durable reservation or enqueue.
+Six existing actions are supported; eight documented other/notification actions
+explicitly reject and remain an activation gate. Fixed action-specific website
+callbacks are distinct from the hook's validated Auth/API base.
+
+Secure current/new token-hash mappings, non-secure single-token variants and
+explicit phone-only first-email confirmation are tested. Missing/null current
+email or partial secure pairs never downgrade the policy. The template now
+renders first-address confirmation without an empty/from link; both existing
+recipient halves retain accurate old-to-new copy. Three bounded agents owned
+separate tests/template/review without branch changes or overlapping edits.
+Focused 352/352 passes (212 new planner + seven new render +133 existing verifier);
+full TypeScript/targeted lint/format/diff and independent review pass. Combined
+integration results are in `evidence/NATIVE_AUTH_EMAIL_PLAN.md`.
+Fresh full application 1,845/1,845 across 70 files (144.15s) includes all 219 new
+tests, zero quarantine. Report checker/full TypeScript/targeted lint/format/diff
+pass. Source guards 103/103 (4.398s), release/report/inventory/assets 75/75 (8.797s)
+pass; five overlapping inventory checks are not double-counted or substituted for
+older full SQL/tooling evidence.
+Fresh full build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked public
+Git/source/output checks pass at `0dfac563`; changed-line lint has zero errors/
+warnings. Existing build warnings remain explicit; no upload or live acceptance.
+
+Prior exact published head `67f81e7e` passed all six CI gates (`38769939396`).
+Independent hosting build `c9b12d3b-50ed-4b68-96d5-6f345d685f83` failed with only
+ID/link reported, no diagnostic text/annotations/root cause. Wrapper `38769939461`
+preview passed; migration/production skipped. New publication requires its own
+exact-head checks. No email activation, SQL/live write, provider change or deploy.
+Mapping 404/423, typed 12/5/2 and all baseline/replay/parity/release flags unchanged.
+
+Previous email-safety slices: bounded raw-byte webhook verifier `5e5d5f8a` and
 unsubscribe acknowledgment/public-page fixes `65475626`, same branch/draft PR #68.
 The verifier is intentionally unwired: fixed body/read/freshness/header/key bounds,
 actual WebCrypto HMAC verification and generic errors, with 133 focused tests.
@@ -221,12 +255,13 @@ Exact next action: verify existing PR #68's exact latest published head; keep al
 further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
 without repeating it or adopting future proposals. Complete action-level feature
 acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
-Next native email dependency is the nonactivated Auth payload-to-delivery-plan
-adapter (six existing template actions, explicit unsupported-action handling,
-sole-project/approved redirect binding, secure current/new email-change token/hash
-mapping, stable event/recipient slots and content-conflict detection). Do not
-repeat completed signature tests or activate delivery. Follow with atomic durable
-consent/event/slot writers and a bounded fake-transport provider contract. Use
+Next native email dependency is the atomic event/recipient reservation and enqueue/
+acknowledgment contract, with exact schema/backlog/recovery boundaries and a bounded
+fake-transport provider adapter. Distinguish queued/provider-accepted/delivery-
+confirmed/outcome-unknown states. Do not repeat completed signature/planner work,
+wire into the legacy dispatcher or activate the hook. Resolve intended action/
+callback coverage, actual secret/project/sender/Auth-setting ownership and atomic
+consent/suppression policy before deployment. Use
 the pinned 12/5/2 remaining-source ledger
 to prepare a reviewed forward/recovery path; do not repeat completed proof or
 replay history. Establish local synthetic
