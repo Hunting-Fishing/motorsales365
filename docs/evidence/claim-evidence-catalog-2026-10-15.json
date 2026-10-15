@@ -1,0 +1,1205 @@
+{
+  "mode": "read-only-catalog-fingerprints",
+  "enums": [
+    {
+      "name": "app_role",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Full business_claim_requests, business_claim_audit and business_claim_evidence metadata; selected approval/guard/owner-intent/status/evidence/touch/moderation/provider function fingerprints and related enums. No app/Auth/config/content/storage rows, raw definitions or helper calls.",
+  "limits": "Three selected claim tables only. No app/Auth/config/storage rows or counts, helper calls, raw bodies/defaults/config/SQL expressions, sequence/settings values, mutation, original-source/history adoption, approved baseline, original actor/session, native/offboarding or release acceptance. Storage-object bytes/policies and unselected incoming/transitive writers are not evaluated. Effective MAINTAIN is not evaluated; raw ACL retained.",
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_claim_audit",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_claim_evidence",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "business_claim_requests",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "claim_id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "actor_user_id",
+      "type": "uuid",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "action",
+      "type": "text",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "details",
+      "type": "jsonb",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "f3db357cf4f4a03883484fa3281a056c"
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_audit",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "claim_id",
+      "type": "uuid",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "uploader_user_id",
+      "type": "uuid",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "evidence_type",
+      "type": "text",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "file_name",
+      "type": "text",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "file_size",
+      "type": "bigint",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "mime_type",
+      "type": "text",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "storage_path",
+      "type": "text",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_evidence",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "business_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "claimant_user_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "contact_method",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "contact_value",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "evidence_url",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "acl": null,
+      "name": "reviewer_user_id",
+      "type": "uuid",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "reviewer_notes",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "decided_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "kind",
+      "type": "text",
+      "table": "business_claim_requests",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": "1575f3b67e9d844635daced0d82688ad"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "business_claim_audit_pkey",
+      "ready": true,
+      "table": "business_claim_audit",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "cf73e8d0fdba4299039c12b47c4c9a3e"
+    },
+    {
+      "name": "idx_bca_claim",
+      "ready": true,
+      "table": "business_claim_audit",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "16e19163c448dd0ab6253e9f215079c0"
+    },
+    {
+      "name": "business_claim_evidence_pkey",
+      "ready": true,
+      "table": "business_claim_evidence",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "a359b615e0543797f4458f06dde1d9af"
+    },
+    {
+      "name": "idx_bce_claim",
+      "ready": true,
+      "table": "business_claim_evidence",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "3e0dd964d9ee1d237dea2220585c9a87"
+    },
+    {
+      "name": "idx_bce_uploader",
+      "ready": true,
+      "table": "business_claim_evidence",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "1222ad6c99af0b75c869d917551e1877"
+    },
+    {
+      "name": "business_claim_requests_pkey",
+      "ready": true,
+      "table": "business_claim_requests",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "b93f1e5607195e88e132e894bd95dd6d"
+    },
+    {
+      "name": "idx_bcr_business",
+      "ready": true,
+      "table": "business_claim_requests",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "4439906d6e5a3af87c325dd6d933170c"
+    },
+    {
+      "name": "idx_bcr_claimant",
+      "ready": true,
+      "table": "business_claim_requests",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "6f9f28286fea44f39231dbd26fe42dc6"
+    },
+    {
+      "name": "idx_bcr_kind_status",
+      "ready": true,
+      "table": "business_claim_requests",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "413cbbb63f074fc87a45ff110562f35b"
+    },
+    {
+      "name": "idx_bcr_status",
+      "ready": true,
+      "table": "business_claim_requests",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "6343c262d71dd0bb2ce4fbbf56d7dd3c"
+    }
+  ],
+  "policies": [
+    {
+      "name": "Block direct inserts",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_audit",
+      "command": "a",
+      "checkMd5": "68934a3e9455fa72420237eb05902327",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Read own claim audit or mod",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_audit",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "2c6d215a3fc0297f861932b3530de0b7",
+      "permissive": true
+    },
+    {
+      "name": "Users delete own claim evidence",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_evidence",
+      "command": "d",
+      "checkMd5": null,
+      "usingMd5": "d9104baf9111adbf0817ea45b9172ef7",
+      "permissive": true
+    },
+    {
+      "name": "Users insert own claim evidence",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_evidence",
+      "command": "a",
+      "checkMd5": "e80b396406728973145ad20a0635bc37",
+      "usingMd5": null,
+      "permissive": true
+    },
+    {
+      "name": "Users read own claim evidence",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_evidence",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "d9104baf9111adbf0817ea45b9172ef7",
+      "permissive": true
+    },
+    {
+      "name": "Staff update claims",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "command": "w",
+      "checkMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "usingMd5": "fc10a64d29959c789918a9f3bce331e3",
+      "permissive": true
+    },
+    {
+      "name": "Users read own claims",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "16df947779b1b94188347120219d9c28",
+      "permissive": true
+    },
+    {
+      "name": "Users submit own claim",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "business_claim_requests",
+      "command": "a",
+      "checkMd5": "47d1170161538a6a195bcd50cbccc969",
+      "usingMd5": null,
+      "permissive": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "trg_claim_audit_evidence_del",
+      "table": "public.business_claim_evidence",
+      "enabled": "O",
+      "function": "public.tg_claim_audit_evidence()",
+      "typeBits": 9,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "242a9efb59a0cf56a1149c0245422923",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_claim_audit_evidence_ins",
+      "table": "public.business_claim_evidence",
+      "enabled": "O",
+      "function": "public.tg_claim_audit_evidence()",
+      "typeBits": 5,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "79e48126c9c56dfa8c4c3084b4c02857",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_bcr_touch",
+      "table": "public.business_claim_requests",
+      "enabled": "O",
+      "function": "public.touch_updated_at()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "ab2fb9f3a87f63f3680a998d8e6d087a",
+      "updateColumns": []
+    },
+    {
+      "name": "trg_claim_audit_status",
+      "table": "public.business_claim_requests",
+      "enabled": "O",
+      "function": "public.tg_claim_audit_status()",
+      "typeBits": 21,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "60ec0d3caba1899d4164f61bc601a98e",
+      "updateColumns": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{=X/supabase_auth_admin,supabase_auth_admin=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "cdef18c69c4f4cbbced2eaf81e628b49",
+      "configMd5": null,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "ea3b41bf29e2ad573067939329aa088e",
+      "serviceExecute": true,
+      "definitionBytes": 274,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "bad56233bdb5168c543db21995aa5ed6",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.approve_business_claim(uuid,boolean)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "9fbd45ca16e960453f05859688ea5717",
+      "argumentModes": null,
+      "argumentNames": [
+        "_claim_id",
+        "_auto"
+      ],
+      "definitionMd5": "e920491d076114fcd68cfef040693f52",
+      "serviceExecute": true,
+      "definitionBytes": 1718,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres,service_role=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "995bf3deb59ebb7314cadfb102c0ec7c",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.can_moderate(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "27656335d4ff4b9557951c2f3678e7a2",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id"
+      ],
+      "definitionMd5": "f7e561172cb3ff6dd98ffdb015066c3c",
+      "serviceExecute": true,
+      "definitionBytes": 299,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "8cb2be4c21b728a5a86e9b06fcf6e94b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.guard_business_owner_update()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "e56525d41e0d9ec0cd6608873fc6b714",
+      "serviceExecute": true,
+      "definitionBytes": 835,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "aed28ca2e7e07337cbb5ed1b7b541f30",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_claim_audit_evidence()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "d8ec4012e0ac000fab63e4273fcb4fb2",
+      "serviceExecute": true,
+      "definitionBytes": 1055,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "a0c7fa189dec91f4024670da5bc71214",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_claim_audit_status()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "1705bd5e18801272e87b99fb97855f1d",
+      "serviceExecute": true,
+      "definitionBytes": 1495,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "9baf00d43cdeb2cd0e55c1de045be21b",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.touch_updated_at()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "30625488571141c913d7e14bea920178",
+      "serviceExecute": true,
+      "definitionBytes": 189,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "46b92e78631dff66834b7e4035b4e251",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.trg_businesses_recompute_intent()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "6d715f23167595b07aaddd268ee3bf25",
+      "serviceExecute": true,
+      "definitionBytes": 1085,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "business_claim_audit_action_check",
+      "type": "c",
+      "match": " ",
+      "table": "business_claim_audit",
+      "columns": [
+        "action"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "a1af80bcdcf4778563a7f4e6789c6723",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_audit_claim_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "business_claim_audit",
+      "columns": [
+        "claim_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "cb98b92f62b306c018f38900625693ae",
+      "referenceTable": "public.business_claim_requests",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "business_claim_audit_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "business_claim_audit",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_evidence_claim_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "business_claim_evidence",
+      "columns": [
+        "claim_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "cb98b92f62b306c018f38900625693ae",
+      "referenceTable": "public.business_claim_requests",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "business_claim_evidence_evidence_type_check",
+      "type": "c",
+      "match": " ",
+      "table": "business_claim_evidence",
+      "columns": [
+        "evidence_type"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "57c19b946e7e696942cc39e8cecda6db",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_evidence_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "business_claim_evidence",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_requests_business_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "business_claim_requests",
+      "columns": [
+        "business_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "39e2076573339fd6674bde9980ccabd0",
+      "referenceTable": "public.businesses",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "business_claim_requests_contact_method_check",
+      "type": "c",
+      "match": " ",
+      "table": "business_claim_requests",
+      "columns": [
+        "contact_method"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "20a953d5333dc4447f8aaf96fb465e62",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_requests_kind_check",
+      "type": "c",
+      "match": " ",
+      "table": "business_claim_requests",
+      "columns": [
+        "kind"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "12678fa73d232eede9b6178f832d5e95",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_requests_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "business_claim_requests",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "business_claim_requests_status_check",
+      "type": "c",
+      "match": " ",
+      "table": "business_claim_requests",
+      "columns": [
+        "status"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "373eaa73faec1238df4bc1de1be451a7",
+      "referenceTable": null,
+      "referenceColumns": []
+    }
+  ],
+  "observedAtUtc": "2026-10-15T11:41:19.388797",
+  "serverVersion": "17.6"
+}

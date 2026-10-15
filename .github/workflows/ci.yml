@@ -154,6 +154,9 @@ jobs:
       - name: Full staff role audit sales partner writer composition (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/full-staff-writer-composition.test.mjs
 
+      - name: Full claim evidence ownership writer composition (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/claim-evidence-catalog-review.test.mjs scripts/ci/full-claim-evidence-composition.test.mjs
+
       - name: Claim review current caller and unwired command contracts (never quarantined)
         run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
 
