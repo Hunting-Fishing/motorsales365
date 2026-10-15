@@ -57,10 +57,20 @@ Security reconciliation branch: `completion/365-security`.
    The separate admin owner-row confirmation/lifetime fix is now implemented in
    draft PR #46 (`8176dc9`), with 43 new tests, 1,029 full application tests across
    54 files and TypeScript passing. It changes no database authority or audit/
-   native reconciliation; verify its own latest CI. Eight business attachments
-   remain excluded from the SQL proof, especially owner-intent/global
-   profile/audit recomputation. Verify latest checks and close that chain before
-   owner positives, then close trusted team/ownership/
+   native reconciliation; docs `5346779` now passed all six CI gates
+   (`38678740970`). PR #45 docs `53350cf` also passed all six (`38678253032`).
+   Hosting failed separately; migrations/production deployment were skipped.
+   PR #45 excludes eight business attachments. The separate draft PR #47
+   (`28cb9e2`) now composes the applicable owner_id UPDATE → intent → profile/
+   admin-audit forward chain offline: 21 focused and 415 tooling/receipt-asset
+   tests pass. It uses actual enum/critical metadata and explicitly synthetic
+   client-deny supports, not full profile/client authority or owner workflow
+   parity. Target-as-audit-actor, overload ambiguity and swallowed audit failure
+   remain source behavior, not repairs. Seven other business attachments target
+   INSERT/status/custom-domain operations outside this slice; global-role/
+   partner/manual writers are separate incoming paths, not derive forward calls.
+   Verify its own latest head, then close original-actor/pending/prior-owner/
+   idempotency, trusted team/ownership/
    shift/audit dependencies before adopting privileged positives. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
    PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
@@ -94,16 +104,16 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #38, docs head `14c18d3`, all six
-CI gates passed (run `38659674559`), 986 application tests. These are review
+Latest fully CI-verified application slice: PR #46, docs head `5346779`, all six
+CI gates passed (run `38678740970`), 1,029 application tests across 54 files. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #46, code `8176dc9`, 1,029 application tests
 across 54 files and full TypeScript pass. It hardens admin owner-row confirmation/
-request lifetimes without changing database authority; its latest CI requires
-verification. The fully CI-verified application parent remains PR #38, code
-`22c2724`, whose six chat callers and 986 tests passed the gates recorded above.
+request lifetimes without changing database authority; its documentation head
+passed the six gates recorded above. PR #38, code `22c2724`, remains the earlier
+six-chat-caller slice (986 tests), not the latest verified application head.
 The following PR #39 is a separate memory-only,
 non-adopted research candidate, not a compatible staff-management release.
 PR #32's reminder consumer is retained in this stack and its
@@ -1329,6 +1339,55 @@ reentry and management/delegation/invitation/multi-roster policy, other privileg
 writers, full DB/private-storage restore, consent/tenure, real API/session/role,
 OCR/mobile/owner pilot and full-media hosting remain open. Heartbeat stays active
 without duplicate automation or repeated unchanged-state notices.
+
+## Owner-intent forward composition checkpoint (2026-10-15)
+
+Draft PR #47, code `28cb9e2c26014abe3835cd5eb96f0ef744225437`, branch
+`security/native-owner-intent-composition`, stacked on PR #46 docs `5346779`.
+PR #45 docs `53350cf` and PR #46 docs `5346779` passed all six CI gates
+(`38678253032` and `38678740970`). Their hosting builds failed separately;
+wrappers skipped migrations/production deployment. PR #47 needs its own checks.
+
+Two separate reviewed READ ONLY catalog transactions (04:00:11.110715 and
+04:08:11.297488 UTC, PG17.6) recover selected function/table/column/constraint/
+policy/attachment metadata and the real seller/app-role enum labels. No live
+application rows/counts/helper calls, DDL/grants/data/history mutation or deploy.
+Eleven additional whole-source pins, 26 selections, five unchanged functions,
+two table contracts, eighteen selected columns, real selected constraints and
+three attachments compose the owner-definer forward path. Full function records
+use unique identity keys, not collation-sensitive array ordering. Profiles stay a
+six-column projection; client policies are explicitly synthetic deny-all rather
+than silently substituting sales/support/admin helpers. Base public roles stay
+synthetic TEXT; no full profile/global-role/client policy provenance is claimed.
+
+Verification: 21/21 focused (17.518s); 405/405 full serial CI-tooling (321.868s),
+then 10/10 receipt assets (0.447s), 415 aggregate in consecutive separate commands,
+no failures/skips/cancellations/quarantine. Syntax/lint/format/diff and independent
+source/fixture/API/catalog/query/document review pass. Dedicated non-quarantined
+memory-only CI step added. SQL and app changes are separate reviewable slices.
+
+Controls characterize actual buyer/business/staff enum derivation, missing-profile/
+NULL/no-op behavior, old/new-owner cascades, evaluator clearing and target-as-actor
+audit. Both current overloads coexist: disposable one-argument calls are ambiguous;
+actual wrappers pass seven args. A clearly isolated one-overload memory variant
+is not current catalog parity. Actual audit NOT NULL failure is swallowed while
+owner/profile/claim changes commit; real profile CHECK and later claim-audit CHECK
+failures roll back all selected earlier intent/audit effects. A synthetic cancelled
+profile UPDATE shows missing affected-row confirmation without weakening constraints.
+No affected production user/incident, native reconciliation or human authority
+acceptance is inferred. See `evidence/NATIVE_OWNER_INTENT_COMPOSITION_PROOF.md`.
+
+Migration impact/deployment: none. Preserve all three applied legacy restrictions
+without replay. Composer remains 404/423 with 19 unclassified; baseline/replay/
+parity/release flags remain false. Exact next action: verify PR #47 latest checks,
+finish the separate claim-review UI acknowledgement/lifetime hardening, then
+close the original-actor/pending/prior-owner/idempotent decision contract and
+trusted team/shift/native synchronization. Manual recompute/global-role/partner
+writers and full signup/business INSERT/DELETE/status fanouts remain separate;
+real API/role/session/concurrency, operator recovery, consent/tenure, receipt/mobile/
+owner pilot and full-media hosting gates remain open. No sparse deployment, paid
+resources, customer communication or destructive history/data repair. Existing
+heartbeat stays active without duplication.
 
 ## Recovery evidence (original scope, retained below)
 

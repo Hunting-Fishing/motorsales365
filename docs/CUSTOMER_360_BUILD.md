@@ -508,3 +508,37 @@ no migration/live application call/deployment occurred. See
 audit, original-actor/idempotent atomic transfer, real API/session/concurrency,
 recovery/consent/tenure/OCR/mobile/full-media hosting gates open. The three applied
 legacy restrictions remain preserved without replay, and continuation stays active.
+
+Follow-up verification: PR #45 docs `53350cf` and PR #46 docs `5346779` now
+passed all six CI gates (`38678253032` and `38678740970`). Hosting failed
+separately and migrations/production deployment were skipped. PR #46 is the
+latest fully CI-verified application slice (1,029 tests), not a deployed release.
+The next SQL proof composes the owner-intent/profile/admin-audit forward path;
+global-role/partner/manual recompute writers remain distinct incoming paths,
+not dependencies silently stubbed into derive. No authority, baseline/parity,
+recovery or release gate is promoted by these CI results.
+
+Draft PR #47 (code `28cb9e2`) now composes the actual selected owner-intent →
+derive → profile UPDATE/admin-audit forward chain offline, reusing PR #45's
+unchanged guard/claim fixture. Real seller enum values, five full function
+metadata contracts, selected real profile/audit constraints and applicable
+attachments are compared with two separate read-only catalog observations.
+Client-deny policies and reduced profile/global-role supports are explicitly
+synthetic, not actual client authorization or migration provenance acceptance.
+
+21 focused tests and 415 full tooling/receipt-asset tests pass in separate serial
+commands (405 CI-tooling plus10assets), no failures/skips/cancellations. Independent
+review and lint/format/diff pass; PR #47 needs its own head verification. Actual
+target-as-actor attribution, one-argument overload ambiguity, swallowed audit
+failure and labelled zero-row profile fault remain source behavior, not repairs.
+Real profile/late claim-audit CHECK failures roll back selected earlier effects.
+No production business rows/helper calls, mutation, migration or deployment;
+two catalog-only observations do not form one atomic live snapshot.
+
+See `evidence/NATIVE_OWNER_INTENT_COMPOSITION_PROOF.md`. Seven excluded business
+attachments target other operations; separate manual/global-role/partner writers
+and trusted original-actor/pending/prior-owner/idempotent/team/native/shift/audit
+authority still need closure. The claim-review ACK/lifetime UI is the next
+separate application slice; recovery/consent/tenure/API/concurrency/OCR/mobile/
+full-media hosting remain open. Preserve applied restrictions without replay;
+no baseline/parity/release flag changes or duplicate continuation automation.

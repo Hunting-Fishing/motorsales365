@@ -79,8 +79,14 @@ Current SDK semantics verified against
 and [fetch AbortSignal](https://supabase.com/docs/reference/javascript/using-modifiers-abortsignal).
 Supabase safety skills kept UI confirmation separate from database authority.
 
-Next verify PR #46 and PR #45 latest checks; then recover/compose the actual
-owner-intent → recompute/derive → global role/profile/admin-audit writer chain
+Follow-up verification: docs head `5346779b096f1a601f8c1c4981ad8e95727a5678`
+passed all six CI gates (`38678740970`), verified on the owner-intent follow-up.
+Hosting `c745a3b6-23a1-49cd-9e39-53d7f7df3674` failed separately;
+wrapper `38678741045` skipped migrations and production deployment. PR #45's
+docs head also passed its six gates (`38678253032`). Neither is deployed.
+
+Next recover/compose the actual owner-intent → recompute/derive → profile update/
+admin-audit insertion forward chain (global-role/partner writers are separate)
 before an atomic, attributable claim/transfer candidate or native owner positives.
 Keep original-actor, pending/current-owner conflict, idempotency, trusted team/
 management, independent sessions and full recovery release prerequisites explicit.

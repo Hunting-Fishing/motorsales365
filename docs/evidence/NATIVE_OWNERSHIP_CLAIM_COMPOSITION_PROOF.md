@@ -84,8 +84,11 @@ plus claim touch timestamp and status audit. **Eight other observed business
 attachments are excluded, not permissively stubbed**, including
 `businesses_recompute_intent`. Owner changes can also execute that real trigger
 outside this fixture. The known chain to `recompute_signup_intent` →
-`derive_signup_intent` → profiles/admin_audit/global partner/business dependencies
-remains unclosed. Reuse `NATIVE_INCOMING_ATTACHMENT_INVENTORY.md`; do not repeat
+`derive_signup_intent` reads profiles/businesses; recompute updates profiles and
+attempts an admin-audit insertion. Partner/global-role writers are separate
+incoming/caller-authorization paths, not forward calls of these bodies. This
+forward chain remains excluded from this PR #45 fixture. Reuse
+`NATIVE_INCOMING_ATTACHMENT_INVENTORY.md`; do not repeat
 its inventory as a new runtime proof. Insert/status/custom-domain/notification/
 partner/team attachments are also outside this composition.
 
@@ -158,7 +161,7 @@ three already-applied legacy restrictions without replay. Composer remains
 404/423 matched with 19 unclassified; source/body correspondences here do not
 adopt those sources or promote baseline/replay/parity/release flags.
 
-Next close the owner-intent/derive/global-role/profile/audit chain and operator
+Next close the owner-intent/derive/profile/admin-audit forward chain and operator
 impact/recovery before an independently authorized atomic, idempotent,
 original-actor-attributable claim/transfer candidate. Do not implement trust from
 NULL subject, execution role, mutable role labels or the latest owner UUID alone.
@@ -179,6 +182,12 @@ EXECUTE, RLS, source behavior and human authorization. Relevant primary semantic
 [PostgreSQL trigger transaction rules](https://www.postgresql.org/docs/18/trigger-definition.html).
 Current HTTP TLS/PG minor-upgrade changelog items do not authorize changing this
 project's engine, resources or release state.
+
+Follow-up verification: docs head `53350cfc45b9d028793f311eb360a39abb97e77c`
+passed all six CI gates (`38678253032`), verified on the owner-intent follow-up.
+Hosting `f8d81fc3-7ae4-4b0a-b2da-84a18ab0c424` failed separately;
+wrapper `38678253257` skipped migrations and production deployment. These are
+not production behavior or migration/release acceptance.
 
 ## LF artifact pins
 
