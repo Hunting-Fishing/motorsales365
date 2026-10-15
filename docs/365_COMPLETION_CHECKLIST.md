@@ -74,6 +74,16 @@ impact/deployment none; zero live business/Auth mutation, restriction replay,
 history repair, customer message, paid resource, PR merge or duplicate automation.
 Only project/branch metadata was read. The heartbeat remains active.
 
+Published/attached draft PR #68:
+`https://github.com/Hunting-Fishing/motorsales365/pull/68`, base PR #67 branch
+at `576fb17d`, code `ece7e2a0`, first evidence head `76c5fa41`. First CI
+`38748496533` is running/queued; wrapper `38748496539` preview is in progress,
+migrations/production skipped; Supabase Preview skips because no SQL changed.
+No hosting upload or new-head CI pass is claimed. This publication-record commit
+supersedes the first check head: verify PR #68's exact newest head next. The
+candidate is now pushed; owner plan commit `0aa3fb5` is included. Main and other
+remote branches were not changed. Continue the exact next actions above.
+
 Newest disposable revision/invalidation model: code `c03fede`, branch
 `security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`.
 Two private witness tables/five invoker-only functions/nine capture/unsupported-

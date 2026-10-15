@@ -10,6 +10,11 @@ Integration branch: `completion/365-seven-day-integration`.
 Source slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
+Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
+stacked on PR #67 at `576fb17d`. First evidence head `76c5fa41` started CI
+`38748496533`; no new-head pass or upload is claimed. This publication record
+supersedes that first check head, so verify the PR's exact newest head next.
+
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
 of the candidate, including CI PR #8. Do not merge those heads again. PR #9
 (provider/cutover/auth/assets and a legacy-URL migration) and PR #2 (Parts plan)
@@ -78,7 +83,7 @@ Detailed commands, limitations and metadata discoveries are in
 
 ## Next actions and owner dependencies
 
-1. Publish this source-bearing candidate slice; verify its exact latest CI head.
+1. Verify published PR #68's exact latest CI head.
    Do not substitute PR #67's green CI for the new head's checks.
 2. Reconcile PR #9 selectively, including provider/auth/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked

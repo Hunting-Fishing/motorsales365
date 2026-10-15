@@ -158,3 +158,15 @@ already completed model/codec/recovery characterization or manufacture privilege
 legacy positives. See `../365_RELEASE_ACCEPTANCE_LEDGER.md` for workflow gates and
 the owner staging/pilot inputs. Reassess the seven-day target by Day 2; no silent
 scope reduction or guarantee of completion from CI/test counts.
+
+### Publication record
+
+Published and attached draft [PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
+base `security/claim-revision-invalidation-model` at `576fb17d`, head
+`completion/365-seven-day-integration`. First evidence head `76c5fa41` started
+CI `38748496533`; the first snapshot has running/queued jobs, not a pass.
+Wrapper `38748496539` preview
+is in progress; migration/production jobs skip. Supabase Preview skips because
+the SQL directory did not change. No upload or provider hosting result is inferred.
+This publication-record commit supersedes the initial check head. Verify the
+exact newest PR head on resumption. No other remote branch or main was changed.

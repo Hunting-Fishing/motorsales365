@@ -1218,3 +1218,9 @@ dependencies; no paid provisioning or live business request/migration/deploy.
 No SQL/generated middleware changed. Source 404/423, 19 unclassified and all prior
 Customer 360 consent/history/financial/release gates remain open. Reassess actual
 deadline feasibility by Day 2; do not replace full acceptance with test counts.
+
+Published/attached draft PR #68 stacks on PR #67 (`576fb17d`), code `ece7e2a0`,
+first evidence head `76c5fa41`; CI `38748496533` running/queued, wrapper
+`38748496539` preview in progress and migrations/production skipped. No upload,
+new-head pass or live behavior is claimed. This publication-record commit
+supersedes the first check head; verify the PR's exact newest head next.
