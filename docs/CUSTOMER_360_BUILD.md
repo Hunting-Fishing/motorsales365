@@ -749,3 +749,32 @@ PR #54's fresh full application regression also passes, 1,207/1,207 in 59 files
 pending; hosting `6f0e6469-b986-4938-bbaa-418a361b69ab` failed separately and
 wrapper `38696532720` skipped migrations/production deployment. Verify later docs
 HEAD separately; no passing build/preview wrapper constitutes deployment.
+
+PR #54 docs `b415d4b` now passed all six CI gates (`38696845832`), verified on
+the auth/bootstrap follow-up; hosting failed separately and migrations/production
+deployment skipped. This supersedes its in-progress snapshot above.
+
+Draft PR #55 (code `34cea88`) adds the bounded auth/bootstrap fingerprint and
+retained-source frontier: six tables/123 columns/25 constraints/22 indexes/24
+policies/15 triggers/29 functions/six enums and one exact-text sequence envelope.
+25 public bodies match nineteen pinned source files; three original org helpers,
+org/member/org-role DDL and external member-tier constraints remain explicit gaps.
+Two READ ONLY executions, retained/privacy-reviewed at `07:22:41.479679` UTC;
+first unpublished local bigint-rounded artifact discarded before exact-text
+recapture. No application/auth rows/counts/helper/raw definition or sequence-current
+reads, mutation, migration or deployment. Eleven focused and 496 tooling/assets
+pass (486 serial plus separate 10), no failures/skips/cancellations. Syntax/lint/
+source+Markdown formatting/canonical JSON/diff/primary review pass. No fresh app
+run is claimed; PR #54's 1,207 tests, TypeScript and CI are parent evidence only.
+Newest PR #55 checks need independent verification. Evidence and exact source
+boundaries: `evidence/AUTH_BOOTSTRAP_DEPENDENCY_FRONTIER.md`.
+
+Next prepare privacy-gated selected org definition recovery, not a general schema/
+data dump or history adoption; compose actual no-referral bootstrap with all
+critical profile/org/membership/plan/subscription/sequence/intent/admin-audit effects.
+Independently close member-tier/nonempty-referral writers. Matched trial `<> ANY`
+logic and staff NULL/enum mismatch remain uncorrected release blockers, not new
+signup/production acceptance. Original actor/revisions/locks/offboarding/native/
+consent/recovery/receipt/mobile/owner/full-media gates remain open; no sparse deploy,
+helper restriction replay, paid resource, customer message, data deletion or
+duplicate automation. Source/replay/baseline/parity/release flags stay unchanged.
