@@ -602,3 +602,37 @@ actor custody, trusted claim/evidence/tenure revisions and competing-writer lock
 protocol before an atomic kernel or native/consent-reconciled owner positives.
 All recovery/API/session/concurrency/OCR/mobile/owner/full-media release gates
 remain open; preserve applied restrictions and the single recurring follow-up.
+
+Follow-up verification: PR #49 docs `722f4de` passed all six CI gates
+(`38684735093`). The codec remains unwired; this does not verify an atomic
+endpoint, original-actor custody, claim revision or production behavior. Hosting
+remains separately failed and migration/deployment wrappers skipped.
+
+Draft PR #50 (code `6136701`) now composes the separate platform-role selected
+policy/nonstaff referral forward path offline: six actual tables, 15 current
+policies, 16 critical constraints, 17 indexes, 13 unchanged helper bodies and nine
+attachments match a new privacy-reviewed fingerprint-only dated catalog. The
+actual accreditation is July's body, not the later retained September rewrite;
+source filename order is not applied lineage. Auth bootstrap/internal helpers and
+two auth attachments are fingerprint-mapped, not executed. Synthetic support
+projections/admin seeds and actual nonstaff-domain early return are explicit;
+no permissive auth/partner stubs or platform authority adoption.
+
+25 composition and seven catalog tests pass; full serial tooling 440/440
+(349.896s) then 10/10 receipt assets (0.483s), 450 total in separate commands.
+Independent review, syntax/lint/format/diff pass. Real late audit NOT NULL/rep FK
+faults verify prior real fanouts and restore selected data/catalog/settings.
+Ordinary DML denials versus zero rows, actual sales-assignment visibility,
+nullable service audit actor, binding gaps and role UPDATE/DELETE stale/missing
+provisioning are characterized, not repaired. Non-row grants are not RLS row
+containment. Scope/pins: `evidence/PLATFORM_ROLE_FORWARD_COMPOSITION.md`.
+
+PR #50 code CI `38687514056` is running; hosting failed separately and wrapper
+skipped migrations/production deployment. Documentation heads need fresh checks.
+One catalog-only live read occurred; no application helpers/API calls, schema/
+role/data/history mutation, migration or deployment. Next compose actual auth/
+profile/organization INSERT and staff-domain partner paths, incoming role writers,
+own-rep/offboarding and original-actor custody, while defining trusted claim/
+evidence/tenure revisions and a common writer-lock protocol before an atomic
+kernel. Native/consent/recovery/API/session/concurrency/OCR/mobile/owner/full-media
+gates remain open. Preserve applied restrictions and the one recurring follow-up.

@@ -211,6 +211,12 @@ and native/consent reconciliation prerequisites are explicit. Do not wire this
 codec to an unapplied RPC or present syntax validation as a completed transfer.
 Existing recurring continuation remains active without duplication.
 
+Follow-up: documentation head `722f4decc67113525511406a697da80f25ce1ab5`
+passed all six CI gates in run `38684735093`, verified on 2026-10-15. Its hosting
+check `b73c2ad5-a313-446e-8a4c-361df5af49e1` failed separately; wrapper
+`38684735156` skipped migrations/production deployment. No deployment or atomic
+authority acceptance follows from these checks.
+
 ## UTF-8 LF pins
 
 | Artifact                                                                                     | Bytes | SHA256                                                             |
