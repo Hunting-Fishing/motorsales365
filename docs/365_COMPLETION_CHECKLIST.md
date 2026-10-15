@@ -69,13 +69,15 @@ Security reconciliation branch: `completion/365-security`.
    remain source behavior, not repairs. Seven other business attachments target
    INSERT/status/custom-domain operations outside this slice; global-role/
    partner/manual writers are separate incoming paths, not derive forward calls.
-   Verify its own latest head, then close original-actor/pending/prior-owner/
-   idempotency, trusted team/ownership/
+   Its docs `8b1b38e` now passed all six CI gates (`38681676475`); PR #48 docs
+   `6389eac` also passed all six (`38682112982`). Hosting remains separately
+   failed and migrations/production deployment skipped. Next close original-actor/pending/prior-owner/
+   idempotency and trusted claim-attempt/evidence/tenure revision, then team/ownership/
    shift/audit dependencies before adopting privileged positives. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
    PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
    (`38667796510`). PR #40 composes
-   selected current policies and confirms profile scope pivots/global catalog-role
+   selected current policies and confirms profile scope pivots/cross-shop native catalog-role
    effects offline. Neither is production authority acceptance.
    PR #40 docs `e97baca` passed all six CI gates (run `38664876182`), verified
    on the roles-catalog follow-up; hosting remains separately failed.
@@ -104,22 +106,30 @@ Security reconciliation branch: `completion/365-security`.
    Philippine pilot from the delivery sequence below. Native CRM remains the
    implementation path; ERPNext/Dolibarr adoption is not approved.
 
-Latest fully CI-verified application slice: PR #46, docs head `5346779`, all six
-CI gates passed (run `38678740970`), 1,029 application tests across 54 files. These are review
+Latest fully CI-verified application slice: PR #48, docs head `6389eac`, all six
+CI gates passed (run `38682112982`), 1,068 application tests across 55 files. These are review
 branches, not merged/deployed production acceptance. The heartbeat stays active
 without duplicate reminders for an unchanged pending owner decision.
 
 Latest application candidate: draft PR #48, code `59228c5`, 1,068 application tests
 across 55 files and full TypeScript pass. It hardens claim-review acknowledgement,
 private snapshot caches and request lifetimes without changing backend authority;
-its latest head needs CI verification. PR #46 remains the latest fully CI-verified
-application parent (owner-row confirmation, 1,029 tests). PR #38, code `22c2724`, remains the earlier
+its documentation head passed the six gates recorded above. PR #46 remains the
+earlier verified owner-row confirmation parent (1,029 tests). PR #38, code `22c2724`, remains the earlier
 six-chat-caller slice (986 tests), not the latest verified application head.
 The following PR #39 is a separate memory-only,
 non-adopted research candidate, not a compatible staff-management release.
 PR #32's reminder consumer is retained in this stack and its
 API remains unapplied: do not ship before compatible database, native authority
 and recovery release prerequisites. No application candidate is deployed.
+
+Latest unwired preparatory candidate: draft PR #49, code `f6bf32e`, strict future
+claim-review command codec plus actual unchanged caller characterization and
+platform helper source correction. Final full app 1,113/1,113 across 57 files,
+45 focused cases, 418 tooling/assets and TypeScript pass; its own latest CI needs
+verification. It is NOT a new atomic endpoint, ledger, authority/revision model,
+confirmed receipt or deployed change. PR #48 remains the verified connected application-source
+parent, not a deployed release. Do not wire the codec before its prerequisites.
 
 Latest database read candidate: draft PR #31, code `797876c`,22 new focused tests
 and 191/191 full sequential tooling pass. The CLI-generated reminder invoker API
@@ -1275,8 +1285,11 @@ admin-audit dependencies, reusing existing incoming inventory. Its effects and
 audit-failure handling remain outside this proof. Resolve original actor,
 pending/current-owner conflict, atomic reviewer stamping, idempotent outcomes and
 independent-session/recovery/operator prerequisites before an authorized forward
-claim/transfer candidate or native owner positives. The unmapped has_role body
-is not executed or silently substituted; actual can_moderate reads public roles
+claim/transfer candidate or native owner positives. The has_role body, described
+as unmapped at that checkpoint, is now source-body mapped on the command-contract
+follow-up (May 1 source lines 45–56; exact body MD5 matches both saved catalogs).
+That earlier mismatch note was incorrect; no frozen source/observation is rewritten.
+It is still not executed or silently substituted; actual can_moderate reads public roles
 directly. Native and platform role authority are different unresolved boundaries.
 
 Trusted team/raw reentry, management/delegation/invitation/multi-roster policy,
@@ -1443,6 +1456,64 @@ consent/tenure/private retention, receipt/mobile/owner pilot and full-media host
 gates remain open. No paid resources, customer communication, data deletion or
 destructive history repair. Existing recurring follow-up stays active, without
 duplicate automation or any claim of continuous work between scheduled turns.
+
+## Preparatory claim command and actual-caller checkpoint (2026-10-15)
+
+Draft PR #49, code `f6bf32efacb837dd570f4a0397ed1e0826eb2e9a`, branch
+`security/claim-review-command-contract`, stacked on PR #48 docs `6389eac`.
+PR #47 docs `8b1b38e` and PR #48 docs `6389eac` now passed all six CI gates
+(`38681676475`, `38682112982`); hosting remains separately failed and migration/
+production deployment wrappers skipped. This new code CI `38684539992` is running;
+hosting `7978ca7c-7944-41ad-bb7a-3e45343baf7c` failed separately and wrapper
+`38684540015` skips migration detection/production deployment. Subsequent docs
+heads require their own verification; no preview-wrapper upload is inferred.
+
+The preparatory server-only-by-convention codec is pure and UNWIRED: strict
+versioned browser fields, explicit nullable expected prior owner, separate
+supplied-middleware actor/account equality, canonical UUIDs/exact notes,
+defensive own-field copies, NUL/unpaired-surrogate rejection, immutable canonical
+payload/SHA256 separated from actor/request key. No current handler/route/client/
+SQL/RPC uses it. Equality, freezing and hashes are not actor trust, authorization,
+revision freshness, a ledger, a confirmed receipt or worker-runtime acceptance.
+Its owner A→B→A control explicitly proves equal fields are not a revision token.
+Claim-attempt/evidence/ownership-tenure revisions must be reviewed before wiring.
+
+Twenty new tests execute the actual unchanged legacy review handler with real
+Zod validation and mocked middleware/clients. They distinguish returned errors/
+zero rows versus rejected promises, exact RPC/stamp/reject/count/reset ordering,
+NULL-count fallback, id-only writes and absent local idempotency/precondition reads.
+No mock proves real auth, permissions, commit/rollback or audit. UI/handler/auth
+middleware/admin-client bytes remain unchanged. Three static tests correct the
+earlier has_role mismatch note: retained May 1 lines 45–56 body matches BOTH dated
+catalogs (`dae5cfc5a8d92461a428f6702e4e65af`). Frozen fixture comments/bytes and
+observations are preserved, with explicit documentation erratum; no applied
+source history or platform-role policy/writer authority is thereby accepted.
+Native Shop Manager role prototypes are not platform public.user_roles policy
+proofs; raw ALL grants do not establish ordinary-client direct role writes.
+
+Verification: final 45 focused app cases (2.21s, 25 codec + 20 handler); full app
+1,113/1,113 across 57 files (88.47s), no failure/skip/quarantine; final TypeScript
+passes. Full serial 408 CI-tooling (317.517s), then 10 receipt assets (0.440s), 418
+total in separate consecutive commands, no failures/skips/cancellations.
+Zero-error/warning ESLint, format/diff and independent final source/prototype-
+cleanup/contract/test/document review pass. Dedicated never-quarantined caller/
+command and static source-correspondence CI gates added. Exact pins/design:
+`evidence/CLAIM_REVIEW_ATOMIC_CONTRACT.md`.
+
+Migration impact/live DB/live application calls/deployment: none. No new endpoint,
+grant/policy/schema/data/history mutations, resources, customer communication or
+sparse artifact upload. Preserve all three live helper restrictions without
+replay; composer remains 404/423 with 19 unclassified and baseline/replay/parity/
+release flags remain false. Exact next action: verify PR #49 latest checks, then
+prepare/review a bounded read-only platform-role/auth-bootstrap/referral metadata
+closure, compose actual selected policies/writers/attachments without permissive
+stubs and establish original-actor custody. Separately define trusted immutable
+claim-attempt/evidence/tenure revision and a common competing-writer lock protocol
+before implementing/wiring a disposable atomic kernel. Required audit and native/
+consent reconciliation cannot be skipped. Real API/JWT/role/session/concurrency,
+operator DB/private-storage recovery, consent/tenure/private retention, receipt/
+mobile/owner pilot and full-media hosting remain open. Same-chat continuation
+stays active without duplication or claims of continuous between-run work.
 
 ## Recovery evidence (original scope, retained below)
 
