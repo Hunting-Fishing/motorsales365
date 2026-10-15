@@ -158,7 +158,7 @@ jobs:
         run: node --test --test-concurrency=1 scripts/ci/claim-evidence-catalog-review.test.mjs scripts/ci/full-claim-evidence-composition.test.mjs
 
       - name: Claim review current caller and unwired command contracts (never quarantined)
-        run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
+        run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts src/lib/claim-review-revision-contract.server.test.ts --maxWorkers=1
 
       - name: Account creation caller acknowledgment and private lifetimes (never quarantined)
         run: npx vitest run src/components/admin/add-user-dialog.test.tsx --maxWorkers=1

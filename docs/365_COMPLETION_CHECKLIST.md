@@ -15,6 +15,49 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+CI budget follow-up for attached PR #65/#66: original PR #65 unit job
+`116415203931`/run `38733014822` cancelled at12:28:38 UTC after15m08s; annotation
+confirms 15m0s maximum exceeded before mandatory suites completed, not a pass or
+an assertion diagnosis. Unit-job timeout alone raised to25 minutes with all tests/
+quarantine/report/release gates unchanged. Isolated `360b1e0` cherry-picked to
+PR #65 as `3040a1e`, then non-destructively merged into v2 branch (`cc54b94`),
+both histories preserved. Parent diff only timeout; runtime/tests unchanged.
+Ten release/report guards pass again (0.529 seconds), YAML format/diff pass.
+PR #65 new CI `38735096453` running; hosting failed separately, wrapper
+`38735096472` preview passed/migrations-production skipped. New PR #66 publication
+HEAD checks supersede its earlier `040599a` run. Verify exact latest heads next;
+no source/authority/release flag, paid tier/resource or production setting change.
+Resume the companion revision/invalidation model below, not completed recovery.
+
+Newest revision-aware claim contract: code `dce37b1`, branch
+`security/claim-review-revision-contract`, based on draft PR #65 docs `a9987a5`.
+Separate UNWIRED v2 codec requires explicit attempt UUID and canonical decimal
+claim-attempt/evidence-set/ownership-tenure revisions, plus prior owner/account/
+request assertions. No v1/generated middleware/legacy handler/database changes;
+immutable v1 source/tests pinned. Exact frozen payload/key and UTF-8 hash cover
+ABA/revision differences, but do not authenticate supplied actors, validate current
+locked state, execute mutations, provide receipts or implement an idempotency ledger.
+Zero is explicit syntax only, never a missing/unknown trusted binding. Unknown/
+accessor/prototype fields, coercions/overflow and malformed text reject.
+33 new/58 focused tests pass (28.74 seconds); fresh full application 1,240/1,240
+across60 files passes (114.058 seconds), zero failures/pending/no quarantine needed;
+full TypeScript/lint/format/diff/primary review pass. Ten fresh report/release-guard
+tests pass (0.753 seconds). PR #65's 676 tooling+10 assets are unchanged parent
+evidence, not rerun/double-counted. Evidence: `evidence/CLAIM_REVIEW_REVISION_CONTRACT.md`.
+PR #65 is published/attached; CI `38733014822` five passed/unit pending at observation,
+hosting failed separately, migrations/production skipped. Verify new HEAD separately.
+Next disposable companion revision/invalidation model on full PR #65 tables:
+all real attempt/evidence/owner writers, metadata UPDATE/delete/recreate/ABA paths,
+unknown/unverified initialization deny; no trusted zero/backfill fabrication.
+Then original actor/fresh authority, atomic pending/current-owner/revision/request
+ledger and audit receipt/common locks, native/team/offboarding/private-storage/
+independent-session/runtime/recovery gates. No codec-only freshness or privileged
+positive adoption. Source404/423,19 unclassified; all baseline/replay/parity/release
+and existing acceptance gates unchanged. Zero live query/mutation/migration/deploy,
+paid resource, customer message, data deletion, restriction replay, PR merge or
+duplicate automation; single recurring continuation active. Internal-staff caller
+acknowledgment remains independent safe work. Do not repeat completed recovery/codec.
+
 Newest full claim/evidence/ownership writer slice: code `dfac9d9`, branch
 `security/full-claim-evidence-composition`, based on PR #64 docs `5de2189`.
 One READ ONLY metadata diagnostic at `11:41:19.388797` UTC recovers actual three
