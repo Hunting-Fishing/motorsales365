@@ -181,6 +181,9 @@ jobs:
       - name: Internal staff acknowledgments and private UI lifetimes (never quarantined)
         run: npx vitest run src/lib/internal-staff.functions.test.ts src/components/internal-staff/InternalStaffView.test.tsx --maxWorkers=1
 
+      - name: Native invoice read lifetimes and financial acknowledgments (never quarantined)
+        run: npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1
+
       - name: Native Google OAuth handoff and route lifetimes (never quarantined)
         run: npx vitest run src/lib/google-oauth.test.ts src/hooks/use-google-oauth.test.tsx src/__tests__/google-oauth-routes.test.tsx --maxWorkers=1
 
