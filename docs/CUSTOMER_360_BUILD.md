@@ -1189,3 +1189,32 @@ evidence HEAD `32a7fc9`; first CI `38739987913` started. Hosting build
 `492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately, wrapper `38739987914`
 started with migrations/production skipped. Verify the newest publication-record
 HEAD next; this documentation-only commit supersedes the first check head.
+
+## Seven-day integration candidate and staff workflow follow-up (2026-10-15)
+
+Use branch `completion/365-seven-day-integration`, source `ece7e2a0288a9a70be58feeeaefdfe1922fde887`,
+and the owner's `365_SEVEN_DAY_COMPLETION_PLAN.md` (target 22 October, 21:00 Manila).
+The initial `365_RELEASE_ACCEPTANCE_LEDGER.md` distinguishes source inclusion,
+staging, owner and live acceptance. It is not yet an exhaustive action-level map.
+59/61 captured open PR heads are already ancestors, including CI #8; PR #9
+cutover and PR #2 plan need separate content reconciliation, not a bulk merge.
+
+The actual internal-staff view/handlers now confirm precise returned rows/provider
+responses, fence stale private account/admin/snapshot/dialog results, and show
+partial creation/sign-in-only acknowledgments. Unknown creation locks only its
+mounted account scope, not a durable retry ledger. No original-human/fresh-role/
+tenant, trusted team, atomic hierarchy, native provisioning or session-revocation
+acceptance is inferred. Fresh full application 1,333/1,333 across 62 files passes
+(93 new focused included); TypeScript/lint/build/report guards/assets pass as
+bounded in `evidence/SEVEN_DAY_INTEGRATION_STAFF_ACKNOWLEDGMENT.md`.
+
+Parent PR #67 latest `576fb17d` now passed all six CI gates; separate hosting
+failure has no diagnostic text from GitHub. Provider logs/full media and recovery
+remain open. Connected Supabase discovery finds no separate 365 staging target;
+the default main branch is not isolated staging. Owner staging and pilot-account
+questions are open; local Docker Linux engine is unavailable. Safe local work
+continues on selective cutover/action-level inventory and trusted transaction
+dependencies; no paid provisioning or live business request/migration/deploy.
+No SQL/generated middleware changed. Source 404/423, 19 unclassified and all prior
+Customer 360 consent/history/financial/release gates remain open. Reassess actual
+deadline feasibility by Day 2; do not replace full acceptance with test counts.

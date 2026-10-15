@@ -25,8 +25,54 @@ recovery blockers and bounded parallel feature work. Continue the named authorit
 dependency below as part of that integration path, not an indefinite standalone
 research chain. Preserve all work and existing approved restrictions. Raise
 specific access/capacity/decision blockers on Day1 and reassess deadline feasibility
-by Day2. One existing automation only; no continuous-execution guarantee. Planning
-files are saved locally in this direct user turn, not committed/pushed or deployed.
+by Day2. One existing automation only; no continuous-execution guarantee. The owner
+plan is preserved in commit `0aa3fb5`; publication status is recorded below.
+
+Newest integrated candidate: `completion/365-seven-day-integration`, source
+`ece7e2a0288a9a70be58feeeaefdfe1922fde887`. Initial workflow gates are in
+`365_RELEASE_ACCEPTANCE_LEDGER.md`; action-level inventory is not yet exhaustive.
+Dated 13:44:13 UTC inventory finds 59/61 then-open PR heads already ancestors,
+including CI #8; do not bulk merge those heads again. PR #9 provider/auth/config/
+assets/legacy-URL migration and PR #2 Parts plan need separate content review.
+Ancestry is not accepted authority, applied SQL, patch parity or live verification.
+
+Actual internal-staff handler/UI fixes now require matching manager/profile/ban
+responses, distinguish partial creation and sign-in-only restriction, scope
+private reads/forms to account/admin/snapshot lifetimes and suppress late results.
+Unknown creation locks controls only within the mounted account scope, not a
+durable ledger. Role/target eligibility, atomic hierarchy, existing-session and
+native/team/chat/storage offboarding remain unresolved; no provisioning or
+revocation success is fabricated. 93 focused tests are included in fresh full
+application 1,333/1,333 across 62 files (100.029s); report checker/full TypeScript/
+changed-file lint/format/diff/primary review/build pass. Fifteen inventory/report/
+release guards and 10 OCR/PDF assets pass separately. Parent 701-tooling evidence
+is unchanged/not rerun. No real-browser/mobile/provider/JWT/SQL acceptance claimed.
+Evidence: `evidence/SEVEN_DAY_INTEGRATION_STAFF_ACKNOWLEDGMENT.md`.
+
+Parent PR #67 exact head `576fb17d` now passed all six CI gates (`38740109605`);
+hosting build `e4ecbe71-54eb-4776-9b31-3f3508d6fece` fails independently.
+Purpose-built check diagnostics expose no text/annotations/root cause; need
+authenticated hosting logs. Wrapper `38740109751` preview step passes but upload
+is configured skipped, migration/production skipped. New candidate head needs
+its own checks. Local sparse build is not a releasable full-media artifact.
+
+Two fresh Supabase resource/branch metadata reads show canonical project healthy
+on 17.6.1.155, but no separate 365 staging target. The sole default main branch is
+not isolation; its Sep 27 MIGRATIONS_FAILED marker is old metadata, not a new
+failed migration. Existing isolated-staging nomination/access question is open;
+pilot shop/test-account question also remains open. No passwords/keys requested.
+Local Docker CLI exists but Linux engine is unavailable; psql absent on PATH.
+No daemon/image install or paid resource. Safe local work continues meanwhile.
+
+Exact next action: publish/attach this source-bearing candidate and check its
+latest head; reconcile PR #9 selectively and PR #2 plan; complete action-level
+ledger and 19 outstanding migration classifications. Close original-human/fresh
+session-role-tenant/native-team/claim/offboarding/private-object transaction and
+recovery boundaries as the staging integration path, not an endless lab chain.
+Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration
+impact/deployment none; zero live business/Auth mutation, restriction replay,
+history repair, customer message, paid resource, PR merge or duplicate automation.
+Only project/branch metadata was read. The heartbeat remains active.
 
 Newest disposable revision/invalidation model: code `c03fede`, branch
 `security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`.
