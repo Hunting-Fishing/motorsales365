@@ -91,6 +91,9 @@ jobs:
       - name: Native staff/chat/offboarding transaction characterization (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/native-staff-trigger-composition.test.mjs
 
+      - name: Native self-shift-only companion candidate (memory-only, not adopted)
+        run: node --test --test-concurrency=1 scripts/ci/native-self-shift-candidate.test.mjs
+
       - name: Native chat membership policy characterization (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/native-catalog-review.test.mjs scripts/ci/native-chat-membership-policy.test.mjs
 
