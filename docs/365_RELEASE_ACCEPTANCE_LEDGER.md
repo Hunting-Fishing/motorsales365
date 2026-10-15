@@ -14,8 +14,9 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest source slice: `0271fc09` (inactive native Auth reservation/receipt and bounded provider attempt).
-Prior source slice: `0dfac563` (unwired native Auth planner/first-email rendering).
+Latest source slice: `0c23d336` (invoice read lifetimes and financial caller acknowledgments).
+Prior source slices: `0271fc09` (inactive native Auth reservation/receipt and bounded provider attempt),
+`0dfac563` (unwired native Auth planner/first-email rendering).
 Prior source slices: `5e5d5f8a` (unwired webhook verifier), `65475626`
 (unsubscribe acknowledgment/UI), test-type follow-up `3f829a6b`.
 Prior slices: `f46b048d` (unused cloud-auth retirement), `a420a44d`
@@ -27,9 +28,11 @@ staff slice: `ece7e2a0288a9a70be58feeeaefdfe1922fde887`.
 Main remains `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
 
 Published/attached [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
-stacked on PR #67 at `576fb17d`. Prior `52145a0a` passed all six CI gates
-(`38774110116`); a transient diagnostic HTTP 502 did not represent a test failure.
-Independent hosting failed without root-cause text. New
+stacked on PR #67 at `576fb17d`. Prior published `d101f650` passed all six CI gates
+(`38778102213`), including browser OCR and disposable Parts Postgres. Independent
+hosting build `60d22afc-094a-4845-8d6e-f87a1e4e5cfe` failed with ID/link only,
+without root-cause text/annotations. Wrapper `38778102490` preview passed and
+migration/production skipped. Authenticated hosting diagnostics remain needed. New
 publication requires exact latest-head checks. No upload or new-head pass is claimed.
 
 The dated PR inventory found 59 of the 61 then-open PR heads already ancestors
@@ -67,7 +70,7 @@ route is not evidence that the changed candidate has passed those gates.
 | U0 / identity      | Native Google login/signup, `src/lib/google-oauth.ts`, `src/hooks/use-google-oauth.ts`, login/signup routes                                                        | PR #9 native-client handoff selectively adapted with URL, single-flight and context-lifetime guards         | Not run | Pending | Not verified | Verify approved Google provider/callback and Supabase redirect allowlist, actual implicit callback/session, pending-profile application, permitted account/role transitions and recovery. URL generation is not authentication or provisioning. Generated middleware/wrapper, dependencies and broader PR #9 cutover remain unchanged.                  |
 | C1 / CRM           | Receipt image/PDF/manual review, `src/components/vehicle-receipt-panel.tsx`, `src/lib/receipt-document.client.ts`, `src/lib/vehicle-receipts.functions.ts`         | OCR and reviewed-entry foundations included; broader workflow acceptance open                               | Not run | Pending | Not verified | Phone image/PDF/manual correction to confirmed purchase/expense with correct amounts/currency/date/customer/vehicle/work order; no duplicate on retry, originals private. Recover original interrupted scanner/workspace separately or record its unresolved status; do not call source recovery completed by rebuilding.                               |
 | C2 / CRM           | Native Customer 360, `src/routes/_authenticated/workspace.customers.$id.tsx`, `src/components/shop-manager/customer-vehicle-activity.tsx`                          | Commercial, communications, reminders and activity readers/UI included; selected SQL candidates not applied | Blocked | Pending | Not verified | Verify same native identities, linked-vehicle consent at read, independent errors/caps, assignments/tasks/reminders and account/shop transitions. Complete release-safe SQL/role boundary before activating consumers.                                                                                                                                  |
-| C3 / CRM           | Shop Manager operational/financial loop, `src/routes/_authenticated/workspace.work-orders.$id.tsx`, `src/routes/_authenticated/workspace.invoices.$id.tsx`         | Existing screens and read hardening included; invoice converter integrity unresolved                        | Blocked | Pending | Not verified | Quote to work order to invoice/payment/refund must reconcile labor/parts/tax/due dates/status, stock and idempotent linkage in an authorized atomic transaction. Direct legacy helper restriction does not close indirect quote-conversion bypass or supply a replacement.                                                                              |
+| C3 / CRM           | Shop Manager operational/financial loop, `src/routes/_authenticated/workspace.work-orders.$id.tsx`, `src/routes/_authenticated/workspace.invoices.$id.tsx`         | Invoice caller lifetimes/returned rows hardened; quote/conversion and atomic writers unresolved             | Blocked | Pending | Not verified | Quote to work order to invoice/payment/refund must reconcile labor/parts/tax/due dates/status, stock and idempotent linkage in an authorized atomic transaction. Caller acknowledgments are not durable dedupe, stock/posting/recovery proof. Direct legacy helper restriction does not close indirect quote-conversion bypass or supply a replacement. |
 | P1 / Parts/history | Parts catalog/fitment/receive/stock, `src/lib/parts-catalog.functions.ts`, `src/lib/parts-ops.functions.ts`, workspace inventory/purchase-order/vendor-bill routes | Existing implementation included; complete operational acceptance open                                      | Not run | Pending | Not verified | Catalog/fitment to order/receive/allocation/installation, returns/warranty and financial reversals must reconcile. Include counter-sale, stock alerts, vendors and margin reports in action-level inventory.                                                                                                                                            |
 | P2 / Parts/history | Parts partner network, `src/lib/parts-network-operations.functions.ts`, `src/lib/parts-fulfillment.functions.ts`                                                   | Existing code included; pinned PR #2 reference content recovered; active authority unchanged                | Not run | Pending | Not verified | Reconcile PA1–PA7 below with current operational scope: partner onboarding/catalog/feed/inquiry/order/fulfillment and private cost/commission/report controls. Plan recovery is not baseline adoption or provider/runtime acceptance.                                                                                                                   |
 | P3 / Parts/history | Vehicle/component history, `src/lib/vehicle-history.functions.ts`, `src/components/public-vehicle-history.tsx`                                                     | Receipt/installation/history foundations included; consent/tenure corrections unfinished                    | Blocked | Pending | Not verified | Actual installation/removal/replacement, corrections, ownership transfer, consent/revocation, private prior-owner records, report snapshots/source coverage and expiring shares. Purchase must never imply installation.                                                                                                                                |
@@ -88,43 +91,68 @@ between scheduled turns.
 
 ## Shop Manager financial action inventory
 
-Bounded source scan at `0271fc09`, not exhaustive application inventory. These
+Bounded source scan at `0271fc09`, invoice caller update at `0c23d336`; not exhaustive application inventory. These
 ported actions use browser `smSupabase` scoped by `src/lib/shop-manager/db.ts`,
 not connected dedicated financial command handlers. Every row remains staging/API
 unverified, owner pending and live unverified. Existing component/SDK mocks do not
 establish JWT/RLS, monetary/stock transactions or recovery acceptance.
 
-| ID    | Existing action and route anchor                                                                                                             | Required closure                                                                                                                                                                            |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C3.01 | Browse/open quotes; `workspace.quotes.tsx:31`, `workspace.quotes.$id.tsx:47`                                                                 | Account/shop-scoped caches, bounded complete items and generic errors; no direct quote-route tests located.                                                                                 |
-| C3.02 | Create quote/items; `workspace.quotes.new.tsx:116`                                                                                           | Separate header/items can partially commit. Verify current shop/customer/vehicle, amounts/date/number, retry identity and atomic creation.                                                  |
-| C3.03 | Convert quote; `workspace.quotes.$id.tsx:103`                                                                                                | Four separate writes and source-item readiness/mappings/shop binding; atomic authorized conversion and idempotency required.                                                                |
-| C3.04 | Browse/create work order; `workspace.work-orders.tsx:29`, `workspace.work-orders.new.tsx:110`                                                | Unscoped list/options, current shop/customer/vehicle binding, returned-row/late callback and retry tests.                                                                                   |
-| C3.05 | Open work order/change status; `workspace.work-orders.$id.tsx:227`, `:379`                                                                   | Existing mocked detail readiness/lifetime tests; affected-row confirmation, authorized transitions and actual API acceptance remain.                                                        |
-| C3.06 | Add/remove labor; `workspace.work-orders.$id.tsx:858`, `:398`                                                                                | Existing draft/late-callback mocks; finite amounts, affected rows, billing locks and authoritative totals reconciliation remain.                                                            |
-| C3.07 | Add/remove parts; `workspace.work-orders.$id.tsx:987`, `:418`                                                                                | Existing caller mocks; atomic stock reservation/issue/actual installation and reversals remain.                                                                                             |
-| C3.08 | Add/delete billable time; `src/components/shop-manager/work-order-time-entries.tsx:86`, `:243`, `:100`                                       | Existing scoped child-card mocks; define labor/time billing contract, since current invoice generation does not consume these entries.                                                      |
-| C3.09 | Generate invoice; `workspace.work-orders.$id.tsx:293`                                                                                        | Existing incomplete-source/partial-write warnings; due date, field mapping, atomic header/items/work-order link, concurrent retries and reviewed tax/stock policy remain.                   |
-| C3.10 | Browse/open invoice/items/payments; `workspace.invoices.tsx:34`, `workspace.invoices.$id.tsx:76`                                             | Unscoped caches/ungated child reads and unreviewed paid/outstanding status semantics; no direct invoice-route tests located.                                                                |
-| C3.11 | Add inventory invoice line; `workspace.invoices.$id.tsx:574`                                                                                 | Separate insert/read/totals update ignores later errors; stock/COGS success is asserted without confirmation. Safe acknowledgment plus atomic stock/financial/reversal acceptance required. |
-| C3.12 | Record payment; `workspace.invoices.$id.tsx:428`                                                                                             | Insert followed by conditional invoice update ignores update error; no returned receipt/idempotency. Partial/unknown/stale/concurrent/overpayment and reconciliation tests required.        |
-| C3.13 | Request/decide refund, void or credit approval; `workspace.operations.tsx:180`, `:205`                                                       | Approval RPCs record request/decision, not financial execution. Verify entity binding and fresh authority/role/RPC acceptance.                                                              |
-| C3.14 | Execute native refund/void and reconcile; approval labels `workspace.operations.tsx:69`, payment exclusions `workspace.invoices.$id.tsx:175` | No connected native execution handler located in this bounded scan. Keep as an explicit implementation gap; approval/display is not completion.                                             |
+| ID    | Existing action and route anchor                                                                       | Required closure                                                                                                                                                                                                                                                                  |
+| ----- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C3.01 | Browse/open quotes; `workspace.quotes.tsx:31`, `workspace.quotes.$id.tsx:47`                           | Account/shop-scoped caches, bounded complete items and generic errors; no direct quote-route tests located.                                                                                                                                                                       |
+| C3.02 | Create quote/items; `workspace.quotes.new.tsx:116`                                                     | Separate header/items can partially commit. Verify current shop/customer/vehicle, amounts/date/number, retry identity and atomic creation.                                                                                                                                        |
+| C3.03 | Convert quote; `workspace.quotes.$id.tsx:103`                                                          | Four separate writes and source-item readiness/mappings/shop binding; atomic authorized conversion and idempotency required.                                                                                                                                                      |
+| C3.04 | Browse/create work order; `workspace.work-orders.tsx:29`, `workspace.work-orders.new.tsx:110`          | Unscoped list/options, current shop/customer/vehicle binding, returned-row/late callback and retry tests.                                                                                                                                                                         |
+| C3.05 | Open work order/change status; `workspace.work-orders.$id.tsx:227`, `:379`                             | Existing mocked detail readiness/lifetime tests; affected-row confirmation, authorized transitions and actual API acceptance remain.                                                                                                                                              |
+| C3.06 | Add/remove labor; `workspace.work-orders.$id.tsx:858`, `:398`                                          | Existing draft/late-callback mocks; finite amounts, affected rows, billing locks and authoritative totals reconciliation remain.                                                                                                                                                  |
+| C3.07 | Add/remove parts; `workspace.work-orders.$id.tsx:987`, `:418`                                          | Existing caller mocks; atomic stock reservation/issue/actual installation and reversals remain.                                                                                                                                                                                   |
+| C3.08 | Add/delete billable time; `src/components/shop-manager/work-order-time-entries.tsx:86`, `:243`, `:100` | Existing scoped child-card mocks; define labor/time billing contract, since current invoice generation does not consume these entries.                                                                                                                                            |
+| C3.09 | Generate invoice; `workspace.work-orders.$id.tsx:293`                                                  | Existing incomplete-source/partial-write warnings; due date, field mapping, atomic header/items/work-order link, concurrent retries and reviewed tax/stock policy remain.                                                                                                         |
+| C3.10 | Browse/open invoice/items/payments; `workspace.invoices.tsx:196`, `workspace.invoices.$id.tsx:324`     | Current-account/per-mount private lifetimes, bounded visible counts, independent errors and recorded-balance semantics hardened with 133 combined route tests. Real-role visibility, pagination/authoritative aggregates and reconciliation remain.                               |
+| C3.11 | Add inventory invoice line; `workspace.invoices.$id.tsx:1095`                                          | Insert/read/tax/totals acknowledgments, numeric/stock preflight and current-editor uncertainty hold implemented. Separate writes remain non-atomic; stock reservation/issue/posting/reversal, concurrency and recovery acceptance required.                                       |
+| C3.12 | Record payment; `workspace.invoices.$id.tsx:890`                                                       | Returned payment/conditional invoice rows and late/unknown outcomes checked; generated receipt references supported. Hold is mounted-view only. Atomic durable dedupe, exact decimal/tax/status/overpayment/adjustment policy, concurrent transactions and reconciliation remain. |
+| C3.13 | Request/decide refund, void or credit approval; `workspace.operations.tsx:180`, `:205`                 | Approval RPCs record request/decision, not financial execution. Verify entity binding and fresh authority/role/RPC acceptance.                                                                                                                                                    |
+| C3.14 | Execute native refund/void and reconcile; approval labels `workspace.operations.tsx:69`                | No connected native execution handler located in this bounded scan. Invoice display exclusions/caller restrictions do not execute refunds or adjustments. Keep as an explicit implementation gap; approval/display is not completion.                                             |
 
 Route anchors above are under `src/routes/_authenticated/` unless given in full.
 Existing `work-order-detail.test.tsx` and `work-order-child-cards.test.tsx` cover
-mocked caller boundaries; Customer 360 commercial tests cover hardened summary
-reads, not these invoice/quote screens. `payments-manual.smoke.test.ts` covers
+mocked caller boundaries. New `invoice-detail.test.tsx` (70) and `invoice-list.test.tsx`
+(63) cover actual routes with a real QueryClient and synthetic SDK responses.
+Customer 360 commercial tests cover summary reads, not these quote screens.
+`payments-manual.smoke.test.ts` covers
 marketplace/admin payments, not native `shop_manager.payments`.
 
-Next safe implementation is C3.10–C3.12: actual invoice route and payment
-acknowledgments, independent child errors and account/invoice/editor lifetime
-tests. Use the neighboring work-order deferred browser-builder and real
-QueryClient harness. Unknown writes must stay visibly uncertain; no invented
+Next safe implementation is C3.01–C3.04: quote/work-order list/create/conversion
+account/shop/target binding, source readiness and returned-row/late callback
+tests. Use the existing deferred browser-builder and real QueryClient harness;
+do not repeat invoice C3.10–C3.12 caller proofs. Unknown writes must stay visibly uncertain; no invented
 rollback, durable dedupe, paid state or stock posting. Atomic financial/stock and
 original-human/fresh-role authority remain release prerequisites.
 
 ## Current verified slice
+
+Invoice caller safety at `0c23d336`: 133/133 focused tests (70 detail +63 list,
+11.85s), fresh full application 2,176/2,176 across 74 files (129.13s), report
+checker/full TypeScript/targeted lint/format/diff pass, zero failures/skips/
+quarantine. Both new suites are explicit never-quarantined CI gates. Independent
+review corrections cover private cache lifetimes, false empty states, numeric
+display/preflight and optimistic customer binding. Visible-row completeness and
+returned financial rows are not whole-ledger visibility, fresh authority,
+transaction/idempotency/stock/settlement/recovery or mobile acceptance. Shared
+uncertainty hold ends on unmount/reload; direct and concurrent callers remain.
+Unsupported decimal/adjustment/overpayment requirements and PDF export remain
+explicit, not silently removed. No SQL/history/live mutation/provider activation
+or application upload. Exact checks, retained trigger risks and next dependency:
+`evidence/NATIVE_INVOICE_ACKNOWLEDGMENTS.md`.
+
+Fresh complete build/Worker/canonical backend/OCR/PDF/server-boundary and all 214
+tracked public Git/source/output checks pass at `0c23d336`; changed-line lint
+across four files has zero errors/warnings/pre-existing findings. Source guards
+103/103 (2.557s) and release/report/inventory/assets 75/75 (8.348s) pass, with five
+overlapping inventory tests not double-counted. Existing build warnings remain;
+packaging is not runtime, transaction, recovery or owner acceptance.
+
+### Previous Auth delivery-boundary slice
 
 Inactive native Auth reservation/receipt and provider boundary at `0271fc09`:
 198 new focused tests (86 reservation +112 provider), combined email chain 550/550
@@ -276,8 +304,10 @@ Reference sources, authority crosswalk and commercial/expansion limits:
    backlog/recovery gates explicit. Do not repeat completed verifier/planner work
    or enable delivery. Use the recovered PR #2
    source/crosswalk; formal baseline/activation acceptance is not granted.
-3. Implement safe C3.10–C3.12 invoice-detail/payment acknowledgments and private
-   account/target lifetimes, then continue the C3.01–C3.14 financial actions with
+3. Continue C3.01–C3.04 quote/work-order list/create/conversion caller bindings,
+   starting with read-only quote-list lifetime/completeness/error tests, then
+   readiness and acknowledgments; C3.10–C3.12 invoice caller hardening is implemented,
+   not financially accepted. Close the C3.01–C3.14 financial actions with
    authorized atomic monetary/stock/recovery acceptance. Complete the remaining
    action-level feature inventory. Use the pinned 12/5/2 remaining-source
    ledger for a reviewed forward/recovery path; preserve exact 404/423 and do not
@@ -292,7 +322,7 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 6. Close trusted original-actor/fresh authority and native-team/offboarding/claim
    mutation boundaries with actual transaction and recovery tests, then validate
    the complete candidate through the agreed safe acceptance path. Docker Desktop
-   was previously stopped/unavailable; latest read-only RAM snapshot is 2.32 GiB
+   was previously stopped/unavailable; latest read-only RAM snapshot is 1.21 GiB
    free of 15.71 GiB. No local
    independent-session API/Auth/storage/PostgreSQL acceptance is claimed and no
    daemon was started or image downloaded.

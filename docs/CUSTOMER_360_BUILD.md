@@ -1406,3 +1406,32 @@ report checker pass; all 198 new tests included, zero failures/skips/quarantine.
 Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
 public Git/source/output checks pass at `0271fc09`, with existing build warnings.
 Local packaging does not satisfy runtime, financial, recovery or owner acceptance.
+
+## Native invoice caller safety (2026-10-16)
+
+Same branch/draft PR #68, source `0c23d336`: invoice list/detail now use signed-in
+account and fresh mounted-view read lifetimes, matching bounded private children,
+visible-row completeness and independent generic retry states. Payment and
+inventory-line writers check exact returned rows and every retained follow-up,
+with conservative numeric/status/stock preflight and a shared mounted-invoice
+uncertainty hold. Account/invoice/editor changes cannot let late results update a
+new draft or start the next write. Current Customer 360 invoice-summary invalidation
+uses its actual account/customer key. Recorded payment entries and header totals
+are not settlement, complete-ledger visibility or reconciliation; former false
+outstanding/stock-success claims are removed.
+
+133/133 focused route/real QueryClient tests (70 detail +63 list, 11.85s), full
+application 2,176/2,176 across 74 files (129.13s), full TypeScript/report checker/
+targeted lint/format/diff and independent review pass. Synthetic SDK acknowledgments
+do not establish actual JWT/RLS/private storage, atomic money/stock/idempotency,
+refund/adjustment/overpayment policy, recovery or phone/owner acceptance. Separate
+financial writes are retained and uncertain holds are not durable across navigation.
+No migration, live financial/Auth mutation, provider activation/email or deploy.
+Verification/artifact/retained-trigger evidence and explicit compatibility gaps:
+`evidence/NATIVE_INVOICE_ACKNOWLEDGMENTS.md`. Continue quote/work-order C3.01–C3.04
+callers and actual authorized atomic writers, not repeated invoice/email proof.
+Fresh complete build/Worker/canonical backend/OCR/PDF/server-boundary and all 214
+tracked public Git/source/output checks pass at `0c23d336`; changed-line lint
+has zero errors/warnings. Source guards 103/103 and release/report/inventory/assets
+75/75 pass (five inventory tests overlap). Build warnings remain; no application
+upload or live acceptance is inferred.

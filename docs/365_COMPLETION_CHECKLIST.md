@@ -40,7 +40,42 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest native Auth delivery-boundary slice: `0271fc09`, same branch/draft PR #68.
+Latest invoice caller slice: `0c23d336`, same branch/draft PR #68. List/detail
+reads now require current account and per-mount lifetimes, matching private rows,
+explicit visible-row completeness and independent generic retries. Unknown/capped
+reads are not empty or complete; recorded payment entries are not settlement.
+The list's incorrect outstanding aggregate is removed. Payment and inventory-line
+callers verify returned rows and every separate follow-up; unsupported amounts,
+status or stock fail closed before dispatch. A shared mounted-invoice write hold
+blocks local duplicate/second-editor writes and keeps uncertain outcomes visible
+across dialog reopen. It is not durable idempotency, atomic posting or recovery.
+
+133/133 focused tests (70 detail +63 list, 11.85s), fresh full application
+2,176/2,176 across 74 files (129.13s), report checker, full TypeScript and targeted
+lint/format/diff pass; zero failures/skips/quarantine. Both route suites have an
+explicit never-quarantined CI step. Independent read-only review corrections are
+included. Exact source, artifact checks, retained trigger risks and unsupported
+decimal/adjustment/overpayment requirements are recorded in
+`evidence/NATIVE_INVOICE_ACKNOWLEDGMENTS.md`. No SQL or live financial/Auth write,
+email/provider activation, deployment, merge or new resource. Actual authorized
+atomic money/stock/refund writers and API/private-storage/recovery/owner acceptance
+remain open; PDF export is not implemented by this caller slice.
+
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public Git/source/output checks pass at `0c23d336`. Changed-line lint across four
+files has zero errors/warnings/pre-existing findings. Source guards 103/103
+(2.557s) and release/report/inventory/assets 75/75 (8.348s) pass; five inventory
+tests overlap. Existing build warnings remain. Packaging is not deployment,
+actual role/private-storage/financial/recovery acceptance or owner approval.
+
+Prior published `d101f650` passed all six CI gates (`38778102213`). Independent
+hosting build `60d22afc-094a-4845-8d6e-f87a1e4e5cfe` failed with ID/link only and
+no root-cause diagnostics; authenticated hosting logs/configuration remain needed.
+Wrapper `38778102490` preview passed, migration/production skipped. The invoice
+publication needs its own exact-head checks. Latest local RAM snapshot: 1.21 GiB
+free of 15.71 GiB; no Docker daemon/image/API/Auth/storage stack started.
+
+Previous native Auth delivery-boundary slice: `0271fc09`, same branch/draft PR #68.
 The unwired reservation command requires every same-plan prepared recipient and
 binds source kind/original event/subject/plan version plus exact provider bytes,
 fingerprints and full stable keys. Source-event uniqueness is independent of plan
@@ -67,11 +102,11 @@ and all 214 tracked public Git/source/output checks pass at `0271fc09`. Existing
 build warnings remain; no upload or runtime/owner acceptance is inferred.
 
 The bounded financial action scan adds C3.01–C3.14 to the acceptance ledger:
-quote/work-order/invoice/payment/approval/refund actions. Invoice payment/totals
-follow-up errors are ignored, several financial caches are account-unscoped, and
-refund approval is not connected native financial execution. These are current
-source gaps, not executed production failures. Next safe source slice is invoice
-detail/payment acknowledgment and account/target lifetimes (C3.10–C3.12), while
+quote/work-order/invoice/payment/approval/refund actions. C3.10–C3.12 caller
+acknowledgments/private lifetimes are now hardened at `0c23d336`, not financially
+accepted. Quote/work-order list/create/conversion bindings and separate-write
+risks remain, and refund approval is not connected native financial execution.
+Next safe source slice is remaining C3.01–C3.04 quote/work-order callers, while
 closing shared authority and actual atomic financial/stock/recovery acceptance.
 Do not expand into indefinite email-only proofs. Native email still needs actual
 durable ingress/lease/fenced completion and consent transactions; legacy backlog
@@ -300,10 +335,13 @@ Exact next action: verify existing PR #68's exact latest published head; keep al
 further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
 without repeating it or adopting future proposals. Complete action-level feature
 acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
-The inactive native reservation/provider boundary is now implemented at `0271fc09`;
-do not repeat its command/receipt/fake-transport work. Next safe integrated source
-work is C3.10–C3.12 invoice-detail/payment acknowledgment and account/target
-lifetimes, using the neighboring work-order QueryClient/deferred-builder tests.
+The inactive native reservation/provider boundary is implemented at `0271fc09`;
+invoice C3.10–C3.12 caller acknowledgments/lifetimes are hardened at `0c23d336`.
+Do not repeat those slices or infer durable/live acceptance. Next safe integrated
+source work is C3.01–C3.04 quote/work-order list/create/conversion binding,
+starting with the read-only quote list's lifetime/completeness/error tests, then
+readiness and acknowledgment tests using the existing real QueryClient/deferred
+SDK harness, while replacing separate writes with authorized atomic commands.
 In parallel, close actual atomic Auth ingress/lease/fenced completion, consent
 and financial/stock writers with isolated transaction/recovery acceptance.
 Distinguish queued/provider-accepted/delivery-confirmed/outcome-unknown states.
@@ -321,7 +359,7 @@ recovery boundaries as the staging integration path, not an endless lab chain.
 Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration
 impact/deployment none; zero live business/Auth mutation, restriction replay,
 history repair, customer message, paid resource, PR merge or duplicate automation.
-No live project/business data was read this email-safety run. The heartbeat remains active.
+No live project/business data was read for the current invoice caller slice. The heartbeat remains active.
 
 Published/attached draft PR #68:
 `https://github.com/Hunting-Fishing/motorsales365/pull/68`, base PR #67 branch

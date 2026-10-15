@@ -66,14 +66,18 @@ the complete application action inventory is still unfinished.
 Inactive Auth reservation/receipt and bounded fake-provider modules at `0271fc09`
 pass focused 550/550; full application 2,043/2,043 and TypeScript pass. These are
 source integration results, not real API/storage/transaction or live acceptance.
-Financial payment/totals follow-up errors, account-unscoped invoice/quote screens
-and missing connected refund execution remain concrete Day 2/3 dependencies.
-Next safe slice targets invoice-detail/payment acknowledgments and account/target
-lifetimes without inventing paid, stock, rollback or durable-dedupe success.
+Invoice list/detail/payment/inventory caller hardening at `0c23d336` adds 133
+focused tests and passes fresh full application 2,176/2,176 plus TypeScript.
+Private read lifetimes, complete visible-row counts and every retained follow-up
+acknowledgment are checked; uncertainty is not success. Separate writes remain
+non-atomic. Quote/work-order list/create/conversion bindings, authorized atomic
+money/stock writers and connected refund execution are concrete Day 2/3 dependencies.
+Next safe slice is C3.01–C3.04 quote/work-order callers, not another email-only
+proof or a claim that passing UI tests satisfy financial/recovery acceptance.
 
 Independent hosting failure still needs authenticated diagnostic/configuration
 access. Local synthetic API/Auth/private-storage/transaction and restore acceptance
-is not established; a current resource snapshot found 0.90 GiB free of 15.71 GiB RAM,
+is not established; the latest resource snapshot found 1.21 GiB free of 15.71 GiB RAM,
 and no Docker daemon/image/stack was started. Pilot shop/test-account nomination
 remains unanswered. These gaps threaten the seven-day target and must enter the
 Day 2 feasibility review; source test counts are not a reliable completion forecast.
