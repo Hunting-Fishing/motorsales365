@@ -73,6 +73,9 @@ jobs:
           npm run test:vehicle-receipts:db
           npm run test:installed-components:db
 
+      - name: Seven day integration inventory capture guards (never quarantined)
+        run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
+
       - name: Customer vehicle activity and receipt ownership boundaries (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/customer-vehicle-activity.test.mjs scripts/ci/vehicle-receipt-ownership-boundary.test.mjs
 
@@ -168,6 +171,9 @@ jobs:
 
       - name: Account creation server returned-row evidence (never quarantined)
         run: npx vitest run src/routes/api/admin/create-user.test.tsx --maxWorkers=1
+
+      - name: Internal staff acknowledgments and private UI lifetimes (never quarantined)
+        run: npx vitest run src/lib/internal-staff.functions.test.ts src/components/internal-staff/InternalStaffView.test.tsx --maxWorkers=1
 
       - name: Approved helper execution envelope and metadata review regressions (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/approved-helper-execution-envelope.test.mjs scripts/ci/approved-helpers-catalog-review.test.mjs scripts/ci/approved-helper-release-evidence.test.mjs

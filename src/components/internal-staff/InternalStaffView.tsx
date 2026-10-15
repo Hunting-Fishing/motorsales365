@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -26,6 +26,28 @@ import {
   type InternalStaffMember,
 } from "@/lib/internal-staff.functions";
 import { Staff365Badge } from "@/components/admin/staff-365-badge";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  managerChangeConfirmed,
+  signInRestrictionConfirmed,
+  staffCreationAckSchema,
+  STAFF_CHANGE_UNCONFIRMED,
+  STAFF_DIRECTORY_UNAVAILABLE,
+  STAFF_CREATION_UNKNOWN,
+  STAFF_CREATION_ACKNOWLEDGED,
+  STAFF_SIGN_IN_ACKNOWLEDGED,
+} from "@/lib/internal-staff-contract";
+
+function useMounted() {
+  const active = useRef(true);
+  useLayoutEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
+  return active;
+}
 
 type Node = InternalStaffMember & { children: Node[] };
 
@@ -43,45 +65,139 @@ function buildTree(members: InternalStaffMember[]): Node[] {
   return roots;
 }
 
-export function InternalStaffView({
-  currentUserId,
-  isAdmin,
-  variant = "tree",
-}: {
+type StaffViewProps = {
   currentUserId: string;
   isAdmin: boolean;
   variant?: "tree" | "list";
-}) {
+};
+
+export function InternalStaffView(props: StaffViewProps) {
+  const { user, loading } = useAuth();
+  if (loading || !user || user.id !== props.currentUserId)
+    return (
+      <div role="status" className="p-6 text-muted-foreground">
+        Sign in to view the internal team.
+      </div>
+    );
+  // Unmount private forms/pending UI callbacks across account/admin context,
+  // including A-to-B-to-A. This is not server authorization or request rollback.
+  return <ScopedStaffView key={user.id} {...props} />;
+}
+
+function ScopedStaffView(props: StaffViewProps) {
+  const [creationLocked, setCreationLocked] = useState(false);
+  // Keep unknown-creation custody across an admin-context change or refresh,
+  // while remounting the private directory and its pending callbacks.
+  return (
+    <StaffDirectory
+      key={String(props.isAdmin)}
+      {...props}
+      creationLocked={creationLocked}
+      onCreationStarted={() => setCreationLocked(true)}
+      onCreationConfirmed={() => setCreationLocked(false)}
+    />
+  );
+}
+
+type CreationCustody = {
+  creationLocked: boolean;
+  onCreationStarted: () => void;
+  onCreationConfirmed: () => void;
+};
+function StaffDirectory(props: StaffViewProps & CreationCustody) {
   const qc = useQueryClient();
   const fetchStaff = useServerFn(listInternalStaff);
+  const queryKey = ["internal-staff", props.currentUserId, props.isAdmin];
+  const result = useQuery({ queryKey, queryFn: () => fetchStaff(), staleTime: 0, gcTime: 0 });
+  if (result.isLoading || result.isFetching)
+    return (
+      <div role="status" className="p-6 text-muted-foreground">
+        Loading team…
+      </div>
+    );
+  if (result.isError || !Array.isArray(result.data))
+    return (
+      <div role="alert" className="p-6">
+        <p>{STAFF_DIRECTORY_UNAVAILABLE}</p>
+        <Button onClick={() => void result.refetch()}>Retry team</Button>
+      </div>
+    );
+  return (
+    <StaffActions
+      key={result.dataUpdatedAt}
+      {...props}
+      members={result.data}
+      refresh={() => {
+        void qc.invalidateQueries({ queryKey, exact: true });
+      }}
+    />
+  );
+}
+
+function StaffActions({
+  currentUserId,
+  isAdmin,
+  variant = "tree",
+  members,
+  refresh,
+  creationLocked,
+  onCreationStarted,
+  onCreationConfirmed,
+}: StaffViewProps &
+  CreationCustody & {
+    members: InternalStaffMember[];
+    refresh: () => void;
+  }) {
+  const active = useMounted();
+  const deactivatePending = useRef(false);
+  const [deactivating, setDeactivating] = useState(false);
   const deactivateFn = useServerFn(deactivateInternalStaff);
-  const { data: members = [], isLoading } = useQuery({
-    queryKey: ["internal-staff"],
-    queryFn: () => fetchStaff(),
-  });
 
   const roots = useMemo(() => buildTree(members), [members]);
   const [addOpen, setAddOpen] = useState<{ managerId: string } | null>(null);
   const [moveFor, setMoveFor] = useState<InternalStaffMember | null>(null);
   const [chatWith, setChatWith] = useState<InternalStaffMember | null>(null);
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["internal-staff"] });
-
-
-  if (isLoading) {
-    return <div className="p-6 text-muted-foreground">Loading team…</div>;
-  }
-
+  const deactivate = async (uid: string) => {
+    if (
+      deactivatePending.current ||
+      !active.current ||
+      !window.confirm(
+        "Restrict this account's sign-in? Existing sessions and related access will still need separate verification.",
+      )
+    )
+      return;
+    deactivatePending.current = true;
+    setDeactivating(true);
+    try {
+      const ack = await deactivateFn({ data: { userId: uid } });
+      if (!active.current) return;
+      if (!signInRestrictionConfirmed(ack, uid)) throw new Error();
+      toast.message(STAFF_SIGN_IN_ACKNOWLEDGED);
+      refresh();
+    } catch {
+      if (active.current) toast.error(STAFF_CHANGE_UNCONFIRMED);
+    } finally {
+      if (active.current) {
+        deactivatePending.current = false;
+        setDeactivating(false);
+      }
+    }
+  };
 
   return (
     <div className="space-y-4">
       {isAdmin && (
         <div className="flex justify-end">
-          <Button onClick={() => setAddOpen({ managerId: currentUserId })}>
+          <Button
+            disabled={creationLocked}
+            onClick={() => setAddOpen({ managerId: currentUserId })}
+          >
             <Plus className="mr-1 h-4 w-4" /> Add staff under me
           </Button>
         </div>
       )}
+      {isAdmin && creationLocked && !addOpen && <p role="alert">{STAFF_CREATION_UNKNOWN}</p>}
 
       <Card className="p-4">
         {variant === "tree" ? (
@@ -96,23 +212,17 @@ export function InternalStaffView({
                   depth={0}
                   isAdmin={isAdmin}
                   currentUserId={currentUserId}
-                  onAdd={(mid) => setAddOpen({ managerId: mid })}
+                  onAdd={(mid) => {
+                    if (!creationLocked) setAddOpen({ managerId: mid });
+                  }}
                   onMove={(m) => setMoveFor(m)}
                   onChat={(m) => setChatWith(m)}
-                  onDeactivate={async (uid) => {
-                    if (!window.confirm("Deactivate this staff account? They will not be able to sign in.")) return;
-                    try {
-                      await deactivateFn({ data: { userId: uid } });
-                      toast.success("Staff deactivated");
-                      refresh();
-                    } catch (e: any) {
-                      toast.error(e?.message ?? "Failed");
-                    }
-                  }}
+                  onDeactivate={deactivate}
+                  deactivating={deactivating}
+                  creationLocked={creationLocked}
                 />
               ))}
             </div>
-
           )
         ) : (
           <div className="divide-y">
@@ -125,18 +235,9 @@ export function InternalStaffView({
                 currentUserId={currentUserId}
                 onChat={() => setChatWith(m)}
                 onMove={() => setMoveFor(m)}
-                onDeactivate={async () => {
-                  if (!window.confirm("Deactivate this staff account?")) return;
-                  try {
-                    await deactivateFn({ data: { userId: m.user_id } });
-                    toast.success("Staff deactivated");
-                    refresh();
-                  } catch (e: any) {
-                    toast.error(e?.message ?? "Failed");
-                  }
-                }}
+                onDeactivate={() => void deactivate(m.user_id)}
+                deactivating={deactivating}
               />
-
             ))}
           </div>
         )}
@@ -144,14 +245,19 @@ export function InternalStaffView({
 
       {isAdmin && addOpen && (
         <AddDialog
+          key={addOpen.managerId}
           managerId={addOpen.managerId}
           members={members}
           onClose={() => setAddOpen(null)}
           onCreated={refresh}
+          creationLocked={creationLocked}
+          onRequestStarted={onCreationStarted}
+          onConfirmed={onCreationConfirmed}
         />
       )}
       {isAdmin && moveFor && (
         <MoveDialog
+          key={moveFor.user_id}
           member={moveFor}
           members={members}
           onClose={() => setMoveFor(null)}
@@ -170,8 +276,6 @@ export function InternalStaffView({
   );
 }
 
-
-
 function TreeRow({
   node,
   depth,
@@ -181,6 +285,8 @@ function TreeRow({
   onMove,
   onChat,
   onDeactivate,
+  deactivating,
+  creationLocked,
 }: {
   node: Node;
   depth: number;
@@ -190,6 +296,8 @@ function TreeRow({
   onMove: (m: InternalStaffMember) => void;
   onChat: (m: InternalStaffMember) => void;
   onDeactivate: (userId: string) => void;
+  deactivating: boolean;
+  creationLocked: boolean;
 }) {
   return (
     <>
@@ -201,13 +309,9 @@ function TreeRow({
           <div className="flex items-center gap-2">
             <span className="font-semibold truncate">{node.full_name ?? "—"}</span>
             {node.is_admin && <Badge variant="default">Admin</Badge>}
-            {node.user_id === currentUserId && (
-              <Badge variant="outline">You</Badge>
-            )}
+            {node.user_id === currentUserId && <Badge variant="outline">You</Badge>}
           </div>
-          <div className="text-xs text-muted-foreground truncate">
-            {node.email ?? "—"}
-          </div>
+          <div className="text-xs text-muted-foreground truncate">{node.email ?? "—"}</div>
         </div>
         <Staff365Badge size="xs" />
         {node.user_id !== currentUserId && (
@@ -217,15 +321,32 @@ function TreeRow({
         )}
         {isAdmin && (
           <>
-            <Button size="sm" variant="ghost" onClick={() => onAdd(node.user_id)} title="Add report under this person">
+            <Button
+              disabled={creationLocked}
+              size="sm"
+              variant="ghost"
+              onClick={() => onAdd(node.user_id)}
+              title="Add report under this person"
+            >
               <Plus className="h-3.5 w-3.5" />
             </Button>
             {!node.is_admin && (
               <>
-                <Button size="sm" variant="ghost" onClick={() => onMove(node)} title="Change manager">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onMove(node)}
+                  title="Change manager"
+                >
                   <MoveRight className="h-3.5 w-3.5" />
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => onDeactivate(node.user_id)} title="Deactivate">
+                <Button
+                  disabled={deactivating}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onDeactivate(node.user_id)}
+                  title="Restrict sign-in"
+                >
                   <Trash2 className="h-3.5 w-3.5 text-destructive" />
                 </Button>
               </>
@@ -244,6 +365,8 @@ function TreeRow({
           onMove={onMove}
           onChat={onChat}
           onDeactivate={onDeactivate}
+          deactivating={deactivating}
+          creationLocked={creationLocked}
         />
       ))}
     </>
@@ -258,6 +381,7 @@ function FlatRow({
   onChat,
   onMove,
   onDeactivate,
+  deactivating,
 }: {
   m: InternalStaffMember;
   members: InternalStaffMember[];
@@ -266,8 +390,8 @@ function FlatRow({
   onChat: () => void;
   onMove: () => void;
   onDeactivate: () => void;
+  deactivating: boolean;
 }) {
-
   const manager = members.find((x) => x.user_id === m.manager_user_id);
   return (
     <div className="flex flex-wrap items-center gap-3 py-3">
@@ -292,7 +416,13 @@ function FlatRow({
           <Button size="sm" variant="ghost" onClick={onMove} title="Change manager">
             <MoveRight className="h-3.5 w-3.5" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onDeactivate} title="Deactivate">
+          <Button
+            disabled={deactivating}
+            size="sm"
+            variant="ghost"
+            onClick={onDeactivate}
+            title="Restrict sign-in"
+          >
             <Trash2 className="h-3.5 w-3.5 text-destructive" />
           </Button>
         </>
@@ -306,12 +436,20 @@ function AddDialog({
   members,
   onClose,
   onCreated,
+  creationLocked,
+  onRequestStarted,
+  onConfirmed,
 }: {
   managerId: string;
   members: InternalStaffMember[];
   onClose: () => void;
   onCreated: () => void;
+  creationLocked: boolean;
+  onRequestStarted: () => void;
+  onConfirmed: () => void;
 }) {
+  const active = useMounted();
+  const pending = useRef(false);
   const [fullName, setFullName] = useState("");
   const [localPart, setLocalPart] = useState("");
   const [password, setPassword] = useState("");
@@ -320,24 +458,48 @@ function AddDialog({
   const createFn = useServerFn(createInternalStaff);
 
   const submit = async () => {
-    if (!fullName.trim() || !localPart.trim() || password.length < 8) return;
+    if (
+      creationLocked ||
+      pending.current ||
+      !fullName.trim() ||
+      !localPart.trim() ||
+      password.length < 8
+    )
+      return;
+    pending.current = true;
+    onRequestStarted();
     setSubmitting(true);
+    const requestedEmail = `${localPart.trim().toLowerCase()}@365motorsales.com`;
     try {
-      await createFn({
+      const result = await createFn({
         data: {
           fullName: fullName.trim(),
-          email: `${localPart.trim().toLowerCase()}@365motorsales.com`,
+          email: requestedEmail,
           password,
           managerUserId: manager,
         },
       });
-      toast.success("Staff account created");
+      if (!active.current) return;
+      const ack = staffCreationAckSchema.safeParse(result);
+      if (
+        !ack.success ||
+        ack.data.email.toLowerCase() !== requestedEmail ||
+        !ack.data.profileConfirmed
+      ) {
+        toast.warning(STAFF_CREATION_UNKNOWN);
+        return;
+      }
+      onConfirmed();
+      toast.message(STAFF_CREATION_ACKNOWLEDGED);
       onCreated();
       onClose();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to create");
+    } catch {
+      if (active.current) toast.warning(STAFF_CREATION_UNKNOWN);
     } finally {
-      setSubmitting(false);
+      if (active.current) {
+        pending.current = false;
+        setSubmitting(false);
+      }
     }
   };
 
@@ -347,30 +509,52 @@ function AddDialog({
         <DialogHeader>
           <DialogTitle>Add internal staff</DialogTitle>
           <DialogDescription>
-            Only admin can create internal 365 staff. The new account is added to
-            the internal 365 MotorSales organization.
+            Admin requests account creation and a manager/profile update. Role, organization and
+            audit provisioning must be verified separately.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Full name</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Jordi Cruz" />
+            <Label htmlFor="staff-create-name">Full name</Label>
+            <Input
+              id="staff-create-name"
+              disabled={submitting || creationLocked}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Jordi Cruz"
+            />
           </div>
           <div>
-            <Label>Email</Label>
+            <Label htmlFor="staff-create-email">Email</Label>
             <div className="flex items-center gap-1">
-              <Input value={localPart} onChange={(e) => setLocalPart(e.target.value.toLowerCase())} placeholder="jordi" />
-              <span className="text-sm text-muted-foreground whitespace-nowrap">@365motorsales.com</span>
+              <Input
+                id="staff-create-email"
+                disabled={submitting || creationLocked}
+                value={localPart}
+                onChange={(e) => setLocalPart(e.target.value.toLowerCase())}
+                placeholder="jordi"
+              />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                @365motorsales.com
+              </span>
             </div>
           </div>
           <div>
-            <Label>Temporary password (min 8)</Label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <Label htmlFor="staff-create-password">Temporary password (min 8)</Label>
+            <Input
+              id="staff-create-password"
+              disabled={submitting || creationLocked}
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
           <div>
-            <Label>Reports to</Label>
+            <Label htmlFor="staff-create-manager">Reports to</Label>
             <select
               value={manager}
+              id="staff-create-manager"
+              disabled={submitting || creationLocked}
               onChange={(e) => setManager(e.target.value)}
               className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
             >
@@ -382,9 +566,12 @@ function AddDialog({
             </select>
           </div>
         </div>
+        {creationLocked && !submitting && <p role="alert">{STAFF_CREATION_UNKNOWN}</p>}
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={submitting}>Cancel</Button>
-          <Button onClick={submit} disabled={submitting}>
+          <Button variant="outline" onClick={onClose} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={submit} disabled={submitting || creationLocked}>
             {submitting ? "Creating…" : "Create staff"}
           </Button>
         </DialogFooter>
@@ -404,22 +591,36 @@ function MoveDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const active = useMounted();
+  const pending = useRef(false);
   const [manager, setManager] = useState<string>(member.manager_user_id ?? "");
   const [saving, setSaving] = useState(false);
   const moveFn = useServerFn(updateStaffManager);
   const options = members.filter((m) => m.user_id !== member.user_id);
 
   const save = async () => {
+    if (pending.current) return;
+    pending.current = true;
     setSaving(true);
+    const requestedManager = manager || null;
     try {
-      await moveFn({ data: { userId: member.user_id, managerUserId: manager || null } });
-      toast.success("Manager updated");
+      const ack = await moveFn({
+        data: { userId: member.user_id, managerUserId: requestedManager },
+      });
+      if (!active.current) return;
+      if (!managerChangeConfirmed(ack, member.user_id, requestedManager)) throw new Error();
+      toast.message(
+        "Manager row update acknowledged. Related role access and audit were not confirmed.",
+      );
       onSaved();
       onClose();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed");
+    } catch {
+      if (active.current) toast.error(STAFF_CHANGE_UNCONFIRMED);
     } finally {
-      setSaving(false);
+      if (active.current) {
+        pending.current = false;
+        setSaving(false);
+      }
     }
   };
 
@@ -430,12 +631,15 @@ function MoveDialog({
           <DialogTitle>Change manager for {member.full_name}</DialogTitle>
         </DialogHeader>
         <div>
-          <Label>Reports to</Label>
+          <Label htmlFor="staff-move-manager">Reports to</Label>
           <select
+            id="staff-move-manager"
+            disabled={saving}
             value={manager}
             onChange={(e) => setManager(e.target.value)}
             className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
           >
+            <option value="">No manager</option>
             {options.map((m) => (
               <option key={m.user_id} value={m.user_id}>
                 {m.full_name ?? m.email}
@@ -444,8 +648,12 @@ function MoveDialog({
           </select>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button onClick={save} disabled={saving}>Save</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>
+            Cancel
+          </Button>
+          <Button onClick={save} disabled={saving}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -453,4 +661,3 @@ function MoveDialog({
 }
 
 void ShieldCheck;
-
