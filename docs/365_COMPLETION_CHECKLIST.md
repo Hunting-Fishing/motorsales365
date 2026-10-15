@@ -15,6 +15,39 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest nonempty referral forward slice: draft PR #61, code `9cbd673`, executes
+actual user_referrals bounty/assignment fanouts plus the separate payout-total
+helper in discarded databases. Two READ ONLY catalog diagnostics at
+`09:44:45.633371` and `09:45:26.830475` UTC recover/match two financial tables:
+30 columns/12 critical constraints/6 indexes/4 policies/1 attachment/7 function
+envelopes/57 reviewed hash+privacy-gated pieces. No app/Auth/config rows/counts,
+raw function bodies, helper calls or live sequence/settings values read.
+Unchanged PR #54 plus actual retained financial DDL/functions yields 11 actual
+selected tables/139 columns/40 critical constraints/34 indexes/31 policies/
+15 attachments/19 public full function envelopes. Its synthetic Auth/profile/
+GUC/role supports stay explicitly guarded and unpromoted; not PR #60 full Auth
+composition. Late assignment failure restores earlier bounty/referral; dropped
+FK/default/ACL/attachment/shim drift fails before outer rollback can hide it.
+Twenty-two focused pass (28.614 seconds), syntax/lint/format/canonical JSON/diff/
+primary review pass. Full serial tooling 582/582 passes (435.252 seconds), then
+10/10 receipt assets (0.333 seconds): 592 aggregate, zero failures/skips/
+cancellations. No fresh application run claimed; PR #54 remains parent evidence.
+Recredit/NULL-source/case-variant credit, inactive assignment, exact-sales-only,
+all-status payout sums/cross-partner/negative values remain characterized release
+gaps, not approved monetary/actor rules. Reached absent partner intent fails
+genuinely, not stubbed. Zero live mutation/migration/deploy. Evidence:
+`evidence/REFERRAL_FINANCIAL_FORWARD.md`. New PR #61 needs latest-head checks.
+Next compose actual nonempty ordinary Auth referral + partner intent using PR
+#60 full structure and this proven source/financial fanout; recover/match actual
+provider Auth uid if reached, never adopt the GUC shim. Then staff-domain Auth/
+role/staff/partner/canonical-org/manager and original actor/revision/common locks/
+offboarding/native acceptance. Do not repeat completed financial/ordinary/full-
+schema/current-org recovery or strip constraints. Source/baseline/replay/parity/
+release flags unchanged; all prior receipt/mobile/consent/private-history/owner/
+recovery/full-media/hosting gates open. No sparse deploy, restriction replay,
+paid resource, customer communication, data deletion, PR merge or duplicate
+automation; existing single recurring continuation active.
+
 Newest completed ordinary Auth bootstrap slice: draft PR #60, code `099b706`,
 executes actual nonstaff/no-referral Auth→profile/org/owner/subscription/intent-audit
 chain in discarded databases. Unchanged full ten-table structure plus actual empty
@@ -33,10 +66,11 @@ Twenty-two focused and 570 tooling/assets pass (560 serial plus separate 10), ze
 failures/skips/cancellations; syntax/lint/format/diff/primary review pass. No fresh
 application suite claimed; PR #54 application/TypeScript remains parent evidence.
 Zero live queries, mutations, migrations or deployments. Evidence:
-`evidence/AUTH_NO_REFERRAL_BOOTSTRAP.md`. New PR #60 requires latest-head checks.
-Next actual nonempty user_referrals INSERT frontier: reuse PR #52 metadata and
-recover/match pp_user_signup_bounty/tg_auto_assign_sales_rep plus actual downstream
-financial/assignment/intent structure/functions/attachments before composition.
+`evidence/AUTH_NO_REFERRAL_BOOTSTRAP.md`. PR #60 docs `3f48b40` now passed all six
+CI gates (`38713945751`); hosting failed separately, migrations/production skipped.
+Nonempty user_referrals INSERT bounty/assignment and financial frontier are now
+rehearsed in PR #61 above. Full ordinary Auth/referral + partner intent composition
+remains next, without promoting independent proofs or synthetic supports.
 Then staff-domain Auth + platform-role/staff/partner integration with actual
 canonical org/manager prerequisites and trusted original actor/revisions/common
 locks/offboarding/native acceptance. Do not repeat ordinary/full schema/current

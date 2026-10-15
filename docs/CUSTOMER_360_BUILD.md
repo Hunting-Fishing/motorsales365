@@ -938,3 +938,37 @@ replay/parity/release flags unchanged; trial/staff enum, consent/private-history
 recovery/receipt/mobile/owner/full-media/hosting gates remain open. No sparse deploy,
 restriction replay, data deletion, PR merge or duplicate automation; single
 recurring continuation stays active.
+
+PR #60 docs `3f48b40` now passed all six CI gates (`38713945751`); hosting failed
+separately and migrations/production skipped. Draft PR #61, code `9cbd673`, closes
+the bounded nonempty user_referrals INSERT bounty/assignment frontier using real
+retained functions and full financial DDL. Two READ ONLY diagnostics at
+`09:44:45.633371` / `09:45:26.830475` UTC recover/match 30 financial columns,
+12 critical constraints/6 indexes/4 policies/1 attachment/7 function envelopes
+and 57 reviewed hash/privacy-gated pieces; no data/Auth/config rows/counts, raw
+function bodies, helper invocation or live sequence/settings values. Immutable
+PR #54 extension retains 11 actual tables/139 columns/40 critical constraints/
+34 indexes/31 policies/15 attachments/19 public function envelopes; synthetic
+Auth/profile/GUC/role supports remain explicit, not full Auth or accepted actor.
+
+Twenty-two focused tests pass (28.614 seconds); full serial tooling 582/582 passes
+(435.252 seconds), then 10/10 receipt assets (0.333 seconds): 592 aggregate, zero
+failures/skips/cancellations. Syntax/lint/format/canonical JSON/diff/primary review
+pass. No fresh application run claimed; PR #54 remains parent evidence.
+Late assignment failure restores earlier bounty/referral; drift checks precede
+outer rollback. Recredit/NULL-source/case-variant credit, inactive/exact-sales
+assignment and all-status/cross-partner/negative payout gaps are characterized,
+not accepted financial or authority policy. Actual missing partner intent fails
+without a stub. New PR #61 needs latest-head checks. Evidence:
+`evidence/REFERRAL_FINANCIAL_FORWARD.md`. Zero live mutation/migration/deployment.
+
+Next combine actual ordinary nonempty Auth referral and partner intent using
+PR #60 full structures and this real source/fanout, retaining constraints and
+genuine rollback/local sequence behavior. Recover actual provider Auth uid if
+reached, not the synthetic GUC support. Then staff-domain Auth/roles/staff/partner/
+canonical org/manager and original actor/revisions/common locks/offboarding/native
+acceptance. Completed financial/ordinary/full-schema recovery need not repeat.
+Source/baseline/replay/parity/release flags and receipt/mobile/owner/consent/private
+history/recovery/full-media/hosting gates unchanged. No sparse deploy, approved
+restriction replay, paid resource, customer message, data deletion, PR merge or
+duplicate automation; single recurring continuation stays active.

@@ -1,0 +1,1542 @@
+{
+  "mode": "read-only-selected-structure-not-history",
+  "enums": [
+    {
+      "name": "app_role",
+      "labels": [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager"
+      ],
+      "schema": "public"
+    }
+  ],
+  "scope": "Full partner_program_commission_events and partner_program_payouts structural metadata, selected/direct-expression function fingerprints and related enums. Structural definitions only behind preceding metadata hashes and privacy gates. No data rows, helper calls or function bodies.",
+  "limits": "Two selected financial tables only. No app/Auth/config rows or counts, helper calls/function bodies, arbitrary structural definitions, sequence or settings/config values, mutation, original-source/history adoption, approved baseline, complete bootstrap/actor/authority/offboarding or release acceptance. Expected hashes come from the preceding reviewed metadata-only capture; privacy independently gates raw pieces. Denials return NULL. Referral/bounty writes/forward attachments remain a separate behavioral frontier. Effective MAINTAIN is not evaluated; raw ACL retained.",
+  "pieces": [
+    {
+      "name": "amount_php",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "approved_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "approved_by",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "clawed_back_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "clawed_back_by",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "clawed_back_reason",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "cleared_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "commission_php",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "created_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "event_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "event_type",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "id",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "notes",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "paid_at",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "partner_id",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "payout_id",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "source_ref",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "status",
+      "table": "partner_program_commission_events",
+      "category": "column",
+      "permitted": true,
+      "definition": "'pending'::text",
+      "expectedMd5": "3d0c12821e68f0fc31291c72ad568aa9",
+      "definitionMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "name": "partner_program_commission_events_approved_by_fkey",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (approved_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "605edf7a887a2105b2c0312e5bc6fd91",
+      "definitionMd5": "605edf7a887a2105b2c0312e5bc6fd91"
+    },
+    {
+      "name": "partner_program_commission_events_clawed_back_by_fkey",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (clawed_back_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "4af6124ff58f5756d9455c2963cddf2a",
+      "definitionMd5": "4af6124ff58f5756d9455c2963cddf2a"
+    },
+    {
+      "name": "partner_program_commission_events_event_type_check",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK ((event_type = ANY (ARRAY['seller_sub'::text, 'boost'::text, 'verified_business'::text, 'advertiser_purchase'::text, 'shop_purchase'::text, 'user_signup'::text, 'business_signup'::text, 'other'::text])))",
+      "expectedMd5": "5b18c304faa814933bc38f2b90e6c4c4",
+      "definitionMd5": "5b18c304faa814933bc38f2b90e6c4c4"
+    },
+    {
+      "name": "partner_program_commission_events_partner_id_fkey",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (partner_id) REFERENCES public.partner_program_partners(id) ON DELETE CASCADE",
+      "expectedMd5": "5707efabf3288ab2212ed453dade65b3",
+      "definitionMd5": "5707efabf3288ab2212ed453dade65b3"
+    },
+    {
+      "name": "partner_program_commission_events_payout_id_fkey",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (payout_id) REFERENCES public.partner_program_payouts(id) ON DELETE SET NULL",
+      "expectedMd5": "019c5c6f7b3fe782ffd174e1c03bcb4c",
+      "definitionMd5": "019c5c6f7b3fe782ffd174e1c03bcb4c"
+    },
+    {
+      "name": "partner_program_commission_events_pkey",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "partner_program_commission_events_status_check",
+      "table": "partner_program_commission_events",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'approved'::text, 'clawed_back'::text, 'paid'::text])))",
+      "expectedMd5": "82b270b6e0af4a39ce582daaa162dabf",
+      "definitionMd5": "82b270b6e0af4a39ce582daaa162dabf"
+    },
+    {
+      "name": "partner_program_commission_events_pkey",
+      "table": "partner_program_commission_events",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX partner_program_commission_events_pkey ON public.partner_program_commission_events USING btree (id)",
+      "expectedMd5": "6908d0ea49146721cb6121873f2eb8e3",
+      "definitionMd5": "6908d0ea49146721cb6121873f2eb8e3"
+    },
+    {
+      "name": "pp_commission_events_source_uniq",
+      "table": "partner_program_commission_events",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX pp_commission_events_source_uniq ON public.partner_program_commission_events USING btree (partner_id, event_type, source_ref) WHERE (source_ref IS NOT NULL)",
+      "expectedMd5": "4df3bdb6c10afef695355e984605075d",
+      "definitionMd5": "4df3bdb6c10afef695355e984605075d"
+    },
+    {
+      "name": "pp_events_partner_idx",
+      "table": "partner_program_commission_events",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX pp_events_partner_idx ON public.partner_program_commission_events USING btree (partner_id, event_at DESC)",
+      "expectedMd5": "5b97ebc248121780f8f19ea7e61838fb",
+      "definitionMd5": "5b97ebc248121780f8f19ea7e61838fb"
+    },
+    {
+      "name": "pp_events_payout_idx",
+      "table": "partner_program_commission_events",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX pp_events_payout_idx ON public.partner_program_commission_events USING btree (payout_id)",
+      "expectedMd5": "4e553a4ddaf1e4830f9f34fbb23696dc",
+      "definitionMd5": "4e553a4ddaf1e4830f9f34fbb23696dc"
+    },
+    {
+      "name": "admin_write_events",
+      "table": "partner_program_commission_events",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "partner_or_admin_read_events",
+      "table": "partner_program_commission_events",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "admin_write_events",
+      "table": "partner_program_commission_events",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "partner_or_admin_read_events",
+      "table": "partner_program_commission_events",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(public.has_role(auth.uid(), 'admin'::public.app_role) OR (partner_id IN ( SELECT partner_program_partners.id\n   FROM public.partner_program_partners\n  WHERE (partner_program_partners.user_id = auth.uid()))))",
+      "expectedMd5": "d23e472f5c50c17231f03cf86851f27d",
+      "definitionMd5": "d23e472f5c50c17231f03cf86851f27d"
+    },
+    {
+      "name": "amount_php",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "0",
+      "expectedMd5": "cfcd208495d565ef66e7dff9f98764da",
+      "definitionMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "name": "created_at",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "created_by",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "id",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "gen_random_uuid()",
+      "expectedMd5": "f3b72bb359a50b640590970a2ab8e514",
+      "definitionMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "name": "method",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "'manual'::text",
+      "expectedMd5": "1c86fb6219cabad38570bf1d10fc4e27",
+      "definitionMd5": "1c86fb6219cabad38570bf1d10fc4e27"
+    },
+    {
+      "name": "notes",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "paid_at",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "paid_by",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "partner_id",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "reference",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "status",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "'pending'::text",
+      "expectedMd5": "3d0c12821e68f0fc31291c72ad568aa9",
+      "definitionMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "name": "updated_at",
+      "table": "partner_program_payouts",
+      "category": "column",
+      "permitted": true,
+      "definition": "now()",
+      "expectedMd5": "75230039beb12ce952f24927f2bfa2f2",
+      "definitionMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "name": "partner_program_payouts_created_by_fkey",
+      "table": "partner_program_payouts",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (created_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "1ceab562a11c774dbbb18205981be824",
+      "definitionMd5": "1ceab562a11c774dbbb18205981be824"
+    },
+    {
+      "name": "partner_program_payouts_paid_by_fkey",
+      "table": "partner_program_payouts",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (paid_by) REFERENCES auth.users(id) ON DELETE SET NULL",
+      "expectedMd5": "623bc12172bfead3e8c85781a90e0232",
+      "definitionMd5": "623bc12172bfead3e8c85781a90e0232"
+    },
+    {
+      "name": "partner_program_payouts_partner_id_fkey",
+      "table": "partner_program_payouts",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "FOREIGN KEY (partner_id) REFERENCES public.partner_program_partners(id) ON DELETE CASCADE",
+      "expectedMd5": "5707efabf3288ab2212ed453dade65b3",
+      "definitionMd5": "5707efabf3288ab2212ed453dade65b3"
+    },
+    {
+      "name": "partner_program_payouts_pkey",
+      "table": "partner_program_payouts",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "PRIMARY KEY (id)",
+      "expectedMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3"
+    },
+    {
+      "name": "partner_program_payouts_status_check",
+      "table": "partner_program_payouts",
+      "category": "constraint",
+      "permitted": true,
+      "definition": "CHECK ((status = ANY (ARRAY['pending'::text, 'processing'::text, 'paid'::text, 'failed'::text, 'cancelled'::text])))",
+      "expectedMd5": "d3208dbcd2016084b60c4c2aae620dcd",
+      "definitionMd5": "d3208dbcd2016084b60c4c2aae620dcd"
+    },
+    {
+      "name": "partner_program_payouts_pkey",
+      "table": "partner_program_payouts",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE UNIQUE INDEX partner_program_payouts_pkey ON public.partner_program_payouts USING btree (id)",
+      "expectedMd5": "d40f20de2bfa8f30afbad787e569af53",
+      "definitionMd5": "d40f20de2bfa8f30afbad787e569af53"
+    },
+    {
+      "name": "pp_payouts_partner_idx",
+      "table": "partner_program_payouts",
+      "category": "index",
+      "permitted": true,
+      "definition": "CREATE INDEX pp_payouts_partner_idx ON public.partner_program_payouts USING btree (partner_id, created_at DESC)",
+      "expectedMd5": "7bed178f29c34c1bca62890b05b6114f",
+      "definitionMd5": "7bed178f29c34c1bca62890b05b6114f"
+    },
+    {
+      "name": "admin_write_payouts",
+      "table": "partner_program_payouts",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "partner_or_admin_read_payouts",
+      "table": "partner_program_payouts",
+      "category": "policyCheck",
+      "permitted": true,
+      "definition": null,
+      "expectedMd5": null,
+      "definitionMd5": null
+    },
+    {
+      "name": "admin_write_payouts",
+      "table": "partner_program_payouts",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "public.has_role(auth.uid(), 'admin'::public.app_role)",
+      "expectedMd5": "52601dff68335277823fcbfe28ec86d5",
+      "definitionMd5": "52601dff68335277823fcbfe28ec86d5"
+    },
+    {
+      "name": "partner_or_admin_read_payouts",
+      "table": "partner_program_payouts",
+      "category": "policyUsing",
+      "permitted": true,
+      "definition": "(public.has_role(auth.uid(), 'admin'::public.app_role) OR (partner_id IN ( SELECT partner_program_partners.id\n   FROM public.partner_program_partners\n  WHERE (partner_program_partners.user_id = auth.uid()))))",
+      "expectedMd5": "d23e472f5c50c17231f03cf86851f27d",
+      "definitionMd5": "d23e472f5c50c17231f03cf86851f27d"
+    },
+    {
+      "name": "pp_payouts_updated",
+      "table": "partner_program_payouts",
+      "category": "trigger",
+      "permitted": true,
+      "definition": "CREATE TRIGGER pp_payouts_updated BEFORE UPDATE ON public.partner_program_payouts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column()",
+      "expectedMd5": "df61d876689524477524d5977b72d802",
+      "definitionMd5": "df61d876689524477524d5977b72d802"
+    }
+  ],
+  "tables": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "partner_program_commission_events",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,anon=arwdDxtm/postgres,authenticated=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "kind": "r",
+      "owner": "postgres",
+      "table": "partner_program_payouts",
+      "rights": [
+        {
+          "role": "anon",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "authenticated",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "postgres",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        },
+        {
+          "role": "service_role",
+          "delete": true,
+          "insert": true,
+          "select": true,
+          "update": true,
+          "trigger": true,
+          "truncate": true,
+          "references": true
+        }
+      ],
+      "forceRls": false,
+      "partition": false,
+      "inheritanceEdges": 0
+    }
+  ],
+  "columns": [
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "partner_id",
+      "type": "uuid",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "event_type",
+      "type": "text",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "amount_php",
+      "type": "numeric(12,2)",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "commission_php",
+      "type": "numeric(12,2)",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "acl": null,
+      "name": "source_ref",
+      "type": "text",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "event_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "cleared_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "payout_id",
+      "type": "uuid",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "approved_by",
+      "type": "uuid",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "approved_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "paid_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "clawed_back_reason",
+      "type": "text",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 16,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "clawed_back_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 17,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "clawed_back_by",
+      "type": "uuid",
+      "table": "partner_program_commission_events",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 18,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "id",
+      "type": "uuid",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "generated": "",
+      "defaultMd5": "f3b72bb359a50b640590970a2ab8e514"
+    },
+    {
+      "acl": null,
+      "name": "partner_id",
+      "type": "uuid",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "amount_php",
+      "type": "numeric(12,2)",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 3,
+      "generated": "",
+      "defaultMd5": "cfcd208495d565ef66e7dff9f98764da"
+    },
+    {
+      "acl": null,
+      "name": "method",
+      "type": "text",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 4,
+      "generated": "",
+      "defaultMd5": "1c86fb6219cabad38570bf1d10fc4e27"
+    },
+    {
+      "acl": null,
+      "name": "reference",
+      "type": "text",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "status",
+      "type": "text",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 6,
+      "generated": "",
+      "defaultMd5": "3d0c12821e68f0fc31291c72ad568aa9"
+    },
+    {
+      "acl": null,
+      "name": "notes",
+      "type": "text",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_by",
+      "type": "uuid",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "paid_by",
+      "type": "uuid",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "paid_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "generated": "",
+      "defaultMd5": null
+    },
+    {
+      "acl": null,
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 11,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    },
+    {
+      "acl": null,
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "partner_program_payouts",
+      "schema": "public",
+      "notNull": true,
+      "identity": "",
+      "position": 12,
+      "generated": "",
+      "defaultMd5": "75230039beb12ce952f24927f2bfa2f2"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "partner_program_commission_events_pkey",
+      "ready": true,
+      "table": "partner_program_commission_events",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "6908d0ea49146721cb6121873f2eb8e3"
+    },
+    {
+      "name": "pp_commission_events_source_uniq",
+      "ready": true,
+      "table": "partner_program_commission_events",
+      "valid": true,
+      "unique": true,
+      "primary": false,
+      "definitionMd5": "4df3bdb6c10afef695355e984605075d"
+    },
+    {
+      "name": "pp_events_partner_idx",
+      "ready": true,
+      "table": "partner_program_commission_events",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "5b97ebc248121780f8f19ea7e61838fb"
+    },
+    {
+      "name": "pp_events_payout_idx",
+      "ready": true,
+      "table": "partner_program_commission_events",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "4e553a4ddaf1e4830f9f34fbb23696dc"
+    },
+    {
+      "name": "partner_program_payouts_pkey",
+      "ready": true,
+      "table": "partner_program_payouts",
+      "valid": true,
+      "unique": true,
+      "primary": true,
+      "definitionMd5": "d40f20de2bfa8f30afbad787e569af53"
+    },
+    {
+      "name": "pp_payouts_partner_idx",
+      "ready": true,
+      "table": "partner_program_payouts",
+      "valid": true,
+      "unique": false,
+      "primary": false,
+      "definitionMd5": "7bed178f29c34c1bca62890b05b6114f"
+    }
+  ],
+  "policies": [
+    {
+      "name": "admin_write_events",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_commission_events",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "partner_or_admin_read_events",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_commission_events",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "d23e472f5c50c17231f03cf86851f27d",
+      "permissive": true
+    },
+    {
+      "name": "admin_write_payouts",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_payouts",
+      "command": "*",
+      "checkMd5": "52601dff68335277823fcbfe28ec86d5",
+      "usingMd5": "52601dff68335277823fcbfe28ec86d5",
+      "permissive": true
+    },
+    {
+      "name": "partner_or_admin_read_payouts",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "partner_program_payouts",
+      "command": "r",
+      "checkMd5": null,
+      "usingMd5": "d23e472f5c50c17231f03cf86851f27d",
+      "permissive": true
+    }
+  ],
+  "triggers": [
+    {
+      "name": "pp_payouts_updated",
+      "table": "public.partner_program_payouts",
+      "enabled": "O",
+      "function": "public.update_updated_at_column()",
+      "typeBits": 19,
+      "whenTreeMd5": null,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentCount": 0,
+      "definitionMd5": "df61d876689524477524d5977b72d802",
+      "updateColumns": []
+    }
+  ],
+  "functions": [
+    {
+      "acl": "{=X/supabase_auth_admin,supabase_auth_admin=X/supabase_auth_admin,dashboard_user=X/supabase_auth_admin}",
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "cdef18c69c4f4cbbced2eaf81e628b49",
+      "configMd5": null,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "ea3b41bf29e2ad573067939329aa088e",
+      "serviceExecute": true,
+      "definitionBytes": 274,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres,authenticated=X/postgres,anon=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "sql",
+      "bodyMd5Lf": "dae5cfc5a8d92461a428f6702e4e65af",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.has_role(uuid,public.app_role)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "boolean",
+      "returnsSet": false,
+      "volatility": "s",
+      "anonExecute": true,
+      "argumentsMd5": "8216964371cd350348af933959ab4fda",
+      "argumentModes": null,
+      "argumentNames": [
+        "_user_id",
+        "_role"
+      ],
+      "definitionMd5": "0c2c78626ed8a4807e6cc1b7b54d641c",
+      "serviceExecute": true,
+      "definitionBytes": 295,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "9922e70c34b04182150e1d8d5f05b52e",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.pp_award_bounty(text,text,text)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "50729e3f6ff57565ad23d20a9a6d9ffb",
+      "argumentModes": null,
+      "argumentNames": [
+        "_code",
+        "_event_type",
+        "_source_ref"
+      ],
+      "definitionMd5": "50b7c73adced5a45d2274cb39ed3552f",
+      "serviceExecute": true,
+      "definitionBytes": 1022,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "8580891c88ba943c57d2128d84df52df",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.pp_recompute_payout_total(uuid)",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "void",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "3e78408c2a1d9d0eee05ed637295c0c8",
+      "argumentModes": null,
+      "argumentNames": [
+        "_payout_id"
+      ],
+      "definitionMd5": "25d4829bf40a6186828ebade9014b758",
+      "serviceExecute": true,
+      "definitionBytes": 428,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "53c2dbdd0884625f0bffa04689d12cb9",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.pp_user_signup_bounty()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "8b0e3a6ec5bb10c5b7824381288bd375",
+      "serviceExecute": true,
+      "definitionBytes": 360,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "df58e18372301426b6dcd49a95f27de9",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.tg_auto_assign_sales_rep()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "e21d67956b02e47ba3da821cbfc2f841",
+      "serviceExecute": true,
+      "definitionBytes": 774,
+      "postgresExecute": true,
+      "securityDefiner": true,
+      "authenticatedExecute": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "kind": "f",
+      "owner": "postgres",
+      "strict": false,
+      "defaults": 0,
+      "language": "plpgsql",
+      "bodyMd5Lf": "5b733ab523bad442e4b10f836de9e4ba",
+      "configMd5": "dcd2abd514173991611a622e71d06e6f",
+      "signature": "public.update_updated_at_column()",
+      "configKeys": [
+        "search_path"
+      ],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "anonExecute": false,
+      "argumentsMd5": "d41d8cd98f00b204e9800998ecf8427e",
+      "argumentModes": null,
+      "argumentNames": null,
+      "definitionMd5": "47b72756852a143198dccf4db5943afc",
+      "serviceExecute": true,
+      "definitionBytes": 197,
+      "postgresExecute": true,
+      "securityDefiner": false,
+      "authenticatedExecute": false
+    }
+  ],
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "partner_program_commission_events_approved_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "approved_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "605edf7a887a2105b2c0312e5bc6fd91",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_commission_events_clawed_back_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "clawed_back_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4af6124ff58f5756d9455c2963cddf2a",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_commission_events_event_type_check",
+      "type": "c",
+      "match": " ",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "event_type"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "5b18c304faa814933bc38f2b90e6c4c4",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_commission_events_partner_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "partner_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "5707efabf3288ab2212ed453dade65b3",
+      "referenceTable": "public.partner_program_partners",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_commission_events_payout_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "payout_id"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "019c5c6f7b3fe782ffd174e1c03bcb4c",
+      "referenceTable": "public.partner_program_payouts",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_commission_events_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_commission_events_status_check",
+      "type": "c",
+      "match": " ",
+      "table": "partner_program_commission_events",
+      "columns": [
+        "status"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "82b270b6e0af4a39ce582daaa162dabf",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_payouts_created_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_payouts",
+      "columns": [
+        "created_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "1ceab562a11c774dbbb18205981be824",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_payouts_paid_by_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_payouts",
+      "columns": [
+        "paid_by"
+      ],
+      "deferred": false,
+      "onDelete": "n",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "623bc12172bfead3e8c85781a90e0232",
+      "referenceTable": "auth.users",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_payouts_partner_id_fkey",
+      "type": "f",
+      "match": "s",
+      "table": "partner_program_payouts",
+      "columns": [
+        "partner_id"
+      ],
+      "deferred": false,
+      "onDelete": "c",
+      "onUpdate": "a",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "5707efabf3288ab2212ed453dade65b3",
+      "referenceTable": "public.partner_program_partners",
+      "referenceColumns": [
+        "id"
+      ]
+    },
+    {
+      "name": "partner_program_payouts_pkey",
+      "type": "p",
+      "match": " ",
+      "table": "partner_program_payouts",
+      "columns": [
+        "id"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "4c6419b3704337bbfe50f018842a9ad3",
+      "referenceTable": null,
+      "referenceColumns": []
+    },
+    {
+      "name": "partner_program_payouts_status_check",
+      "type": "c",
+      "match": " ",
+      "table": "partner_program_payouts",
+      "columns": [
+        "status"
+      ],
+      "deferred": false,
+      "onDelete": " ",
+      "onUpdate": " ",
+      "validated": true,
+      "deferrable": false,
+      "definitionMd5": "d3208dbcd2016084b60c4c2aae620dcd",
+      "referenceTable": null,
+      "referenceColumns": []
+    }
+  ],
+  "observedAtUtc": "2026-10-15T09:45:26.830475",
+  "serverVersion": "17.6"
+}
