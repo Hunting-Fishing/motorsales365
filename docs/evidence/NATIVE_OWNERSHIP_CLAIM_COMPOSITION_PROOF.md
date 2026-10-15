@@ -43,9 +43,16 @@ reachability remain outside this proof.
 `public.user_roles` labels. That is not native `shop_manager.user_roles`, nor proof
 that role-assignment provenance is trusted. No role permissions are broadened.
 
-The captured `has_role(uuid,public.app_role)` body differs from its old retained
-definition. It is not a dependency of selected `can_moderate`/policies and is not
-executed, replaced or claimed source-matched by this proof. `update_updated_at_column()`
+Correction on the command-contract follow-up: the captured
+`has_role(uuid,public.app_role)` body DOES match retained source
+`20260501224406_1fde4d15-467c-4a50-a39e-089c25417e52.sql:45–56` exactly
+(LF body MD5 `dae5cfc5a8d92461a428f6702e4e65af`). The earlier mismatch note
+was incorrect. `platform-role-source-contract.test.mjs` independently pins the
+source section and both dated observations. It remains outside this PR #45
+fixture's executed helpers/policies; no role-writer or applied-history acceptance
+is inferred. The immutable fixture's introductory mismatch comment is historical
+and superseded by this correction; its byte pin/SQL behavior are preserved.
+`update_updated_at_column()`
 is captured but is not the actual business attachment: that uses `tg_set_updated_at()`.
 No source-ordering assumption substitutes a different timestamp/body.
 

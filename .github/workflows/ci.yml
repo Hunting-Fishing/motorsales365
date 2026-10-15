@@ -112,6 +112,12 @@ jobs:
       - name: Native owner-intent profile and audit forward composition (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/native-owner-intent-catalog-review.test.mjs scripts/ci/native-owner-intent-composition.test.mjs
 
+      - name: Platform role helper retained-source correspondence (static, no database)
+        run: node --test scripts/ci/platform-role-source-contract.test.mjs
+
+      - name: Claim review current caller and unwired command contracts (never quarantined)
+        run: npx vitest run src/lib/business-claims.functions.test.ts src/lib/claim-review-contract.server.test.ts --maxWorkers=1
+
       - name: Approved helper execution envelope and metadata review regressions (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/approved-helper-execution-envelope.test.mjs scripts/ci/approved-helpers-catalog-review.test.mjs scripts/ci/approved-helper-release-evidence.test.mjs
 

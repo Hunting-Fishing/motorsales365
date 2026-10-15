@@ -91,6 +91,13 @@ tenure/private retention/full-media hosting gates remain open. The recurring
 same-chat continuation remains active without a duplicate automation. Supabase
 safety skills kept client acknowledgement separate from database authority.
 
+Follow-up verification: docs head `6389eac4520af2247fdc9a40cb750de200c03c7e`
+passed all six CI gates (`38682112982`). Hosting
+`1bee2422-9407-4349-94d4-6dedad352d45` failed separately; wrapper
+`38682112890` skipped migrations and production deployment. PR #47 docs
+`8b1b38e` also passed all six (`38681676475`). Neither is deployed or accepted
+as production behavior, trusted owner authority or recovery/release readiness.
+
 ## LF artifact pins
 
 | Artifact                                           | UTF-8 LF bytes | SHA-256                                                            |

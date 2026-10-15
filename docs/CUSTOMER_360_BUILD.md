@@ -568,3 +568,37 @@ operator recovery/consent/tenure/private retention/OCR/mobile/owner pilot/full-m
 hosting remain open; no sparse artifact deploy, baseline/parity/release promotion
 or replay of the three applied restrictions. Same-chat scheduled continuation stays
 active without duplication or a claim of continuous between-run work.
+
+Follow-up verification: PR #47 docs `8b1b38e` and PR #48 docs `6389eac` now
+passed all six CI gates (`38681676475` and `38682112982`). Hosting remains
+separately failed; wrappers skipped migrations/production deployment. PR #48 is
+the latest fully CI-verified application slice (1,068 tests), not a deployed
+release. The next preparatory codec remains unwired until actual atomic authority,
+claim-attempt/evidence/tenure revision, native reconciliation and recovery gates
+are satisfied. An earlier has_role source-mismatch note is corrected by new
+static body mapping; no source history or role authority is thereby adopted.
+
+Draft PR #49 (code `f6bf32e`) adds the UNWIRED preparatory review-command codec
+and actual unchanged server-caller characterization. It validates syntax and
+separate supplied-actor equality and produces frozen canonical bytes/fingerprint;
+no route/handler/RPC/ledger/authority/revision or confirmed receipt is implemented.
+The owner A→B→A case explicitly demonstrates that matching values are not a
+trusted claim/evidence/ownership revision. Legacy errors/zero rows/NULL-count
+reset and separate stamping remain characterized gaps, not repairs.
+
+Final 45 focused tests (25 codec + 20 handler), full app 1,113/1,113 across 57 files
+(88.47s), TypeScript, zero-error/warning lint, format/diff and independent review
+pass. Tooling 408 plus 10 receipt assets pass separately (418 total); three new
+static tests correct the prior has_role mismatch by exact retained-source/body
+mapping to both dated observations. Native role prototypes do not prove platform
+role assignment authority. Frozen older source/observations are not rewritten.
+See `evidence/CLAIM_REVIEW_ATOMIC_CONTRACT.md` for exact pins and proposed gates.
+
+PR #47/#48 docs now passed all six CI gates; PR #49's own latest head needs
+verification. Hosting remains failed separately and migration/deployment wrappers
+skip; no live DB/application call, schema/history/data mutation or upload. Next
+close actual platform-role/auth-bootstrap/referral writer provenance and original
+actor custody, trusted claim/evidence/tenure revisions and competing-writer lock
+protocol before an atomic kernel or native/consent-reconciled owner positives.
+All recovery/API/session/concurrency/OCR/mobile/owner/full-media release gates
+remain open; preserve applied restrictions and the single recurring follow-up.

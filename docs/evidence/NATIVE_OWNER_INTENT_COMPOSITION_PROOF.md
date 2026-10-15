@@ -37,7 +37,11 @@ Both and the two trigger wrappers are postgres-owned SECURITY DEFINER,
 is also SECURITY DEFINER but authenticated EXECUTE is true (anon false). This
 does not authorize a new live restriction. `has_role`/`can_support` definitions
 and policies are observation inventory, not permissive stubs or executed fixture
-authorization. The old `has_role` source mismatch remains outside this proof.
+authorization. The later command-contract audit corrects the earlier mismatch
+note: retained May 1 source lines 45–56 match the actual `has_role` body exactly
+(`dae5cfc5a8d92461a428f6702e4e65af`). Its source/body mapping is now static-tested;
+the helper is still not executed/composed with platform client policies or role
+writers in this fixture. No source-history or authority acceptance follows.
 
 The actual selected forward chain is business-owner attachment → seven-argument
 recompute → derive profile/business reads → profile intent UPDATE and attempted
@@ -152,6 +156,12 @@ consent/tenure, private financial retention, receipt/mobile/owner pilot and
 full-media hosting acceptance remain open. Existing recurring continuation stays
 active without a duplicate automation. Supabase/Postgres safety skills kept
 metadata collection read-only and separated source behavior from authority.
+
+Follow-up verification: docs head `8b1b38e895cd8b867ee0eb429c83b46c010aebfe`
+passed all six CI gates (`38681676475`). Hosting
+`40775dcb-bd16-4afe-823b-01bd8c5665c5` failed separately; wrapper
+`38681676472` skipped migrations and production deployment. No new authority,
+migration provenance, production behavior or release/recovery acceptance follows.
 
 ## LF artifact pins
 
