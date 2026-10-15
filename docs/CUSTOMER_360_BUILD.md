@@ -271,12 +271,45 @@ invoker timestamp RLS, void no-ops, duplicate invitation rows, notification-id
 guard omission and real atomic rollback are characterized, not production fixes
 or notification delivery. Source/ACL boundaries and synthetic sender-profile
 support remain explicit in `evidence/NATIVE_CHAT_WRITER_COMPOSITION_PROOF.md`.
-Remote CI awaits verification on the published documentation head. No migration,
+Documentation head `1abcab4` passed all six CI gates (run `38656320823`), verified
+on the messaging follow-up. Independent hosting still fails. No migration,
 application/production permission/data/history change or deployment occurs.
 
-Next is bounded caller acknowledgement/error/late-context handling (strict
+The bounded caller acknowledgement/error/late-context candidate (strict
 UUID/count responses, no false read success after resolved RPC errors, no
-row-confirmation claim from void, refresh-before-retry ambiguity), followed by the
-offline native companion authority/offboarding contract. All native identity,
+row-confirmation claim from void, refresh-before-retry ambiguity) is now implemented
+locally; verification/publication is recorded in the completion checklist and
+`evidence/MESSAGING_REQUEST_CONFIRMATION.md`. It changes no SQL or native authority.
+Next is the offline native companion authority/offboarding contract. All native identity,
 baseline/recovery, consent/OCR/pilot, real API/concurrency/role and hosting release
 gates remain open; the recurring follow-up is not a completion or revenue promise.
+
+Draft PR #38 (code `22c2724`) now implements the six chat caller confirmation/
+context slice: original HTTP status is preserved in a no-retry fixed-bearer
+server transport, UUID/count results are strict, and void stays acknowledged/
+effect-unverified. Account/thread/dialog lifetimes suppress late callbacks;
+automatic reads no longer invent membership timestamps or loop, and manual unread
+is not undone. Browser snapshot reads publish only complete/latest visible reads
+and hide prior rows on failure, but remain browser/RLS/capped/non-atomic and show
+the previous same-account snapshot during a pending refresh. Excluded DM/offer/
+upload/thread-state/direct-message writers and real authority/API/hosting limits
+remain explicit in `evidence/MESSAGING_REQUEST_CONFIRMATION.md`.
+
+263 new focused tests; 986 full application tests across 53 files, full TypeScript,
+report checker/no quarantine, formatting/diff and zero-error focused lint pass.
+Full sequential tooling re-run passes 259/259 (157.79s); no SQL tooling changed.
+Independent bounded review is clean after two corrected route regressions.
+Code `22c2724` passed all six CI gates (run `38659076609`); the following docs head
+needs its own next-run check. Hosting still fails separately; migrations/production
+deployment skip and the green preview wrapper is not an upload. No SQL, migration, grant, live
+business RPC/message, authority repair or deployment is performed.
+
+The next offline dependency is now proposed in
+`evidence/NATIVE_COMPANION_AUTHORITY_CONTRACT.md`: design-only, not adopted or
+implemented. Start a separate disposable identity/self-shift/privileged-target
+candidate while preserving legacy IDs and actual attachments; keep unresolved
+owner/delegation/provenance/multi-roster positives gated and close trusted team/
+native provisioning/role writers before claiming atomic offboarding authority.
+Real independent-session concurrency, baseline/storage recovery, consent/tenure,
+configuration/role/API acceptance, OCR/mobile pilot and hosting remain open. The
+recurring follow-up remains active without duplicate automations or reminders.
