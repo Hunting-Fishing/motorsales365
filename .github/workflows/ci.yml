@@ -76,6 +76,9 @@ jobs:
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 
+      - name: Recovered Parts and remaining migration source guards (never quarantined)
+        run: node --test scripts/ci/parts-plan-reference.test.mjs scripts/ci/migration-remaining-source-ledger.test.mjs scripts/ci/retired-cloud-auth.test.mjs
+
       - name: Complete public asset release guard regressions (never quarantined)
         run: node --test scripts/ci/verify-release-assets.test.mjs
 

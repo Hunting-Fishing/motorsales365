@@ -1,0 +1,296 @@
+{
+  "formatVersion": 1,
+  "mode": "offline-recorded-source-ledger",
+  "repository": "Hunting-Fishing/motorsales365",
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOn": "2026-10-15",
+  "observedCandidate": "06e21a2ef968975fc43e840d17c84ad77c4ea48c",
+  "normalization": "CRLF-to-LF-only; no whitespace, comments, tokens or SQL transformations",
+  "scope": "Categorizes the exact 19 files outside the existing whole-source classifier. Recorded execution evidence is not fresh production verification. No SQL execution, migration ingress, history adoption or schema activation is authorized.",
+  "exactWholeSourceClassifier": {
+    "totalSources": 423,
+    "matchedSources": 404,
+    "outsideExactClassifier": 19,
+    "counts": {
+      "recordedVersion": 2,
+      "recordedVersionUnverified": 0,
+      "recordedSqlHashMismatch": 0,
+      "legacyHashMatch": 388,
+      "legacyHashMismatch": 0,
+      "remoteSqlHashMatch": 14,
+      "unclassified": 19
+    },
+    "compositionEvidenceRefs": ["provenance", "historyHashes", "invoiceContainment"],
+    "embeddedExecutionsAddedToExactMatches": false
+  },
+  "categoryCounts": {
+    "historical-unresolved": 12,
+    "unapplied-candidate": 5,
+    "recorded-embedded-execution": 2
+  },
+  "sources": [
+    {
+      "path": "supabase/migrations/20260831041834_associate_parts_order_lifecycle.sql",
+      "sha256Lf": "3fc2cdc241821d00fb37d7c75684062ba5c01d0519092e76e37d09b82380f654",
+      "bytesLf": 60352,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Eight retained splits and selected bodies correspond; a nonblank-line multiset does not establish ordered replay or exact whole-source identity."
+    },
+    {
+      "path": "supabase/migrations/20260831113000_business_associate_enrollment.sql",
+      "sha256Lf": "979fcf84c79fa85b1db03db708dfee0d4c3da799bde38f2fd4cf4f34cfcff080",
+      "bytesLf": 6234,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Retained base plus six later hardening/projection lines; not exact whole-source identity or comprehensive schema/workflow parity."
+    },
+    {
+      "path": "supabase/migrations/20260831114500_associate_privacy_customer_vehicle_ledger.sql",
+      "sha256Lf": "da2965899dfd286fec0bf4560872aaa313f407c1b1cb39e1585c2cd7f09efe1d",
+      "bytesLf": 24293,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Six additional trigger-helper ACL lines lack an identified separate retained source; selected body matches do not prove consent/history/data parity."
+    },
+    {
+      "path": "supabase/migrations/20260831130502_employee_module_access.sql",
+      "sha256Lf": "103dcc61d3136e4deee11a42300cc46025ee114b26b7f381b492721f77a72d04",
+      "bytesLf": 5228,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Retained base plus a folded-in driver block; removing that block is not equality of the unchanged whole local source."
+    },
+    {
+      "path": "supabase/migrations/20260831193523_counter_sales_registers_pricebook.sql",
+      "sha256Lf": "e2736908cc1e3343e4cb1a784c0f839ff198e0754c015f39b831fb3482f0327c",
+      "bytesLf": 13800,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit", "baselineStrategy"],
+      "correspondenceNote": "Cost correction is folded into historical source; the later original-text patch fails on replay. Do not rerun it or claim whole-source/replay equivalence."
+    },
+    {
+      "path": "supabase/migrations/20260901025424_business_staff_shop_manager_bridge.sql",
+      "sha256Lf": "a49e50ecd9a621d4162ff58666ab98584d9aa009775732ce4cf8b645d8c21a9e",
+      "bytesLf": 6515,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Selected bodies/tokens correspond to later owner-authoritative routing; whole-source, provisioning and backfill parity remain unresolved."
+    },
+    {
+      "path": "supabase/migrations/20260901134215_parts_demo_playground.sql",
+      "sha256Lf": "bd6a76cbcd62b5c21da8bdcb13a9b02e48548de5e8831dd52242e802ee5ad413",
+      "bytesLf": 3765,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Despite its filename this contains invoice/payment trigger corrections; documented token correspondence to retained successors is not exact source or accounting acceptance."
+    },
+    {
+      "path": "supabase/migrations/20260902123940_business_part_cross_references.sql",
+      "sha256Lf": "91a88d65bf0595658fc63b494ee9ed5f6c7a4556de3c3183379ba0d05127d989",
+      "bytesLf": 6219,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Composes a retained base and separately retained REVOKE; neither is the exact unchanged whole local source, and backfill completeness remains unverified."
+    },
+    {
+      "path": "supabase/migrations/20260902131844_seed_ph_chassis_vehicle_profiles.sql",
+      "sha256Lf": "1c0dcb6ac0ac66e1eb30796b783d254f48591c213bdd422f1271d386f72eb72b",
+      "bytesLf": 1076,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "No same-name retained history record or seed/reference-data parity proof. No seed execution or reference-data row query is implied."
+    },
+    {
+      "path": "supabase/migrations/20260902162000_parts_receiving_exceptions.sql",
+      "sha256Lf": "a340c2468a6872845f9abbd46627efbe1f4945aca8f9e85b3edb47e500fad0d4",
+      "bytesLf": 11448,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Folded-in grants/quarantine and selected later function correspondence do not establish exact full-source, full-table or workflow parity."
+    },
+    {
+      "path": "supabase/migrations/20260910170500_harden_parts_receiving_exception_privileges.sql",
+      "sha256Lf": "00613752aff0be5d6741ff835a55edf0a2576a7410f4be0a9441341d43f18a84",
+      "bytesLf": 951,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Only comments/whitespace-normalized correspondence was recorded; original full-source hashes differ and are not relabeled equal."
+    },
+    {
+      "path": "supabase/migrations/20260911120000_close_standalone_migration_ingress.sql",
+      "sha256Lf": "051a6b4434518bf607cf1d88c48907a7261c16ec2691eab418dc3d4f9dd7e846",
+      "bytesLf": 1089,
+      "classification": "historical-unresolved",
+      "evidenceRefs": ["correspondenceAudit"],
+      "correspondenceNote": "Selected sealing effects and retained hash were observed; archive body was deliberately not recovered, so exact local source identity remains unresolved."
+    },
+    {
+      "path": "supabase/migrations/20260927090000_parts_network_cross_org_rls_hardening.sql",
+      "sha256Lf": "0bdeb54f03c6a329835819a012bd58ca75f0f3800b736f15548b9ebb44417e0d",
+      "bytesLf": 14336,
+      "classification": "unapplied-candidate",
+      "evidenceRefs": ["baselineStrategy"],
+      "correspondenceNote": "Recorded pending-forward candidate, not a fresh live-state assertion or authorization to enter the blocked migration path."
+    },
+    {
+      "path": "supabase/migrations/20260927120000_parts_network_security_followups.sql",
+      "sha256Lf": "074feb25f80e497033d09d9a51332905930913e5a89b511d27f122f27df1f2bc",
+      "bytesLf": 18117,
+      "classification": "unapplied-candidate",
+      "evidenceRefs": ["baselineStrategy"],
+      "correspondenceNote": "Recorded pending-forward candidate, not a fresh live-state assertion or authorization to enter the blocked migration path."
+    },
+    {
+      "path": "supabase/migrations/20261014140802_preserve_direct_installed_vehicle.sql",
+      "sha256Lf": "44e931d06afb9999a63b15837d543bc54743e94fd708ee48bdec96f75bd58047",
+      "bytesLf": 686,
+      "classification": "unapplied-candidate",
+      "evidenceRefs": ["baselineStrategy"],
+      "correspondenceNote": "Recorded pending-forward candidate; direct-vehicle preservation needs the reviewed baseline, upgrade/recovery and acceptance path before release."
+    },
+    {
+      "path": "supabase/migrations/20261014185003_contain_legacy_profile_bootstrap_execute.sql",
+      "sha256Lf": "53c9081e23d9a31846f39a730a5c7cb5bd589716f224d11a7ed9a76e73d00aba",
+      "bytesLf": 6295,
+      "classification": "recorded-embedded-execution",
+      "evidenceRefs": ["approvedHelperExecution", "profileEnvelope"],
+      "correspondenceNote": "Recorded approved execution embeds these exact original bytes inside a different retained statement. Not whole-file retained-source equality, fresh production verification or permission to replay.",
+      "recordedExecution": {
+        "remoteVersion": "20261015021118",
+        "name": "contain_legacy_profile_bootstrap_execute",
+        "envelopeEvidenceRef": "profileEnvelope",
+        "envelopeSha256Lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+        "envelopeBytesLf": 6741,
+        "embeddedByteStart": 357,
+        "embeddedByteEndExclusive": 6652,
+        "recordedVerifiedAtUtc": "2026-10-15 02:11:58.84888",
+        "freshProductionVerification": false,
+        "wholeSourceEquality": false,
+        "replayAuthorized": false
+      }
+    },
+    {
+      "path": "supabase/migrations/20261014185052_contain_legacy_work_order_totals_execute.sql",
+      "sha256Lf": "f87c6852dce4cff8be7f33d97aeadceddd223c2e4a3f310185f149a60297baf7",
+      "bytesLf": 6307,
+      "classification": "recorded-embedded-execution",
+      "evidenceRefs": ["approvedHelperExecution", "totalsEnvelope"],
+      "correspondenceNote": "Recorded approved execution embeds these exact original bytes inside a different retained statement. Not whole-file retained-source equality, fresh production verification or permission to replay.",
+      "recordedExecution": {
+        "remoteVersion": "20261015021145",
+        "name": "contain_legacy_work_order_totals_execute",
+        "envelopeEvidenceRef": "totalsEnvelope",
+        "envelopeSha256Lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+        "envelopeBytesLf": 6753,
+        "embeddedByteStart": 357,
+        "embeddedByteEndExclusive": 6664,
+        "recordedVerifiedAtUtc": "2026-10-15 02:11:58.84888",
+        "freshProductionVerification": false,
+        "wholeSourceEquality": false,
+        "replayAuthorized": false
+      }
+    },
+    {
+      "path": "supabase/migrations/20261014194659_customer_vehicle_activity_readers.sql",
+      "sha256Lf": "e6359571027741ea6402e2b6adda868c952e0d4776995b443400a8b3c34404b8",
+      "bytesLf": 8738,
+      "classification": "unapplied-candidate",
+      "evidenceRefs": ["vehicleReaderContract"],
+      "correspondenceNote": "Reviewed/tested offline reader candidate; recorded as unapplied, not current hosted API activation or authority/role/storage acceptance."
+    },
+    {
+      "path": "supabase/migrations/20261014214406_customer_reminders_invoker_read.sql",
+      "sha256Lf": "c65593b7a93048b3801e50853ce72bac58c83d6f76a8848cedb2d7ff3adfbb5d",
+      "bytesLf": 5363,
+      "classification": "unapplied-candidate",
+      "evidenceRefs": ["reminderReaderContract"],
+      "correspondenceNote": "Reviewed/tested offline same-statement reader candidate; recorded as unapplied, not current hosted API activation or reminder-write/native-authority acceptance."
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "id": "provenance",
+      "path": "docs/evidence/migration-provenance-2026-10-14.json",
+      "sha256Lf": "d41709e5a9b669cfd5d352a95d24195b2660f843bdb416318c1168ed68ec36e4",
+      "bytesLf": 82860
+    },
+    {
+      "id": "historyHashes",
+      "path": "docs/evidence/post-cutover-migration-hashes-2026-10-14.json",
+      "sha256Lf": "a9e8a49e1d36821833bfeb3acc208ec06e0e139841755c63f1fa292bd88c91ec",
+      "bytesLf": 9718
+    },
+    {
+      "id": "invoiceContainment",
+      "path": "docs/evidence/invoice-containment-migration-2026-10-15.json",
+      "sha256Lf": "c2302bc10ad3dba0e190295f8c2aabd418b67038feb44e011e10cfa5ec5cc5d2",
+      "bytesLf": 1049
+    },
+    {
+      "id": "correspondenceAudit",
+      "path": "docs/evidence/migration-object-audit-2026-10-15.md",
+      "sha256Lf": "cde396be3c4a722a854d95b8cbcd84ae2eb1481e57d3f48d282ee62ff8cc3dfc",
+      "bytesLf": 16199
+    },
+    {
+      "id": "baselineStrategy",
+      "path": "docs/evidence/MIGRATION_BASELINE_STRATEGY.md",
+      "sha256Lf": "7ad76e406c072d0d8a7fe06c9d4f8e9c32dbb79cb10c078b21579a0222f65785",
+      "bytesLf": 14220
+    },
+    {
+      "id": "vehicleReaderContract",
+      "path": "docs/evidence/CUSTOMER_VEHICLE_ACTIVITY_READ_CONTRACT.md",
+      "sha256Lf": "250dbb9e80594d9e43c31504126429bb0a01fbb1bc68c34894dd3f50d5f56c9f",
+      "bytesLf": 9218
+    },
+    {
+      "id": "reminderReaderContract",
+      "path": "docs/evidence/CUSTOMER_REMINDERS_INVOKER_READ_CONTRACT.md",
+      "sha256Lf": "7e32e009963344f6f11fc17be3f7153c31a5871fb20b8ffb8707a473e733e72f",
+      "bytesLf": 11862
+    },
+    {
+      "id": "approvedHelperExecution",
+      "path": "docs/evidence/approved-helper-execution-2026-10-15.json",
+      "sha256Lf": "8969efe0daa3680a979d01ad164c5d25d6c2fdcde74cbed649da9628c78f1135",
+      "bytesLf": 40370
+    },
+    {
+      "id": "profileEnvelope",
+      "path": "docs/evidence/approved-helper-profile_bootstrap-execution.sql",
+      "sha256Lf": "3903780b9eab291b0481ec4aec83373925827eb64d78f492a5045e6da1c1ffd6",
+      "bytesLf": 6741
+    },
+    {
+      "id": "totalsEnvelope",
+      "path": "docs/evidence/approved-helper-work_order_totals-execution.sql",
+      "sha256Lf": "34a1623d30fa59a1a9dbd9b596e1270101111f4e0b41cda596c488458ff01cb8",
+      "bytesLf": 6753
+    }
+  ],
+  "outsideCandidate": {
+    "pullRequest": 9,
+    "sourceCommit": "300f02ba8f8fb0ad8b6c5746fc60373153187c65",
+    "path": "supabase/migrations/20260928090000_rewrite_legacy_hosted_asset_urls.sql",
+    "presentAtObservedCandidate": false,
+    "includedIn423Sources": false,
+    "activeMigration": false,
+    "pendingMigrationIngress": false,
+    "migrationIngressAuthorized": false,
+    "activationVerified": false,
+    "note": "Present only in the separately pinned PR9 source, absent from the observed candidate. Not one of the 19, not accepted migration ingress and not covered by 404/423. Selective adoption would require a distinct source/recovery/data-update review."
+  },
+  "acceptance": {
+    "wholeSourceEqualityPromoted": false,
+    "freshProductionStateVerified": false,
+    "fullReplayVerified": false,
+    "baselineVerified": false,
+    "parityVerified": false,
+    "databaseReleaseApproved": false,
+    "applicationActivationVerified": false,
+    "historyRepairAuthorized": false,
+    "migrationExecutionAuthorized": false
+  }
+}
