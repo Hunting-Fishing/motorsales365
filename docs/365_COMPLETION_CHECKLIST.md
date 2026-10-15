@@ -39,8 +39,12 @@ Security reconciliation branch: `completion/365-security`.
    error/late-result contract is now implemented locally without treating void as
    a confirmed mutation (draft PR #38); docs `14c18d3` passed all six CI gates.
    The first self-shift-only disposable companion candidate is now implemented/
-   tested in draft PR #39, with no adopted privileged positive branches. Next
-   build the deny-only direct native profile/user-role write prototype. The narrow
+   tested in draft PR #39, with no adopted privileged positive branches. The
+   deny-only direct native profile/user-role write prototype is now implemented/
+   tested offline in draft PR #43 (`7ce8f19`): 19 focused and 356 total tooling/
+   receipt-asset tests pass. Verify its latest CI, then close the original-actor
+   business_staff trigger/native-sync writer boundary and trusted team/ownership/
+   shift/audit dependencies before adopting privileged positives. The narrow
    roles-catalog restriction/recovery candidate is implemented/tested in draft
    PR #41, memory-only and unapplied; docs `5ab35ef` passed all six CI gates
    (`38667796510`). PR #40 composes
@@ -955,7 +959,10 @@ and mappings without another database audit. Hostile operator/temp-type/catalog/
 rollback controls are rehearsed with synthetic data, not live business calls.
 PR #18's six gates remain verified; PR #42 code `9bad6b2` also passed all six
 (`38669588329`), including the new regression step/full unit gate. Latest PR #42
-documentation/evidence-test CI needs its own next-resume check. Hosting build
+documentation/evidence-test `dbdbf01` also passed all six (`38670594609`), verified
+on the profile/assignment follow-up. Its hosting build
+`aeeb87e9-7882-4a6c-99d7-c57fa8777f4b` failed separately; wrapper `38670594626`
+skipped migrations/production deployment. Original code hosting build
 `994a4f64-94a7-4679-abe7-685b8fef64dc` failed; wrapper `38669588369` skipped
 migrations/production deployment. PR #41 docs passed all six gates (`38667796510`);
 its roles candidate remains unapplied.
@@ -985,14 +992,97 @@ replay/release acceptance all remain false; full restore/private storage, real
 API/JWT/concurrency, consent/tenure, OCR/mobile/owner pilot and full-media hosting
 remain open. The sparse checkout must not be deployed.
 
-Exact next action: verify PR #42 latest head/checks and preserve all three live
-restrictions without rerunning them. Continue the offline deny-only direct
-profiles/user_roles prototype outlined above, preserving SELECT/policies/legacy
-rows and forbidding contact/admin/owner exceptions or canonicalization. Reuse
+Exact next action (PR #42 latest docs checks verified): preserve all three live
+restrictions without rerunning them. The following PR #43 checkpoint now records
+the completed offline deny-only direct profiles/user_roles prototype, preserving
+SELECT/policies/legacy rows and forbidding contact/admin/owner exceptions or
+canonicalization. Reuse
 completed bootstrap/roster evidence. Then close trusted indirect writer/ownership/
 team/shift/audit boundaries before positive authority or atomic offboarding.
 Quote hardening/containment is a separate unresolved decision, not covered by
 these two approvals. The existing heartbeat remains active; no duplicate reminder.
+
+## Native profile/assignment containment checkpoint (2026-10-15)
+
+Draft PR #43, code `7ce8f19794cbd7cdcc90cc6e03461ccf2ecde1b3`, branch
+`security/native-profile-assignment-containment`, stacked on PR #42 docs
+`dbdbf01`. The parent passed all six CI gates (`38670594609`), verified on this
+resume; hosting build `aeeb87e9-7882-4a6c-99d7-c57fa8777f4b` failed separately
+and wrapper `38670594626` skipped migrations/production deployment. No green
+preview-wrapper upload or production workflow acceptance is claimed. Initial
+code CI `38672918147` is pending at capture (build/unit still running); hosting
+`051891c6-e359-4e58-a36a-db9731c2fda1` failed separately and wrapper `38672918177`
+skipped migrations/production deployment. Latest documentation head requires its
+own next-resume check.
+
+This slice is **offline, unapplied and not production authority**. The fixed-
+evidence builder atomically removes only authenticated INSERT/UPDATE/DELETE on
+native profiles and user_roles, preserving permitted SELECT/policies/relevant
+constraints/all legacy rows, original roles catalog, three native helpers,
+postgres/service and default ACLs. It adds no contact/native-admin/owner exception,
+identity repair, migration, app source or production executor. Its one fixed
+metadata-file read is bounded/pinned; no credentials or arbitrary path is read.
+
+Exact dated metadata covers 21/four target columns at 01:00:28 UTC, not fresh
+live table state. Both targets and the original roles relation are checked for
+ordinary/no-partition/inheritance topology before either lock; profiles then
+user_roles use deterministic ONLY ACCESS EXCLUSIVE locks, same-OID/topology
+revalidation and exact both-table/helper/roles pre/post guards. Global/native
+default ACL snapshots are preserved, not adopted as trusted provenance. Explicit
+caller transaction/timeouts and rollback remain required; independent sessions,
+concurrent DDL/role data and actual target-version compatibility remain unverified.
+The per-builder receipt remains caller-fabricable process bookkeeping, not
+execution/commit/human approval/original-state/durable evidence. Recovery restores
+only original I/U/D on both and deliberately reopens unsafe writes, not data.
+
+Verification: 19/19 focused cases (18.980s); full tooling in consecutive sequential
+commands, 346/346 scripts/ci (272.003s) and 10/10 receipt assets (0.484s), 356 total,
+no failures/skips/cancellations. Syntax, ESLint/Prettier/diff and independent
+read-only module/test/document review pass. The first run exposed a real
+regclass[]/oid[] comparison defect; both explicit oid[] casts fix it before final
+passing runs. No original source/constraint was altered to make tests pass.
+
+Controls include raw/scoped/RETURNING/zero/no-op/UPSERT/DO NOTHING denials42501
+without native-admin/owner exceptions, canonical/legacy/NULL-shadow reads/helpers,
+row-lock loss, owner/service CRUD versus installer denial, exact drift/refusal/
+recovery and preservation of unrelated committed data. Second-table precheck
+drift reaches no first REVOKE. Distinct genuine first-DDL P0001 traps prove
+partial-boundary atomic rollback. Three separately labelled own-postcheck55000
+faults after both actions roll back PUBLIC grants, column/default changes and
+fault rows with both ACL changes. Receipt fakeability is demonstrated without a DB.
+
+Roles catalog writes remain possible under its unchanged actual policy. This
+candidate deliberately requires original roles metadata and refuses PR #41's
+separate restricted state: no automatic combined ordering/adoption is implied.
+Other ordering needs separately reviewed fixed expectations and rehearsal, not
+"accept either" logic. Privileged roster/native/bootstrap/ownership writers and
+existing row integrity remain separate risks. Bounded retained native profile
+callers are reads; dynamic/external/older clients and the leave-request reader's
+unobserved profiles.role query remain unverified. Reuse completed bootstrap/
+roster characterization instead of duplicating it as a new authority proof.
+
+Migration impact: none. Live database call/mutation/deployment: none. Preserve
+all three already-applied legacy restrictions; do not replay or recover them.
+Any live native table/role operation still needs separately explicit authority
+after real operator/impact/target-version/concurrency/recovery readiness. Global
+composer remains 404/423 with 19 unclassified and the new helper-envelope facts
+separate; baseline/parity/replay/release flags stay false. Source/SQL/test pins,
+scope and detailed controls: `evidence/NATIVE_PROFILE_ASSIGNMENT_CONTAINMENT_CANDIDATE.md`.
+
+Exact next action: verify PR #43's latest head/checks, then close original-actor/
+trusted roster-to-native writer authority, beginning with observed public
+business_staff mutation → sync_business_staff_to_shop_manager →
+sync_business_staff_trigger() → latest sync_business_staff_member() → native
+profile upsert/shop rebind and managed role replacement. Direct client EXECUTE
+denial on bridge functions does not constrain their automatic postgres-definer
+trigger execution. Coordinate actual always-UPDATE chat/no-op effects and source
+constraints; do not invent manager/service/NULL-subject bypasses. Recover owner
+claim/transfer, trusted team classification and original-actor shift/audit writers
+before positive management or valid atomic offboarding. Full database/private-
+storage restore, consent/tenure, real API/session/role/concurrency, OCR/mobile/
+owner pilot and full-media hosting remain open. No paid resources, customer
+communication, data/history repair or sparse deployment. Existing heartbeat
+remains active without duplicate reminders; no premature live approval request.
 
 ## Recovery evidence (original scope, retained below)
 

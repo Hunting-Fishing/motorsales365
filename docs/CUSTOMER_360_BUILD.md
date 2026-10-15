@@ -395,9 +395,42 @@ PR #42 code `9bad6b2` passed all six CI gates (`38669588329`), including the new
 regression step/full unit gate; hosting failed separately and wrapper
 migrations/production deployment skipped. PR #41 docs `5ab35ef` passed all six
 gates (`38667796510`), while its roles
-candidate remains unapplied. Verify PR #42 latest documentation checks next,
-then continue the offline deny-only direct profiles/user_roles prototype and
+candidate remains unapplied. PR #42 docs `dbdbf01` also passed all six gates
+(`38670594609`), verified on the profile/assignment follow-up; hosting failed
+separately and wrapper migrations/production deployment skipped. Continue the
+offline deny-only direct profiles/user_roles prototype and
 remaining indirect-writer authority boundaries. This helper approval does not
 authorize native tables/roles or quote conversion. The indirect quote bypass,
 baseline/recovery, real API/session/concurrency, OCR/mobile pilot and full-media
 hosting gates remain open; heartbeat stays active without duplicate automation.
+
+Draft PR #43 (code `7ce8f19`) now implements the offline deny-only direct native
+profiles/user_roles containment/recovery prototype: only authenticated I/U/D on
+both tables, preserving SELECT/policies/legacy rows/original roles/native helpers/
+owner/service/defaults. No contact or native-admin/owner exception, identity
+canonicalization, migration, app change, live database call or deployment occurs.
+The fixed-evidence builder reads one bounded/pinned local metadata file; its
+receipt is explicitly caller-fabricable bookkeeping, not execution/commit/
+approval or trusted durable original-state evidence.
+
+19/19 focused cases and 356 total tooling/receipt-asset checks pass in consecutive
+sequential commands (346 CI-tooling plus10assets), no failures/skips/cancellations;
+syntax/lint/format/diff and independent review pass. Exact two-table early
+topology/ordered-lock/pre/post guards, partial-first-DDL and actual own-postcheck
+rollback faults are rehearsed. A generated OID-array comparison defect was fixed
+before passing runs, without changing original source/constraints. See
+`evidence/NATIVE_PROFILE_ASSIGNMENT_CONTAINMENT_CANDIDATE.md` for exact pins and
+limits. The parent's latest PR #42 docs `dbdbf01` passed all six gates; this
+slice's newest head needs its own next-resume CI check.
+
+The separate roles-catalog restriction remains unapplied, so the original catalog
+stays writable. This candidate requires
+its original metadata, not automatic composition with PR #41's restriction.
+Privileged roster/native/bootstrap/ownership writers still bypass direct client
+table ACLs. Next close the original-actor business_staff-trigger to latest
+sync_business_staff_member writer boundary with actual chat/no-op effects, then
+trusted ownership/team/shift/audit dependencies before management positives or
+valid offboarding. Preserve the three live legacy restrictions without replay.
+No live table authority or release readiness is inferred; baseline/recovery,
+API/session/concurrency, consent/tenure, OCR/mobile/owner pilot and full-media
+hosting remain open. Recurring continuation stays active without duplication.

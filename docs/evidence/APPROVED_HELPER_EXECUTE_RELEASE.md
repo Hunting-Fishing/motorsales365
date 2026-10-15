@@ -123,13 +123,16 @@ is still memory-only/unapplied. PR #42 code `9bad6b2` passed all six CI gates
 gate, verified on this run. Separate hosting build
 `994a4f64-94a7-4679-abe7-685b8fef64dc` failed; wrapper `38669588369` skipped
 migrations/production deployment, and its green preview wrapper is not an upload.
-PR #42's newest documentation/evidence-test head requires a
-fresh CI check on the next resume. Passing those checks is not production workflow
+PR #42 documentation/evidence-test head `dbdbf01c7d51946b880d6d348e886aefc8c4cc9e`
+also passed all six gates (`38670594609`), verified on the profile/assignment
+follow-up. Its hosting build `aeeb87e9-7882-4a6c-99d7-c57fa8777f4b` failed
+separately and wrapper `38670594626` skipped migrations/production deployment.
+Passing those checks is not production workflow
 or hosting acceptance. No merge, application upload/deployment or sparse-media
 checkout release was performed.
 
-Exact next action: verify PR #42 latest head/checks without replaying either
-applied helper, then continue the offline deny-only direct native profiles and
+Exact next action (PR #42 docs checks now verified): do not replay either
+applied helper; continue the offline deny-only direct native profiles and
 user_roles write prototype described in the completion checklist. Preserve all
 legacy rows and permitted SELECT; add no manager/contact-edit exception or repair.
 Keep the separate quote-conversion risk explicit and outside this approval.
