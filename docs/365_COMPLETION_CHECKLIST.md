@@ -15,6 +15,39 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest full staff writer slice: code `5e748d2`, branch
+`security/full-staff-writer-composition`, based on PR #63 docs `a188571`.
+Actual provider uid and role/staff/audit/sales/territory writers now compose with
+unchanged PR #62 full Auth/referral/partner-intent: 21 full public tables/347
+columns/78 critical constraints/81 indexes/37 public function envelopes plus
+provider uid/30 complete attachments. Current observed ACLs preserved, no legacy
+client policies or provider/profile/helper success substitutes; genuine manager/
+org inputs and all constraints retained. Twenty-three focused pass (31.604 seconds),
+syntax/lint/format/diff/primary review pass. Full serial tooling 651/651 passes
+(524.422 seconds), then 10/10 receipt assets (0.365 seconds): 661 aggregate,
+zero failures/skips/cancellations. Focused tests are included, not double-counted.
+Evidence: `evidence/FULL_STAFF_WRITER_COMPOSITION.md`. Zero live query/mutation/
+migration/deployment. This is actual forward/rollback characterization, not trusted
+original-human/JWT/native role/provisioning/consent/offboarding acceptance.
+Confirmed staff Auth still does not grant roles. Separate role insertion can
+accredit unconfirmed staff with synthetic consent; role removal leaves active
+staff/partner/sales/territory/prior assignments. Full late role/consumer failures
+restore all 21 public/Auth rows, preserve local sequence gaps and recover with
+original defaults. Staff audits read actual uid, but nonempty partner intent still
+substitutes target-as-actor. No such legacy behavior adopted as professional policy.
+PR #63 docs `a188571` now passed all six CI gates (`38724707790`); hosting failed
+separately, migrations/production skipped. New publication-head checks remain to
+verify. Next actual claim/evidence/reviewer/ownership writer boundaries from
+PR #45/#47 on this full foundation, then trusted original actor/revisions/common
+locks/idempotency/team/native/offboarding candidate. Safe separate internal-staff
+caller acknowledgment/lifetime work remains available. Do not repeat completed
+source/prerequisite/ordinary/schema/financial/staff writer recovery or adopt
+unsigned synthetic subjects/service/global-admin seeds as humans. Source404/423,
+19 unclassified; all source/baseline/replay/parity/release and financial/consent/
+privacy/recovery/receipt/mobile/owner/full-media/hosting gates unchanged. No sparse
+deploy, approved restriction replay, paid resource, customer message, data deletion,
+PR merge or duplicate automation; single recurring continuation active.
+
 Newest provider uid/staff Auth prerequisite slice: draft PR #63, code `d59b24e`.
 One READ ONLY source diagnostic at `10:40:55.605099` UTC recovers only actual
 auth.uid(), gated by the complete prior reviewed envelope plus independent

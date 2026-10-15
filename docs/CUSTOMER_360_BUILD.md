@@ -1042,3 +1042,35 @@ baseline/replay/parity/release and all financial/consent/private-history/recover
 receipt/mobile/owner/full-media/hosting gates unchanged. No live mutation/migration/
 deploy, paid resource, customer message, data deletion, restriction replay, PR merge
 or duplicate automation; single recurring continuation remains active.
+
+Full staff writer follow-up, code `5e748d2`, branch
+`security/full-staff-writer-composition`, based on PR #63 docs `a188571`:
+actual provider uid and platform role/staff/audit/sales/territory writers now
+compose with unchanged full PR #62 Auth/referral/partner intent. Verified 21 full
+public tables/347 columns/78 critical constraints/81 indexes/37 public function
+envelopes plus provider uid/30 complete attachments. Current ACLs preserved;
+no client-policy adoption or identity/profile/intent substitutes. Genuine canonical
+manager/org configuration, full constraints, late failures/all-row rollback and
+local sequence gaps remain explicit. Twenty-three focused pass (31.604 seconds),
+syntax/lint/format/diff/primary review pass; full serial tooling 651/651 passes
+(524.422 seconds), then 10/10 receipt assets (0.365 seconds): 661 aggregate,
+zero failures/skips/cancellations. Focused tests included, not double-counted.
+Evidence: `evidence/FULL_STAFF_WRITER_COMPOSITION.md`. Zero live query/mutation/
+migration/deployment; not original-human/JWT/native authority/provisioning/consent/
+offboarding acceptance. Separate role creation can accredit unconfirmed staff;
+removing sales role leaves active staff/partner/sales/territory/prior assignment
+state. Staff audits read actual uid but real nonempty partner intent still uses
+target-as-actor. These are blockers characterized, not professional policies adopted.
+
+PR #63 docs `a188571` passed all six CI gates (`38724707790`); hosting failed
+separately and migrations/production skipped. Verify the new publication HEAD's
+own checks. Next actual claim/evidence/reviewer/ownership writer boundary recovery/
+composition from PR #45/#47 on this full foundation, then trusted original actor/
+revisions/common locks/idempotency/team/native/offboarding candidate. Internal-staff
+caller acknowledgment/lifetime is independent safe app work, not new authority.
+Do not repeat completed uid/prerequisite/ordinary/full-schema/financial/staff writer
+recovery or promote unsigned lab subjects/service/global-admin positives. Source
+404/423, nineteen unclassified; all source/baseline/replay/parity/release and
+financial/consent/privacy/recovery/receipt/mobile/owner/full-media/hosting gates
+unchanged. No sparse deploy, restriction replay, paid resources, customer messages,
+production deletion, PR merge or duplicate automation; single continuation active.
