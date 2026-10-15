@@ -15,6 +15,48 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-15)
 
+Newest disposable revision/invalidation model: code `c03fede`, branch
+`security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`.
+Two private witness tables/five invoker-only functions/nine capture/unsupported-
+write guards run on unchanged full PR #65 tables/actual Auth/provider/functions/
+constraints/37 selected attachments. Material claim/evidence/owner changes,
+reparent/reopen/ABA/delete-recreate and legacy approval/transfer/sibling writers
+invalidate exact monotonic metadata revisions. Tombstones retain generations;
+unknown preexisting bindings remain NULL through edits/deletion/recreation.
+No initializer/backfill/trusted zero, codec change, actor authority, private-byte
+custody or atomic executor. Exact bigints remain strings; overflow/real late audit/
+FK/CHECK faults restore companion and full public/Auth state. Twenty-five focused
+pass (46.926 seconds); syntax/lint/format/diff/primary review pass. Full serial
+tooling701/701 passes (761.866 seconds), then receipt assets10/10 (0.228 seconds):
+711 aggregate, zero failures/skips/cancellations, focused included/not double-
+counted. Publication-head checks are pending below; no fresh application run
+claimed for this SQL/test-only slice. Disposable PostgreSQL18.6 is not live17.6
+or independent-session parity.
+Evidence: `evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`. Seven other business
+attachments and DDL/replication/disabled-trigger bypass remain outside closure;
+metadata capture alone cannot satisfy v2's separately verified object-custody gate.
+Parent PR #65 `3040a1e` and PR #66 `02cb49f` now each passed all six CI gates
+(`38735096453`/`38735428535`). Hosting failed separately; wrapper previews passed,
+migrations/production skipped. Their CI is not this slice's publication check.
+Next trusted original-reviewer custody/fresh session-role-tenant authority, then
+all-writer/epoch/private-object closure and separate UNWIRED atomic pending/current-
+owner/revision/payload-ledger/audit-receipt executor with common locks. Independent
+PostgreSQL sessions/native-team/offboarding/storage/recovery/runtime verification
+remain required. Do not repeat completed model/codec/recovery or adopt privileged
+legacy positives. Internal-staff caller acknowledgment/lifetime work is independent.
+Source404/423,19 unclassified; all baseline/replay/parity/release and acceptance
+gates unchanged. Zero live query/write/migration/deploy, customer communication,
+paid resource, production data deletion, restriction replay, PR merge or duplicate
+automation; single continuation active.
+
+Published/attached draft PR #67:
+`https://github.com/Hunting-Fishing/motorsales365/pull/67`, code `c03fede`, first
+evidence HEAD `32a7fc9`. First CI `38739987913` started; hosting build
+`492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately, wrapper `38739987914`
+started with migrations/production already skipped. This publication-record
+commit supersedes that initial check head: verify PR #67's exact newest HEAD next,
+not the initial run or parent PR CI. No new source/test or release-setting change.
+
 CI budget follow-up for attached PR #65/#66: original PR #65 unit job
 `116415203931`/run `38733014822` cancelled at12:28:38 UTC after15m08s; annotation
 confirms 15m0s maximum exceeded before mandatory suites completed, not a pass or
