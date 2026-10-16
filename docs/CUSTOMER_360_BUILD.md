@@ -1,5 +1,18 @@
 # Native Customer 360: first delivery slice
 
+## Current delivery authority (17 October 2026)
+
+Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequencing and
+CRM/Shop Manager desktop/phone/tablet acceptance. This file retains historical
+source evidence; old "next" statements are not repeated work instructions.
+Source is not fully accepted functionality: quote conversion, native refund/void
+execution, safe draft discard and writable101+ receipts remain unfinished;
+native authority/atomic stock/finance/private originals/recovery/owner/live
+gates remain. Latest published1014b72e all six Actions pass; actual unit
+4,863/93 files102.07s is not authenticated device or live acceptance. Dedicated
+QA signup still needs owner handoff; one direct CRM-route alternative redirected
+to login, so this browser action stops until new access. No identity/Terms bypass.
+
 Source34a90930 adds ONLY private/unapplied one-existing-draft-line transaction
 support for safe101+ review/edit. Full prior receipt/item NUMERIC-text CAS,
 seven-field UPDATE/strict bindings/guards/persisted reread preserves IDs/unseen

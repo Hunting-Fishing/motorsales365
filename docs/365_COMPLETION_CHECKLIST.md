@@ -1,6 +1,25 @@
 # 365 application completion checklist
 
-Updated: 2026-10-16 (Asia/Manila)
+Updated: 2026-10-17 (Asia/Manila)
+
+## Consolidated current delivery authority
+
+Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequence,
+Day 2 feasibility, fail-fast stops, CRM/device acceptance, multi-store ordering /
+Barangay Buddy boundaries and conditional main promotion. All 18 existing
+workflow IDs and detailed actions remain in the acceptance ledger; N1–N3 now
+explicitly track consumer ordering/delivery closure. Historical checkpoints and
+their former "next" steps below are evidence, not repeated work instructions.
+Owner rule: after failure, at most one safe alternate approach; if still blocked
+(or no safe alternate), stop that action and notify with evidence/needed help.
+Continue independent work; no blind retry of unknown writes or unchanged failures.
+Consolidation validation:21 workflow IDs, four board pointers, nine relative links,
+ten policy checks, six-file Prettier/diff and two independent read-only reviews
+pass. Existing automation update/readback preserves identity/active30min/thread.
+Same PR68, commit subject "Consolidate 365 delivery, fail-fast and network
+acceptance plan"; new-head CI is separate. No app/SQL/migration/hosted/Buddy change
+or deployment. Exact next implementation: native PG17 draft-line independent
+sessions; authority/provenance/hosting continue independently under fail-fast.
 
 ## Authority and source
 
@@ -14,7 +33,25 @@ Current integration branch: `completion/365-seven-day-integration`.
 Historical foundation branch: `completion/365-foundation`.
 Security reconciliation branch: `completion/365-security`.
 
-## Current resumption order (2026-10-16)
+## Current resumption order (2026-10-17)
+
+Published1014b72e/source34a90930 verified canonical remote/same draft PR68/base/
+title/draft/main/original history. All six Actions gates38926258007 pass; unit
+117058446033 reports4,863/4,863 across93 files102.07s, zero unexpected/quarantined
+failures. Returned unit log truncated; final summaries present. Whole job uses
+roughly24min of unchanged25min budget, so headroom stays a risk. Actual fresh
+build117058445835 final214 assets/Worker/
+canonical365/OCR/PDF/dry-run and COMPLETE merge-tree18312eba… equality pass;
+returned build log truncated. Actual native117058446020 untruncated PG17.11/
+Parts247/quotes/expense/bounded recovery/cleanup pass,47 replay failures remain,
+tiny63/79/201ms not RTO; this does NOT execute/prove new draft-line SQL in PG17.
+Preview117058446694 config skip/no upload; production/migration/Supabase Preview
+skip; Workersdbf2a69a… fails, fresh cause unverified. Next new draft-line native
+PG17 wait/CAS/outer transaction/
+rollback harness before authority/catalog/all-writer/durable/UI connection gates.
+Owner explicitly requested this consolidated documentation slice after parent
+unit completion; publish in same PR68, not a duplicate planning PR. New publication
+head checks are separate; no inherited parent result or release promotion.
 
 Source34a90930 adds ONLY an unapplied owner-only single-existing-draft-item SQL
 candidate over unchanged receipt/expense source. Exact receipt/item NUMERIC-text

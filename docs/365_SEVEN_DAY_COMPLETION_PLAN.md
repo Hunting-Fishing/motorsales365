@@ -1,5 +1,27 @@
 # 365 Seven Day Completion Plan
 
+## Consolidated execution baseline (17 October 2026)
+
+[365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) now owns current execution order,
+Day 2 feasibility/rebased dates, all18 existing workflow IDs plus N1–N3, role/device
+acceptance and main/release conditions. This plan retains historical schedule and
+source evidence; older dates/"next" statements are not completion claims or
+instructions to repeat work. Current migration classification is12 historical /
+five unapplied / two recorded envelopes, not the old19 unclassified snapshot.
+
+Owner requires fail-fast execution: failure → at most one safe alternate → stop
+affected action and notify if still blocked or no safe alternate. Continue
+independent work, preserve unknown-write reconciliation, and record stops across
+scheduled turns. Main may be promoted only when complete readiness gates pass.
+The owner's explicit multi-store consumer ordering/Buddy operator-delivery scope
+has no verified live bridge yet and adds deadline risk; separate backends remain.
+
+Day 2 review:22 October21:00 Asia/Manila is at risk, not a supported guarantee.
+All six Actions on1014b72e pass, actual unit4,863/93 files102.07s, but current
+hosting failure/47 replay failures/native authority/atomic commerce/full recovery/
+QA/device/owner acceptance remain. No application/SQL/hosted release in this
+explicitly requested consolidation. Parent CI is not inherited by a new head.
+
 Source34a90930 adds an unapplied/private single draft-line UPDATE prerequisite,
 not an enabled101+ editor. Final54/54 four files45.847s (20 new), exact-scale
 CAS/preservation/native CHECK/late-rewrite/outer-rollback/publication ACL cases,

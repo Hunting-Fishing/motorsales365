@@ -4,6 +4,22 @@
 branch/draft PR68. This is a private memory-only mechanical SQL prerequisite for
 safe101+ review/edit, NOT an enabled app editor, migration or accepted native API.
 
+Publication1014b72e5deaa63aca0904ff3c90c4cb12a9e055 is verified on canonical
+remote/same draft PR68/base/title/draft/main, with original49,044-character review
+history intact. Exact-head run38926258007 has five gates passing; unit117058446033
+remains in progress, not accepted. Fresh build117058445835 final29.60s/214 assets/
+Worker/canonical365/OCR/PDF/dry-run markers are in a truncated log. Fetched CI
+merge5ffe48c13d3d4b2c1dd49b6cade6c89befdd658e (parents576fb17d…/1014b72e)
+has COMPLETE identical tree18312eba9f98537ffe2685ff3c678c198e2338e9 to published
+head. Untruncated native117058446020 PGDG17.11/server170011/Parts247/six quotes/
+ten expense markers/bounded recovery/cleanup pass;47 replay failures remain,
+tiny63/79/201ms not RTO. That existing native harness does NOT execute this new
+draft-line candidate or establish its independent-session/PG17 proof. Preview
+117058446694/run38926258149 confirms config skip/no upload; production/migrations/
+Supabase Preview skip. Workers117059011859/builddbf2a69a-b999-422d-a6b2-6edf32a83258
+fails, fresh cause unverified. Follow-up notes join next meaningful source slice
+without a docs-only push cancelling the running unit job.
+
 ## Why a separate operation
 
 Retained `save_receipt` locks the parent, deletes ALL existing children and inserts
@@ -127,7 +143,15 @@ app build/typecheck is claimed for this scripts-only slice. No hosted query/writ
 real account, grant, Docker, charge, provider activation, deployment, merge or
 main change. C1.07/C1.08/R2/R3 remain unaccepted; safe101+ review/edit is not enabled.
 
-Next verify new exact-head CI, then Docker-free native PG17 independent-session
+Publication1014b72e exact-head CI38926258007 now passes all six Actions. Actual
+unit117058446033 reports4,863/4,863 across93 files102.07s, zero unexpected/
+quarantined failures; returned log truncated, final summaries present. Native
+PG17 job117058446020 passes its retained cohorts but does not execute this new
+draft-line SQL. Preview config skip/no upload; Workersdbf2a69a… fails with fresh
+cause unverified. No migration/grant/app connection/hosted write/deployment.
+Current sequence/fail-fast/main policy: [delivery board](../365_DELIVERY_BOARD.md).
+
+Next Docker-free native PG17 independent-session
 wait/stale-CAS/outer commit/rollback and selected binding/constraint tests.
 Before connecting a dedicated handler/dialog, require reviewed compatible current
 catalog/trigger/all-writer locks, trusted owned ingress/strict session/native
