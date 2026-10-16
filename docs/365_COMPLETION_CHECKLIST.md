@@ -16,6 +16,39 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+R3 recovery source `c25f79f3` is committed/reviewed: two fresh private native PG17
+clusters on the established ephemeral Linux host, externally pinned synthetic
+roles/archive artifacts, source-offline restore and actual ordinary database
+role/data/catalog/sequence checks. No Docker, application SQL or live operation.
+Final combined offline guards 91/91 (793.18ms), syntax/format/diff and changed-line
+lint zero findings pass; read-only 214 public/Worker boundaries verify with
+unchanged application build inputs. Same-PR publication/new exact-head Linux execution are still required; this is
+not full API/Auth/private-original recovery or production RTO acceptance.
+Contract/evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. After selected
+rehearsal verification, continue real-stack/private-byte recovery prerequisites
+and independent C1.08 full-line viewing/atomic writers. The fresh read-only QA
+check still finds an unsubmitted signup; credentials/Terms/native pilot/session
+are not bypassed. Keep 47 replay failures and other exact release gaps open for
+the 17 October feasibility review.
+
+Publication `0b836b15` is verified on canonical remote/same attached draft PR #68;
+title/base/draft/history/main `70ab892a` are preserved. Final-head 214 public assets
+and Worker/backend/OCR/PDF/server checks pass. Run `38873619165` has build/
+typecheck/lint/browser OCR/native Parts passing; unit `116883321839` still runs
+at the earlier capture. The completed unit log now confirms application
+4,170/4,170 across 87 files (69.56s), zero unexpected/quarantined failures;
+overall log is truncated but final summaries are present. All six Actions gates
+pass on this exact head. Completed untruncated native `116883321961` confirms PGDG17.11/170011,
+Parts247/247, six quote groups, both stops/scoped cleanup and 47 retained replay
+failures, not full baseline/API/restore proof. Wrapper preview `116883322027` is
+a confirmed configuration skip without application upload; migrations/production/
+Supabase Preview skip. Workers build `abd7d11d-0509-4ec3-ba24-e540f18060e2` fails
+with fresh cause unverified. These notes join the next source slice, no docs-only
+CI restart. Unit result is recovered; continue synthetic second-private-PG17-cluster
+dump/restore rehearsal; do not repeat completed C1.05/C1.06 source or approvals.
+Full API/private-object/native authority, atomic domain writers and QA/owner/live
+acceptance remain open; no deployment or scope cut.
+
 C1.06 source `ee9af3a8` captures installation account/receipt/item/selected
 vehicle/date/odometer intent, checks same-client child/parent preflights and the
 legacy void transport acknowledgment, and fences dialog-content/session/write

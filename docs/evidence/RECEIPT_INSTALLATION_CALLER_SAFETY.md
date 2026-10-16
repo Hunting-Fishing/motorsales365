@@ -1,5 +1,29 @@
 # Receipt installation caller and acknowledgment safety
 
+## Publication
+
+Canonical remote and the same attached draft PR #68 verify published head
+`0b836b1582afce33e88164a3821c8fa5e6c6918c`. Title/base/draft and main `70ab892a`
+are preserved; the updated PR body retains all prior evidence. Final-head 214
+public Git/source/output copies and Worker/backend/OCR/PDF/server checks pass.
+
+Run `38873619165`: build/typecheck/lint/browser OCR/native Parts pass; unit
+`116883321839` remains in progress at capture. Completed untruncated native
+`116883321961` confirms PGDG17.11, actual server170011, Parts247/247, all six
+independent-session quote groups, both server stops/scoped cleanup and 47 retained
+replay failures. This is selected synthetic SQL, not whole baseline/API/Auth/
+private-Storage/restore acceptance. Wrapper `38873619168` preview `116883322027`
+is a confirmed DEPLOY_VIA_ACTIONS configuration skip, not application upload;
+migrations/production/Supabase Preview skip. Independent Workers build
+`abd7d11d-0509-4ec3-ba24-e540f18060e2` fails with ID/link only; fresh cause and
+source-freeze execution remain unverified. No CI CLI/API fallback was used.
+
+These follow-up publication notes join the next integrated source slice without
+a docs-only CI restart. Verify remaining unit result, then implement the bounded
+synthetic second-cluster PG17 recovery dependency below, without dropping real
+API/private-object/role or broader receipt/commercial scope. No new acceptance,
+live action, deployment, approval or scope reduction follows from publication.
+
 ## Scope and status
 
 C1.06 source `ee9af3a8ff67d2bef9577ca8cb833fc94a98bde1`, 16 October 2026, same
@@ -109,6 +133,17 @@ weakening the retained 100-line replacement-write guard. Independent atomic
 sharing and durable discard/financial recovery remain separately open. Preserve
 the no-Docker directive, sole canonical backend, existing approved restrictions
 and owner-completed QA credential/Terms/native pilot handoff.
+
+## Completed exact-head application checks
+
+Published `0b836b1582afce33e88164a3821c8fa5e6c6918c` now has all six Actions
+gates passing in run `38873619165`. Completed unit `116883321839` reports
+application 4,170/4,170 across 87 files (69.56s), zero unexpected/quarantined
+failures. Its overall log is truncated but final Vitest/checker summaries are
+present. This closes the previously pending CI result, not native atomic
+installation, real-role/history/owner or live acceptance. The prepared QA signup
+remains unsubmitted at the new read-only check: credential/contact fields blank,
+Terms unchecked; no form changes, identity reset or privilege grant occurred.
 
 ## Shared release dependency after this slice
 

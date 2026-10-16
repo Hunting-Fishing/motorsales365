@@ -1,5 +1,17 @@
 # 365 Seven Day Completion Plan
 
+16 October recovery dependency update: bounded synthetic native PG17
+dump/source-shutdown/second-private-cluster source `c25f79f3` is committed/reviewed,
+using the existing ephemeral Linux host and no Docker or live operation.
+Role/ACL/data/catalog/sequence and ordinary database connection checks are
+required; final offline guards 91/91, syntax/format/diff/lint and retained artifact
+checks pass but are not actual native execution. Contract and current
+checks: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. Whole application baseline,
+real API/Auth/private originals/configuration/production RTO and owner/live
+acceptance remain open. Continue those and independent receipt workflow work;
+this is not a scope cut or a completed R3 gate. The 17 October feasibility review
+and 22 October 21:00 Asia/Manila target remain unchanged.
+
 ## Target and scope
 
 Owner directive, 16 October: no Docker. Do not install/start/use Docker, pull

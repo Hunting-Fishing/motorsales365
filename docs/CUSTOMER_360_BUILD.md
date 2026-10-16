@@ -1,5 +1,17 @@
 # Native Customer 360: first delivery slice
 
+16 October R3 shared dependency: a bounded synthetic second-private-cluster
+PG17 recovery source `c25f79f3` is committed/reviewed and targets the existing
+ephemeral Linux host. It keeps role/ACL/data/sequence and source-offline checks without Docker,
+live SQL or an application migration. Final combined offline guards 91/91,
+syntax/format/diff and changed-line lint zero findings pass; retained artifact
+checks verify unchanged application inputs. Exact-head native execution is still
+required; it is not real API/Auth/private-original or production recovery proof.
+See `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. Continue real-stack/private-byte
+recovery prerequisites and independent C1.08 full-line viewing/atomic writers
+after this selected rehearsal. QA signup/native pilot/session and 47 retained
+application replay failures remain open, not removed from the seven-day scope.
+
 C1.06 source `ee9af3a8` captures installation account/receipt/item/selected vehicle/
 date/odometer intent, checks child/parent preflights and legacy void transport
 acknowledgment, and uses parent-held admission/session/unknown fences with actual

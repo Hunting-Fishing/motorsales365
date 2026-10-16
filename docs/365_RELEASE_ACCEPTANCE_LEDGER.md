@@ -41,6 +41,36 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+R3 bounded recovery source `c25f79f3` is committed/reviewed, not yet native accepted:
+two private fresh PG17 clusters, synthetic role/archive recovery with externally
+held manifest pin, source-offline restore, ordinary database role checks and
+data/catalog/ACL/RLS/sequence comparison. Final combined offline 91/91 (793.18ms),
+syntax/format/diff, changed-line lint zero findings and retained 214 public/Worker
+boundaries pass; application build inputs unchanged. Evidence and exclusions:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. No Docker, application migration,
+live operation or deployment. Exact-head Linux execution remains required;
+whole baseline/API/Auth/private originals/configuration/production RTO and
+owner/live acceptance remain open. The QA form is still unsubmitted at the
+fresh read-only check. Next: selected rehearsal verification, then real-stack/
+private-byte recovery and independent C1.08/atomic workflow dependencies.
+
+Published `0b836b15` is verified on canonical remote/same attached draft PR #68/
+base/title/draft/history/main; final 214 assets/Worker boundaries pass. Run
+`38873619165` build/typecheck/lint/browser OCR/native Parts pass; unit
+`116883321839` was in progress at the earlier capture and now passes: application
+4,170/4,170 across 87 files (69.56s), zero unexpected/quarantined failures.
+The overall log is truncated with final summaries present; all six Actions gates
+pass on this exact head. Untruncated native `116883321961`
+verifies PGDG17.11/170011, Parts247/247, six quote groups/stops/scoped cleanup and
+47 retained replay failures, not whole baseline/API/private-object/restore proof.
+Wrapper preview `116883322027` is a confirmed configuration skip, no application
+upload; migrations/production/Supabase Preview skip. Workers build
+`abd7d11d-0509-4ec3-ba24-e540f18060e2` fails with ID/link only, fresh cause unverified.
+These follow-up notes join the next source slice without a docs-only CI restart.
+Next: bounded synthetic second-cluster PG17 recovery;
+do not repeat completed installation/discard source or approved restrictions.
+No new isolated/owner/live acceptance, scope cut or deployment.
+
 C1.06 source `ee9af3a8` has seven-field installation intent, same-client child/parent
 preflights, checked void transport acknowledgment and parent-held session/lifetime/
 uncertainty fences, with actual portal-content cleanup and neutral feedback.
