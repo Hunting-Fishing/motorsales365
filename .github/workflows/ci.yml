@@ -83,6 +83,9 @@ jobs:
       - name: Expense operation request and reported-posting contract (offline, never quarantined)
         run: node --test scripts/vehicle-receipts/expense-operation-contract.test.mjs
 
+      - name: Locked receipt expense transaction candidate (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs
+
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 

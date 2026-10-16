@@ -146,6 +146,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test scripts/vehicle-receipts/expense-operation-contract.test.mjs",
     ],
     [
+      "Locked receipt expense transaction candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs",
+    ],
+    [
       "Native invoice read lifetimes and financial acknowledgments (never quarantined)",
       "npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1",
     ],
