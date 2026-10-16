@@ -33,6 +33,7 @@ import {
   parseLinkWindow,
 } from "./vehicle-receipt-read-contract";
 import {
+  RECEIPT_DISCARD_UNAVAILABLE,
   receiptDate,
   receiptSaveSchema,
   parseReceiptExtraction,
@@ -308,20 +309,11 @@ export const setReceiptSharing = createServerFn({ method: "POST" })
 export const discardReceiptDraft = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: uuid }).parse(d))
-  .handler(async ({ data, context }) => {
-    const db = context.supabase as any;
-    const { data: row, error } = await db
-      .from("vehicle_receipts")
-      .select("file_path")
-      .eq("id", data.id)
-      .single();
-    if (error) throw new Error(error.message);
-    // Delete the object while the draft's access policy still exists. Failed cleanup is retryable.
-    if (row.file_path) {
-      const removed = await db.storage.from("vehicle-receipts").remove([row.file_path]);
-      if (removed.error) throw new Error("Could not remove the draft attachment. Please retry.");
-    }
-    return rpc(db, "discard_vehicle_receipt_draft", { _id: data.id });
+  .handler(async () => {
+    // Temporary source interlock for every draft, including manual entries.
+    // Storage removal and the existing DB discard have no verified recovery
+    // coordinator. This does not restrict live ACLs or complete that workflow.
+    throw new Error(RECEIPT_DISCARD_UNAVAILABLE);
   });
 export const getPrivateReceiptUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

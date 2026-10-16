@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const RECEIPT_DISCARD_UNAVAILABLE =
+  "Draft removal is temporarily unavailable until recovery is verified. Keep this draft and its original file.";
+
 export const PART_CATEGORIES = {
   suspension: "Suspension",
   brakes: "Brakes",

@@ -6,9 +6,11 @@ import {
   listVehicleShopLinks,
   getPrivateReceiptUrl,
   recordVehicleReceiptExpense,
+  discardReceiptDraft,
 } from "./vehicle-receipts.functions";
 import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
 import { RECEIPT_EXPENSE_FAILURE } from "./vehicle-receipt-expense-contract";
+import { RECEIPT_DISCARD_UNAVAILABLE } from "./vehicle-receipts";
 const mocks = vi.hoisted(() => ({
   request: vi.fn(),
   privileged: vi.fn(),
@@ -338,6 +340,14 @@ async function privateUrl(data: unknown, ctx: unknown) {
 async function receiptExpense(data: unknown, ctx: unknown) {
   return (
     recordVehicleReceiptExpense as unknown as (args: {
+      data: unknown;
+      context: unknown;
+    }) => Promise<unknown>
+  )({ data, context: ctx });
+}
+async function discardDraft(data: unknown, ctx: unknown) {
+  return (
+    discardReceiptDraft as unknown as (args: {
       data: unknown;
       context: unknown;
     }) => Promise<unknown>
@@ -1825,6 +1835,117 @@ describe("receipt expense caller and transport boundary", () => {
       expect(String(result)).not.toContain("PRIVATE");
       if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
       else expect(caller.rpc).toHaveBeenCalledTimes(1);
+    },
+  );
+});
+
+describe("temporary draft discard source interlock", () => {
+  // Actual handler with middleware mocked for direct-call denial coverage.
+  // These tests do not prove a live ACL restriction or a recoverable deletion.
+  afterEach(() => {
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(mocks.privileged).not.toHaveBeenCalled();
+    expect(mocks.writes).not.toHaveBeenCalled();
+  });
+
+  function expectNoClientAccess(caller: ReturnType<typeof client>) {
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+    expect(caller.storage.from).not.toHaveBeenCalled();
+    expect(caller.createSignedUrl).not.toHaveBeenCalled();
+    expect(caller.reads).toEqual([]);
+  }
+
+  it("pins the shared temporary-unavailable copy without claiming a completed deletion", () => {
+    expect(RECEIPT_DISCARD_UNAVAILABLE).toBe(
+      "Draft removal is temporarily unavailable until recovery is verified. Keep this draft and its original file.",
+    );
+  });
+
+  it.each(["authenticated", "service-role", "client-only", "raw"] as const)(
+    "refuses a valid UUID through the actual handler for %s context without any operation",
+    async (kind) => {
+      const caller = client();
+      const ctx =
+        kind === "authenticated"
+          ? context(caller)
+          : kind === "service-role"
+            ? { userId: account, claims: { sub: account, role: "service_role" }, supabase: caller }
+            : kind === "client-only"
+              ? { supabase: caller }
+              : caller;
+      const result = await discardDraft({ id: receiptId }, ctx).catch((value: unknown) => value);
+      expect(result).toBeInstanceOf(Error);
+      expect((result as Error).message).toBe(RECEIPT_DISCARD_UNAVAILABLE);
+      expect(result).not.toHaveProperty("cause");
+      expectNoClientAccess(caller);
+    },
+  );
+
+  it.each([undefined, null, 17, "PRIVATE context", {}])(
+    "refuses raw unsupported context without inspecting it: %j",
+    async (ctx) => {
+      await expect(discardDraft({ id: receiptId }, ctx)).rejects.toThrow(
+        RECEIPT_DISCARD_UNAVAILABLE,
+      );
+    },
+  );
+
+  it.each(["supabase", "userId", "claims", "auth", "storage", "client", "from", "rpc"] as const)(
+    "does not access side-effect context getter %s",
+    async (field) => {
+      const get = vi.fn(() => {
+        throw new Error("PRIVATE context/client getter");
+      });
+      const ctx = {};
+      Object.defineProperty(ctx, field, { enumerable: true, get });
+      await expect(discardDraft({ id: receiptId }, ctx)).rejects.toThrow(
+        RECEIPT_DISCARD_UNAVAILABLE,
+      );
+      expect(get).not.toHaveBeenCalled();
+    },
+  );
+
+  it("never reflects on an opaque context Proxy", async () => {
+    const trap = vi.fn(() => {
+      throw new Error("PRIVATE context reflection");
+    });
+    const ctx = new Proxy(
+      {},
+      { get: trap, getPrototypeOf: trap, getOwnPropertyDescriptor: trap, ownKeys: trap },
+    );
+    await expect(discardDraft({ id: receiptId }, ctx)).rejects.toThrow(RECEIPT_DISCARD_UNAVAILABLE);
+    expect(trap).not.toHaveBeenCalled();
+  });
+
+  it.each(["manual", "attached"] as const)(
+    "does not exempt a %s draft based on a client file hint or read preflight",
+    async (kind) => {
+      const caller = client({
+        responses: {
+          private: {
+            data: { id: receiptId, file_path: kind === "manual" ? null : privatePath },
+            error: null,
+          },
+        },
+      });
+      await expect(
+        discardDraft(
+          { id: receiptId, file_path: kind === "manual" ? null : privatePath },
+          context(caller),
+        ),
+      ).rejects.toThrow(RECEIPT_DISCARD_UNAVAILABLE);
+      expectNoClientAccess(caller);
+    },
+  );
+
+  it.each([null, {}, { id: null }, { id: "not-a-uuid" }])(
+    "retains UUID request validation without invoking any native operation: %j",
+    async (input) => {
+      const caller = client();
+      await expect(discardDraft(input, context(caller))).rejects.toThrow();
+      expectNoClientAccess(caller);
     },
   );
 });

@@ -24,6 +24,7 @@ import {
   validateReceiptFile,
   receiptEntrySchema,
   receiptSaveSchema,
+  RECEIPT_DISCARD_UNAVAILABLE,
 } from "@/lib/vehicle-receipts";
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
@@ -60,7 +61,6 @@ import {
   getPrivateReceiptUrl,
   installReceiptItem,
   setReceiptSharing,
-  discardReceiptDraft,
   requestShopVehicleLink,
   approveShopVehicleLink,
   listVehicleShopLinks,
@@ -139,7 +139,6 @@ function AuthenticatedVehicleReceiptPanel({
   const fetchFn = useServerFn(getVehicleReceipts);
   const signFn = useServerFn(getPrivateReceiptUrl);
   const shareFn = useServerFn(setReceiptSharing);
-  const discardFn = useServerFn(discardReceiptDraft);
   const expenseFn = useServerFn(recordVehicleReceiptExpense);
   const receipts = useQuery({
     queryKey: receiptKey,
@@ -500,9 +499,9 @@ function AuthenticatedVehicleReceiptPanel({
                     <Button
                       size="sm"
                       variant="ghost"
-                      disabled={busy === r.id}
-                      onClick={() => action(r.id, () => discardFn({ data: { id: r.id } }))}
+                      disabled
                       aria-label="Discard draft"
+                      aria-describedby={`receipt-discard-unavailable-${r.id}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -510,6 +509,15 @@ function AuthenticatedVehicleReceiptPanel({
                 )}
               </div>
             </div>
+            {r.status === "draft" && r.can_write === true && (
+              <p
+                id={`receipt-discard-unavailable-${r.id}`}
+                role="status"
+                className="text-sm text-muted-foreground"
+              >
+                {RECEIPT_DISCARD_UNAVAILABLE}
+              </p>
+            )}
             {!r.items_complete && (
               <p role="status" className="text-sm text-muted-foreground">
                 Showing {r.items.length} of {r.item_count} lines. This partial receipt cannot be

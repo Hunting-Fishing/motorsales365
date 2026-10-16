@@ -2678,3 +2678,214 @@ describe("receipt expense request acknowledgment and committed lifetime", () => 
     });
   }
 });
+
+// Source-only interlock: no removal transport is admitted. These synthetic
+// component cases do not prove Storage/database recovery or safe deletion.
+describe("temporary receipt draft-removal unavailability", () => {
+  const unavailable =
+    "Draft removal is temporarily unavailable until recovery is verified. Keep this draft and its original file.";
+  type State = "editable" | "retained read-only" | "incomplete";
+  function draft(attached: boolean, state: State): ReceiptRead["receipts"][number] {
+    return receiptPage({
+      receipts: [
+        {
+          ...receipt("Preserved draft supplier"),
+          id: draftId,
+          file_path: attached ? `owner-a/${draftId}/original.pdf` : null,
+          file_name: attached ? "Preserved original.pdf" : null,
+          media_type: attached ? "application/pdf" : null,
+          items: ["brakes", "engine"].map((category, index) => ({
+            id: `preserved-draft-line-${index}`,
+            description: `Preserved line ${index}`,
+            category: category as "brakes" | "engine",
+            brand: null,
+            part_number: null,
+            quantity: 1,
+            total: null,
+            confidence: 1,
+            reviewed: true,
+            installed_on: null,
+            odometer_km: null,
+            public_summary_allowed: false,
+          })),
+          items_complete: state !== "incomplete",
+          item_count: state === "incomplete" ? 101 : 2,
+          edit_eligible: state === "editable",
+        },
+      ],
+      linkedVehicleId: null,
+    }).receipts[0];
+  }
+  function expectNoRemovalDispatch() {
+    expect(api.discardReceiptDraft).not.toHaveBeenCalled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.extractVehicleReceipt).not.toHaveBeenCalled();
+    expect(localOcr.upload).not.toHaveBeenCalled();
+  }
+  function rawDisabledBypass(button: HTMLElement) {
+    const key = Object.getOwnPropertyNames(button).find((name) => name.startsWith("__reactProps$"));
+    if (key) {
+      const props = Reflect.get(button, key) as { onClick?: unknown };
+      expect(props.onClick).toBeUndefined();
+    } else {
+      // React may remove its prop pointer when detaching an old account/target.
+      expect(button.isConnected).toBe(false);
+    }
+    const delivered = vi.fn();
+    button.addEventListener("click", delivered);
+    act(() => {
+      (button as HTMLButtonElement).disabled = false;
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      (button as HTMLButtonElement).disabled = true;
+    });
+    button.removeEventListener("click", delivered);
+    expect(delivered).toHaveBeenCalledExactlyOnceWith(expect.any(MouseEvent));
+  }
+  beforeEach(() => {
+    vi.mocked(api.discardReceiptDraft).mockReset();
+    vi.spyOn(toast, "success").mockImplementation(() => 0);
+    vi.spyOn(toast, "error").mockImplementation(() => 0);
+    vi.spyOn(toast, "message").mockImplementation(() => 0);
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  for (const attached of [false, true]) {
+    for (const filtered of [false, true]) {
+      it.each(["editable", "retained read-only", "incomplete"] as const)(
+        `keeps ${attached ? "attached" : "manual"} %s drafts with removal disabled and ${filtered ? "filtered" : "all"} lines`,
+        async (state) => {
+          const row = draft(attached, state);
+          const original = structuredClone(row);
+          vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+            receiptPage({ receipts: [row], linkedVehicleId: null }),
+          );
+          const { client } = show();
+          const invalidate = vi.spyOn(client, "invalidateQueries");
+          await screen.findByText("Preserved draft supplier");
+          if (filtered) {
+            fireEvent.change(screen.getByLabelText("Filter parts by section"), {
+              target: { value: "brakes" },
+            });
+            expect(screen.queryByText("Preserved line 1")).not.toBeInTheDocument();
+          }
+          const remove = screen.getByRole("button", { name: "Discard draft" });
+          expect(remove).toBeDisabled();
+          expect(remove).toHaveAccessibleDescription(unavailable);
+          expect(screen.getByText(unavailable)).toBeVisible();
+          rawDisabledBypass(remove);
+          expectNoRemovalDispatch();
+          expect(invalidate).not.toHaveBeenCalled();
+          expect(toast.success).not.toHaveBeenCalled();
+          expect(toast.error).not.toHaveBeenCalled();
+          expect(toast.message).not.toHaveBeenCalled();
+          expect(row).toEqual(original);
+          if (state === "editable") {
+            const review = screen.getByRole("button", { name: "Review" });
+            expect(review).toBeEnabled();
+            fireEvent.click(review);
+            const editor = screen.getByRole("dialog");
+            expect(within(editor).getByLabelText("Supplier / shop")).toHaveValue(
+              "Preserved draft supplier",
+            );
+            expect(within(editor).getByRole("button", { name: "Save draft" })).toBeEnabled();
+            expectNoRemovalDispatch();
+          } else expect(screen.queryByRole("button", { name: "Review" })).not.toBeInTheDocument();
+        },
+      );
+    }
+  }
+
+  it("keeps zero-item manual drafts reviewable without any removal exception", async () => {
+    const row = { ...receipt("Empty preserved draft"), id: draftId };
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({ receipts: [row], linkedVehicleId: null }),
+    );
+    show();
+    const remove = await screen.findByRole("button", { name: "Discard draft" });
+    expect(remove).toBeDisabled();
+    expect(remove).toHaveAccessibleDescription(unavailable);
+    rawDisabledBypass(remove);
+    fireEvent.click(screen.getByRole("button", { name: "Review" }));
+    expect(within(screen.getByRole("dialog")).getByLabelText("Item description")).toHaveValue("");
+    expectNoRemovalDispatch();
+  });
+
+  it("does not add draft actions or imply write access to a read-only receipt", async () => {
+    const row = { ...draft(true, "editable"), can_write: false };
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({ receipts: [row], linkedVehicleId: null, canWrite: false }),
+    );
+    show();
+    await screen.findByText("Preserved draft supplier");
+    expect(screen.queryByRole("button", { name: "Discard draft" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review" })).not.toBeInTheDocument();
+    expect(screen.queryByText(unavailable)).not.toBeInTheDocument();
+    expectNoRemovalDispatch();
+  });
+
+  it.each(["account", "vehicle", "Auth loading"] as const)(
+    "has no raw removal fallback during a committed %s transition and new read",
+    async (kind) => {
+      vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+        receiptPage({ receipts: [draft(true, "editable")], linkedVehicleId: null }),
+      );
+      const { container, rerender, view } = show();
+      const old = await screen.findByRole("button", { name: "Discard draft" });
+      const pending = deferred<ReceiptRead>();
+      vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(pending.promise);
+      if (kind === "account") {
+        auth.userId = "owner-b";
+        rerender(view());
+      }
+      if (kind === "vehicle") rerender(view({ vehicleId: "10000000-0000-4000-8000-000000000002" }));
+      if (kind === "Auth loading") {
+        auth.loading = true;
+        rerender(view());
+        expect(container).toBeEmptyDOMElement();
+        auth.loading = false;
+        rerender(view());
+      }
+      expect(screen.queryByRole("button", { name: "Discard draft" })).not.toBeInTheDocument();
+      rawDisabledBypass(old);
+      expectNoRemovalDispatch();
+      await act(async () =>
+        pending.resolve(
+          receiptPage({ receipts: [draft(false, "editable")], linkedVehicleId: null }),
+        ),
+      );
+      const current = await screen.findByRole("button", { name: "Discard draft" });
+      expect(current).not.toBe(old);
+      expect(current).toBeDisabled();
+      expect(current).toHaveAccessibleDescription(unavailable);
+      rawDisabledBypass(current);
+      expectNoRemovalDispatch();
+      expect(screen.getByRole("button", { name: "Review" })).toBeEnabled();
+    },
+  );
+
+  it("retains the interlock through generic read failure and explicit retry without a hold or false removal", async () => {
+    const row = draft(true, "editable");
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({ receipts: [row], linkedVehicleId: null }),
+    );
+    const { client } = show();
+    const old = await screen.findByRole("button", { name: "Discard draft" });
+    vi.mocked(api.getVehicleReceipts).mockRejectedValueOnce(new Error("PRIVATE read detail"));
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    await screen.findByText("Could not load receipts. Please try again.");
+    rawDisabledBypass(old);
+    expectNoRemovalDispatch();
+    fireEvent.click(screen.getByRole("button", { name: "Retry receipts" }));
+    const current = await screen.findByRole("button", { name: "Discard draft" });
+    expect(current).toBeDisabled();
+    expect(current).toHaveAccessibleDescription(unavailable);
+    expect(screen.queryByText(/PRIVATE|Draft removed|Draft deleted/)).not.toBeInTheDocument();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(toast.message).not.toHaveBeenCalled();
+    expectNoRemovalDispatch();
+  });
+});
