@@ -16,6 +16,16 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest R3 repair `719255fb` replaces nonregular libpq credential controls with
+verified empty private files, retaining strict stderr rejection and every
+identity/recovery/cleanup condition. Third actual `aff9f829` run fails first
+client read (`identity-read/unavailable`); PG17 source confirms the old `/dev/null`
+password-file warning blocker consistent with that stage, not a captured sole
+cause. Final offline100/100 (2,854.39ms), format/syntax/diff and independent
+review pass. Next is actual repaired Linux recovery, not acceptance yet.
+No Docker, application SQL/live change or deployment. Evidence and open gates:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 diagnostic source `176732c6` preserves all admission conditions and
 adds fixed identity-field/pristine-inventory checkpoints. The second Linux run
 at `e4b316b0` still refuses `server-identity/unavailable` before any fixture/dump/

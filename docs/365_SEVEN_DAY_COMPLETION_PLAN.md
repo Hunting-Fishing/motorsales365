@@ -1,5 +1,12 @@
 # 365 Seven Day Completion Plan
 
+Latest R3 repair `719255fb` replaces warning-producing nonregular libpq control
+files with verified empty private files, keeping every isolation/identity/restore
+gate and strict stderr rejection. Third actual native run still fails first
+client read; repaired actual execution remains required. Offline100/100/review/
+syntax/format/diff pass, not recovery acceptance. No Docker or live change.
+Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. Schedule/gates unchanged.
+
 Latest R3 diagnostic source `176732c6`: second actual Linux run still fails
 identity admission before fixture/dump/restore, with Parts247/quote/cleanup pass.
 All conditions are retained; finer fixed checkpoints plus offline98/98/review/

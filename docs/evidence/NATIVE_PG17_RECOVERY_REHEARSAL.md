@@ -3,6 +3,7 @@
 Updated 16 October 2026. Initial source `c25f79f3217565901d0359835b5246a543ebd7cd`;
 repair source `3393d29adb0d313d8d009fecbb628ee4eedd32d1`;
 diagnostic checkpoint source `176732c691ff7630ccc4cdaa2aa5b8494c868892`;
+empty-client-control repair source `719255fbf14c77fdb076c5df3ebda46ee0c3d96f`;
 same integrated candidate and draft PR #68; no hosted
 project, application migration, live operation or deployment is part of this
 slice. Source/publication and execution results are recorded below when verified.
@@ -187,6 +188,40 @@ At the final `e4b316b0` check, build/typecheck/lint/browser OCR pass and unit
 preview is reported success but its new log is not yet inspected. Workers build
 `7368be80-be35-4f33-87ed-4cbbc92e1ff9` fails with fresh cause unverified. No app
 build input, migration, hosting setting or live state changed in this follow-up.
+
+### Third Linux attempt: first client read and libpq control-file repair
+
+Actual published `aff9f82908474fdb82e04dd551c1a253c680dc2d` native job
+`116905322349` in run `38880223108` fails `identity-read/unavailable`, before
+JSON parsing or field/pristine assertions. Retained Parts247/six quote groups and
+scoped cleanup pass. There is still no dump/restore or recovery-time success.
+
+[PostgreSQL17 libpq source](https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/interfaces/libpq/fe-connect.c)
+confirms that password-file lookup occurs during connection-option setup, even
+before later trust authentication, and a nonregular password file emits a stderr
+warning. The runner uses `PGPASSFILE=/dev/null` and rejects any successful command
+with stderr, a concrete source-confirmed client blocker consistent with this
+observed stage. The raw warning was not captured, so it is not claimed as the
+proven sole cause of that run.
+
+Repair `719255fb` uses fixed private `empty.pgpass` and `empty.pg_service.conf`
+files in the verified root, created exclusively/no-follow before the first client
+and validated on both phases: regular, zero bytes, own UID,0600, single link and
+stable inode/metadata. No fallback to real credential/service configuration.
+Backup artifact reads still reject empty files by default. Strict stderr rejection,
+all SQL/identity/pristine/manifest/restore checks and shell cleanup are unchanged.
+
+Final combined offline **100/100**, zero failures/skips, 2,854.39ms; format/syntax/
+diff and independent frozen review pass. New negatives cover one/two bytes,
+nonregular/symlink/hardlink, wrong owner/mode/named inode, empty-artifact refusal
+and exclusive-create/validation-before-first-client ordering. Initial99/100 had
+one new source-guard formatting mismatch after Prettier; whitespace matching was
+corrected without changing runtime conditions, assertions, timeout or quarantine.
+Source SHA `d9b80bf391b80cc0935bb4aaf93c7c3d9070a785aff635b14fabf833204e4341`;
+test SHA `77de95105603720997ecbb17881473654c8fd9f8798430682e055821425dc653`.
+Actual repaired Linux recovery remains required; this source fix is not acceptance.
+Changed-line lint against `aff9f829` has zero errors/warnings/retained findings
+across two JS files. Shell and its previously reviewed cleanup remain byte-identical.
 
 ## Open release gates and next dependency
 

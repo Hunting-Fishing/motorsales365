@@ -41,6 +41,14 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+Latest R3 repair `719255fb` uses verified zero-byte private libpq controls,
+retaining all stderr/identity/restore/cleanup gates. Actual `aff9f829` still fails
+first client read; PG17 source confirms a consistent nonregular-password-file
+warning blocker, not a captured sole cause. Final offline100/100 (2,854.39ms),
+format/syntax/diff/review pass. Next actual repaired Linux execution remains
+required; R3 is blocked, no migration/live change or deployment.
+Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 diagnostic source `176732c6` adds fixed identity-field/pristine-inventory
 checkpoints without relaxing any condition. Actual `e4b316b0` run fails before
 fixture/dump/restore at `server-identity/unavailable`; Parts247/quote six groups/

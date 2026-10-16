@@ -1,5 +1,12 @@
 # Native Customer 360: first delivery slice
 
+Latest R3 repair `719255fb` fixes a source-confirmed libpq control-file blocker
+consistent with the third native first-read failure. Verified empty private files
+replace `/dev/null` without permitting warnings or relaxing identity/cleanup.
+Offline100/100, review/syntax/format/diff pass; actual repaired native recovery
+is still required. No application migration/live operation or deployment.
+Details: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 diagnostic source `176732c6` retains every identity/pristine condition
 after `e4b316b0` still refuses before fixture/dump/restore. Final offline98/98,
 review/syntax/format/diff/lint pass; new actual Linux checkpoint execution is
