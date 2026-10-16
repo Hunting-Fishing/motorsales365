@@ -6,6 +6,29 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Latest source `10d23d37`: unconnected receipt CREATE exact-money/full-payload
+operation and reported-posting contract, not an SQL writer or durable ledger.
+Root36/36 (8.906s:22 pure/12 retained SQL/2 CI guards), review/syntax/format/full
+changed-file ESLint/diff and214 copies/Worker boundaries pass; changed-line lint
+zero errors/warnings/retained findings. Null-vendor/fallback collision requires
+full reported request binding from one detached intent. Fabricated matching data
+can still validate; native authority/commit/idempotency/recovery not established.
+Initial positive PHP/exact-cent/finite-date/tax-zero/Cash-AP cohorts are explicit
+model limits, not adopted policy or removed scope. No app writer/SQL/migration/
+ledger/grant/live/deployment change. Full evidence: `evidence/EXPENSE_OPERATION_CONTRACT.md`.
+
+Parent `de7152df` now passes all six Actions gates; application4,696/4,696 across
+92 files (59.03s), zero unexpected/quarantined failures, truncated unit log with
+final summaries. Actions runtime deprecation warning retained. Native116959248633
+passes Parts247/six quote groups/bounded synthetic restore/rollback/cleanup,
+tiny65/81/208ms not RTO;47 replay failures remain. Preview116959247789 confirms
+config skip/no upload; migrations/production/Supabase Preview skip. Workers
+36043f9f-8aca-4bf2-a16b-2a4af5135aeb fails, fresh cause unverified. New contract
+head needs its own CI. Next: locked unapplied owner-only transaction/protected
+immutable outcome ledger, native authority/current-catalog/financial/all-writer/
+concurrency/recovery gates before connection. C1.04/C3 remain unaccepted; earlier
+next-contract/fixture entries below retain history, not unfinished duplicate work.
+
 Latest checkpoint, source `7804bd98`: pinned unchanged-source expense/journal fixture, same
 integrated candidate/draft PR #68. Local12/12 (12.218s), then14/14 with the
 explicit never-quarantined single-worker CI guards (8.842s), syntax/format/full

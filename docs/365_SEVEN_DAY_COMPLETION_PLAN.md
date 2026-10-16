@@ -1,5 +1,23 @@
 # 365 Seven Day Completion Plan
 
+Latest source `10d23d37` implements the next unconnected receipt CREATE operation
+contract: exact cents/native receipt bounds/full payload binding and strict
+reported expense/journal results, no writer/ledger/grant/live change. Root36/36
+(8.906s), review/syntax/format/full changed-file ESLint/diff/214 assets/Worker
+boundaries pass; no authority/idempotency/SQL-truth acceptance. Modeled cohorts
+are not a financial policy or silent scope cut. Parentde7152df all six Actions
+pass, application4,696/4,696/92 files59.03s, zero unexpected/quarantined failures;
+unit log truncated, final summaries present. Native Parts/quote/bounded restore
+pass,47 replay failures remain; Preview config skip/no upload, separate Workers
+failure cause unverified and Actions runtime warning retained. New-head CI is
+still required. Next: locked unapplied owner-only atomic transaction/immutable
+payload-bound outcome ledger; current-catalog/native authority/financial/all-
+writer/concurrency/recovery gates before connection. Evidence:
+`evidence/EXPENSE_OPERATION_CONTRACT.md`. Baseline/private originals/API/Auth,
+safe101+ review/edit and pilot/owner/release gaps still threaten22 October;
+17 October feasibility review remains, no forecast guarantee or scope cut.
+Earlier next-contract/fixture statements below are superseded, not repeated.
+
 Latest checkpoint,16 October, source `7804bd98`: the retained expense/journal graph is composed in
 a memory-only source-pinned fixture, same integrated candidate/draft PR #68.
 Local12/12 and CI-wiring14/14 (8.842s), syntax/format/full changed-file ESLint and

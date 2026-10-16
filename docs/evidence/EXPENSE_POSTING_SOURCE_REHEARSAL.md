@@ -6,6 +6,27 @@ Source `7804bd9892f01fbc279e214cae3407765a298d93`; evidence joins the same integ
 publication. New exact-head CI remains required. This is unchanged-source characterization, not a migration,
 corrected financial writer, native authority proof or release acceptance.
 
+Publication `de7152dfc0f88800abafd8738296b180c4b7546f` is verified on canonical
+remote/same attached draft PR68, preserving title/base/main/history. All six
+Actions gates pass; unit116959248579/run38896846951 confirms4,696/4,696 across
+92 files (59.03s), zero unexpected/quarantined failures. Returned unit log is
+truncated: final summaries/checker output present, early new fixture TAP not in
+the returned tail; local12/12 and14/14 remain exact standalone counts. Actions
+runtime deprecation warning retained. Native116959248633 is untruncated and
+confirms Parts247/six quote groups/bounded synthetic restore/ACL/RLS/sequence/
+late-failure rollback/cleanup; tiny65/81/208ms not RTO,47 replay failures remain.
+Preview116959247789 confirms config skip/no upload; migrations/production/
+Supabase Preview skip. Workers36043f9f-8aca-4bf2-a16b-2a4af5135aeb fails with
+fresh cause unverified. No deployment/owner/live acceptance. Earlier pending
+publication statements below are superseded by this checkpoint.
+
+The next preparatory request/reported-result contract is implemented separately
+at10d23d37, not an SQL command or durable ledger. Root36/36 combined contract/
+retained SQL/CI guards pass; full binding closes the null/fallback description
+collision but is still fabricable reported text. See `EXPENSE_OPERATION_CONTRACT.md`.
+Continue the locked owner-only transaction/immutable ledger and real authority/
+financial/recovery prerequisites, not repeat the completed fixture or contract.
+
 ## Execution and provenance boundary
 
 `scripts/vehicle-receipts/expense-posting-fixture.mjs` creates only a fresh

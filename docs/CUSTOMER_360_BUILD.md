@@ -1,5 +1,22 @@
 # Native Customer 360: first delivery slice
 
+Latest source `10d23d37`: unconnected receipt CREATE operation contract with exact
+money/native receipt bounds/full payload binding and strict reported expense/
+journal/two-line results; no connected writer, SQL, ledger, grant or live change.
+Root36/36 (8.906s:22 pure/12 retained SQL/2 CI guards), review/syntax/format/full
+changed-file ESLint/diff/214 assets/Worker boundaries pass. A fabricated matching
+result still validates; no native authority, durable retry, commit or recovery
+acceptance. Null/fallback vendor intents remain distinct; cohorts are not adopted
+policy or removed scope. Parentde7152df all six Actions pass,4,696/4,696/92 files
+59.03s, zero unexpected/quarantined failures; truncated unit log, final summaries
+present. Bounded native Parts/quote/restore pass,47 replay failures remain;
+Preview confirms config skip/no upload, Workers failure cause unverified and
+Actions runtime warning retained. New exact-head CI is separate. Next: locked
+unapplied owner-only transaction/protected immutable outcome ledger plus native
+authority/current-catalog/financial/all-writer/concurrency/recovery closure before
+connection. Evidence: `evidence/EXPENSE_OPERATION_CONTRACT.md`; older next-
+fixture/contract entries are superseded, owner/live release gates unchanged.
+
 Latest checkpoint,16 October, source `7804bd98`: retained receipt-expense/journal composition
 is implemented as a source-pinned memory-only fixture, same candidate/draft
 PR #68. Local12/12 plus CI-wiring14/14 (8.842s), syntax/format/full changed-file

@@ -16,6 +16,26 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest resumption source `10d23d37`: unconnected receipt CREATE operation contract
+prepares exact-cent intent, complete normalized payload binding and strict
+reported expense/journal/two-line results, including null-vendor/fallback collision
+refusal. Root serial36/36 (8.906s:22 pure contract/12 retained SQL/2 CI guards),
+independent review/syntax/format/full changed-file ESLint/diff pass; changed-line
+lint zero errors/warnings/retained findings.214 copies/Worker/backend/OCR/PDF/
+server boundaries reverify at10d23d37. No app writer/SQL/ledger/grant/live/deploy;
+forged matching DTOs still pass and unsupported cohorts are not scope cuts or
+approved financial policy. Parent `de7152df` now passes all six Actions gates,
+application4,696/4,696 across92 files (59.03s), zero unexpected/quarantined
+failures; returned unit log truncated, final summaries present. Its Actions
+runtime deprecation warning and separate Workers failure are retained. Native
+Parts247/quote/synthetic restore/rollback/cleanup pass,47 replay failures remain;
+Preview confirms config skip/no upload. New exact-head publication/CI is separate.
+Next: locked unapplied owner-only receipt CREATE transaction plus immutable
+payload-bound outcome ledger, then native authority/current-catalog/financial/
+competing-writer/concurrency/recovery closure before any connection. Details:
+`evidence/EXPENSE_OPERATION_CONTRACT.md`. Earlier checkpoint next-fixture/contract
+work below is complete; do not repeat it. Target/owner/live gates unchanged.
+
 Latest checkpoint, source `7804bd98`: retained expense-to-journal composition is implemented
 as a pinned, memory-only fixture on the same integrated candidate/draft PR #68.
 Seven whole LF source pins/22 unchanged selections preserve the actual selected
