@@ -1,5 +1,29 @@
 # Native Customer 360: first delivery slice
 
+Expense page read support is implemented at `1953f580`, same candidate/draft PR
+#68. Bound100-row windows, strict native DTOs, exact-query freshness, independent
+errors/retries and amount/tax presentation replace global queries, false empty
+states and a capped MTD total. All three legacy financial mutationFn bodies remain
+byte-identical. Related1,468/1,468 (nine suites,27.59s), strengthened new server/
+contract253/253, UI/panel276/276,294 new cases, review/format/full TypeScript/
+complete build/214 assets/Worker boundaries pass. Lint zero blocking errors, one
+moved legacy any warning/eight retained elsewhere. This is synthetic source/read
+integration, not actual-role/API/private-byte/posting acceptance. No SQL/live/
+deploy. New exact-head publication/CI and receipt-expense/journal composition,
+atomic/durable posting/native authority/recovery remain next. Evidence:
+`evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`.
+
+Published `4af1d906`/same attached draft PR #68 is verified; final214 assets/
+Worker boundaries pass. All six Actions gates pass; completed unit
+`116923466985` confirms application4,402/4,402 across89 files (95.99s), zero
+unexpected/quarantined failures (overall log truncated, final summaries present).
+Actual new native restore/ACL/RLS/sequence/late-
+failure rollback/cleanup pass;47 replay failures remain. Preview config skip/no
+upload and migrations/production/Supabase Preview skip are confirmed. Fresh
+Workers failure cause is unverified. These notes join the next source slice.
+Next: connected account/shop-bound expense reads, whole-baseline/private-original/native authority and
+safe101+ review/edit; do not repeat completed read-only viewing. No live/deploy.
+
 C1.08 source `c8beede8` connects strict separate display-only receipt-line pages
 to the incomplete-receipt viewer, with exact account/target/receipt/parent-version
 and per-mount/page lifetimes. Focused1,542/1,542 across18 suites,241 new cases,

@@ -16,6 +16,42 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Expense read support is implemented at `1953f580`, same integrated branch/draft
+PR #68. Account/observed-shop-bound100-row expense/category/vehicle windows,
+strict native DATE/amount/DTO checks, independent retries and exact-query UI
+lifetimes replace global/capped/error-to-empty reads and the false MTD total.
+Unknown vehicle/customer shop binding refuses the whole page, not a silent
+omission. Related1,468/1,468 across nine suites (27.59s), final strengthened
+contract/handler253/253 (2.26s), UI/panel276/276 (18.05s),294 new synthetic cases,
+independent review/format/diff/full TypeScript/build/214 public copies/Worker/
+backend/OCR/PDF/server checks pass. Lint: zero blocking errors, one moved legacy
+any warning, eight retained findings elsewhere. All three legacy mutationFn
+bodies remain byte-identical; reader/callback fences are not native write fences.
+No SQL/migration/grant/live change/deployment. New exact-head publication/CI
+remains required. Next: unchanged-source receipt-expense/journal posting graph
+fixture, then locked atomic/durable writer and native authority/financial/recovery
+closure; do not equate insert/duplicate-ID acknowledgment with journal posting.
+Whole baseline,47 replay failures, private originals, safe101+ review/edit and
+owner/live gates remain. Evidence: `evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`.
+
+Publication `4af1d906` is verified on canonical remote/same attached draft PR #68;
+title/base/draft/history/main `70ab892a` are preserved, and final214 public copies/
+Worker/backend/OCR/PDF/server checks pass. New-head build/typecheck/lint/browser
+OCR/native pass; completed unit `116923466985` in run `38885907605` confirms
+application4,402/4,402 across89 files (95.99s), zero unexpected/quarantined
+failures. The overall log is truncated but final summaries are present. All six
+Actions gates pass on this exact head. Untruncated native `116923467192` confirms Parts247/six quote groups and
+synthetic restore/ACL/RLS/sequence/late-failure rollback/cleanup (tiny61/77/194ms,
+not production RTO), retaining47 replay failures. Preview `116923462760` is a
+confirmed config skip/no upload; migrations/production/Supabase Preview skip.
+Workers build `a40c6591-1125-4912-a33b-29d11a669f55` fails with fresh cause
+unverified. These publication notes join the next source slice without a
+docs-only CI restart. Next connected slice: account/shop-bound expense read
+windows with explicit errors/counts, while whole baseline/private originals/
+native authority and safe101+ review/edit remain open. Do not repeat the
+completed read-only viewer or synthetic recovery, replay approved restrictions
+or equate this candidate with owner/live acceptance. No deployment.
+
 C1.08 read-only complete-line viewing is implemented at `c8beede8` on the same
 integrated candidate/PR #68. Strict separate100-line display windows and matching
 account/receipt/target/consent checks connect to an actual Dialog/QueryClient

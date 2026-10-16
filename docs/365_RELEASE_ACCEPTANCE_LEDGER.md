@@ -6,6 +6,20 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Expense read support at `1953f580` is source implemented/integrated on the same
+candidate/draft PR #68, not isolated-role/owner/live accepted. Account/observed-
+shop-bound100-row windows and exact-query lifetimes replace global/error-to-empty
+reads and false MTD totals; unknown vehicle shop binding refuses the whole page.
+Related1,468/1,468 (nine suites,27.59s), final strengthened new server/contract
+253/253 (2.26s), UI/panel276/276 (18.05s),294 new synthetic cases, independent
+review/format/full TypeScript/fresh complete build/214 assets/Worker checks pass.
+Lint zero blocking errors, one moved legacy any warning/eight retained elsewhere.
+Three legacy mutationFn bodies are byte-identical; first-dispatch/upload-chain/
+persisted financial/journal/authority/durable recovery gates remain open. No SQL/
+migration/live/deploy. Next: exact published-head CI and unchanged-source receipt
+expense/journal graph fixture before a locked atomic command. Full evidence:
+`evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`; C1.04/C3 remain unaccepted.
+
 Owner directive, 16 October: no Docker. No Docker install/start/use, image pulls
 or repeated Docker Desktop setup questions. Continue Docker-free validation;
 do not equate mocks or production testing with isolated real-role/storage/restore
@@ -41,6 +55,22 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+Published `4af1d906` is verified on canonical remote/same attached draft PR #68,
+preserving title/base/draft/history/main; final214 assets/Worker boundaries pass.
+All six Actions gates pass. Completed unit `116923466985` in run `38885907605`
+confirms application4,402/4,402 across89 files (95.99s), zero unexpected/
+quarantined failures; overall log truncated with final summaries present.
+Untruncated native `116923467192`
+confirms Parts247/six quote groups and synthetic restore/ACL/RLS/sequence/late-
+failure rollback/cleanup, tiny61/77/194ms not production RTO;47 replay failures
+retained. Preview `116923462760` confirms config skip/no upload; migrations/
+production/Supabase Preview skip. Workers `a40c6591-1125-4912-a33b-29d11a669f55`
+fails with fresh cause unverified. These notes join the next source slice without
+docs-only CI restart. Next: connected account/shop-bound expense read windows,
+with remaining baseline/private-original/native authority/safe101+ review-edit
+gates still open, not repeated viewing or
+approved restriction replay. No new owner/live acceptance or deployment.
+
 C1.08 read-only source `c8beede8` implements separately bound100-line windows
 and an actual Dialog/QueryClient viewer with parent-version/account/target/receipt/
 session/page fences. Focused1,542/1,542 across18 suites (35.42s),241 new cases,
@@ -589,6 +619,18 @@ durable retry/numbering/all-writer scope and native PG17/API/recovery acceptance
 Do not repeat the completed reader/caller proofs or connect the revoked candidate
 early. C3.03 conversion remains interlocked and unfinished; financial/stock and
 owner/release acceptance stay open. Unknown writes must stay visibly uncertain.
+
+Expense action additions, 16 October, from the existing expense route. These
+recover pre-existing actions in the bounded inventory, not additional scope.
+Isolated real-role/API/financial/private-object acceptance is not run, owner
+acceptance pending and live behavior unverified for all four.
+
+| ID    | Existing action                                       | Source status and exact remaining closure                                                                                                                                                                                                                                                                                     |
+| ----- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C3.15 | Browse expenses/categories and select receipt vehicle | Read support at1953f580: bound counted100-row windows, native DTOs, fresh-only private UI, explicit errors/retries and no capped MTD claim. Actual helper/RLS/FK/API/pilot/owner acceptance and whole-inventory/export semantics remain.                                                                                      |
+| C3.16 | Create expense category                               | Legacy insert body unchanged; current-only launch/feedback is not expected-shop/native-authority or durable acknowledgment. Verify native fill/RLS/defaults, persisted category and unknown-outcome/retry behavior before acceptance.                                                                                         |
+| C3.17 | Create expense with optional original upload          | Legacy upload/insert/Number(value)                                                                                                                                                                                                                                                                                            |     | 0 body unchanged. Missing prior-shop/caller/decimal/state/attachment coordination, dispatch/continuation fencing and durable outcome reconciliation remain. Compose the retained journal posting graph; Cash/AP/tax/zero semantics, exact persisted values, real-role transactions and recovery are not accepted. |
+| C3.18 | Remove expense                                        | Legacy delete body unchanged; neutral current-only feedback is not affected-row confirmation, authorized accounting reversal or durable deletion recovery. Verify competing writers, retained journal/source relations and approved reversal/reconciliation behavior; do not assume deleting an expense reverses its journal. |
 
 ## Current verified slice
 

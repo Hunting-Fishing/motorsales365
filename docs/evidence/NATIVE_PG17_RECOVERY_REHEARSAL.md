@@ -284,6 +284,19 @@ CI restart. No Docker, hosted resource, app migration/live operation or deployme
 
 ## Open release gates and next dependency
 
+Subsequent current published `4af1d90693d291a7e2b1e31026bcf655a9cb42e1` native
+job `116923467192` / run `38885907605` also completes success with untruncated
+log: PGDG17.11/server170011, Parts247/six quote groups, synthetic restore/catalog/
+ACL/RLS/sequence/late-failure rollback and scoped cleanup. Tiny observed timings
+61/77/194ms are not production RTO;47 replay failures remain. Build/typecheck/
+lint/browser OCR pass; completed unit `116923466985` confirms application4,402/
+4,402 across89 files (95.99s), zero unexpected/quarantined failures. All six
+Actions gates pass at this exact head; overall unit log truncated with final
+summaries present. Confirmed preview
+config skip/no upload; migrations/production/Supabase Preview skip. New Workers
+build `a40c6591-1125-4912-a33b-29d11a669f55` fails, fresh cause unverified. These
+publication notes join the next source slice, no docs-only CI restart.
+
 Even a passing rehearsal does not recover the application baseline, real Auth/
 HTTP services, credentials, provider/Worker configuration or private originals.
 Supabase [file metadata and original bytes are separate](https://supabase.com/docs/guides/storage/management/download-objects);

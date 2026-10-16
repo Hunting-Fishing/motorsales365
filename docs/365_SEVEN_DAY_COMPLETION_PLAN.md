@@ -1,5 +1,30 @@
 # 365 Seven Day Completion Plan
 
+Expense read source `1953f580` continues the integrated candidate/PR #68:
+account/shop-bound windows and private lifetimes, explicit unknown-binding/error
+states, received amount/tax presentation and no false capped MTD total. Related
+1,468/1,468 plus final strengthened server/contract253/253 and UI/panel276/276
+pass;294 new synthetic cases. Review/format/full TypeScript/fresh complete build/
+214 assets/Worker boundaries pass; lint zero blocking errors, one moved legacy
+any warning. New exact publication/CI remains separate; no SQL/live/deploy.
+The next source dependency is the retained expense-to-journal graph, then
+atomic/durable exact-money posting and trusted native authority—not another
+transport acknowledgment. Whole baseline/47 replay failures, full API/Auth/
+private-original recovery, safe101+ review/edit and pilot/owner/release gaps still
+threaten the22 October target and must enter17 October feasibility review.
+No forecast guarantee or scope cut. `evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`.
+
+Published `4af1d906`/same draft PR #68 is verified with final214 assets/Worker
+boundaries. All six Actions gates pass, including actual bounded native restore/
+rollback/cleanup. Completed unit `116923466985` confirms application4,402/4,402
+across89 files (95.99s), zero unexpected/quarantined failures; overall log
+truncated with final summaries present.47 replay failures and full
+release/owner/live gates remain. Preview config skip/no upload, no migrations/
+production/Supabase Preview; fresh Workers failure cause is unverified. These
+notes join the next source slice, no docs-only CI restart. Next: connected
+account/shop-bound expense reads and whole-baseline/private-original/native authority plus safe101+ review/
+edit, not repeated completed read-only work. Target/17 October review unchanged.
+
 C1.08 source `c8beede8` implements bounded read-only viewing beyond100 lines,
 with strict account/receipt/target/consent windows and parent/dialog/page lifetime
 fences. Focused1,542/1,542 (18 suites,241 new), full TypeScript, review/format/diff/

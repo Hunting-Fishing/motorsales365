@@ -93,6 +93,20 @@ Frozen LF SHA-256 pins:
 
 ## Remaining acceptance and next dependency
 
+Publication `4af1d90693d291a7e2b1e31026bcf655a9cb42e1` is verified on canonical
+remote and the same attached draft PR #68, preserving title/base/draft/history/
+main. Final-head214 assets/Worker/backend/OCR/PDF/server checks pass. New-head
+all six Actions gates pass; completed unit `116923466985` / run `38885907605`
+confirms application4,402/4,402 across89 files (95.99s), zero unexpected/
+quarantined failures, not inferred from the parent's4,170 pass. The overall unit
+log is truncated, with final summaries present.
+Untruncated native `116923467192` repeats bounded synthetic recovery/rollback/
+cleanup, not actual receipt HTTP/role acceptance. Preview `116923462760` confirms
+configuration skip/no upload; migrations/production/Supabase Preview skip. Workers
+build `a40c6591-1125-4912-a33b-29d11a669f55` fails, fresh cause unverified. These
+verified publication notes join the next source slice without a docs-only CI
+restart; no owner/live acceptance or deployment is inferred.
+
 C1.08 read-only source is implemented; safe review/edit of101+ lines remains open.
 Do not feed accumulated windows to the replace-all editor, infer full-set
 completeness or remove the current writer limit. Native role/consent/session and
