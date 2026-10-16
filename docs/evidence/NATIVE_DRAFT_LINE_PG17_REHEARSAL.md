@@ -1,5 +1,12 @@
 # Native PG17 draft-line rehearsal: prepared, actual CI acceptance pending
 
+Publication update: source4fea16072eb76ffc292a28cb6a9dc549012787c0, same draft
+PR68. Parent40fd9aee now passes all six Actions38932061829 including unit117078254223
+by completion-status read; publication hold cleared without cancellation.
+Previously stopped parent log remains unread after502 initial/one retry; no
+invented unit count/runtime. Publish existing source/evidence, then read new-head
+native cohorts/cleanup and six required Actions; no inherited pass or121 rerun.
+
 17 October 2026, Asia/Manila. Same integrated candidate/draft PR68. This slice
 closes source preparation for the delivery board's next named C1.08 dependency;
 it does not enable101+ editing or accept real native authority/recovery.

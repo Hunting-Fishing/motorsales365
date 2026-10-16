@@ -10,6 +10,13 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Source4fea16072eb76ffc292a28cb6a9dc549012787c0 has direct parent40fd9aee. Parent
+all six Actions38932061829 now pass, unit117078254223 included; publication hold
+cleared without cancellation. Publish existing source+evidence in same PR68 and
+read own native proof/cleanup and required checks; do not rerun unchanged121 tests.
+Parent unit log remains unread after prior502 stop; no invented count/runtime or
+inherited new-head pass. No app/SQL/migration/grant/live/deployment/main change.
+
 Prepared native draft-line phase:121/121 nine suites54.782s, review/format/lint/
 diff/214 assets/existing Worker guards pass. Pure source child adds only seven
 retained spans/private candidate after original native expense cohorts; eight
@@ -21,11 +28,10 @@ C1.07/C1.08/R2/R3 unaccepted; authority/all-writer/catalog/durable/API/private
 original/full recovery/owner/device gates remain before activation. Preserve
 parent unit before push and existing QA/hosting stops. Exact evidence:
 `evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md`.47 replay/22 October risk unchanged.
-Parent40fd9aee unit117078254223 still in_progress; exact log endpoint returned
-HTTP502 twice (initial + one retry). Log retrieval STOPPED until changed provider/
-job evidence; no fallback/repeated read or invented counts. Hold source push to
-preserve running parent. Local commit subject "Prepare native PG17 draft line
-independent session rehearsal"; next completion status then publish existing slice.
+Parent40fd9aee unit117078254223 completion is newly verified by status; its log
+endpoint had returned HTTP502 twice (initial + one retry) and remains unread.
+The publication hold is cleared, not retried/cancelled. No fallback/invented
+counts; own-head native acceptance remains next. Existing hosting/QA stops stay.
 
 Current documentation publication40fd9aeed5053ea65bcf8a78f4919a99115b9e54 is on
 the canonical remote/same draft PR68; title/base/prior62,030-character body and

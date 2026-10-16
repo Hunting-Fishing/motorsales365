@@ -43,6 +43,13 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Resume source4fea16072eb76ffc292a28cb6a9dc549012787c0, direct parent40fd9aee.
+Parent all six Actions38932061829 now pass, including unit117078254223; publication
+hold cleared without cancellation. Publish existing source/evidence in same PR68,
+then verify own native cohorts/cleanup and exact-head checks. Parent unit log is
+unread after prior502 stop; no invented count/runtime or inherited pass. Do not
+repeat unchanged121 local tests or call source/PGlite native acceptance.
+
 Native draft-line PG17 source prerequisite is prepared in same PR68: pure pinned
 seven-span child builder and eight mandatory observed-wait/outer transaction/CAS/
 scope/native CHECK/late rewrite cohorts, with all original expense proofs and
@@ -54,11 +61,10 @@ R2/R3 remain unaccepted. Next actual PG17 proof, then trusted authority/current
 catalog/all-writer/durable/API/private-original/full recovery before connection.
 `evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md` records exact source/tests/limits.
 Unchanged QA/hosting stops and47 replay/provenance/22 October risk retained.
-Publication hold: parent40fd9aee unit117078254223 remains in_progress. Log reads
-failed HTTP502 initial + one allowed retry, so STOP that unchanged read; no CLI/
-dashboard fallback. Source commit subject "Prepare native PG17 draft line
-independent session rehearsal" is local until parent completes; next status-only
-completion check then push this existing slice, not repeated implementation/tests.
+Prior hold is superseded by parent completion. Log reads failed HTTP502 initial
+
+- one allowed retry, so that unchanged read stopped; no CLI/dashboard fallback
+  or fresh parent unit count. Current own-head native result is the next dependency.
 
 Published1014b72e/source34a90930 verified canonical remote/same draft PR68/base/
 title/draft/main/original history. All six Actions gates38926258007 pass; unit

@@ -12,6 +12,13 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+Source commit4fea16072eb76ffc292a28cb6a9dc549012787c0 is prepared. Parent40fd9aee
+now passes all six Actions in38932061829, including unit117078254223, so the
+publication hold is cleared without cancelling it. Publish existing source plus
+this evidence in same draft PR68; then read its own actual native cohorts/cleanup
+and required exact-head checks. Do not reimplement/rerun unchanged121 local tests
+or inherit parent passes. No migration/grant/app connection/deployment/main change.
+
 Next dependency source prepared: additive Docker-free native PG17 draft-line
 phase preserves original expense transport/cleanup/ten markers and requires
 eight new ordered cohorts before success. Final local121/121 nine suites54.782s,
@@ -21,14 +28,14 @@ No app/migration/grant/hosted/Buddy change/deploy. Preserve running parent unit
 before publication in same PR68. Next read actual new native cohorts/cleanup,
 then authority/catalog/all-writer/durable/API/recovery gates before connection.
 Evidence: [native draft-line rehearsal](evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md).
-Parent40fd9aee five Actions pass; unit remains running at latest readback.
+Parent40fd9aee all six Actions now pass by completion-status read. Its previously
+unavailable unit log remains unread; no fresh count/runtime claim is invented.
 Hosting and QA stops remain unchanged; do not retry them or re-ask nominations.
 Parent unit log117078254223 retrieval returned HTTP502 twice (initial + one
-allowed retry); that log-read action is STOPPED until changed provider/job
-evidence. Non-log status still reports in_progress. Commit the verified source
-locally, but hold push so it cannot cancel the running parent. Resume by checking
-completion status, then publish this existing slice; do not recreate it or repeat
-121 tests unchanged. No CLI/dashboard log fallback or invented parent unit count.
+allowed retry); that unchanged log-read action was STOPPED. Completion status is
+new evidence and clears the publication dependency; no parent log retry is needed.
+New-source native log acceptance is separate and still required. No CLI/dashboard
+log fallback or invented parent unit count. Hosting/QA stops remain unchanged.
 
 - Integrated source: `34a9093045543526b6e3d6ee1450353f0eda3373`; published
   candidate: `1014b72e5deaa63aca0904ff3c90c4cb12a9e055`, branch
@@ -99,7 +106,7 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
 | Authenticated CRM browser acceptance | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                    | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
 | Cloudflare build remediation         | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried. | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
 | Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                    | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
-| Parent40fd9aee unit log retrieval    | Job117078254223 returned HTTP502 on initial read and one allowed retry. STOPPED; no alternative budget remains for unchanged log reads. Status-only reports still show in_progress.                                  | Changed provider/job evidence, not another identical log request or CLI/dashboard fallback. Hold source push until completion status avoids cancelling parent.                            |
+| Parent40fd9aee unit log retrieval    | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                    | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
 
 ## One scope and dependency board
 
