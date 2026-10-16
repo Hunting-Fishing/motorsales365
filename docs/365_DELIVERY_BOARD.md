@@ -12,7 +12,37 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current independent slice: accessible Add job line controls (C3/U6).**
+While the existing Auth source/QA/hosting actions remain stopped, six controls in
+the existing work-order dialog now have explicit visible-label associations using
+one stable React useId prefix. Two actual-route DOM regressions are appended;
+all previous tests, state/payloads/guards/handlers and other dialogs are preserved.
+Root focused three-suite validation passes154/154 in41.68s; changed-file ESLint
+has0 errors/15 unchanged legacy warnings; independent review, normal full
+TypeScript and nine-file format/diff pass. Same draft PR68/commit subject
+`Associate native job-line fields with accessible labels`; exact source/publication
+will be in its evidence comment, new-head CI remains separate. No financial,
+authority, device or whole-CRM acceptance is inferred. This implementation joins
+the retained provenance read-back notes, not a planning-only PR or repeated run.
+[Exact scope and validation](evidence/SHOP_MANAGER_JOB_LINE_LABELS.md).
+
 **Current slice: provider migration-version provenance after native21 success.**
+Published source42d97b31c04ab278895738c94d6340beb798fea3 /
+publication0ee7a2261728cdce88164e870c80937786eeb0f6 is verified on the canonical
+branch/same draft PR68/comment6224248921; exact body/title/base/draft/main preserved.
+All six own Actions38963656014 now pass at exact0ee7a226, not inherited.
+Actual completed unit117184665375 reports5,032/96 files102.10s, zero unexpected/
+quarantined failures (returned log truncated, final summaries present).
+Actual new-head native log is untruncated, PG17.11/Parts247/quote6/all21 exact
+ordered expense markers/terminators/cleanup pass; selected58/67/203ms not full/RTO.
+Actual build final214media/15OCR/202PDF/server-boundary/canonical Worker+365/dry-run
+guards pass (truncated/final summaries). COMPLETE CI merge013594f598aee71fe0e7c354b41f6adce6326e39
+equals current candidate treef0a2db63749ee93c674d6d8d6aa5bb1c8983e8a1:2,591 current
+objects/zero missing, not historical recovery. Existing follow-up updated/read back
+in place; exact prompt/identity/active30min/thread/creation preserved, no duplicate.
+New Workers117184717632 failure cause unverified, existing hosting STOP unchanged.
+These read-back notes join the next implementation slice, no docs-only CI restart.
+
 Recovery source49008932/publication28295c1001f7e8a3280a12ab6569588bc435bfee is
 verified same canonical branch/draft PR68/comment6223834920, exact body/title/
 base/draft/main preserved. Actual own native117174018706/run38960489710 passes
@@ -37,14 +67,13 @@ RLS-active/C-byte refusal prevents partial-reader metadata certification. Final
 local19/19 three-suite model/capture/privacy/wiring gate passes in2.1727946s after
 one reviewed parsed-YAML mandatory-step guard correction; no unchanged
 23/111/app suite. Existing baseline manifest/pins/flags remain unchanged.
-Source42d97b31c04ab278895738c94d6340beb798fea3 is locally committed;282 completed
-unit status now clears publication hold without cancellation. Publish it once
-with these evidence notes in the same PR68; new-head required checks are separate.
+Source42d97b31c04ab278895738c94d6340beb798fea3 was published once after282 completed
+unit status cleared publication hold without cancellation. New-head checks remain separate.
 Unit log117174018596 returned HTTP502 initially and after ONE same-tool retry;
 that log read is STOPPED. Completion status can clear the hold without inventing
-count/runtime or retrying the log; no CLI/dashboard fallback. Record fresh status.
+count/runtime or retrying the log; that completed status is verified. No fallback.
 Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
-exact source/publication will be in its evidence comment.
+exact source/publication is in comment6224248921.
 [Exact observation, native proof and limits](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
 
 Next published-head required checks, immutable upstream/bootstrap/body mapping of82
@@ -400,9 +429,15 @@ Native recovery attempt20dd failed; alternative1 is consumed and PASSES actual
 stop or confirmed original cause. If the same source-stop failure recurs, STOP
 without a second guessed repair and require new sanitized substage/config/access
 evidence or owner direction. Separate native authority/full recovery gates remain.
-Upstream Auth directory/API listing research exhausted its initial+one safe
-alternative and that fetch path is stopped; individually available primary raw
-files are not complete repository recovery. Do not repeat that unchanged path.
+Upstream Auth directory/commit enumeration through web tool exhausted its initial
+GitHub tree paths (Internal Error, no HTTP status) plus ONE API contents/commits
+alternative (URL not accessible via this tool). That action is STOPPED; no connector
+switch/unchanged retry. Individually available primary raw files are not complete
+immutable inventory. Owner notified once and asked to authorize direct official
+supabase/auth Git checkout as changed route, or supply approved immutable commit/
+release and official source archive/integrity evidence. No credentials needed.
+Native Auth mapping/rehearsal depends on that inventory; other app work continues,
+22 October risk retained. Await new direction before another recovery mechanism.
 
 ## One scope and dependency board
 

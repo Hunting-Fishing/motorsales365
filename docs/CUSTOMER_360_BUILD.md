@@ -2,6 +2,17 @@
 
 ## Current delivery authority (17 October 2026)
 
+Independent Add job line accessibility source now binds six visible labels and
+controls using stable IDs; root154/154 three suites41.68s and independent review
+pass, all prior business/privacy/lifetime logic preserved. Normal full TypeScript,
+format/diff and lint0 errors/15 retained warnings pass. Same PR68/commit subject
+`Associate native job-line fields with accessible labels`, own-head CI separate.
+This is not real-role/device/financial or full
+CRM acceptance. Parent0ee7a226 all six Actions pass; actual unit5,032/96 files
+102.10s (truncated/final summaries), zero unexpected/quarantined failures.
+`evidence/SHOP_MANAGER_JOB_LINE_LABELS.md`; current board remains authority,
+Auth source enumeration/QA/hosting stops and22 October risk remain unchanged.
+
 Parent19fd2a7e Auth catalog prerequisite now passes all six Actions; actual unit
 5,008/95 files101.25s (truncated/final summaries), zero unexpected/quarantined
 failures. Independent N3 proposed365 request/offer codec passes24/24/full normal

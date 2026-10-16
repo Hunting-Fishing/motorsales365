@@ -2,6 +2,17 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Independent C3/U6 Add job line label fix has154/154 focused three-suite checks
+in41.68s and clear review, preserving all previous behavior/guards. Normal full
+TypeScript/nine-file format/diff/lint0 errors15 retained warnings pass; same PR68/
+commit subject `Associate native job-line fields with accessible labels`, own-head
+CI separate; no whole-UI/device/financial acceptance.
+Parent0ee7a226 all six Actions pass, actual unit5,032/96 files102.10s with zero
+unexpected/quarantined failures (truncated/final summaries). Existing Auth source
+enumeration/QA/hosting stops await new direction/access, not retried. Evidence:
+`evidence/SHOP_MANAGER_JOB_LINE_LABELS.md`; all18+N1–N3/47/12/5/2 and22 October
+risk remain. Current sequence belongs to the delivery board.
+
 Parent19fd2a7e now passes all six Actions, actual5,008/95 files101.25s, zero
 unexpected/quarantined failures (truncated/final summaries). Independent N3
 proposed365 request/offer codec passes24/24/full TypeScript/CI wiring/review;

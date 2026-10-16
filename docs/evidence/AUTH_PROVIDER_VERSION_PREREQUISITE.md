@@ -97,9 +97,22 @@ retry at2026-10-16T20:34UTC. That read is STOPPED, owner notified once; no CLI/
 dashboard fallback. Later completed exact-head status may clear publication hold
 without a fresh count/runtime or unchanged log retry; that completed success
 status is now observed. New-head CI stays separate. Implemented source
-42d97b31c04ab278895738c94d6340beb798fea3 is committed, clean; publish it with these
-verification notes once in same draft PR68. Exact publication will be in the PR
-evidence comment. No docs-only CI cancellation or separate planning PR.
+42d97b31c04ab278895738c94d6340beb798fea3 is published once at
+0ee7a2261728cdce88164e870c80937786eeb0f6/same draft PR68/comment6224248921.
+Exact remote/body/title/base/draft/main read-back preserved; all six own Actions
+38963656014 pass at exact0ee7a226, not inherited. Actual completed unit117184665375
+reports5,032/96 files102.10s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native117184664999 log is untruncated: PG17.11/Parts247/quote6/all21 exact
+ordered expense/draft/Auth-user markers, both terminators and EXIT/always-cleanup.
+Root compared full vector to strict shell list. Selected recovery58/67/203ms is
+not full/RTO,47 failures remain; new source does not establish native authority.
+Actual build117184665582 final214media/15OCR/202PDF/server-boundary/Worker+sole365/
+dry-run summaries pass (returned log truncated). Fetched COMPLETE CI merge
+013594f598aee71fe0e7c354b41f6adce6326e39 equals the candidate current tree
+f0a2db63749ee93c674d6d8d6aa5bb1c8983e8a1:2,591 objects/zero missing, not history
+recovery. Existing follow-up updated/read back in place: exact prompt and original
+identity/active30min/thread/creation preserved, no duplicate. These post-publication notes join
+the next implementation slice, no docs-only CI cancellation or planning PR.
 
 Primary source supports a later native standalone Auth binary against external
 Postgres: [Makefile](https://github.com/supabase/auth/blob/master/Makefile),
@@ -107,10 +120,16 @@ Postgres: [Makefile](https://github.com/supabase/auth/blob/master/Makefile),
 [migration command](https://github.com/supabase/auth/blob/master/cmd/migrate_cmd.go),
 [startup command](https://github.com/supabase/auth/blob/master/cmd/root_cmd.go).
 These floating references are research, not an immutable accepted build pin.
-One direct upstream directory/API listing path failed after an initial attempt
-and one safe alternative during read-only research; that path is stopped. Do not
-repeat it or claim repository/source recovery from the individually available
-raw primary files. No build, install or downloaded code execution occurred.
+Upstream directory/commit enumeration through the web tool returned Internal Error
+for GitHub tree paths, without HTTP status. ONE API contents/commits alternative
+returned URL not accessible via this tool. That action is STOPPED, not all source
+recovery declared impossible. Do not retry or switch connectors unchanged. Owner
+notified once; direct official supabase/auth Git checkout as a changed recovery
+route, or an approved immutable commit/release plus accessible official source
+archive/integrity evidence is requested. No credentials needed. Mapping and the
+pinned native Auth rehearsal depend on it; unrelated application work can proceed.
+Individual raw primary files are not complete immutable inventory. No build,
+install or downloaded code execution occurred.
 The [actual legacy migration](https://github.com/supabase/auth/blob/master/migrations/00_init_auth_schema.up.sql)
 uses the `00` filename prefix. The
 [Pop migration runner](https://github.com/gobuffalo/pop/blob/v6.1.1/migrator.go)

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Loader2,
@@ -869,6 +869,7 @@ function AddJobLineDialog({
   assertCanWrite,
   onWritten,
 }: EditorScope & { nextOrder: number }) {
+  const fieldId = useId();
   const qc = useQueryClient();
   const isMounted = useActiveScope();
   const isCurrent = () => isMounted() && isScopeCurrent();
@@ -931,8 +932,9 @@ function AddJobLineDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Job name *</Label>
+            <Label htmlFor={`${fieldId}-name`}>Job name *</Label>
             <Input
+              id={`${fieldId}-name`}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Oil change"
@@ -940,12 +942,17 @@ function AddJobLineDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Category</Label>
-              <Input value={category} onChange={(e) => setCategory(e.target.value)} />
+              <Label htmlFor={`${fieldId}-category`}>Category</Label>
+              <Input
+                id={`${fieldId}-category`}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Est. hours</Label>
+              <Label htmlFor={`${fieldId}-hours`}>Est. hours</Label>
               <Input
+                id={`${fieldId}-hours`}
                 type="number"
                 step="0.25"
                 value={hours}
@@ -955,8 +962,9 @@ function AddJobLineDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Labor rate ₱/hr</Label>
+              <Label htmlFor={`${fieldId}-rate`}>Labor rate ₱/hr</Label>
               <Input
+                id={`${fieldId}-rate`}
                 type="number"
                 step="0.01"
                 value={rate}
@@ -964,13 +972,17 @@ function AddJobLineDialog({
               />
             </div>
             <div>
-              <Label>Total ₱</Label>
-              <Input value={total ? total.toLocaleString() : ""} readOnly />
+              <Label htmlFor={`${fieldId}-total`}>Total ₱</Label>
+              <Input id={`${fieldId}-total`} value={total ? total.toLocaleString() : ""} readOnly />
             </div>
           </div>
           <div>
-            <Label>Description</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Label htmlFor={`${fieldId}-description`}>Description</Label>
+            <Textarea
+              id={`${fieldId}-description`}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
         </div>
         <DialogFooter>

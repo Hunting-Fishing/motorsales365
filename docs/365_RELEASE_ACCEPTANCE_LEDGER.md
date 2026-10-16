@@ -10,6 +10,18 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Independent C3/U6 source fix associates all six Add job line controls with visible
+labels/stable useId suffixes. Two appended actual-route DOM tests plus retained
+quote/work-order list/detail checks pass154/154 in41.68s. No existing tests or
+state/payload/handlers/guards/private lifetimes/other dialogs changed. ESLint0
+errors/15 retained legacy warnings, independent review/full normal TypeScript/
+nine-file format/diff clear; publication/new-head CI separate. Same PR68/commit
+subject `Associate native job-line fields with accessible labels`; exact hash in
+evidence comment. Source-level accessibility only, not financial/
+native authority/device/owner/live acceptance or a completed C3/U6 workflow.
+Migration/deployment impact none; all scope/stops retained.
+[Exact evidence](evidence/SHOP_MANAGER_JOB_LINE_LABELS.md).
+
 Actual28295c10 native117174018706/run38960489710 passes untruncated PG17.11/
 Parts247/quote6/selected recovery/all21 ordered expense/draft/Auth-user proofs/
 terminators/cleanup, not parent/model-inferred. Alternative1 consumed and selected
@@ -26,8 +38,16 @@ pinned, all service/body/baseline/authority/release flags false. Final19/19 thre
 suite model/capture/privacy/wiring passes in2.1727946s after parsed-YAML mandatory-
 step correction; mandatory serialized offline CI gate,
 normal limits/adversarial/transaction coverage preserved. Source42d97b31c04ab278895738c94d6340beb798fea3
-committed; completed282 unit status clears publication hold, same PR68/commit subject `Capture bounded Auth provider
-migration-version provenance`; exact commit in evidence comment. Unit log
+published at0ee7a2261728cdce88164e870c80937786eeb0f6/same PR68/comment6224248921,
+exact body/title/base/draft/main preserved. Completed282 unit cleared hold;
+all six own Actions38963656014 now pass at exact0ee7a226. Actual unit117184665375
+reports5,032/96 files102.10s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native117184664999 untruncated PG17.11/Parts247/quote6/all21 exact ordered
+markers/terminators/cleanup passes, selected58/67/203ms not full/RTO; current
+build guards/complete current CI tree2,591/zero missing verified, not history.
+Existing follow-up exact prompt/identity/schedule/thread/creation read-back passes.
+These read-back notes join
+next implementation without docs-only CI restart. Unit log
 117174018596 initial+ONE same-tool retry HTTP502: retrieval STOPPED/owner notified
 once, no unchanged read/fallback. Completed exact-head status can clear hold
 without fresh count/runtime. Next immutable

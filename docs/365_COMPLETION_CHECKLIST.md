@@ -42,6 +42,16 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Independent C3/U6 Add job line label fix now associates six controls with stable
+React IDs; two appended real-route DOM regressions preserve all prior tests and
+business/lifetime logic. Root154/154 three suites41.68s, lint0 errors/15 retained
+legacy warnings, independent review, full normal TypeScript and nine-file format/
+diff pass; own-head CI pending. Same PR68/commit subject `Associate native job-line
+fields with accessible labels`, exact publication in evidence comment. No backend/
+migration/permissions/live activation. Join retained
+provenance notes in same PR68; no unchanged capture/app suite or stopped-action retry.
+[Exact bounded accessibility evidence](evidence/SHOP_MANAGER_JOB_LINE_LABELS.md).
+
 Current provider-version source prerequisite follows actual28295c10 native21
 success: untruncated job117174018706/run38960489710 proves PG17.11/Parts247/quote6/
 selected recovery/all21 ordered markers/terminators/cleanup. Alternative1 consumed
@@ -57,8 +67,16 @@ body/baseline/authority/release flags false. Local19/19 three-suite gate passes
 in2.1727946s after reviewed parsed-YAML mandatory-step correction;
 mandatory serialized non-quarantined CI added, no limits/coverage relaxation.
 Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
-Source42d97b31c04ab278895738c94d6340beb798fea3 committed; completed282 unit status
-clears publication hold, same PR68/new-head checks separate; exact publication in PR comment.
+Source42d97b31c04ab278895738c94d6340beb798fea3 is published at
+0ee7a2261728cdce88164e870c80937786eeb0f6/same PR68/comment6224248921, exact body/
+title/base/draft/main preserved. Completed282 unit cleared hold without cancellation.
+All six own Actions38963656014 now pass at exact0ee7a226. Actual unit117184665375
+reports5,032/96 files102.10s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native117184664999 untruncated PG17.11/Parts247/quote6/all21 exact ordered
+markers/terminators/cleanup pass; selected58/67/203ms not full/RTO. Current build
+guards and COMPLETE current CI tree closure2,591/zero missing verified separately.
+Existing follow-up exact prompt/identity/schedule/thread/creation read-back passes.
+These notes join next implementation; no docs-only CI cancellation or inherited pass.
 Unit log117174018596 initial+ONE same-tool retry returned HTTP502; retrieval
 STOPPED/owner notified once. Completion status may clear hold without log count/
 runtime claim; no unchanged log retry/CLI/dashboard fallback.
