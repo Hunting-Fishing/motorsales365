@@ -197,6 +197,9 @@ jobs:
       - name: Native quote and work-order creation callers (never quarantined)
         run: npx vitest run src/components/shop-manager/quote-create.test.tsx src/components/shop-manager/work-order-create.test.tsx --maxWorkers=1
 
+      - name: Locked atomic quote candidate (offline SQL, synthetic roles, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/native-quote-create-transaction.test.mjs
+
       - name: Independent Workers build source freeze (offline, never quarantined)
         run: node --test scripts/ci/independent-workers-build.test.mjs
 
