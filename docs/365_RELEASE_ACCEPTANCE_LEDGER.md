@@ -10,6 +10,26 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Published20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
+draft PR68/comment6223011064 with exact prior body/title/base/draft/main preserved.
+Build/type/OCR/lint pass, unit117153435216 running; no cancelling follow-up push.
+Native117153435094 FAILS existing recovery source-stop verification before new
+expense21 execution. Actual untruncated PG17.11 log proves Parts247/quote6 only,
+not recovery or new expense acceptance. One log/source diagnosis cannot identify
+exact failing subcheck; immediate PID disappearance race remains hypothetical.
+ONE conservative max2s actual verified-PID exit wait selected; no signals, zombie
+exemption or final check relaxation. Fresh Linux trial not executed; finish20dd
+unit before publishing source. If alternative fails STOP recovery/expense action
+and notify once, no second speculative repair/retry. This red gate further
+threatens Day2/22 October; all other scope/release/QA/hosting limits unchanged.
+The one selected recovery alternative now passes local23/23 in2.6393822s plus
+syntax/nonCI/lint/format/diff/independent review. Initial21/23 test-construction
+failure received ONE test-only correction; source helper unchanged, original
+whole-shell reconstruction exact. This is not native/process/restore acceptance.
+Fresh Linux alternative still unexecuted; finish20dd unit, publish source once,
+then accept actual result or STOP on failure. No repeated111/app validation.
+[Exact one-alternative evidence](evidence/RECOVERY_PID_EXIT_ALTERNATIVE.md).
+
 Private/unapplied receipt-expense Auth-user KEY SHARE now precedes outcome and
 business locks; missing42501 prevents posting. SQLSHAeec735a6…; no Auth grants,
 definer/admin fallback, app connection or hosted changes. Four new synthetic

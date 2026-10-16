@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 
 const scriptUrl = new URL("./run-native-recovery-postgres.sh", import.meta.url);
 const scriptPath = fileURLToPath(scriptUrl);
@@ -180,6 +181,143 @@ test("source-offline proof checks PID socket listener and matching process absen
   const restore = source.lastIndexOf('run_phase --restore "$recovery_manifest_sha"');
   assert.ok(prepare < stop && stop < offline && offline < restore);
 });
+
+test("bounded PID wait is the only shutdown change and retains actual directory absence plus all final checks", () => {
+  const start = at("postmaster_pid_absent() {");
+  const end = at("stop_cluster() {");
+  const helpers = source.slice(start, end);
+  assert.match(helpers, /\[\[ ! -d "\/proc\/\$verified_pid" \]\]/);
+  assert.match(helpers, /for attempt in \{1\.\.20\}; do/);
+  assert.match(helpers, /sleep 0\.1/);
+  assert.match(helpers, /postmaster_pid_wait_cadence \|\| return 1/);
+  const helperCode = helpers
+    .split("\n")
+    .filter((line) => !line.trimStart().startsWith("#"))
+    .join("\n");
+  assert.doesNotMatch(helperCode, /\bkill\b|killall|pkill|pg_ctl|readlink|\/stat|\brm\b/);
+  const stop = source.slice(end, at("recovery_phase_pid="));
+  assert.ok(stop.indexOf('validate_postmaster "$cluster" "$port"') < stop.indexOf("-m fast"));
+  assert.ok(
+    stop.indexOf("-m immediate") < stop.indexOf('wait_verified_pid_absent "$verified_pid"'),
+  );
+  assert.ok(
+    stop.indexOf('wait_verified_pid_absent "$verified_pid"') <
+      stop.indexOf('postmaster_absent "$cluster" "$port"'),
+  );
+  const withoutHelpers = source.slice(0, start) + source.slice(end);
+  const original = withoutHelpers.replace(
+    '    wait_verified_pid_absent "$verified_pid" || return 1\n',
+    '    [[ ! -d "/proc/$verified_pid" ]] || return 1\n',
+  );
+  assert.notEqual(original, withoutHelpers, "the single replacement is actually present");
+  assert.equal(
+    createHash("sha256").update(original).digest("hex"),
+    "57a5e3f8c20080990d2d836aee108c2924d8135e400cc8855a39e4415b0a1d24",
+    "all original identity/stop escalation/socket/listener/cleanup/timeouts remain byte-identical",
+  );
+});
+
+function runPidAbsencePoll({
+  pid = "12345",
+  presentChecks = 0,
+  cadenceFailure = 0,
+  missingArgument = false,
+} = {}) {
+  // Definitions only. Replace both OS-touching callbacks before invoking the
+  // actual poll: no /proc reads, sleep, PostgreSQL, files, network or wrapper.
+  const definitions = source.slice(at("postmaster_pid_absent() {"), at("stop_cluster() {"));
+  // Fixed hex DATA preserves malformed newlines through Windows native argv;
+  // only numeric callback controls are passed as shell arguments.
+  const pidLiteral = `$'${[...Buffer.from(pid, "utf8")]
+    .map((byte) => `\\x${byte.toString(16).padStart(2, "0")}`)
+    .join("")}'`;
+  const invocation = missingArgument
+    ? "wait_verified_pid_absent"
+    : 'wait_verified_pid_absent "$expected_pid"';
+  return spawnSync(
+    bash,
+    [
+      "--noprofile",
+      "--norc",
+      "-c",
+      `${definitions}
+predicate_calls=0
+cadence_calls=0
+present_checks=$1
+cadence_failure=$2
+postmaster_pid_absent() {
+  predicate_calls=$((predicate_calls + 1))
+  [[ "$1" == "$expected_pid" ]] || return 1
+  [[ $predicate_calls -gt $present_checks ]]
+}
+postmaster_pid_wait_cadence() {
+  cadence_calls=$((cadence_calls + 1))
+  [[ $cadence_calls != $cadence_failure ]]
+}
+expected_pid=${pidLiteral}
+status=0
+${invocation} || status=$?
+printf '%s:%s:%s\\n' "$status" "$predicate_calls" "$cadence_calls"
+`,
+      "isolated-pid-poll",
+      String(presentChecks),
+      String(cadenceFailure),
+    ],
+    {
+      env: refusalEnvironment,
+      encoding: "utf8",
+      timeout: 5000,
+      maxBuffer: 8192,
+    },
+  );
+}
+function assertPoll(result, expected) {
+  assert.equal(result.error, undefined);
+  assert.equal(result.status, 0);
+  assert.equal(result.stderr, "");
+  assert.equal(result.stdout, `${expected}\n`);
+}
+
+test(
+  "actual isolated Bash poll returns immediately for an already absent PID without cadence",
+  { skip: !bash },
+  () => {
+    assertPoll(runPidAbsencePoll(), "0:1:0");
+  },
+);
+test(
+  "actual isolated Bash poll waits only until its real predicate is satisfied within the bound",
+  { skip: !bash },
+  () => {
+    assertPoll(runPidAbsencePoll({ presentChecks: 3 }), "0:4:3");
+    assertPoll(runPidAbsencePoll({ presentChecks: 20 }), "0:21:20");
+  },
+);
+test(
+  "actual isolated Bash poll refuses persistent PID presence at exactly twenty cadences",
+  { skip: !bash },
+  () => {
+    assertPoll(runPidAbsencePoll({ presentChecks: 21 }), "1:21:20");
+    assertPoll(runPidAbsencePoll({ presentChecks: 1000 }), "1:21:20");
+  },
+);
+test(
+  "actual isolated Bash poll refuses malformed or absent PID input before predicate or cadence",
+  { skip: !bash },
+  () => {
+    for (const pid of ["", "0", "01", "-1", "+1", "1.0", "12345678901", "1\n2", "../12345", "NaN"])
+      assertPoll(runPidAbsencePoll({ pid }), "1:0:0");
+    assertPoll(runPidAbsencePoll({ missingArgument: true }), "1:0:0");
+  },
+);
+test(
+  "actual isolated Bash poll refuses failed cadence immediately without a later predicate",
+  { skip: !bash },
+  () => {
+    assertPoll(runPidAbsencePoll({ presentChecks: 100, cadenceFailure: 1 }), "1:1:1");
+    assertPoll(runPidAbsencePoll({ presentChecks: 100, cadenceFailure: 4 }), "1:4:4");
+  },
+);
 
 test("manifest pin stays in shell-local state between prepare and source stop/restore, never a mutable sidecar", () => {
   assert.match(source, /captured=\$\(head -c 66.*printf '\.'/);

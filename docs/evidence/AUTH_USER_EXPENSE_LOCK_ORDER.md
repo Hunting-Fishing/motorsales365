@@ -11,6 +11,26 @@ all six Actions before publication: actual unit117142431397 reports5,032/96 file
 101.60s, zero unexpected/quarantined failures (truncated log/final summaries).
 No running unit cancellation or inherited new-head/native21 result.
 
+Publication20dd5a3eb90c0608e24007289b5b07351faec48f is verified in same draft PR68/
+[comment6223011064](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6223011064),
+prior exact body/title/non-main base/draft/main preserved. Own build/type/OCR/lint
+pass; unit117153435216 still running. Actual untruncated native117153435094 FAILS
+at existing recovery `source stop could not be verified`, after PG17.11/Parts247/
+quote6 and BEFORE the new expense step. Thus expense21 was never executed and
+current recovery is not accepted. One permitted log/source diagnosis found a
+coarse marker, not a confirmed failing subcheck. ONE conservative alternative
+selected: bounded actual already-verified PID-directory disappearance wait, no
+signals/zombie exemption/relaxed final absence checks. Its fresh Linux trial is
+pending parent20dd unit completion and reviewed source publication. If it fails,
+STOP that action, notify once and require new evidence; no second speculative fix.
+Existing automation updated/readback in place, unchanged identity/schedule/thread/
+creation. These notes join corrective source, not a docs-only unit cancellation.
+Actual build117153435215 log is truncated but final214 tracked assets/15OCR/202PDF/
+server-boundary/dry-run guards exist. COMPLETE CI merge17cc575c60834b3cd611c0027aa947d5663f32fa
+equals candidate whole current treebdd75c377f093eb0d07e128dd893c904c49e2b8a;
+2,587 current objects/zero missing, not complete repository-history recovery.
+Build/artifact success does not supersede the failed recovery or unexecuted21.
+
 ## Implemented boundary
 
 After complete immutable intent validation, `create_operation` locks the exact

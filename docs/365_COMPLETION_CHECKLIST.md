@@ -42,6 +42,26 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Publication20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
+draft PR68/comment6223011064, exact body/title/base/draft/main preserved. Own build/
+type/OCR/lint pass; unit117153435216 running, no follow-up push cancellation.
+Native117153435094 fails existing recovery source-stop verification BEFORE new
+expense21 execution; actual untruncated log has PG17.11/Parts247/quote6 pass only.
+One log/source diagnosis; precise failing subcheck/root cause unverified. ONE
+conservative max2s wait for actual verified PID disappearance selected, no signals/
+zombie exemption/final check relaxation. Trial not yet executed; parent20dd unit
+must complete before publication. If that one fresh Linux alternative fails STOP
+recovery/expense acceptance and notify, no second speculative repair. Existing
+hosting/QA stops unchanged; this increases Day2 receipt/recovery schedule risk.
+No DB/Auth row/grant/app/main/deploy/Buddy/366 change. Exact resume in board.
+Selected recovery alternative locally validates23/23 in2.6393822s, syntax/nonCI/
+lint/format/diff/independent review pass; initial21/23 test-only construction
+failure received ONE narrow correction, production helper unchanged. Original
+entire shell reconstructed exactly after removing only PID poll helpers/one
+call site. Fresh Linux alternative not executed; publish once only after20dd
+unit completion. No unchanged111/app suite rerun. If native alternative fails,
+STOP and notify; [exact quota/evidence](evidence/RECOVERY_PID_EXIT_ALTERNATIVE.md).
+
 Private receipt-expense Auth-user ordering source is implemented: exact expected
 user KEY SHARE before outcome/business locks, missing42501 before posting. SQL
 eec735a6… stays private/unapplied, no Auth grant/definer/fallback/app activation.

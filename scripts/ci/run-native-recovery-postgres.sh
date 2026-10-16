@@ -90,6 +90,27 @@ postmaster_absent() {
   quiet_native 7s "$recovery_bin/pg_isready" -h "$cluster/socket" -p "$port" -U postgres -d postgres -t 5 || ready_status=$?
   [[ $ready_status == 2 ]]
 }
+postmaster_pid_absent() {
+  local verified_pid=${1:-}
+  [[ $# == 1 && "$verified_pid" =~ ^[1-9][0-9]{0,9}$ ]] || return 1
+  [[ ! -d "/proc/$verified_pid" ]]
+}
+postmaster_pid_wait_cadence() {
+  sleep 0.1
+}
+wait_verified_pid_absent() {
+  local verified_pid=${1:-} attempt
+  [[ $# == 1 && "$verified_pid" =~ ^[1-9][0-9]{0,9}$ ]] || return 1
+  postmaster_pid_absent "$verified_pid" && return 0
+  # One bounded shutdown hardening alternative, not a diagnosed CI root cause.
+  # Actual directory disappearance only: no signals, zombie exemption or weaker
+  # executable/status test. Persistent/reused PID or cadence failure refuses.
+  for attempt in {1..20}; do
+    postmaster_pid_wait_cadence || return 1
+    postmaster_pid_absent "$verified_pid" && return 0
+  done
+  return 1
+}
 stop_cluster() {
   local cluster=$1 port=$2 stop_status=0 verified_pid
   validate_root "$recovery_root" || return 1
@@ -102,7 +123,7 @@ stop_cluster() {
       [[ "$recovery_verified_pid" == "$verified_pid" ]] || return 1
       quiet_native 15s "$recovery_bin/pg_ctl" -D "$cluster/data" -m immediate -w -t 10 stop || return 1
     fi
-    [[ ! -d "/proc/$verified_pid" ]] || return 1
+    wait_verified_pid_absent "$verified_pid" || return 1
   fi
   postmaster_absent "$cluster" "$port"
 }

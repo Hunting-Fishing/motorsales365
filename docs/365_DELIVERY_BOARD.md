@@ -13,6 +13,34 @@ any acceptance criterion or silently remove scope.
 ## Current verified position and feasibility
 
 **Current slice: private receipt-expense Auth-user deletion/FK ordering.**
+Published20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified on
+canonical branch/same draft PR68/comment6223011064; exact body/title/base/draft/
+main preserved. Own38954382460 build/type/OCR/lint pass; unit117153435216 is
+running and must not be cancelled by a follow-up push. Native117153435094 FAILS
+before the new expense step: actual untruncated PG17.11 log has Parts247/six quote
+groups pass, then `source stop could not be verified` in existing recovery.
+Expense21 did NOT execute; no native acceptance/complete recovery is claimed.
+One permitted log/source diagnosis found only a coarse failure marker. Immediate
+verified-PID disappearance could race; that cause is unconfirmed. ONE conservative
+alternative is selected: bounded max2s wait for actual already-verified PID
+directory absence, no zombie exemption/signals, retaining all final checks and
+timeouts. Fresh Linux alternative trial is NOT yet executed; reserve one only,
+after parent20dd unit completion. If it fails, STOP recovery/expense acceptance,
+notify once with exact evidence and require new sanitized substage/access/config
+evidence; no second speculative repair or unchanged rerun. Other lanes continue.
+This red native gate further threatens Day2 receipt/recovery progress;22 October
+is still at risk, not a forecast. New Workers79aaef58 failure cause unverified;
+existing hosting STOP unchanged. Existing automation updated/readback in place,
+identity/active30min/thread/creation preserved; no duplicate. Follow-up evidence
+joins the corrective implementation, no docs-only restart.
+The selected recovery alternative is now locally validated23/23 in2.6393822s,
+zero fail/skip/cancel; syntax/nonCI refusal/lint/format/diff/independent review
+pass. Initial21/23 test-construction failures received ONE test-only correction,
+production helper unchanged. Complete original shell SHA reconstruction proves
+only the bounded PID observation changed. Fresh native trial remains unexecuted;
+hold publication until20dd unit completes. No unchanged111/24/1231/121 rerun.
+[One-alternative register and exact evidence](evidence/RECOVERY_PID_EXIT_ALTERNATIVE.md).
+
 Source adds exact Auth-user KEY SHARE after immutable intent validation and before
 outcome/receipt/native/financial locks; missing user fails42501 before posting.
 CandidateSHAeec735a6… stays INVOKER/private/unapplied, client/service grants withheld.
@@ -284,12 +312,13 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
    transaction coverage and normal timeouts/quarantine. No Docker, paid resources,
    customer outreach, destructive repair or unreviewed production experiments.
 
-| Stopped/dependent action             | Observed result / alternate budget                                                                                                                                                                                   | Resume condition                                                                                                                                                                          |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authenticated CRM browser acceptance | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                    | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
-| Cloudflare build remediation         | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried. | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
-| Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                    | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
-| Parent40fd9aee unit log retrieval    | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                    | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
+| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                            | Resume condition                                                                                                                                                                                                       |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Native recovery → expense21 acceptance | First20dd failure117153435094: coarse source-stop refusal after Parts247/quote6; expense not executed. Diagnosis once; exactly ONE bounded actual verified-PID-exit alternative selected, not yet trialled. No old-job retry. | Finish20dd unit without cancellation, publish reviewed source alternative once, read its fresh Linux result. If failure persists STOP and notify once; no second repair/retry without new evidence or owner direction. |
+| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                             | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                                                     |
+| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.          | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch.                              |
+| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                             | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                                                          |
+| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                             | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                                                         |
 
 ## One scope and dependency board
 
