@@ -195,7 +195,7 @@ function AuthenticatedVehicleReceiptPanel({
     setOpeningReceiptId(id);
     const current = () => scope.active && scope.lifetime === lifetime && scope.attempt === attempt;
     try {
-      const url = await signFn({ data: { id } });
+      const url = await signFn({ data: { id, expectedAccountId: userId } });
       if (!current()) return;
       window.open(url, "_blank", "noopener,noreferrer");
     } catch {

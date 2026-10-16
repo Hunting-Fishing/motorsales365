@@ -4,6 +4,14 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
+  privateReceiptUrlRequestSchema,
+  PRIVATE_RECEIPT_URL_FAILURE,
+  PRIVATE_RECEIPT_SIGN_TTL_SECONDS,
+  parsePrivateReceiptPathResponse,
+  parsePrivateReceiptSigningResponse,
+  waitForPrivateReceiptSigning,
+} from "./private-receipt-url.server";
+import {
   readReceiptRequestSchema,
   readLinkRequestSchema,
   RECEIPT_PAGE_SIZE,
@@ -36,6 +44,7 @@ type ReceiptReadBuilder = PromiseLike<ReceiptReadResponse> & {
   range(from: number, to: number): ReceiptReadBuilder;
   limit(count: number): ReceiptReadBuilder;
   maybeSingle(): ReceiptReadBuilder;
+  single(): ReceiptReadBuilder;
   abortSignal(signal: AbortSignal): ReceiptReadBuilder;
   retry(enabled: false): ReceiptReadBuilder;
 };
@@ -310,18 +319,59 @@ export const discardReceiptDraft = createServerFn({ method: "POST" })
   });
 export const getPrivateReceiptUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: uuid }).parse(d))
+  .inputValidator((input: unknown) => {
+    const parsed = privateReceiptUrlRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid private receipt request.");
+    return parsed.data;
+  })
   .handler(async ({ data, context }) => {
-    const db = context.supabase as any;
-    const { data: r, error } = await db
-      .from("vehicle_receipts")
-      .select("file_path")
-      .eq("id", data.id)
-      .single();
-    if (error || !r?.file_path) throw new Error("Receipt attachment unavailable");
-    const signed = await db.storage.from("vehicle-receipts").createSignedUrl(r.file_path, 300);
-    if (signed.error) throw new Error(signed.error.message);
-    return signed.data.signedUrl as string;
+    const intent = Object.freeze({ expectedAccountId: data.expectedAccountId, id: data.id });
+    if (context?.userId !== intent.expectedAccountId)
+      throw new Error("Account changed. Refresh before opening this receipt.");
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCurrent = await caller.verify(request);
+      assertCurrent();
+      const db = context.supabase as unknown as {
+        from(table: "vehicle_receipts"): ReceiptReadBuilder & {
+          single(): ReceiptReadBuilder;
+        };
+        storage: {
+          from(bucket: "vehicle-receipts"): {
+            createSignedUrl(path: string, expiresIn: number): Promise<unknown>;
+          };
+        };
+      };
+      const query = db
+        .from("vehicle_receipts")
+        .select("id,file_path")
+        .eq("id", intent.id)
+        .abortSignal(request.signal)
+        .retry(false)
+        .single();
+      assertCurrent();
+      const response = await query;
+      assertCurrent();
+      const path = parsePrivateReceiptPathResponse(response, intent.id);
+      assertCurrent();
+      const signed = await waitForPrivateReceiptSigning(
+        () => {
+          assertCurrent();
+          const bucket = db.storage.from("vehicle-receipts");
+          assertCurrent();
+          return bucket.createSignedUrl(path, PRIVATE_RECEIPT_SIGN_TTL_SECONDS);
+        },
+        request.signal,
+        assertCurrent,
+      );
+      assertCurrent();
+      const url = parsePrivateReceiptSigningResponse(signed, path);
+      assertCurrent();
+      return url;
+    } catch {
+      throw new Error(PRIVATE_RECEIPT_URL_FAILURE);
+    }
   });
 export const extractVehicleReceipt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

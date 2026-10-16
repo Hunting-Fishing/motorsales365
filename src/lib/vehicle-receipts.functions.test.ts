@@ -1,7 +1,12 @@
 // Actual server readers/caller guard/DTO contract with synthetic SDK responses.
 // No live Auth/JWT/RLS/storage, native authority, DB cancellation or snapshot proof.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getVehicleReceipts, listVehicleShopLinks } from "./vehicle-receipts.functions";
+import {
+  getVehicleReceipts,
+  listVehicleShopLinks,
+  getPrivateReceiptUrl,
+} from "./vehicle-receipts.functions";
+import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
 const mocks = vi.hoisted(() => ({
   request: vi.fn(),
   privileged: vi.fn(),
@@ -42,6 +47,10 @@ const account = uid(1),
 const token = "fixture.access.token";
 const receiptFailure = "Could not load this vehicle's receipts. Refresh and try again.";
 const linkFailure = "Could not load this vehicle's shop connections. Refresh and try again.";
+const privatePath = `${uid(99)}/${receiptId}/original.pdf`;
+const signedReceiptUrl = (path = privatePath) =>
+  `https://wjxaajgvddtrxxtocxen.supabase.co/storage/v1/object/sign/vehicle-receipts/${path}?token=fixture.storage.token`;
+const privateRequest = () => ({ expectedAccountId: account, id: receiptId });
 const receiptProjection =
   "id,vehicle_id,shop_vehicle_id,created_by,file_path,file_name,media_type,vendor,purchased_on,currency,total,status,share_with_shop,created_at";
 const itemProjection =
@@ -91,7 +100,7 @@ const link = (id = shopVehicle) => ({
   active: true,
 });
 type Response = { data: unknown; error: unknown; count?: unknown };
-type Stage = "access" | "activeLink" | "headers" | "items" | "attachments" | "links";
+type Stage = "access" | "activeLink" | "headers" | "items" | "attachments" | "links" | "private";
 type Read = {
   stage: Stage;
   table?: string;
@@ -127,6 +136,10 @@ function client(
     >;
     onResult?: (read: Read) => void;
     onBuild?: (read: Read, method: string) => void;
+    signingResponse?: unknown;
+    onStorageBuild?: () => void;
+    onSigningStart?: () => void;
+    onSigningResult?: () => void;
   } = {},
 ) {
   const reads: Read[] = [];
@@ -147,7 +160,9 @@ function client(
                 ]
               : read.stage === "attachments"
                 ? Object.fromEntries((read.args?._ids as string[]).map((id) => [id, false]))
-                : [link()],
+                : read.stage === "private"
+                  ? { id: receiptId, file_path: privatePath }
+                  : [link()],
     error: null,
     ...(["headers", "items", "links"].includes(read.stage) ? { count: 1 } : {}),
   });
@@ -161,6 +176,7 @@ function client(
         read.projection = projection;
         read.options = queryOptions;
         if (projection === activeProjection) read.stage = "activeLink";
+        if (projection === "id,file_path") read.stage = "private";
         return op("select");
       },
       eq: (column: string, value: unknown) => {
@@ -195,6 +211,10 @@ function client(
         read.single = true;
         return op("maybeSingle");
       },
+      single: () => {
+        read.single = true;
+        return op("single");
+      },
       then: (resolve: (response: Response) => unknown, reject: (reason: unknown) => unknown) => {
         const dispatched = { ...read, filters: { ...read.filters }, orders: [...read.orders] };
         reads.push(dispatched);
@@ -213,6 +233,16 @@ function client(
     };
     return query;
   }
+  const createSignedUrl = vi.fn((_path: string, _expiresIn: number): Promise<unknown> => {
+    options.onSigningStart?.();
+    const result = Object.hasOwn(options, "signingResponse")
+      ? options.signingResponse
+      : { data: { signedUrl: signedReceiptUrl() }, error: null };
+    return Promise.resolve(result).then((value) => {
+      options.onSigningResult?.();
+      return value;
+    });
+  });
   return {
     auth: {
       getUser: vi.fn(
@@ -241,6 +271,13 @@ function client(
         orders: [],
       }),
     ),
+    storage: {
+      from: vi.fn((_bucket: string) => {
+        options.onStorageBuild?.();
+        return { createSignedUrl };
+      }),
+    },
+    createSignedUrl,
     reads,
   };
 }
@@ -257,6 +294,14 @@ async function receipts(data: unknown, ctx: unknown) {
 async function links(data: unknown, ctx: unknown) {
   return (
     listVehicleShopLinks as unknown as (args: {
+      data: unknown;
+      context: unknown;
+    }) => Promise<unknown>
+  )({ data, context: ctx });
+}
+async function privateUrl(data: unknown, ctx: unknown) {
+  return (
+    getPrivateReceiptUrl as unknown as (args: {
       data: unknown;
       context: unknown;
     }) => Promise<unknown>
@@ -836,4 +881,486 @@ describe("receipt and shop-link server read boundaries", () => {
     await expect(links(ownerRequest(), context(caller))).resolves.toMatchObject({ page: 0 });
     expect(caller.reads[0]).toMatchObject({ filters: { vehicle_id: vehicle }, range: [0, 99] });
   });
+});
+
+describe("private receipt URL server boundary", () => {
+  // The synthetic Storage method deliberately ignores cancellation. The actual
+  // SDK has no per-call signal option here; late results must be discarded.
+  afterEach(() => {
+    expect(mocks.writes).not.toHaveBeenCalled();
+    expect(mocks.privileged).not.toHaveBeenCalled();
+  });
+
+  it("verifies one explicit caller and signs only the matched DB path with the fixed private bucket and TTL", async () => {
+    const caller = client();
+    await expect(privateUrl(privateRequest(), context(caller))).resolves.toBe(signedReceiptUrl());
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.from).toHaveBeenCalledExactlyOnceWith("vehicle_receipts");
+    expect(caller.reads).toEqual([
+      expect.objectContaining({
+        stage: "private",
+        projection: "id,file_path",
+        filters: { id: receiptId },
+        signal: controller.signal,
+        retry: false,
+        single: true,
+      }),
+    ]);
+    expect(caller.reads[0]).not.toHaveProperty("range");
+    expect(caller.storage.from).toHaveBeenCalledExactlyOnceWith("vehicle-receipts");
+    expect(caller.createSignedUrl).toHaveBeenCalledExactlyOnceWith(privatePath, 300);
+    expect(caller.rpc).not.toHaveBeenCalled();
+    expect(privatePath.startsWith(account)).toBe(false);
+  });
+
+  it("uses a safe retained DB key without assuming the generated three-segment shape", async () => {
+    const path = "retained/shop-evidence/copy-1.pdf";
+    const caller = client({
+      responses: { private: { data: { id: receiptId, file_path: path }, error: null } },
+      signingResponse: { data: { signedUrl: signedReceiptUrl(path) }, error: null },
+    });
+    await expect(privateUrl(privateRequest(), context(caller))).resolves.toBe(
+      signedReceiptUrl(path),
+    );
+    expect(caller.createSignedUrl).toHaveBeenCalledExactlyOnceWith(path, 300);
+  });
+
+  it.each([
+    null,
+    {},
+    { id: receiptId },
+    { expectedAccountId: account },
+    { expectedAccountId: "bad", id: receiptId },
+    { expectedAccountId: account, id: "bad" },
+    { ...privateRequest(), path: privatePath },
+    { ...privateRequest(), expectedAccountId: null },
+  ])("rejects malformed private input before request/Auth/native access: %j", async (input) => {
+    const caller = client();
+    await expect(privateUrl(input, context(caller))).rejects.toThrow(
+      "Invalid private receipt request.",
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it("does not invoke an input account accessor", async () => {
+    const get = vi.fn(() => account);
+    const input = { id: receiptId };
+    Object.defineProperty(input, "expectedAccountId", { enumerable: true, get });
+    const caller = client();
+    await expect(privateUrl(input, context(caller))).rejects.toThrow(
+      "Invalid private receipt request.",
+    );
+    expect(get).not.toHaveBeenCalled();
+    expect(mocks.request).not.toHaveBeenCalled();
+  });
+
+  it("preserves early account-changed denial before any request or Auth call", async () => {
+    const caller = client();
+    await expect(
+      privateUrl({ ...privateRequest(), expectedAccountId: uid(7) }, context(caller)),
+    ).rejects.toThrow("Account changed. Refresh before opening this receipt.");
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it("captures primitive account and receipt intent before request hooks can mutate validated input", async () => {
+    const caller = client();
+    mocks.request.mockImplementationOnce(() => {
+      Object.assign(mocks.validated as object, { expectedAccountId: uid(7), id: uid(8) });
+      return currentRequest();
+    });
+    await expect(privateUrl(privateRequest(), context(caller))).resolves.toBe(signedReceiptUrl());
+    expect(caller.reads[0].filters).toEqual({ id: receiptId });
+    expect(caller.createSignedUrl).toHaveBeenCalledExactlyOnceWith(privatePath, 300);
+  });
+
+  it.each([null, "Basic PRIVATE", "Bearer opaque", "Bearer fixture.access.token,second"])(
+    "refuses malformed Bearer before explicit Auth/native/signing: %j",
+    async (authorization) => {
+      const caller = client();
+      mocks.request.mockReturnValue({
+        signal: controller.signal,
+        headers: { get: () => authorization },
+      });
+      await expect(privateUrl(privateRequest(), context(caller))).rejects.toThrow(
+        PRIVATE_RECEIPT_URL_FAILURE,
+      );
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.storage.from).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    null,
+    { sub: account, role: "service_role" },
+    { sub: uid(9), role: "authenticated" },
+    { sub: account, role: "authenticated", is_anonymous: true },
+  ])("refuses incompatible middleware claims before getRequest: %j", async (claims) => {
+    const caller = client();
+    await expect(privateUrl(privateRequest(), { ...context(caller), claims })).rejects.toThrow(
+      PRIVATE_RECEIPT_URL_FAILURE,
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { data: { user: null }, error: null },
+    { data: { user: { id: uid(9) } }, error: null },
+    { data: { user: { id: account, is_anonymous: true } }, error: null },
+    { data: { user: { id: account } }, error: { message: "PRIVATE Auth" } },
+  ])("refuses unconfirmed current Auth without native/signing access: %j", async (response) => {
+    const caller = client();
+    caller.auth.getUser.mockResolvedValue(response);
+    await expect(privateUrl(privateRequest(), context(caller))).rejects.toThrow(
+      PRIVATE_RECEIPT_URL_FAILURE,
+    );
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  const losses = ["account", "client", "claims", "auth-method", "header", "abort"] as const;
+  function loseCaller(
+    ctx: ReturnType<typeof context>,
+    loss: (typeof losses)[number],
+    request: ReturnType<typeof currentRequest>,
+  ) {
+    if (loss === "account") ctx.userId = uid(9);
+    if (loss === "client") ctx.supabase = client();
+    if (loss === "claims") ctx.claims.role = "service_role";
+    if (loss === "auth-method")
+      ctx.supabase.auth.getUser = vi.fn(() =>
+        Promise.resolve({ data: { user: { id: account } }, error: null }),
+      );
+    if (loss === "header") request.headers.set("authorization", "Bearer changed.access.token");
+    if (loss === "abort") controller.abort(new Error("PRIVATE aborted"));
+  }
+
+  it.each(["account", "client", "claims", "auth-method"] as const)(
+    "captures caller before getRequest can replace %s",
+    async (loss) => {
+      const caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockImplementationOnce(() => {
+        loseCaller(ctx, loss, request);
+        return request;
+      });
+      await expect(privateUrl(privateRequest(), ctx)).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.storage.from).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(losses)(
+    "refuses %s loss during pending Auth and ignores its late current-user result",
+    async (loss) => {
+      const pending = deferred<unknown>(),
+        caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockReturnValue(request);
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const result = privateUrl(privateRequest(), ctx);
+      loseCaller(ctx, loss, request);
+      pending.resolve({ data: { user: { id: account } }, error: null });
+      await expect(result).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.storage.from).not.toHaveBeenCalled();
+    },
+  );
+
+  for (const point of [
+    "query-build",
+    "row-settlement",
+    "storage-build",
+    "signing-settlement",
+  ] as const) {
+    it.each(losses)(
+      `refuses %s loss at ${point} without returning bearer evidence`,
+      async (loss) => {
+        const request = currentRequest();
+        const caller = client({
+            onBuild: (read, method) => {
+              if (point === "query-build" && read.stage === "private" && method === "single")
+                loseCaller(ctx, loss, request);
+            },
+            onResult: (read) => {
+              if (point === "row-settlement" && read.stage === "private")
+                loseCaller(ctx, loss, request);
+            },
+            onStorageBuild: () => {
+              if (point === "storage-build") loseCaller(ctx, loss, request);
+            },
+            onSigningResult: () => {
+              if (point === "signing-settlement") loseCaller(ctx, loss, request);
+            },
+          }),
+          ctx = context(caller);
+        mocks.request.mockReturnValue(request);
+        await expect(privateUrl(privateRequest(), ctx)).rejects.toThrow(
+          PRIVATE_RECEIPT_URL_FAILURE,
+        );
+        if (point === "query-build") expect(caller.reads).toEqual([]);
+        if (point === "query-build" || point === "row-settlement")
+          expect(caller.storage.from).not.toHaveBeenCalled();
+        if (point !== "signing-settlement") expect(caller.createSignedUrl).not.toHaveBeenCalled();
+        else expect(caller.createSignedUrl).toHaveBeenCalledTimes(1);
+      },
+    );
+  }
+
+  it.each([
+    null,
+    {},
+    { id: uid(9), file_path: privatePath },
+    { id: receiptId, file_path: null },
+    { id: receiptId, file_path: "" },
+    { id: receiptId, file_path: "../private.pdf" },
+    { id: receiptId, file_path: "/private.pdf" },
+    { id: receiptId, file_path: "retained//private.pdf" },
+    { id: receiptId, file_path: "retained/%2e%2e/private.pdf" },
+    { id: receiptId, file_path: "retained/private.pdf?other" },
+    { id: receiptId, file_path: "retained/private.pdf#fragment" },
+    { id: receiptId, file_path: "retained\\private.pdf" },
+  ])("refuses missing/mismatched/unsupported path rows before signing: %j", async (row) => {
+    const caller = client({ responses: { private: { data: row, error: null } } });
+    await expect(privateUrl(privateRequest(), context(caller))).rejects.toThrow(
+      PRIVATE_RECEIPT_URL_FAILURE,
+    );
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  for (const phase of ["row", "signing"] as const) {
+    it.each([undefined, false, "", { message: "PRIVATE provider cause" }])(
+      `requires explicit error:null at ${phase} with otherwise-valid evidence: %j`,
+      async (error) => {
+        const caller = client(
+          phase === "row"
+            ? { responses: { private: { data: { id: receiptId, file_path: privatePath }, error } } }
+            : { signingResponse: { data: { signedUrl: signedReceiptUrl() }, error } },
+        );
+        const result = await privateUrl(privateRequest(), context(caller)).catch(
+          (value: unknown) => value,
+        );
+        expect((result as Error).message).toBe(PRIVATE_RECEIPT_URL_FAILURE);
+        expect(result).not.toHaveProperty("cause");
+        expect(String(result)).not.toContain("PRIVATE");
+        expect(String(result)).not.toContain(privatePath);
+        if (phase === "row") expect(caller.storage.from).not.toHaveBeenCalled();
+      },
+    );
+  }
+
+  it.each([
+    "row-data",
+    "row-error",
+    "row-id",
+    "row-path",
+    "sign-data",
+    "sign-error",
+    "sign-url",
+  ] as const)("refuses %s accessors without invoking them", async (field) => {
+    const row = { id: receiptId, file_path: privatePath },
+      data = { signedUrl: signedReceiptUrl() };
+    const response: Response = { data: row, error: null },
+      signed: Response = { data, error: null };
+    const target =
+      field === "row-id" || field === "row-path"
+        ? row
+        : field === "sign-url"
+          ? data
+          : field.startsWith("row-")
+            ? response
+            : signed;
+    const key = field.endsWith("-data")
+      ? "data"
+      : field.endsWith("-error")
+        ? "error"
+        : field === "row-id"
+          ? "id"
+          : field === "row-path"
+            ? "file_path"
+            : "signedUrl";
+    const get = vi.fn(() =>
+      key === "data"
+        ? row
+        : key === "error"
+          ? null
+          : key === "id"
+            ? receiptId
+            : key === "file_path"
+              ? privatePath
+              : signedReceiptUrl(),
+    );
+    Object.defineProperty(target, key, { enumerable: true, get });
+    const caller = client({ responses: { private: response }, signingResponse: signed });
+    await expect(privateUrl(privateRequest(), context(caller))).rejects.toThrow(
+      PRIVATE_RECEIPT_URL_FAILURE,
+    );
+    expect(get).not.toHaveBeenCalled();
+    if (field.startsWith("row-")) expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    undefined,
+    null,
+    "javascript:PRIVATE",
+    signedReceiptUrl().replace("https:", "http:"),
+    signedReceiptUrl().replace("wjxaajgvddtrxxtocxen", "otherproject"),
+    signedReceiptUrl().replace("supabase.co/", "supabase.co.example.invalid/"),
+    signedReceiptUrl().replace("supabase.co/", "supabase.co:443/"),
+    signedReceiptUrl().replace("https://", "https://user:password@"),
+    signedReceiptUrl().replace("/vehicle-receipts/", "/other-bucket/"),
+    signedReceiptUrl().replace(privatePath, "retained/other.pdf"),
+    `${signedReceiptUrl()}#fragment`,
+    `${signedReceiptUrl()}&token=second`,
+    `${signedReceiptUrl()}&download=other`,
+    signedReceiptUrl().replace("fixture.storage.token", ""),
+  ])("refuses malformed/cross-project/misbound signed URL acknowledgment: %j", async (url) => {
+    const caller = client({ signingResponse: { data: { signedUrl: url }, error: null } });
+    await expect(privateUrl(privateRequest(), context(caller))).rejects.toThrow(
+      PRIVATE_RECEIPT_URL_FAILURE,
+    );
+    expect(caller.createSignedUrl).toHaveBeenCalledExactlyOnceWith(privatePath, 300);
+  });
+
+  it("keeps the matched DB path snapshot when later SDK setup mutates the original row", async () => {
+    const row = { id: receiptId, file_path: privatePath };
+    const caller = client({
+      responses: { private: { data: row, error: null } },
+      onStorageBuild: () => {
+        row.file_path = "retained/changed.pdf";
+      },
+    });
+    await expect(privateUrl(privateRequest(), context(caller))).resolves.toBe(signedReceiptUrl());
+    expect(caller.createSignedUrl).toHaveBeenCalledExactlyOnceWith(privatePath, 300);
+  });
+
+  it("checks caller after row parser traps before starting Storage", async () => {
+    const trap = vi.fn();
+    const row = new Proxy(
+      { id: receiptId, file_path: privatePath },
+      {
+        ownKeys: (target) => {
+          trap();
+          ctx.claims.role = "service_role";
+          return Reflect.ownKeys(target);
+        },
+      },
+    );
+    const caller = client({ responses: { private: { data: row, error: null } } }),
+      ctx = context(caller);
+    await expect(privateUrl(privateRequest(), ctx)).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+    expect(trap).toHaveBeenCalledTimes(1);
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it("checks caller after URL parser traps before returning the bearer URL", async () => {
+    const trap = vi.fn();
+    const data = new Proxy(
+      { signedUrl: signedReceiptUrl() },
+      {
+        ownKeys: (target) => {
+          trap();
+          ctx.claims.role = "service_role";
+          return Reflect.ownKeys(target);
+        },
+      },
+    );
+    const signed = { data, error: null };
+    const caller = client({ signingResponse: signed }),
+      ctx = context(caller);
+    await expect(privateUrl(privateRequest(), ctx)).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+    expect(trap).toHaveBeenCalledTimes(1);
+    expect(caller.createSignedUrl).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["resolve", "reject"] as const)(
+    "observes an ignored late Auth %s after its wait timeout without reaching Storage",
+    async (settlement) => {
+      vi.useFakeTimers();
+      const pending = deferred<unknown>(),
+        caller = client();
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const result = privateUrl(privateRequest(), context(caller));
+      const assertion = expect(result).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+      await vi.advanceTimersByTimeAsync(10_000);
+      await assertion;
+      if (settlement === "resolve")
+        pending.resolve({ data: { user: { id: account } }, error: null });
+      else pending.reject(new Error("PRIVATE late Auth"));
+      await Promise.resolve();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.storage.from).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it("does not sign after an aborted row query eventually returns a valid ignored result", async () => {
+    const pending = deferred<Response>(),
+      caller = client({ responses: { private: pending.promise } });
+    const result = privateUrl(privateRequest(), context(caller));
+    await vi.waitFor(() => expect(caller.reads).toHaveLength(1));
+    controller.abort();
+    pending.resolve({ data: { id: receiptId, file_path: privatePath }, error: null });
+    await expect(result).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  for (const interruption of ["abort", "timeout"] as const) {
+    it.each(["resolve", "reject"] as const)(
+      `observes late Storage %s after ${interruption} without leaking bearer evidence`,
+      async (settlement) => {
+        vi.useFakeTimers();
+        const pending = deferred<unknown>(),
+          caller = client({ signingResponse: pending.promise });
+        const result = privateUrl(privateRequest(), context(caller));
+        const assertion = expect(result).rejects.toThrow(PRIVATE_RECEIPT_URL_FAILURE);
+        await vi.waitFor(() => expect(caller.createSignedUrl).toHaveBeenCalledTimes(1));
+        if (interruption === "abort") controller.abort(new Error("PRIVATE abort"));
+        else await vi.advanceTimersByTimeAsync(10_000);
+        await assertion;
+        if (settlement === "resolve")
+          pending.resolve({ data: { signedUrl: signedReceiptUrl() }, error: null });
+        else pending.reject(new Error(`PRIVATE late ${signedReceiptUrl()}`));
+        await Promise.resolve();
+        expect(caller.createSignedUrl).toHaveBeenCalledTimes(1);
+        expect(vi.getTimerCount()).toBe(0);
+      },
+    );
+  }
+
+  it.each(["query", "bucket", "signing"] as const)(
+    "redacts synchronous %s failure without provider fallback",
+    async (phase) => {
+      const caller = client({
+        onBuild: () => {
+          if (phase === "query") throw new Error(`PRIVATE ${privatePath}`);
+        },
+        onStorageBuild: () => {
+          if (phase === "bucket") throw new Error(`PRIVATE ${privatePath}`);
+        },
+        onSigningStart: () => {
+          if (phase === "signing") throw new Error(`PRIVATE ${signedReceiptUrl()}`);
+        },
+      });
+      const result = await privateUrl(privateRequest(), context(caller)).catch(
+        (value: unknown) => value,
+      );
+      expect((result as Error).message).toBe(PRIVATE_RECEIPT_URL_FAILURE);
+      expect(result).not.toHaveProperty("cause");
+      expect(String(result)).not.toContain("PRIVATE");
+      expect(String(result)).not.toContain(privatePath);
+    },
+  );
 });

@@ -175,6 +175,9 @@ function privateReceipt(id = "private-receipt-1"): VehicleReceipt {
 }
 
 describe("private receipt opening lifetime", () => {
+  const signingRequest = (expectedAccountId = "owner-a", id = "private-receipt-1") => ({
+    data: { id, expectedAccountId },
+  });
   beforeEach(() => {
     vi.mocked(api.getPrivateReceiptUrl).mockReset();
     vi.mocked(api.getVehicleReceipts).mockResolvedValue(
@@ -197,9 +200,7 @@ describe("private receipt opening lifetime", () => {
     const invalidate = vi.spyOn(client, "invalidateQueries");
     const button = await screen.findByRole("button", { name: /^Receipt$/ });
     fireEvent.click(button);
-    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith({
-      data: { id: "private-receipt-1" },
-    });
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
     expect(button).toBeDisabled();
     expect(window.open).not.toHaveBeenCalled();
     await act(async () => signed.resolve("https://private.example/current-bearer"));
@@ -227,6 +228,8 @@ describe("private receipt opening lifetime", () => {
     fireEvent.click(button);
     await waitFor(() => expect(window.open).toHaveBeenCalledTimes(2));
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
     expect(window.open).toHaveBeenLastCalledWith(
       "https://private.example/second",
       "_blank",
@@ -251,6 +254,7 @@ describe("private receipt opening lifetime", () => {
       buttons[1].dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
     expect(buttons[0]).toBeDisabled();
     expect(buttons[1]).toBeDisabled();
     await act(async () => signed.resolve("https://private.example/one-read"));
@@ -277,6 +281,8 @@ describe("private receipt opening lifetime", () => {
     fireEvent.click(button);
     await waitFor(() => expect(window.open).toHaveBeenCalledTimes(1));
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
     expect(invalidate).not.toHaveBeenCalled();
   });
 
@@ -292,6 +298,7 @@ describe("private receipt opening lifetime", () => {
     );
     expect(button).toBeEnabled();
     expect(window.open).not.toHaveBeenCalled();
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
   });
 
   it("redacts a current popup exception and allows an explicit retry", async () => {
@@ -313,6 +320,8 @@ describe("private receipt opening lifetime", () => {
     await waitFor(() => expect(window.open).toHaveBeenCalledTimes(2));
     expect(toast.error).toHaveBeenCalledTimes(1);
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
     expect(invalidate).not.toHaveBeenCalled();
   });
 
@@ -342,6 +351,7 @@ describe("private receipt opening lifetime", () => {
       expect(toast.error).not.toHaveBeenCalled();
       expect(invalidate).not.toHaveBeenCalled();
       expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+      expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
     },
   );
 
@@ -370,6 +380,7 @@ describe("private receipt opening lifetime", () => {
       expect(toast.error).not.toHaveBeenCalled();
       expect(window.open).not.toHaveBeenCalled();
       expect(invalidate).not.toHaveBeenCalled();
+      expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
     },
   );
 
@@ -405,6 +416,8 @@ describe("private receipt opening lifetime", () => {
       expect(currentButton).toBeEnabled();
       fireEvent.click(currentButton);
       expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+      expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+      expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
       await act(async () => oldRead.resolve("https://private.example/old-aba"));
       expect(window.open).not.toHaveBeenCalled();
       expect(currentButton).toBeDisabled();
@@ -421,6 +434,85 @@ describe("private receipt opening lifetime", () => {
       expect(invalidate).not.toHaveBeenCalled();
     },
   );
+
+  it("pins the issuing account in an old request instead of adopting a new account's explicit opening", async () => {
+    const oldRead = deferred<string>();
+    const currentRead = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl)
+      .mockReturnValueOnce(oldRead.promise)
+      .mockReturnValueOnce(currentRead.promise);
+    const { client, rerender, view } = show();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    fireEvent.click(await screen.findByRole("button", { name: /^Receipt$/ }));
+    const originalRequest = vi.mocked(api.getPrivateReceiptUrl).mock.calls[0][0];
+    expect(originalRequest).toEqual(signingRequest());
+
+    auth.userId = "owner-b";
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [
+          {
+            ...privateReceipt("private-receipt-b"),
+            created_by: "owner-b",
+            file_path: "owner-b/private-receipt-b/original.pdf",
+          },
+        ],
+        linkedVehicleId: null,
+      }),
+    );
+    rerender(view());
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(
+      2,
+      signingRequest("owner-b", "private-receipt-b"),
+    );
+    expect(originalRequest).toEqual(signingRequest());
+    await act(async () => oldRead.resolve("https://private.example/old-account"));
+    expect(window.open).not.toHaveBeenCalled();
+    expect(button).toBeDisabled();
+    expect(originalRequest).toEqual(signingRequest());
+    await act(async () => currentRead.resolve("https://private.example/current-account"));
+    expect(window.open).toHaveBeenCalledExactlyOnceWith(
+      "https://private.example/current-account",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(button).toBeEnabled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it("never revives a captured private request across committed retained-user Auth loading", async () => {
+    const oldRead = deferred<string>();
+    const currentRead = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl)
+      .mockReturnValueOnce(oldRead.promise)
+      .mockReturnValueOnce(currentRead.promise);
+    const { container, rerender, view } = show();
+    fireEvent.click(await screen.findByRole("button", { name: /^Receipt$/ }));
+    auth.loading = true;
+    rerender(view());
+    expect(container).toBeEmptyDOMElement();
+    auth.loading = false;
+    rerender(view());
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
+    await act(async () => oldRead.resolve("https://private.example/pre-bootstrap"));
+    expect(window.open).not.toHaveBeenCalled();
+    expect(button).toBeDisabled();
+    await act(async () => currentRead.resolve("https://private.example/post-bootstrap"));
+    expect(window.open).toHaveBeenCalledExactlyOnceWith(
+      "https://private.example/post-bootstrap",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(button).toBeEnabled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
 
   it("permanently fences a read started before StrictMode effect cleanup and allows a new attempt", async () => {
     const oldRead = deferred<string>();
@@ -477,10 +569,13 @@ describe("private receipt opening lifetime", () => {
     expect(seededKeys.length).toBeGreaterThan(0);
     expect(cleanups).toBe(1);
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith(signingRequest());
     const button = screen.getByRole("button", { name: /^Receipt$/ });
     expect(button).toBeEnabled();
     fireEvent.click(button);
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(1, signingRequest());
+    expect(api.getPrivateReceiptUrl).toHaveBeenNthCalledWith(2, signingRequest());
     await act(async () => oldRead.resolve("https://private.example/pre-cleanup"));
     expect(window.open).not.toHaveBeenCalled();
     expect(button).toBeDisabled();
