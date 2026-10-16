@@ -386,8 +386,10 @@ function AuthenticatedVehicleReceiptPanel({
       if (!current()) return;
       toast.message("Expense request acknowledged. Check shop expenses to confirm.");
       if (!current()) return;
-      // The current expenses route still uses this legacy key. This does not
-      // confer account scoping on that separate reader.
+      // Refresh the account-bound expense reader and retain compatibility with
+      // other legacy readers. Invalidation is not authority or posting proof.
+      void qc.invalidateQueries({ queryKey: ["shop-manager", userId, "expenses"] });
+      if (!current()) return;
       void qc.invalidateQueries({ queryKey: ["shop-manager", "expenses"] });
       if (!current()) return;
       void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });

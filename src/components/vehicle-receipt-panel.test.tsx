@@ -2300,6 +2300,12 @@ describe("receipt expense request acknowledgment and committed lifetime", () => 
     const pending = deferred<ExpenseAck>();
     vi.mocked(api.recordVehicleReceiptExpense).mockReturnValueOnce(pending.promise);
     const { client } = await showExpense();
+    const currentExpenses = ["shop-manager", "owner-a", "expenses", "scope-a"];
+    const otherExpenses = ["shop-manager", "owner-b", "expenses", "scope-b"];
+    const vehicleChoices = ["shop-manager", "owner-a", "receipt-vehicle-choices", "scope-a"];
+    client.setQueryData(currentExpenses, { marker: "current expense window" });
+    client.setQueryData(otherExpenses, { marker: "other account window" });
+    client.setQueryData(vehicleChoices, { marker: "independent vehicle window" });
     const invalidate = vi.spyOn(client, "invalidateQueries");
     const buttons = screen.getAllByRole("button", { name: control });
     const rawFirst = captureSourceClick(buttons[0]);
@@ -2328,10 +2334,14 @@ describe("receipt expense request acknowledgment and committed lifetime", () => 
     expect(toast.success).not.toHaveBeenCalled();
     expect(toast.error).not.toHaveBeenCalled();
     expect(invalidate.mock.calls.map(([filters]) => filters?.queryKey)).toEqual([
+      ["shop-manager", "owner-a", "expenses"],
       ["shop-manager", "expenses"],
       ["vehicle-receipts", "owner-a"],
       ["vehicle-history"],
     ]);
+    expect(client.getQueryState(currentExpenses)?.isInvalidated).toBe(true);
+    expect(client.getQueryState(otherExpenses)?.isInvalidated).toBe(false);
+    expect(client.getQueryState(vehicleChoices)?.isInvalidated).toBe(false);
     expect(screen.queryByText(failure)).not.toBeInTheDocument();
     expect(screen.queryByText(/Recorded in shop expenses/)).not.toBeInTheDocument();
   });
