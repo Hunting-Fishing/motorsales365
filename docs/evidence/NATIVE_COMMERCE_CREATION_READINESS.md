@@ -69,7 +69,13 @@ on native server authorization, trigger/audit behavior and durable retry handlin
 Neither browser preflight nor matching acknowledgments close those gaps. The
 quote-conversion interlock remains; the unsafe legacy converter is not reconnected.
 
-Next executable backend dependency is C3.02: one invoker-preferred transaction for
+Follow-up source `c2f7f315` now implements a locked/unapplied atomic-only C3.02 SQL
+candidate with 88/88 partial offline transaction tests. It is outside migrations,
+has no application caller or execution grant and does not replace these separate
+browser writes. See `NATIVE_QUOTE_ATOMIC_CANDIDATE.md` for native constraint/late
+rollback proof and exact expected-shop/authority/retry/API/restore gaps.
+
+The full backend dependency remains C3.02: one invoker-preferred transaction for
 the complete quote, ordered children and durable command receipt. Bind the verified
 original actor, fresh session/role/shop, canonical payload and stable retry key;
 same content returns the same result and conflicting content rejects. Protect and
@@ -102,6 +108,22 @@ release-asset verification confirms all **214 Git/source/output copies** at that
 source commit. Existing route-discovery/chunk/import/Wrangler-main warnings
 remain. No upload or live release follows from packaging. Publication of this
 source/evidence needs its own exact-head remote checks, not prior green.
+
+Subsequent publication `6037678d9629956aabd39fd5d57b210f97d3d65e` is verified on
+the canonical remote and same attached draft PR #68/base; main remains
+`70ab892a8b7c05eac288ea4a6cce7a002d316f00`. The source/CI/media inputs are unchanged
+from `bcc25350`; final published-head tracked-asset verification again passes all
+214 copies. Exact-head run `38837739930` native Parts job `116770527450` succeeds;
+its complete log confirms PostgreSQL 17.11, all 247 assertions and scoped cleanup,
+with 47 retained replay failures. All six Actions gates now pass on this exact
+head. Unit job `116770527477` confirms 2,595/2,595 across 79 application files
+(77.47s), zero unexpected/quarantined failures. The returned log is truncated
+overall but includes the final summary and result checker. Wrapper `38837739975` migration/production and Supabase
+Preview skipped. Independent Workers build `57f7ae46-a59f-4580-b546-02dc45e68f67`
+fails with ID/link only; no fresh cause or source-freeze execution is inferred.
+These check notes join the next integrated source slice without a separate
+documentation-only CI restart. Continue the authorized atomic C3.02 dependency;
+do not repeat these caller proofs or substitute this head's pass for later CI.
 
 Prior published `bf091dc7` passed all six Actions gates in run `38833837897`.
 Linux application: 2,422/2,422 across 77 files (69.02s), zero unexpected/quarantined

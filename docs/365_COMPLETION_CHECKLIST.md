@@ -54,7 +54,21 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest creation caller slice: `bcc253507d65294d5dc73f37b39e91c13e7c87d8`, same
+Latest backend slice: `c2f7f3153d13a2453db863877bf9ae880628b1e1`, locked/unapplied
+atomic quote candidate outside migrations, same draft PR #68. Actual header/items
+SQL, strict native-compatible inputs, target locks/rechecks, persisted outcomes
+and fail-closed transactional publication pass 88/88 memory-only tests (9.096s;
+PGlite 0.5.9/PostgreSQL 18.6). Native selected constraints and number trigger stay
+enabled; late CHECK/PK/trigger/RLS and final vehicle-binding failures roll back
+the operation. Format/syntax/lint, independent review and unconditional offline
+CI wiring (2/2) pass. Exact boundaries and next action:
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. No grant/application connection/live
+SQL or deployment. C3.02 remains open: no prior expected-shop binding, trusted
+fresh authority, durable retry receipt, native PG17 independent-session/API/
+private-storage/restore or owner acceptance. Compose those gates with this
+transaction rather than repeat the caller slice or enable a legacy bypass.
+
+Prior creation caller slice: `bcc253507d65294d5dc73f37b39e91c13e7c87d8`, same
 branch/draft PR #68. Quote/work-order creation now uses account/mount-scoped bounded
 options, fresh selected-record revalidation, exact returned identities/values and
 mounted uncertainty holds. Invalid quote shop/type/tax representation mappings are
@@ -69,6 +83,21 @@ remain unfinished: browser preflight/acknowledgments are not fresh native author
 atomic header/items/scope, durable retry, stock/financial/recovery or owner proof.
 Next is the complete authorized C3.02 quote transaction and shared authority/
 API/private-storage/restore acceptance, not repeated reader-only tests.
+
+Published and verified head `6037678d9629956aabd39fd5d57b210f97d3d65e` contains
+source `bcc25350` plus evidence, same attached draft PR #68/base; main unchanged.
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public copies pass, including final published-head asset verification. New run
+`38837739930` Parts job `116770527450` passes all 247 assertions on native PG17.11
+with cleanup; the same 47 retained replay failures remain. All six Actions gates
+now pass on this exact head. Unit job `116770527477` confirms 2,595/2,595 across
+79 application files (77.47s), zero unexpected/quarantined failures. Its returned
+log is truncated overall, but the final summary and report checker are present.
+Wrapper `38837739975` migration/
+production and Supabase Preview skipped. Independent Workers build
+`57f7ae46-a59f-4580-b546-02dc45e68f67` fails with ID/link only; its fresh log was
+not inspected or assumed to have the prior cause. These final check notes join
+the next integrated source slice; they are not new deployment evidence.
 
 Prior quote-detail/build-freeze/Docker-free CI slice: `166ff0c4`, same branch/draft PR #68; source commit
 and exact final checks are in `evidence/NATIVE_QUOTE_DETAIL_READINESS.md`.

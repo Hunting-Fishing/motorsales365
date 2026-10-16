@@ -76,6 +76,13 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
+Backend source `c2f7f315` adds a revoked/unapplied atomic quote transaction outside
+migrations, with 88/88 partial PGlite SQL tests and mandatory CI wiring. It is not
+connected or accepted authority/retry/API/recovery behavior; exact limits and
+next dependencies are in `evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. Published
+parent `6037678d` now passes all six Actions gates, including 2,595/2,595
+application tests (79 files,77.47s); newer publication needs its own exact-head CI.
+
 Creation caller slice `bcc25350` adds 84 quote and 89 work-order route tests;
 combined security/creation 183/183, full TypeScript/lint/review and mandatory
 creation CI wiring pass. Scoped selection, native scalar/type compatibility,
