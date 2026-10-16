@@ -23,6 +23,7 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
   }
   assert.equal(workflow.env.NODE_VERSION, "22");
   const parts = workflow.jobs["parts-rls"];
+  assert.equal(parts["timeout-minutes"], 25);
   assert.equal(parts.services, undefined);
   assert.equal(parts.container, undefined);
   assert.equal(parts.env, undefined);
@@ -107,6 +108,24 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
   assert.equal(quoteCleanup["timeout-minutes"], 2);
   assert.ok(parts.steps.indexOf(quote) > parts.steps.indexOf(cleanup));
   assert.ok(parts.steps.indexOf(quoteCleanup) > parts.steps.indexOf(quote));
+  const recovery = parts.steps.find(
+    (step) =>
+      step.name === "Synthetic database dump and second-cluster restore (native PostgreSQL 17)",
+  );
+  const recoveryCleanup = parts.steps.find(
+    (step) => step.name === "Clean private recovery PostgreSQL clusters (always)",
+  );
+  assert.ok(recovery && recoveryCleanup);
+  assert.equal(recovery.run, "bash scripts/ci/run-native-recovery-postgres.sh --run");
+  assert.equal(recovery.if, undefined);
+  assert.equal(recovery["continue-on-error"], undefined);
+  assert.equal(recovery["timeout-minutes"], 7);
+  assert.equal(recoveryCleanup.run, "bash scripts/ci/run-native-recovery-postgres.sh --cleanup");
+  assert.equal(recoveryCleanup.if, "always()");
+  assert.equal(recoveryCleanup["continue-on-error"], undefined);
+  assert.equal(recoveryCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(recovery) > parts.steps.indexOf(quoteCleanup));
+  assert.ok(parts.steps.indexOf(recoveryCleanup) > parts.steps.indexOf(recovery));
   const nodeSetup = parts.steps.filter((step) => step.uses === "actions/setup-node@v4");
   assert.equal(nodeSetup.length, 1);
   assert.equal(nodeSetup[0].with["node-version"], "${{ env.NODE_VERSION }}");
@@ -145,6 +164,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     [
       "Native quote PostgreSQL runner safety (offline, never quarantined)",
       "node --test scripts/ci/native-quote-postgres.test.mjs",
+    ],
+    [
+      "Native PostgreSQL recovery runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/native-recovery-postgres.test.mjs scripts/ci/run-native-recovery-postgres.test.mjs",
     ],
     [
       "Native customer callers and receipt entry lifetimes (never quarantined)",

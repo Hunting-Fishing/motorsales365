@@ -203,6 +203,9 @@ jobs:
       - name: Native quote PostgreSQL runner safety (offline, never quarantined)
         run: node --test scripts/ci/native-quote-postgres.test.mjs
 
+      - name: Native PostgreSQL recovery runner safety (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/native-recovery-postgres.test.mjs scripts/ci/run-native-recovery-postgres.test.mjs
+
       - name: Native customer callers and receipt entry lifetimes (never quarantined)
         run: npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/lib/customer-commercial.functions.test.ts src/lib/customer-communications.functions.test.ts src/components/vehicle-receipt-panel.test.tsx src/lib/vehicle-receipts.test.ts --maxWorkers=1
 
@@ -330,7 +333,8 @@ jobs:
   parts-rls:
     name: Parts adversarial RLS suite (throwaway Postgres)
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    # Retain the existing 15-minute budget plus bounded recovery/run cleanup.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       # The quote runner uses Node builtins and psql, without application packages.
@@ -449,3 +453,12 @@ jobs:
         timeout-minutes: 2
         shell: bash
         run: bash scripts/ci/run-native-quote-postgres.sh --cleanup
+      - name: Synthetic database dump and second-cluster restore (native PostgreSQL 17)
+        timeout-minutes: 7
+        shell: bash
+        run: bash scripts/ci/run-native-recovery-postgres.sh --run
+      - name: Clean private recovery PostgreSQL clusters (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-recovery-postgres.sh --cleanup
