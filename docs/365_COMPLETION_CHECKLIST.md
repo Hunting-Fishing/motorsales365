@@ -42,6 +42,35 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Native stock source parity and actual retained B2B writer composition now pass
+root6/6 in2.1367703s and13/13 in10.8898883s, zero fail/skip/cancel. Fixed exports
+preserve the66-action core, extend49 spans/14 tables/75 actions/30FK and retain
+the original complete B2B writer with fixture execution withheld from ordinary/
+service roles. Actual acceptance/cancel/inverse availability/late-FK/outer
+rollback preserve the complete selected graph; synthetic owner/Auth support is
+not native authority. Wiring2/2 in75.6675ms/ESLint0/independent reviews pass.
+Same PR68/commit subject `Compose native stock sources with retained B2B writer`;
+own-head CI remains separate. [Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md).
+Next own exact-head gates then fresh private Docker-free PG17 independent
+actual-writer sessions/wait/commit/rollback/recheck; no native stock process ran.
+No app/migration/grant/hosted activation. Catalog/all-writer/native authority/
+TTL/durable unknown outcomes/full recovery/device/owner/main/live gates remain.
+
+### Closed mixed-stock candidate checkpoint
+
+Stock4050ec27de26564af807a2d3eace898ac2556e36 is published same draft PR68/comment
+6226237118, exact body/title/base/draft/main preserved. Parentc59 all six own
+Actions pass, actual5,036/96 files103.47s zero unexpected/quarantined failures
+(truncated/final summaries), no cancelled unit. Own405 all six38978627414 Actions
+now pass, actual5,036/96 files64.75s zero unexpected/quarantined failures
+(truncated/final summaries). Early memory16 step log clipped, no separately
+observed Linux16 claim. Actual native117233967523 untruncated PG17.11/Parts247/
+quote6/retained21 ordered expense markers/cleanup, not stock execution; selected
+68/88/225ms not full/RTO. Build/full current tree2,599 objects0missing and actual
+Preview configuration skip verified, not deployment/history recovery. Native-source
+parity/B2B composition now passes above; independent sessions remain. No unchanged
+local16/2 rerun or docs-only unit restart.
+
 Current independent stock slice is private/unapplied mixed inquiry+B2B hold
 correction, actual isolated SQL16/16 in14.6660125s, zero fail/skip/cancel. Legacy
 10+8+5=13 reproduces; candidate rejects5/permits2 with real selected NUMERIC/
@@ -52,15 +81,16 @@ support is synthetic, no native authority or app/grant/migration activation.
 Mandatory serialized non-quarantined CI/wiring2/2 in93.3995ms and changed-script
 ESLint0 pass; one test-only review correction narrows target normalization.
 Same PR68/commit subject `Prepare private mixed stock reservation correction`;
-hold publication untilc59 unit completes, exact hash in evidence comment.
+published afterc59 unit completed, exact hash in comment6226237118.
 Next native independent-session mixed-writer wait/commit/rollback, then current
 catalog/all-writer/native authority/TTL/durable outcome/full recovery acceptance.
 Atomic stock Day2 remains open;22 October still at risk, no scope cut.
 [Exact scope, pins and limits](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
 
 Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444,
-exact prior body/title/base/draft/main preserved. Own build/type/OCR/lint/native
-pass, unit pending, no all-six claim. Actual untruncated native117225560643 proves
+exact prior body/title/base/draft/main preserved. All six own Actions pass,
+actual unit5,036/96 files103.47s with zero unexpected/quarantined failures.
+Actual untruncated native117225560643 proves
 PG17.11/Parts247/quote6/all21 exact ordered expense markers/terminators/cleanup,
 vector equals unchanged admitted21. Selected65/82/211ms not full/RTO;47 failures
 remain. Actual Preview skips upload; hosting STOP unchanged. Follow-up identity/

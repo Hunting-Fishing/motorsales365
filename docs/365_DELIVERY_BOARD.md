@@ -12,6 +12,54 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current integrated slice: native stock source parity and actual B2B composition.**
+Fixed exports preserve the original66 setup actions and add eight exact retained
+writer/event/timestamp spans:49 total spans/14 tables/75 setup actions/30 real FKs.
+The original complete B2B transition body is unchanged; its authenticated grant
+is NOT adopted and fixture ordinary/service execution stays withheld. Root
+actual6/6 parity2.1367703s plus13/13 actual-writer sequential SQL10.8898883s pass,
+zero fail/skip/cancel. Genuine retained acceptance/cancel, inverse inquiry/B2B
+availability and late-FK/outer rollback preserve the full selected graph. One
+pre-runtime metadata/test-only correction distinguishes extension49/14/75 from
+base41/13/66; no failed SQL trial. Wiring2/2 in75.6675ms/ESLint0/reviews pass.
+Same draft PR68/commit subject `Compose native stock sources with retained B2B writer`;
+exact source/publication goes in its evidence comment. Own-head CI is separate.
+[Exact pins, tests and limits](evidence/MIXED_STOCK_NATIVE_SOURCE.md).
+
+**Next:** own exact-head gates, then a fresh private Docker-free PG17 cluster
+runner with independent actual B2B/inquiry sessions, observed blocker/wait,
+commit/rollback/recheck and inverse ordering. No native mixed-stock SQL ran yet;
+do not reuse expense admission bypasses/conflicting databases or inserted holds
+as genuine-writer proof. Original candidate/app/migrations/grants stay unchanged
+and private/unapplied. Current catalog/all-writer/native authority/TTL/durable
+unknown outcomes/full recovery and UI connection remain gates. All18+N1–N3/
+47/12/5/2/stops/owner/main/live requirements remain; Day2 atomic-stock still open,
+22 October target at risk. No full CRM/marketplace/device acceptance claim.
+
+### Closed mixed-stock candidate checkpoint
+
+Stock source4050ec27de26564af807a2d3eace898ac2556e36 is PUBLISHED in same draft
+PR68/comment6226237118, exact remote/body/title/non-main base/draft/main retained.
+Parentc59 all six38976025387 Actions now pass: actual unit117225560774 has5,036/
+96 files103.47s, zero unexpected/quarantined failures (truncated/final summaries),
+including actual18 detail tests. Publication hold cleared without cancellation.
+Own405 all six38978627414 Actions now pass; actual unit1172339677465,036/96 files
+64.75s, zero unexpected/quarantined failures (returned log truncated/final summaries).
+Early mixed-stock16 step transcript is outside the returned clipped log; do not
+claim separately observed Linux16 from its completed job status or local result.
+Actual untruncated native117233967523 PG17.11/Parts247/quote6/retained21 exact
+ordered expense markers/terminators/cleanup verified; vector equals unchanged
+admitted21. It does NOT execute stock SQL. Selected68/88/225ms not full/RTO;47
+failures remain. Actual build final214media/15OCR/202PDF/server-boundary/Worker+
+sole365/dry-run summaries verified (truncated/final summaries). Complete CI merge
+062cdfd18b0a3c121ab4535cb501d7c3a5c949ee equals candidate tree
+b0d4759428b6031fa422c77264f16b3ed665042b/2,599 current objects0missing, not history
+recovery. Actual untruncated Preview117233967617 configuration skip/no upload;
+production/migrations/Supabase Preview skip. Workers117234010767 cause unverified,
+hosting STOP unchanged. Native-source parity/retained B2B composition is now
+implemented above; independent sessions remain next. No unchanged local16/2 rerun.
+These notes join implementation, not a docs-only CI restart.
+
 **Current critical stock slice: mixed inquiry/B2B reservation mechanics.** Root
 actual isolated SQL16/16 in14.6660125s, zero fail/skip/cancel, reproduces legacy
 stock10+B2B8+inquiry5=13 and verifies the private candidate rejects5/permits2.
@@ -37,13 +85,14 @@ native authority, TTL/revocation and durable unknown-outcome/recovery gates rema
 The Day2 atomic-stock milestone is still open; this necessary correction and its
 native proof add work to an already at-risk22 October target, not a scope cut.
 Same PR68/commit subject `Prepare private mixed stock reservation correction`;
-exact commit/publication in evidence comment. Hold publication untilc59 unit
-completes; no cancelling a running unit or inheriting its results.
+exact commit/publication in comment6226237118. Completedc59 unit cleared the
+publication hold; no cancellation or inherited results.
 
 Published Add Part sourcec59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/
 comment6225907444; canonical remote/exact body/title/non-main base/draft/main
-preserved. Own38976025387 build/type/OCR/lint/native pass; unit still running at
-read-back, not all-six acceptance. Actual own untruncated native117225560643 has
+preserved. Own38976025387 all six build/type/OCR/lint/native/unit pass; actual
+5,036/96 files103.47s zero unexpected/quarantined failures, not inherited.
+Actual own untruncated native117225560643 has
 PG17.11/server170011/Parts247/quote6/all21 ordered expense/draft/Auth-user markers,
 terminators/EXIT+always-cleanup; full vector equals the admitted21, whose source
 is unchanged. Selected65/82/211ms not full/RTO,47 failures remain. Actual own
@@ -74,17 +123,17 @@ Its native21/build/current artifact evidence below is retained, not rerun or
 inherited. Auth-source inventory, QA login and hosting STOP conditions remain
 unchanged; no new recovery route or repeated notification is authorized.
 
-**Next critical independent stock dependency:** retained inquiry reservation
+**Historical defect discovery (correction/composition now above):** retained inquiry reservation
 source sums inquiry holds only, while later B2B acceptance creates Parts holds
 on the same inventory. With10 on hand, an8-unit B2B hold plus a5-unit inquiry
 can be admitted by the old inquiry body. This is a concrete retained-source
-defect, not verified hosted behavior. Prepare a private/unapplied INVOKER
-candidate and pinned selected-schema SQL regressions for both hold families;
+defect, not verified hosted behavior. Its private/unapplied INVOKER
+candidate and pinned selected-schema SQL regressions now cover both hold families;
 do not replay the historical migration or activate a writer. Selected-fixture
 tests, native independent-session waits, current catalog/all-writer ordering,
 native authority and durable unknown-outcome/recovery proof remain separate.
 `adjustBusinessInventory` still has a split movement/read/update path; no global
-no-oversell claim. Work on the isolated correction follows this UI publication.
+no-oversell claim. The isolated correction and composition are now implemented.
 All18+N1–N3,47 replay failures/12 historical/five unapplied/two recorded envelopes,
 full recovery/device/owner/main/live gates and22 October risk remain open.
 

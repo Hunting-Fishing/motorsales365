@@ -2,12 +2,32 @@
 
 ## Current delivery authority (17 October 2026)
 
+Current stock prerequisite now composes the exact retained B2B writer with the
+private inquiry correction and fixed native-source exports. Root parity6/6 in
+2.1367703s plus sequential actual-writer13/13 in10.8898883s pass;49 spans/14
+tables/75 setup actions/30FK preserve the66-action original prefix. Ordinary/
+service execution remains withheld; owner/Auth support is synthetic. Actual
+acceptance/cancel/inverse inquiry availability/late-FK/outer rollback are not
+native concurrent-session or CRM authority acceptance. Wiring2/2 in75.6675ms/
+ESLint0/reviews pass, same PR68, own-head CI separate.
+[Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md). Next fresh private
+Docker-free PG17 actual-writer sessions/wait/commit/rollback/recheck; no native
+stock process or UI connection yet. All-writer/catalog/native authority/TTL/
+durable outcomes/recovery/device/owner/live and all18+N1–N3 remain open.
+
+### Closed mixed-stock candidate checkpoint
+
 Current independent atomic-stock prerequisite counts both inquiry/B2B holds in
 one private/unapplied INVOKER candidate. Root isolated SQL16/16 in14.6660125s
 reproduces legacy10+8+5=13 and candidate reject5/permit2, with actual selected
 NUMERIC/FK/trigger/denial/rollback controls. Owner/GUC/Auth support is synthetic,
 not CRM/native authority. Mandatory CI/wiring2/2 in93.3995ms and ESLint0 pass;
-same PR68, publication waits for currentc59 unit, exact hash in evidence comment.
+source4050ec27 is published in same PR68/comment6226237118. All six own38978627414
+Actions now pass, actual5,036/96 files64.75s zero unexpected/quarantined failures
+(truncated/final summaries). Early memory16 log clipped; retained actual native21
+does not run stock SQL. Current artifact2,599 objects0missing/Preview skip
+verified, not deployment or full recovery. Native-source parity/actual retained
+B2B composition now passes above; independent-session acceptance remains next.
 [Exact selected scope](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md). No app/
 grants/migration/stock/payment activation. Native independent-session mixed-writer
 proof, all-writer/current catalog/native authority/TTL/durable recovery remain

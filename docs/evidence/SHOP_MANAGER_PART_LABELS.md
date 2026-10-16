@@ -8,8 +8,10 @@ evidence comment, subject `Associate part editor controls with accessible labels
 Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444;
 exact prior64,364-character body/title/non-main base/draft/main preserved. Own
 38976025387 build117225560656/type117225560644/OCR117225560784/lint117225560426/native117225560643
-pass; unit117225560774 still running at read-back, not all-six
-acceptance. Actual untruncated native PG17.11/server170011/Parts247/quote6/all21
+pass; unit117225560774 now completes: actual5,036/96 files103.47s zero unexpected/
+quarantined failures (truncated/final summaries). All six own38976025387 Actions
+pass, including actual18 detail tests, not inherited. Actual untruncated native
+PG17.11/server170011/Parts247/quote6/all21
 ordered expense/draft/Auth-user markers/both terminators/EXIT+always-cleanup pass;
 root compares complete vector to the admitted frozen21, unchanged source. Selected
 65/82/211ms is not full recovery/RTO;47 replay failures remain. Actual untruncated

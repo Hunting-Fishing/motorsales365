@@ -2,13 +2,33 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Native stock source parity and unchanged actual B2B writer composition now pass
+root6/6 in2.1367703s and13/13 in10.8898883s, zero fail/skip/cancel. Fixed exports
+retain66 original actions; extension49 spans/14 tables/75 actions/30FK covers
+actual sequential acceptance/cancel/inverse availability/late-FK/outer rollback.
+Wiring2/2 in75.6675ms/ESLint0/reviews pass, same PR68, own-head CI separate.
+[Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md). Next fresh private
+Docker-free PG17 genuine-writer independent sessions and observed waits/commit/
+rollback/rechecks; native stock SQL has not run. No app/grant/migration/live
+activation. Day2 atomic-stock milestone remains open with catalog/all-writer/
+native authority/TTL/durable outcome/full recovery gates. This source prerequisite
+does not close the Day2 milestone or make22 October a supported forecast.
+Auth-source/QA/hosting stops, all18+N1–N3/47/12/5/2/owner/device/main/live remain.
+
+### Closed mixed-stock candidate checkpoint
+
 Mixed inquiry/B2B reservation defect adds a required atomic-stock correction and
 native mixed-writer proof to the Day2 dependency, not a scope reduction. Root
 actual isolated SQL16/16 in14.6660125s now reproduces legacy10+8+5=13 and verifies
 private/unapplied candidate reject5/permit2. Actual selected NUMERIC/FKs/trigger/
 denial/rollback retained; synthetic owner/Auth support is not native authority.
-Mandatory serialized CI/wiring2/2 in93.3995ms/ESLint0 pass. Same PR68/publication
-waits for currentc59 unit, exact hash in comment. No app/grants/migration/live
+Mandatory serialized CI/wiring2/2 in93.3995ms/ESLint0 pass. Source4050ec27 is
+published same PR68/comment6226237118 and all six own38978627414 Actions pass;
+actual5,036/96 files64.75s zero unexpected/quarantined failures (truncated/final
+summaries), early memory16 log clipped. Actual retained native21 is expense-only,
+not stock SQL. Current2,599-object artifact/Preview skip verified, not full
+recovery/deployment. Native-source parity/unchanged B2B composition now passes
+above; genuine native independent-session proof remains. No app/grants/migration/live
 stock activation. [Exact frontier](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
 Next native independent-session wait/commit/rollback/mixed-writer races, current
 catalog/all-writer/native authority/TTL/durable outcomes/full recovery. Atomic

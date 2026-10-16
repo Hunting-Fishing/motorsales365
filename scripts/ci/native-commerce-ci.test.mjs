@@ -249,6 +249,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs",
     ],
     [
+      "Mixed stock native-source and actual B2B writer composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-native-source.test.mjs scripts/parts-stock/mixed-reservation-order-source.test.mjs",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

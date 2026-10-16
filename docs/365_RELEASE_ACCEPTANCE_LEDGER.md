@@ -10,6 +10,35 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Current source-only stock prerequisite adds fixed native-source exports and the
+unchanged retained actual B2B transition/event/timestamp composition. Root6/6
+parity2.1367703s and13/13 sequential SQL10.8898883s pass with zero fail/skip/cancel;
+49 spans/14 tables/75 setup actions/30 real FKs, original66-action prefix retained.
+Actual acceptance/cancel/inverse inquiry availability/late-FK/outer rollback
+preserve all selected rows/catalog; owner/Auth support remains synthetic and
+ordinary/service writer execution withheld. Wiring2/2 in75.6675ms/ESLint0 and
+independent reviews pass. Same PR68/commit subject
+`Compose native stock sources with retained B2B writer`; own-head CI separate.
+[Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md). No workflow acceptance
+advances: P1/PA3/N1/N2 await fresh private PG17 independent actual-writer waits/
+commit/rollback/recheck, current catalog/all-writer/native authority/TTL/durable
+outcomes/full recovery. No native stock process or app/migration/grant/live change.
+
+### Closed mixed-stock candidate checkpoint
+
+Stock4050ec27de26564af807a2d3eace898ac2556e36 is published same draft PR68/comment
+6226237118, exact body/title/base/draft/main preserved. Parentc59 all six own
+Actions pass, actual5,036/96 files103.47s zero unexpected/quarantined failures
+(truncated/final summaries), no unit cancellation. Own405 all six38978627414
+Actions pass; actual5,036/96 files64.75s zero unexpected/quarantined failures
+(truncated/final summaries). Early memory16 log is clipped, not separately
+observed Linux16. Actual untruncated native117233967523 has PG17.11/Parts247/
+quote6/retained21 exact ordered expense proofs/cleanup, NOT stock SQL; selected
+68/88/225ms not full/RTO. Actual build/current2,599 objects0missing/Preview skip
+verified, not historical recovery/deployment. Native-source parity/actual retained
+B2B composition now passes above; independent sessions remain. No unchanged local16/2
+or native/build verification repeat; notes join implementation, not docs-only push.
+
 Current stock prerequisite implements a private/unapplied INVOKER mixed-hold
 candidate, not an accepted stock workflow. Root actual isolated SQL16/16 in
 14.6660125s reproduces the old inquiry-only10+8+5=13 admission and corrected
@@ -22,7 +51,7 @@ pass. One test-only review correction replaces whole-target normalization with
 seven-field whitelist. Serialized mandatory CI/wiring2/2 in93.3995ms/ESLint0
 pass; native/timeouts/quarantine/coverage unchanged. Same PR68/commit subject
 `Prepare private mixed stock reservation correction`, exact hash in comment;
-publication waits for currentc59 unit completion. No app/old source/grants/
+publication followed completedc59 unit. No app/old source/grants/
 migration/live activation. Next actual native mixed-writer independent sessions,
 current catalog/all-writer/native authority/TTL/durable unknown outcome/recovery
 acceptance; selected sequential mechanics are not global no-oversell or release.
@@ -30,8 +59,8 @@ All18+N1–N3/47/12/5/2/stops/main gates remain; Day2 stock and22 October risk o
 [Exact source/validation frontier](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
 
 Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444,
-exact body/title/non-main base/draft/main retained. Own build/type/OCR/lint/native
-pass, unit pending, no all-six claim. Actual native117225560643 untruncated PG17.11/
+exact body/title/non-main base/draft/main retained. All six own Actions pass,
+actual5,036/96 files103.47s zero unexpected/quarantined failures. Actual native117225560643 untruncated PG17.11/
 Parts247/quote6/all21 exact ordered markers/terminators/cleanup matches admitted
 unchanged21; selected65/82/211ms not full/RTO,47 failures remain. Actual Preview
 configuration skips/no upload; production/migrations skip, hosting STOP unchanged.

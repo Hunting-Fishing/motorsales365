@@ -4,6 +4,34 @@
 `Prepare private mixed stock reservation correction`; exact commit/publication
 in the PR evidence comment. No application, migration, grant or live activation.
 
+Follow-on [native-source/B2B composition](MIXED_STOCK_NATIVE_SOURCE.md) now
+preserves this original fixture/candidate/test exactly. Root6/6 parity2.1367703s
+and13/13 actual retained writer sequential SQL10.8898883s pass. Native mixed-stock
+independent sessions, current catalog/all-writer/native authority/TTL/durable
+outcome/full recovery and application connection remain open; no native process
+ran and this candidate stays private/unapplied.
+
+Source4050ec27de26564af807a2d3eace898ac2556e36 is published same draft PR68/comment
+6226237118, exact remote/body/title/base/draft/main retained. Parentc59 all six
+38976025387 Actions now pass; actual unit1172255607745,036/96 files103.47s zero
+unexpected/quarantined failures (truncated/final summaries), including18 actual
+detail tests. Hold cleared without cancellation. Own405 all six38978627414
+Actions now pass; actual unit1172339677465,036/96 files64.75s zero unexpected/
+quarantined failures (returned log truncated/final summaries). Early memory16
+step transcript is clipped, not separately observed Linux16 from status/local16.
+Actual own native117233967523 is untruncated: PG17.11/Parts247/quote6/all21 exact
+ordered expense/draft/Auth-user markers/terminators/EXIT+always-cleanup, complete
+vector equals admitted frozen21 whose source is unchanged. This is NOT native
+stock SQL execution. Selected68/88/225ms not full/RTO;47 failures remain. Actual
+build final214media/15OCR/202PDF/server-boundary/Worker+sole365/dry-run summaries
+verified (truncated/final summaries); COMPLETE CI merge062cdfd18b0a3c121ab4535cb501d7c3a5c949ee
+equals candidate treeb0d4759428b6031fa422c77264f16b3ed665042b/2,599 current objects
+0missing, not history recovery. Actual untruncated Preview117233967617 skips
+configuration/no upload, production/migrations/Supabase Preview skip.
+Workers117234010767
+fails cause unverified, hosting STOP unchanged. Production/migrations/Supabase
+Preview skip. Read-back notes join next implementation, no docs-only restart.
+
 ## Actual retained-source defect and selected correction
 
 The retained `20260709033911_3dc415e7-4ec3-47e8-bafa-e2dc520d5f34.sql`
@@ -75,7 +103,7 @@ ESLint0 findings, syntax/format/diff and independent read-only review pass.
 Normal25-minute job timeout, quarantine and all native/adversarial/transaction
 coverage remain unchanged. A reviewer capacity failure used ONE available
 independent read-only reviewer alternative successfully; no repeated model retry
-or bypass. Same-PR publication waits for c59 unit completion, no cancellation.
+or bypass. Same-PR publication followed c59 unit completion, no cancellation.
 Own-head required CI is separate and does not imply new native mixed-hold proof.
 
 ## Limits, impact and next dependency
@@ -103,8 +131,9 @@ Sites informed the already published adjacent UI labels, not stock authority.
 OpenAI Docs keeps the existing follow-up updated in place, not duplicated.
 
 Parentc59 Add Part source has actual18/18 DOM30.97s/full normal TypeScript/lint/
-format/review, own build/type/OCR/lint/native pass; current unit pending at this
-write, no all-six claim. Its actual untruncated nativePG17.11/Parts247/quote6/
+format/review, all six own Actions pass; actual unit5,036/96 files103.47s zero
+unexpected/quarantined failures (truncated/final summaries). Its actual
+untruncated nativePG17.11/Parts247/quote6/
 retained21 expense markers/cleanup and build/full current2,594-object artifact
 are separately verified, not execution of this new stock candidate. Actual
 Preview skipped/no upload. All18+N1–N3/47 replay failures/12 historical/five

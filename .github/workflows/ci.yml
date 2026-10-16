@@ -84,6 +84,9 @@ jobs:
       - name: Mixed inquiry and B2B stock reservation candidate (memory-only, never quarantined)
         run: node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs
 
+      - name: Mixed stock native-source and actual B2B writer composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-native-source.test.mjs scripts/parts-stock/mixed-reservation-order-source.test.mjs
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db
