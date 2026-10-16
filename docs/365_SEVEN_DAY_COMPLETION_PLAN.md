@@ -1,5 +1,14 @@
 # 365 Seven Day Completion Plan
 
+R3 repair `6fb1e895` fixes the next source-confirmed column ACL snapshot defect,
+without removing permission comparison. Actual `afde5a81` now passes identity/
+pristine/fixture and fails source-access22023 before dump/restore. Offline101/101,
+syntax/format/diff/review and changed-line lint pass; new exact-head native result
+is required. No Docker, live change or deployment. Continue real-stack/private-byte
+prerequisites and independent read-only C1.08 viewing after this bounded test.
+Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. The 17 October feasibility
+review and 22 October target/gates remain unchanged; no recovery acceptance yet.
+
 Latest R3 repair `719255fb` replaces warning-producing nonregular libpq control
 files with verified empty private files, keeping every isolation/identity/restore
 gate and strict stderr rejection. Third actual native run still fails first

@@ -223,6 +223,36 @@ Actual repaired Linux recovery remains required; this source fix is not acceptan
 Changed-line lint against `aff9f829` has zero errors/warnings/retained findings
 across two JS files. Shell and its previously reviewed cleanup remain byte-identical.
 
+### Fourth Linux attempt: column ACL snapshot repair
+
+Actual `afde5a81468f528ce47f6ade4ae0d3945aeb07b1` native job `116909139334`
+in run `38881411362` passes identity/pristine admission and fixture setup, then
+fails `source-access/22023`. Parts247 and six quote groups/scoped stops pass;
+recovery EXIT/always-cleanup complete. Dump/restore/timing acceptance is still open.
+Build/typecheck/lint/browser OCR pass; unit `116909138968` remains running at the
+latest capture. Untruncated preview `116908772613` confirms configuration skip
+(`DEPLOY_VIA_ACTIONS` not true), no upload. Migrations/production/Supabase Preview
+skip. Workers build `4b01435b-cac3-4b66-9224-de5dd9e7be33` fails with ID/link only,
+fresh cause unverified; no earlier cause is promoted into this head's proof.
+
+Snapshot columns previously coalesced NULL `attacl` to a zero-dimensional literal
+empty ACL array. [PG17 ACL implementation](https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/backend/utils/adt/acl.c)
+rejects that shape with22023. Source repair `6fb1e895` passes nullable `attacl`
+directly: [the strict set-returning function behavior](https://raw.githubusercontent.com/postgres/postgres/REL_17_STABLE/src/backend/executor/execSRF.c)
+returns no rows on NULL input, and the existing aggregate normalizes this to `[]`.
+Explicit column grants and their grantor/grantee/privilege/grantable ordering stay
+unchanged; no fabricated defaults or removed ACL checks. This is a definite source
+defect consistent with the stage/code, not a claim that all later stages pass.
+
+Final offline **101/101**, zero failures/skips, 3,034.21ms; syntax/format/diff and
+independent frozen review pass. New isolated-column regression pins explicit
+grants/empty normalization and refuses invalid fallback/default substitution.
+Changed-line lint against `afde5a81`: zero errors/warnings/retained findings across
+two JS files. Node SHA `f11075479200119dea5614673b7e12d5873612b3c94f56b40426a0a50a1f2850`;
+test SHA `3f46cc744f01ae12c35095b5d5221d9b64092fdc99c557df4f2b7f1d278ad15d`.
+Shell/fixture/admission/pin/restore/cleanup are unchanged. Actual repaired Linux
+execution remains required; no Docker, app SQL/live changes or deployment.
+
 ## Open release gates and next dependency
 
 Even a passing rehearsal does not recover the application baseline, real Auth/

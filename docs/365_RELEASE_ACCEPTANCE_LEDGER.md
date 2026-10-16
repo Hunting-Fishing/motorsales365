@@ -41,6 +41,19 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+R3 repair `6fb1e895` removes an invalid empty column ACL-array fallback while
+preserving explicit grants and absent-grant normalization. Actual `afde5a81`
+native job `116909139334` now passes identity/pristine/fixture and fails
+source-access22023 before dump/restore. Final offline101/101 (3,034.21ms), syntax/
+format/diff/review and changed-line lint zero findings pass. Repaired exact-head
+native execution remains required; R3 is blocked. Build/typecheck/lint/browser OCR
+pass on `afde5a81`; unit is still running at capture. Confirmed preview config
+skip/no upload; migrations/production/Supabase Preview skip. Workers failure
+`4b01435b-cac3-4b66-9224-de5dd9e7be33` has fresh cause unverified. No Docker,
+application migration/live change/deployment. Next: repaired native recovery,
+real-stack/private-byte prerequisites and separate read-only C1.08 viewing.
+Exact evidence and unsatisfied gates: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 repair `719255fb` uses verified zero-byte private libpq controls,
 retaining all stderr/identity/restore/cleanup gates. Actual `aff9f829` still fails
 first client read; PG17 source confirms a consistent nonregular-password-file

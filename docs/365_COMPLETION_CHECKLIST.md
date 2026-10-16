@@ -16,6 +16,21 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+R3 ACL snapshot repair `6fb1e895` follows actual published `afde5a81` native job
+`116909139334` (run `38881411362`): identity/pristine admission and fixture now
+pass, but source-access fails SQLSTATE22023 before dump/restore. A zero-dimensional
+empty ACL fallback is a source-confirmed PG17 defect; direct nullable column ACL
+input preserves explicit grants and normalizes absent grants through the existing
+aggregate. Final offline101/101 (3,034.21ms), syntax/format/diff, independent review
+and changed-line lint zero findings pass. New exact-head native execution remains
+required; R3 is not accepted. Build/typecheck/lint/browser OCR pass on `afde5a81`;
+unit remains running at capture. Preview is a confirmed configuration skip, no
+upload; migrations/production/Supabase Preview skip. New Workers failure cause is
+unverified. No Docker, application migration/live change or deployment. Next:
+verify repaired native recovery, then real-stack/private-byte prerequisites and
+separate read-only C1.08 complete-line viewing. Exact evidence and open gates:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 repair `719255fb` replaces nonregular libpq credential controls with
 verified empty private files, retaining strict stderr rejection and every
 identity/recovery/cleanup condition. Third actual `aff9f829` run fails first

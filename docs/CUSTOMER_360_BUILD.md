@@ -1,5 +1,14 @@
 # Native Customer 360: first delivery slice
 
+R3 snapshot repair `6fb1e895` retains column permission evidence while removing
+an invalid empty ACL-array fallback. Actual `afde5a81` native execution now passes
+identity/pristine/fixture but fails source-access22023, before dump/restore. Final
+offline101/101, syntax/format/diff/review and changed-line lint zero findings pass;
+new repaired native execution is required. No migration, live operation or deploy.
+Next: native recovery, real-stack/private-byte prerequisites and separate read-only
+C1.08 line-window viewing without unlocking partial-row edit/share/write. Evidence:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 Latest R3 repair `719255fb` fixes a source-confirmed libpq control-file blocker
 consistent with the third native first-read failure. Verified empty private files
 replace `/dev/null` without permitting warnings or relaxing identity/cleanup.
