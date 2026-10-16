@@ -10,10 +10,44 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
-Owned-ingress source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5, parent0fbec296,
-same candidate/draft PR68:1231/1231/full normal TypeScript/review/lint/format/
-preservation pass. Publish with evidence and read separate exact-head checks;
-no inherited acceptance, main/deploy/migration/grant/Buddy/account change.
+Selected Auth catalog prerequisite is integrated, not a positive authority gate.
+Actual sole365170006 observation2026-10-16T18:18:36.401211UTC captures18 selected
+columns/4 constraints/5 indexes/0 session policies/218 attachments/9 functions;
+no Auth rows/IDs/private values/helper execution. Initial64-trigger bound correctly
+reports incomplete; ONE reviewed same-scope256-bound alternative passes. Both
+dated captures retained, final9e210651…/queryed3d0459… pins and mandatory offline
+CI gate added. Existing baseline gains explicit unverified session/JWT/termination/
+timeout/native-role dependencies; only selectedMetadataSnapshotPinned is observed.
+All old sources/date/lineage/function projections remain; release/parity flags
+false and inventory exit1. Final local62/62 six suites pass, new-head full CI
+separate. Exact publication/checks recorded in same PR68 evidence comment/board;
+no inherited parent passes or unchanged app1231/native121/Windows full rerun.
+Next reviewed original-human/session/native-shop transaction admission and all
+writers/lock ordering/current-catalog/durable outcome recovery; selected catalog
+does not close R1/R2/R3/C1.07/C1.08. No app writer/grant/DDL/DML/settings/account/
+Buddy/main/deployment change. Existing QA/hosting stops,47 failures/12/5/2 and
+owner/API/private-original/device/full recovery/live acceptance remain open.
+Evidence: [Auth catalog prerequisite](evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md).
+
+### Verified parent owned-ingress checkpoint
+
+Owned-ingress source29172a0b/publicationfb881504bbd35821fd8e8d0b4497c76176ab72b4
+verified canonical branch/same draft PR68; exact64,364-character body/title/base/
+draft/main preserved.1231/1231/full normal TypeScript/review/lint/format/
+preservation pass. All six Actions38942225928 now pass; unit117112437695 reports
+5,008/95 files72.81s, zero unexpected/quarantined failures (truncated log, final
+summaries/new core117+middleware28 file results visible). Actual native117112437626
+untruncated PG17.11/Parts247/all18 ordered expense/draft proofs/cleanup pass;
+47 replay failures remain; bounded57/82/203ms recovery not operational/full.
+Build final214 assets/Worker/backend/OCR/PDF/server-boundary/dry-run markers
+present (truncated); COMPLETE merge1e9714c2… equals candidate tree9e58de6d… .
+Preview config skip/no upload; production/migration/Supabase Preview skip;
+Workers8eda6e24 fails, cause unknown, existing stop retained. Existing follow-up
+updated/readback preserves ID/settings/thread/creation. These notes join next
+implementation. Unit hold closed; next value-free Auth catalog capture and
+explicit baseline session/termination/native-role gates, then reviewed strict
+authority/all-writer/durable/recovery. No main/deploy/migration/grant/Buddy/account
+change or invented Auth DDL/ordinary table access/privileged fallback.
 
 Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
 all-six completion. New native117094365266/run38936842687 actually passes

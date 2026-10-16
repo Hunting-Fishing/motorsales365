@@ -233,6 +233,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "npx vitest run src/lib/receipt-command-ingress.server.test.ts src/lib/receipt-command-middleware.server.test.ts --maxWorkers=1",
     ],
     [
+      "Native Auth session catalog privacy and dependencies (offline, never quarantined)",
+      "node --test scripts/ci/auth-session-catalog-review.test.mjs",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

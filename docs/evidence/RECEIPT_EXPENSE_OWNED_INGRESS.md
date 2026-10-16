@@ -4,9 +4,32 @@
 Connected source is a denial boundary, not completed financial/native authority,
 strict session revocation, safe draft editing or production acceptance.
 
-Source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5 follows parent0fbec296; publish
-source/evidence together in same draft PR68. Required actual own-head CI results
-are separate and must be read next; no inherited parent acceptance or release.
+Source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5/publication
+fb881504bbd35821fd8e8d0b4497c76176ab72b4 verified on canonical branch/same draft
+PR68, exact prior64,364-character body/title/base/draft/main preserved. Evidence
+comment6221363436 records source/tests/limits without truncating prior history.
+
+All six Actions38942225928 now pass. Actual unit117112437695 reports5,008/5,008
+across95 files72.81s, zero unexpected/quarantined failures. Returned log truncated,
+final summaries and new core117/middleware28 test-file results visible. This is
+actual full-suite source coverage, not synthetic transport upgraded to real Auth.
+Actual native117112437626 is untruncated PGDG17.11/server170011, Parts247/all18
+exact ordered expense/draft proofs/terminators/cleanup;47 replay failures remain.
+Bounded57/82/203ms recovery is not operational/full recovery. Build117112438094
+log truncated but final214 media/Worker motorsales365/canonical365/15 OCR/202 PDF/
+server-boundary/dry-run markers present. COMPLETE fetched CI merge
+1e9714c233e6259eaa5ecea70be58bb97ece4104 has parent base576fb17d…/headfb881504…
+and identical WHOLE tree9e58de6d53a91b79574c3a1f48d8dd49bf164c54 to the candidate.
+Preview117112442671 untruncated confirms config skip/no upload; production/
+migration/Supabase Preview skip. Workers117112513167/8eda6e24 fails with unknown
+fresh cause; existing hosting stop retained. No release. Unit hold now closed;
+follow-up notes join next implementation, not another docs-only CI restart.
+
+Existing follow-up update/readback preserves ID/name/kind/active30min/thread/
+creation and exact updated checkpoint/stop policy. No new automation. Official
+OpenAI Docs guided same-chat follow-up preservation; unavailable markdown was
+read once through its official HTML page instead:
+[thread follow-ups](https://learn.chatgpt.com/docs/changelog#start-follow-and-steer-work).
 
 ## Connected source
 

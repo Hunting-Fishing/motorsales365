@@ -42,10 +42,42 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
-Owned-ingress source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5 follows0fbec296,
-same candidate/draft PR68. Final local1231/1231/full normal TypeScript/review/
-lint/format/exact preservation pass. Publish with evidence, then own exact-head
-checks; parent passes do not accept this source. No main/deploy/migration/grant.
+Selected Auth catalog/dependency integration now captures actual sole365 metadata
+without Auth rows/IDs/values/helper execution. ONE initial64-trigger bound reports
+incomplete; ONE reviewed same-scope256-bound alternative passes with218 selected
+attachments. Both captures retained. Final dated artifact9e210651…/queryed3d0459…
+pin18 columns/4 constraints/5 indexes/0 session policies/9 functions on170006.
+Explicit session/JWT/termination/timeout/native-role requirements are reachable
+but unverified; only selected metadata is source-observed. Existing source pins/
+date/lineage/function projections and all false release/parity flags remain.
+Offline mandatory CI gate and final local62/62 six-suite validation are integrated;
+new exact-head CI is separately required. No unchanged1231/121/full Windows rerun.
+Evidence: [Auth prerequisite](evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md).
+Next reviewed original-human/session/native-shop transaction admission, all-writer/
+current-catalog/durable reconciliation, not another unchanged catalog capture.
+No Auth access grant, privileged fallback, DDL/DML/history/setting/account/Buddy/
+main/deployment change. QA/hosting stops and47 replay failures/12/5/2 remain;
+R2/C1.07/C1.08/R3 owner/API/private-original/device/recovery/live acceptance open.
+
+### Verified parent owned-ingress checkpoint
+
+Owned-ingress source29172a0b/publicationfb881504bbd35821fd8e8d0b4497c76176ab72b4
+is verified on canonical branch/same draft PR68 with exact prior64,364-character
+body/title/base/draft/main preserved. Final local1231/1231/full normal TypeScript/
+review/lint/format/preservation pass. All six38942225928 Actions now pass; actual
+unit117112437695 reports5,008/95 files72.81s, zero unexpected/quarantined failures
+(truncated log, final summaries/new core117+middleware28 file results visible).
+Actual native117112437626 untruncated
+PG17.11/Parts247/all18 ordered expense/draft proofs/cleanup pass;47 replay failures
+remain, bounded57/82/203ms recovery not RTO. Build final214 assets/Worker/backend/
+15 OCR/202 PDF/server-boundary/dry-run markers present (truncated log). COMPLETE
+merge1e9714c2… equals candidate tree9e58de6d… . Preview config skip/no upload;
+production/migration/Supabase Preview skip; Workers8eda6e24 fails, cause unknown.
+Existing automation updated/readback preserves identity/settings/thread/creation;
+known stops retained. Unit hold closed; these notes join next implementation:
+value-free Auth catalog capture/explicit baseline session and native-role gates,
+then reviewed strict authority/all-writer/durable/recovery. No repeated source/
+tests, invented provider DDL, ordinary Auth table grant or privileged fallback.
 
 Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
 completed all six Actions; no cancellation/repeated121 tests. Actual new native

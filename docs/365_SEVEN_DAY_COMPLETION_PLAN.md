@@ -25,7 +25,14 @@ unit117094365659 reports4,863/93 files100.43s, zero unexpected/quarantined failu
 application activation or live release. Connected owned original-Bearer receipt-
 expense ingress passes1231/1231 seven suites10.37s/full normal TypeScript, independent review/exact
 preservation; actual installed SDK uses fake HTTP, not live Auth/native roles.
-`evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`. Next exact-head checks and strict
+`evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`. Owned-ingress publicationfb881504
+now passes all six Actions; actual unit117112437695 reports5,008/95 files72.81s,
+zero unexpected/quarantined failures (truncated log, final summaries present).
+Selected sole365 Auth catalog/dependency integration now passes actual bounded
+metadata capture after ONE reviewed alternative; both attempts retained. Local
+six-suite62/62 passes, all authority/lineage/expiry/writer gates remain unverified.
+`evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md` records exact scope/limits;
+new-head CI is separate, no unchanged capture/app test rerun. Next strict
 session/native authority/catalog/all-writer/durable/API/
 private-original/recovery gates still precede draft editing. Current hosting/
 47 replay/native authority/atomic commerce/full recovery/QA/device/owner gates

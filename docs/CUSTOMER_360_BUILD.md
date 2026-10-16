@@ -18,9 +18,16 @@ Connected owned original-Bearer receipt-expense ingress passes1231/1231 seven
 suites10.37s/full normal TypeScript and independent review; exact14-other-export/generated/helper/
 dependency preservation verified. Actual SDK composition uses fake HTTP, not a
 live session/native-role proof. `evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`.
-Next fresh exact-head checks, then strict
-session/native authority/current catalog/all-writer/durable/API/private-original/
-recovery gates remain before draft editing. Dedicated
+Owned-ingress publicationfb881504 now passes all six required Actions;
+actual unit117112437695 reports5,008/95 files72.81s, zero unexpected/quarantined
+failures (truncated log, final summaries present). Selected Auth catalog and
+explicit unverified baseline requirements are now integrated; actual sole365
+metadata18 columns/218 attachments/9 functions passes after ONE reviewed bounded
+alternative, not Auth/session/native authority. First incomplete capture retained.
+Local integrated62/62 six suites pass; new-head CI remains separate. Evidence:
+`evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md`. Next reviewed strict session/
+native authority/current catalog/all-writer/durable/API/private-original/recovery
+gates remain before draft editing; no unchanged capture/app test rerun. Dedicated
 QA signup still needs owner handoff; one direct CRM-route alternative redirected
 to login, so this browser action stops until new access. No identity/Terms bypass.
 

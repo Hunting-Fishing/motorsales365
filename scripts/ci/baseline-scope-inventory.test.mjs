@@ -328,6 +328,239 @@ test("staff/chat inventory adds only bounded dated dependencies and keeps author
   assert.ok(report.findings.some((row) => row.code === "DEPENDENCY_CYCLE_REQUIRES_REVIEW"));
 });
 
+test("receipt session/native authority requirements stay an unverified external closure, not executed source", () => {
+  const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
+  const manifestPath = "docs/evidence/baseline-native-scope-v1.json";
+  const manifest = JSON.parse(fs.readFileSync(path.join(repositoryRoot, manifestPath), "utf8"));
+  const report = runInventoryCli([manifestPath], repositoryRoot);
+  const requirementsId = "external:receipt-command-session-and-authority-requirements";
+  const newIds = [
+    requirementsId,
+    "external:auth.sessions",
+    "external:auth.jwt()",
+    "external:auth-session-termination-and-revocation-ordering",
+    "external:auth-configured-session-timeouts",
+    "external:receipt-native-role-authority",
+    "external:auth-session-catalog-evidence-2026-10-17",
+  ];
+  assert.equal(manifest.formatVersion, 1, "no runtime/schema extension");
+  assert.equal(manifest.sourceCommit, "4100bbfd4513ddeefe21c7d138c88955ff96fadf");
+  assert.equal(manifest.observedAtUtc, "2026-10-14T22:28:36.246157Z");
+  assert.equal(
+    hash(JSON.stringify(manifest.sources)),
+    "be6148ccb93375f0bfc1cace1d5868da537fad1820f52c9581eb0fb6ca85a104",
+    "this declaration does not change any retained source pin, lineage class or evidenceRef",
+  );
+  assert.equal(
+    hash(
+      JSON.stringify(
+        manifest.objects.filter(
+          (row) => row.kind === "function" && /receipt|vehicle_receipts_private/.test(row.id),
+        ),
+      ),
+    ),
+    "10ddd4e8902c62b94dd800d4611d4cd7194ef18f0d5a6fc35d710924e9a3fd22",
+    "requirements add no future gate or calls edge to retained receipt functions",
+  );
+  assert.ok(manifest.roots.includes(requirementsId));
+  for (const id of newIds) {
+    const row = manifest.objects.find((object) => object.id === id);
+    assert.ok(row, `${id}: explicit declaration`);
+    assert.ok(report.reachableObjectIds.includes(id), `${id}: declared reachable`);
+    assert.equal(row.kind, "external");
+    assert.equal(row.disposition, "unverified");
+    assert.deepEqual(row.sourceRefs, [], "platform/future contracts have no invented migration");
+    for (const dependency of row.dependencies) {
+      assert.equal(dependency.relation, "external-prerequisite");
+      assert.equal(dependency.reviewStatus, "unverified");
+    }
+    for (const [facet, status] of Object.entries(row.facets))
+      assert.equal(
+        status,
+        id === "external:auth-session-catalog-evidence-2026-10-17" &&
+          facet === "selectedMetadataSnapshotPinned"
+          ? "source-observed"
+          : "unreviewed",
+        `${id}:${facet}: only the selected evidence pin is observed, not its authority contract`,
+      );
+  }
+  const requirements = manifest.objects.find((row) => row.id === requirementsId);
+  assert.deepEqual(
+    requirements.dependencies.map((row) => row.id),
+    ["external:auth.users", "external:auth.uid()", ...newIds.slice(1)],
+  );
+  const nativeAuthority = manifest.objects.find(
+    (row) => row.id === "external:receipt-native-role-authority",
+  );
+  assert.deepEqual(
+    nativeAuthority.dependencies.map((row) => row.id),
+    [
+      "table:shop_manager.profiles",
+      "table:shop_manager.user_roles",
+      "table:shop_manager.roles",
+      "external:identity-constraints-policies-grants-and-trigger-closure",
+    ],
+    "native-role and mutable-profile closure is a prerequisite, not established authority",
+  );
+  for (const [id, facets] of [
+    [
+      "external:auth.sessions",
+      [
+        "platformManagedInstallationAndLineage",
+        "expiryAndInactivitySemantics",
+        "realAuthAdmissionAndRevocation",
+      ],
+    ],
+    [
+      "external:auth.jwt()",
+      ["verifiedBearerClaimsVersusDatabaseGuc", "sessionIdExpiryAndRoleClaims"],
+    ],
+    [
+      "external:auth-session-termination-and-revocation-ordering",
+      ["allSessionTerminationAndRefreshWriters", "lockOrderingAndCommitBoundary"],
+    ],
+    [
+      "external:auth-configured-session-timeouts",
+      ["projectSessionTimeoutConfiguration", "timeboxInactivityRefreshAndSingleSessionSemantics"],
+    ],
+    [
+      "external:receipt-native-role-authority",
+      [
+        "trustedNativeProfileAndShopBinding",
+        "allRoleAssignmentAndCatalogWriters",
+        "roleRevocationOffboardingAndLockOrdering",
+      ],
+    ],
+  ]) {
+    const row = manifest.objects.find((object) => object.id === id);
+    for (const facet of facets) assert.equal(row.facets[facet], "unreviewed");
+  }
+  assert.equal(
+    manifest.platformPrerequisites.find(
+      (row) => row.id === "platform:receipt-command-session-and-native-authority",
+    ).reviewStatus,
+    "unverified",
+  );
+  assert.equal(
+    manifest.separateDataAssertions.find(
+      (row) => row.id === "data:receipt-command-session-authority-acceptance",
+    ).status,
+    "unverified",
+  );
+  assert.equal(report.exitCode, 1);
+  assert.equal(report.structureValid, true);
+  assert.equal(report.pinsVerified, true);
+  for (const key of [
+    "declaredCoverageComplete",
+    "fullReplayVerified",
+    "baselineVerified",
+    "databaseReleaseApproved",
+    "exactAppliedLineageVerified",
+    "schemaParityVerified",
+    "dataParityVerified",
+    "aclParityVerified",
+    "sqlObjectIdentityVerified",
+    "attachmentsVerified",
+  ])
+    assert.equal(report[key], false, `${key}: catalog/requirements cannot approve release`);
+  for (const row of report.sources) {
+    assert.equal(row.appliedLineageInferred, false);
+    assert.equal(row.exactAppliedLineageVerified, false);
+  }
+});
+
+test("pinned Auth catalog evidence binds the external declaration but cannot promote managed/source lineage", () => {
+  const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
+  const manifest = JSON.parse(
+    fs.readFileSync(
+      path.join(repositoryRoot, "docs/evidence/baseline-native-scope-v1.json"),
+      "utf8",
+    ),
+  );
+  const evidenceId = "authSessionCatalog";
+  const evidencePath = "docs/evidence/auth-session-catalog-2026-10-17.json";
+  const evidencePin = manifest.evidenceFiles.find((row) => row.id === evidenceId);
+  assert.deepEqual(evidencePin, {
+    id: evidenceId,
+    path: evidencePath,
+    sha256Lf: "9e2106517fcf040392db69acb8d315bcb04950c409a95d3175dd338fca113804",
+  });
+  const content = fs.readFileSync(path.join(repositoryRoot, evidencePath), "utf8");
+  assert.equal(hash(content), evidencePin.sha256Lf);
+  assert.equal(Buffer.byteLength(content.replace(/\r\n/g, "\n")), 138_282);
+  const saved = JSON.parse(content);
+  assert.equal(saved.projectRef, canonicalProject);
+  assert.equal(saved.mode, "read-only-auth-session-catalog-fingerprints-v1");
+  assert.equal(saved.observedAtUtc, "2026-10-16T18:18:36.401211");
+  assert.equal(saved.serverVersionNum, "170006");
+  assert.equal(saved.complete, true, "complete only within the fixed selected catalog scope");
+  assert.equal(saved.truncated, false);
+  assert.deepEqual(saved.failures, []);
+  assert.deepEqual(saved.scope, {
+    roles: ["anon", "authenticated", "service_role", "supabase_auth_admin"],
+    source: "pg_catalog only; no Auth/application rows or row counts",
+    triggers: "all sessions attachments plus users DELETE and inbound sessions-FK attachments",
+    relations: ["auth.sessions", "auth.users"],
+    usersColumns: ["id", "is_anonymous", "deleted_at"],
+    attachedFunctions:
+      "fingerprints only for selected trigger function OIDs in any schema; no execution",
+    requestedFunctions: ["auth.uid()", "auth.jwt()"],
+  });
+  assert.equal(saved.caps.triggers, 256, "the reviewed same-scope bounded alternate");
+  assert.equal(saved.observedCatalogCounts.triggers, 218);
+  assert.deepEqual(
+    saved.relations.map((row) => row.name),
+    ["auth.sessions", "auth.users"],
+  );
+  assert.deepEqual(
+    saved.functions.filter((row) => row.requested).map((row) => row.signature),
+    ["auth.jwt()", "auth.uid()"],
+  );
+  assert.deepEqual(saved.limits, [
+    "Catalog fingerprints only; no managed Auth migration lineage, raw source recovery or complete baseline adoption.",
+    "No Auth/user/session rows, identifiers, row counts, credentials, configuration values or helper execution.",
+    "Effective privileges are dated metadata, not permission to grant access or a strict-session/native-role authorization path.",
+    "No logout, termination, timebox/inactivity, JWT/API behavior, lock-order/all-writer concurrency, financial, recovery or release acceptance.",
+  ]);
+  const declaration = manifest.objects.find(
+    (row) => row.id === "external:auth-session-catalog-evidence-2026-10-17",
+  );
+  assert.equal(declaration.disposition, "unverified");
+  assert.deepEqual(declaration.sourceRefs, []);
+  assert.equal(declaration.facets.selectedMetadataSnapshotPinned, "source-observed");
+  for (const facet of [
+    "platformManagedInstallationAndLineage",
+    "configuredTimeoutAndExpirySemantics",
+    "allWriterAndRevocationOrderingClosure",
+    "realAuthAndNativeRoleAuthority",
+  ])
+    assert.equal(declaration.facets[facet], "unreviewed");
+  assert.ok(manifest.sources.every((source) => !source.evidenceRefs.includes(evidenceId)));
+  assert.equal(Object.hasOwn(saved, "legacyApplied"), false);
+  assert.equal(Object.hasOwn(saved, "historySqlHashes"), false);
+
+  // Real selected fingerprints cannot certify the whole synthetic migration,
+  // much less managed Auth lineage. No SQL or Auth helper is executed here.
+  const item = fixture();
+  item.manifest.evidenceFiles = [clone(evidencePin)];
+  item.files[1] = { path: evidencePath, content };
+  item.manifest.sources[0].evidenceRefs = [evidenceId];
+  assert.throws(() => inspect(item), /Unsupported source-correspondence evidence/);
+  item.manifest.sources[0].lineageClass = "catalog-correspondence";
+  assert.throws(() => inspect(item), /Unsupported whole-source catalog correspondence/);
+  item.manifest.sources[0].lineageClass = "unclassified";
+  const report = inspect(item);
+  assert.equal(report.exitCode, 1);
+  assert.equal(report.pinsVerified, true);
+  assert.equal(report.sources[0].sourceHashCorrespondenceSupported, false);
+  assert.equal(report.sources[0].appliedLineageInferred, false);
+  assert.equal(report.sources[0].exactAppliedLineageVerified, false);
+  assert.equal(report.databaseReleaseApproved, false);
+  assert.equal(report.baselineVerified, false);
+  assert.equal(report.schemaParityVerified, false);
+  assert.equal(report.aclParityVerified, false);
+});
+
 function modify(change) {
   const item = fixture();
   change(item);
