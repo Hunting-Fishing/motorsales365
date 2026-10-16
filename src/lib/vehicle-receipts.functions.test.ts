@@ -14,6 +14,7 @@ import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
 import { RECEIPT_EXPENSE_FAILURE } from "./vehicle-receipt-expense-contract";
 import { RECEIPT_DISCARD_UNAVAILABLE } from "./vehicle-receipts";
 import { RECEIPT_INSTALLATION_FAILURE } from "./vehicle-receipt-installation-contract";
+import { captureNativeCommandCaller } from "./native-request-caller.server";
 import {
   RECEIPT_LINES_FAILURE,
   RECEIPT_LINES_PARENT_PROJECTION,
@@ -24,28 +25,65 @@ const mocks = vi.hoisted(() => ({
   privileged: vi.fn(),
   writes: vi.fn(),
   validated: null as unknown,
+  expenseMiddleware: { name: "receiptCommandMiddleware" },
+  prepareExpense: vi.fn(),
+  assertExpense: vi.fn(),
+  expenseRequest: null as unknown,
+  expenseSessions: new WeakMap<
+    object,
+    { request: unknown; expectedAccountId: string; receiptId: string; assertCurrent: () => void }
+  >(),
 }));
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => {
     let validate = (value: unknown) => value;
+    let expense = false;
     const builder = {
-      middleware: () => builder,
+      middleware: (middlewares: unknown[]) => {
+        expense = middlewares.includes(mocks.expenseMiddleware);
+        return builder;
+      },
       inputValidator: (fn: typeof validate) => {
         validate = fn;
         return builder;
       },
       handler:
         (fn: (args: { data: unknown; context: unknown }) => unknown) =>
-        (args: { data: unknown; context: unknown }) => {
+        async (args: { data: unknown; context: unknown }) => {
           const data = validate(args.data);
           mocks.validated = data;
+          if (expense) {
+            // Isolated handler/session controls retain the prior strict-caller
+            // assertions below. Real opaque-capability admission is exercised
+            // separately through the actual owned middleware and core ingress.
+            const intent = Object.freeze({ ...(data as object) });
+            await mocks.prepareExpense(args.context, intent);
+            try {
+              return await fn({ ...args, data: intent });
+            } finally {
+              mocks.expenseRequest = null;
+            }
+          }
           return fn({ ...args, data });
         },
     };
     return builder;
   },
 }));
-vi.mock("@tanstack/react-start/server", () => ({ getRequest: mocks.request }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: () => mocks.expenseRequest ?? mocks.request(),
+}));
+vi.mock("./receipt-command-middleware.server", () => ({
+  receiptCommandMiddleware: mocks.expenseMiddleware,
+}));
+vi.mock("./receipt-command-ingress.server", () => ({
+  assertReceiptCommandIngress: (
+    context: unknown,
+    request: unknown,
+    expected: string,
+    receipt: string,
+  ) => mocks.assertExpense(context, request, expected, receipt),
+}));
 vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: { rpc: mocks.privileged, from: mocks.privileged, storage: mocks.privileged },
@@ -423,6 +461,41 @@ async function receiptLines(data: unknown, ctx: unknown) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.expenseRequest = null;
+  mocks.expenseSessions = new WeakMap();
+  mocks.prepareExpense.mockImplementation(
+    async (value: unknown, input: { expectedAccountId: string; id: string }) => {
+      if ((value as { userId?: unknown } | null)?.userId !== input.expectedAccountId)
+        throw new Error("Account changed. Refresh before recording a receipt expense.");
+      try {
+        const caller = captureNativeCommandCaller(value, input.expectedAccountId);
+        const request = mocks.request();
+        const assertCurrent = await caller.verify(request);
+        mocks.expenseSessions.set(value as object, {
+          request,
+          expectedAccountId: input.expectedAccountId,
+          receiptId: input.id,
+          assertCurrent,
+        });
+        mocks.expenseRequest = request;
+      } catch {
+        throw new Error(RECEIPT_EXPENSE_FAILURE);
+      }
+    },
+  );
+  mocks.assertExpense.mockImplementation(
+    (value: object, request: unknown, expected: string, receipt: string) => {
+      const session = mocks.expenseSessions.get(value);
+      if (
+        !session ||
+        session.request !== request ||
+        session.expectedAccountId !== expected ||
+        session.receiptId !== receipt
+      )
+        throw new Error(RECEIPT_EXPENSE_FAILURE);
+      session.assertCurrent();
+    },
+  );
   controller = new AbortController();
   mocks.request.mockReturnValue(currentRequest());
 });

@@ -229,6 +229,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts src/lib/native-command-caller.server.test.ts --maxWorkers=1",
     ],
     [
+      "Owned receipt command ingress and middleware custody (never quarantined)",
+      "npx vitest run src/lib/receipt-command-ingress.server.test.ts src/lib/receipt-command-middleware.server.test.ts --maxWorkers=1",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

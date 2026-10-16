@@ -1,11 +1,33 @@
-# Native PG17 draft-line rehearsal: prepared, actual CI acceptance pending
+# Native PG17 draft-line rehearsal: actual selected cohorts passed
 
-Publication update: source4fea16072eb76ffc292a28cb6a9dc549012787c0, same draft
-PR68. Parent40fd9aee now passes all six Actions38932061829 including unit117078254223
-by completion-status read; publication hold cleared without cancellation.
-Previously stopped parent log remains unread after502 initial/one retry; no
-invented unit count/runtime. Publish existing source/evidence, then read new-head
-native cohorts/cleanup and six required Actions; no inherited pass or121 rerun.
+Publication: source4fea16072eb76ffc292a28cb6a9dc549012787c0/evidence
+0fbec296a24b1ceebe235d2487c40cf5869edd13, canonical branch/same draft PR68.
+Parent40fd9aee completed all six Actions before publication, without cancellation
+or repeated121 local tests. Its stopped unit log remains unread after502 initial/
+one retry; no invented parent count/runtime. The result below is the NEW native
+job, not an inherited parent pass.
+
+## Actual native Linux result on0fbec296
+
+Run38936842687/job117094365266 completed SUCCESS. Permitted Code Review log is
+untruncated. PGDG packages17.11 and actual private server170011 are verified.
+All18 expected proof markers occur once and in order, including the eight new
+draft-line cohorts described below, followed by both driver/shell terminators.
+Native phase completion, EXIT trap and explicit always-cleanup step all pass.
+Retained Parts247 assertions and six quote groups pass;47 replay failures remain.
+Bounded selected synthetic dump69ms/restore83ms/verify208ms is not operational
+RTO, full current-baseline recovery, real Auth/API/private Storage or authority.
+
+Complete fetched CI mergee74556daa8e7e49dc02bd76fcdb9e2ba6543265e has parents
+576fb17d1fdea96d73b4ae68ea6b725eef62efdf and0fbec296… . Its WHOLE tree
+3ea4b80f2081181070d46862978857c88c10b4b7 equals the published candidate tree.
+All six Actions are successful. Unit117094365659 reports4,863/4,863 across93 files
+100.43s, zero unexpected/quarantined failures; returned log truncated, final
+summaries present. Build117094365700 log is truncated, but final214 tracked-assets/Worker
+motorsales365/canonical365/15 OCR/202 PDF/server-boundary/dry-run markers are
+present. Preview117094365264 untruncated log confirms configuration skip/no upload;
+production/migration/Supabase Preview skip. Workers117094539617/dc0de1fa fails
+with fresh cause unverified; existing hosting stop retained. No deployment.
 
 17 October 2026, Asia/Manila. Same integrated candidate/draft PR68. This slice
 closes source preparation for the delivery board's next named C1.08 dependency;
@@ -41,7 +63,7 @@ step/25min job and all validated process/cluster/always-cleanup controls remain.
 | `scripts/ci/run-native-expense-postgres.sh`             | `d300b13ac04a59d5fbfe9e2c6208639945d672bc5add63930afc8736674e7342` |
 | `.github/workflows/ci.yml`                              | `0d8ce4ea0b972c4882998053a51b399ce90f07ac7a4d61e48e8959921478b6b3` |
 
-## Mandatory native cohorts, not yet actual results
+## Mandatory native cohorts, now executed in selected PG17 lab
 
 1. Exact private invoker/owner/search-path/ACL metadata, authenticated table-UPDATE
    denial and actual anon/authenticated/service_role function denials. Positive
@@ -98,15 +120,11 @@ guard. Read-only review separately caught the link PK and accidental-financial-
 baseline hazards before native publication; both are corrected and guarded.
 No repeated unchanged Windows full-suite run.
 
-Parent40fd9aee has five completed Actions successes and a still-running unit job
-117078254223 at latest status read. Its log endpoint returned HTTP502 on initial
-and the one allowed retry. That unchanged log-read action is STOPPED; no CLI/
-dashboard fallback or guessed unit count. Source is committed locally under
-"Prepare native PG17 draft line independent session rehearsal"; push is held
-until status-only confirms parent completion, preventing cancellation. Next run
-publishes this existing commit and reads its own native result, not reimplements
-the source or reruns unchanged local121 tests. New evidence may resume the stopped
-read; existing hosting/QA notices are not repeated.
+Historical publication hold is closed: parent40fd9aee unit117078254223 completed
+success by status read before4fea1607/0fbec296 publication. Its log endpoint had
+returned HTTP502 on initial and one allowed retry; that unchanged log-read action
+remains STOPPED. No CLI/dashboard fallback or guessed parent count/runtime. No
+source reimplementation/unchanged121 rerun; hosting/QA notices are not repeated.
 
 Independent review finds no additional blocking source/SQL/cohort/marker defect.
 Syntax/Prettier/full changed-file ESLint/diff checks and214 tracked assets plus
@@ -122,14 +140,14 @@ The QA and hosting actions remain stopped under the delivery board; no new owner
 question or diagnostic fallback.47 replay/12 historical/five unapplied/two
 recorded provenance entries remain unresolved.22 October remains at risk.
 
-After publication, read the **new exact-head native Linux job** for PGDG17/server
-identity, all18 ordered proofs, final completion and EXIT/always cleanup. Do not
-inherit parent40fd9aee or old expense native passes. Required six Actions and
-normal runtime budget remain separate; preserve a running parent unit job before
-pushing. If native failure occurs, follow one-safe-alternate/stop/notify policy.
+New exact-head native job acceptance above closes this selected dependency only.
+Required full unit completion is now verified; normal runtime budget remains
+unchanged. Next connected source work
+is original-Bearer owned receipt-expense ingress with fresh Auth and final SDK
+transport custody, not a grant or safe draft-editor activation.
 
-Even successful native cohorts would establish selected synthetic mechanics
-only. Original-human owned ingress/strict session/fresh native role/team/tenant
+Successful native cohorts establish selected synthetic mechanics only.
+Original-human owned ingress/strict session/fresh native role/team/tenant
 authority, complete current-catalog/all-writer locks, durable request/reopen
 reconciliation, financial policy/account phantoms, real API/private originals,
 full recovery, pilot/owner/device/live gates precede any handler/dialog activation.

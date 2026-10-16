@@ -8,10 +8,23 @@ source evidence; old "next" statements are not repeated work instructions.
 Source is not fully accepted functionality: quote conversion, native refund/void
 execution, safe draft discard and writable101+ receipts remain unfinished;
 native authority/atomic stock/finance/private originals/recovery/owner/live
-gates remain. Latest published1014b72e all six Actions pass; actual unit
-4,863/93 files102.07s is not authenticated device or live acceptance. Dedicated
+gates remain. Published source4fea1607/evidence0fbec296 now passes actual selected
+native PG17 draft-line waits/CAS/outer transaction/rollback/scope/faults/cleanup,
+all18 expense/draft markers, job117094365266/run38936842687 (untruncated).
+All six Actions pass; unit117094365659 reports4,863/93 files100.43s, zero
+unexpected/quarantined failures (truncated log, final summaries present). No
+application activation, permission, migration or live/native authority acceptance.
+Connected owned original-Bearer receipt-expense ingress passes1231/1231 seven
+suites10.37s/full normal TypeScript and independent review; exact14-other-export/generated/helper/
+dependency preservation verified. Actual SDK composition uses fake HTTP, not a
+live session/native-role proof. `evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`.
+Next fresh exact-head checks, then strict
+session/native authority/current catalog/all-writer/durable/API/private-original/
+recovery gates remain before draft editing. Dedicated
 QA signup still needs owner handoff; one direct CRM-route alternative redirected
 to login, so this browser action stops until new access. No identity/Terms bypass.
+
+### Historical source checkpoints (superseded sequence)
 
 Source34a90930 adds ONLY private/unapplied one-existing-draft-line transaction
 support for safe101+ review/edit. Full prior receipt/item NUMERIC-text CAS,

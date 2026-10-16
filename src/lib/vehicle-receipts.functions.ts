@@ -2,10 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
-import {
-  captureNativeCommandCaller,
-  captureNativeRequestCaller,
-} from "./native-request-caller.server";
+import { captureNativeRequestCaller } from "./native-request-caller.server";
+import { receiptCommandMiddleware } from "./receipt-command-middleware.server";
+import { assertReceiptCommandIngress } from "./receipt-command-ingress.server";
 import {
   receiptLinesRequestSchema,
   RECEIPT_LINES_FAILURE,
@@ -691,7 +690,7 @@ export const revokeShopVehicleLink = createServerFn({ method: "POST" })
     }),
   );
 export const recordVehicleReceiptExpense = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([receiptCommandMiddleware])
   .inputValidator((input: unknown) => {
     const parsed = receiptExpenseRequestSchema.safeParse(input);
     if (!parsed.success) throw new Error("Invalid receipt expense request.");
@@ -706,10 +705,11 @@ export const recordVehicleReceiptExpense = createServerFn({ method: "POST" })
     if (context?.userId !== intent.expectedAccountId)
       throw new Error("Account changed. Refresh before recording a receipt expense.");
     try {
-      // Denial-only session custody; this does not authorize or replace the legacy RPC.
-      const caller = captureNativeCommandCaller(context, intent.expectedAccountId);
+      // The owned middleware already verified the original bearer. Recheck its
+      // request-bound capability here; never recapture or adopt another token.
       const request = getRequest();
-      const assertCurrent = await caller.verify(request);
+      const assertCurrent = () =>
+        assertReceiptCommandIngress(context, request, intent.expectedAccountId, intent.id);
       assertCurrent();
       const db = context.supabase as unknown as {
         from(table: "vehicle_receipts"): ReceiptReadBuilder;

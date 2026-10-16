@@ -17,10 +17,21 @@ The owner's explicit multi-store consumer ordering/Buddy operator-delivery scope
 has no verified live bridge yet and adds deadline risk; separate backends remain.
 
 Day 2 review:22 October21:00 Asia/Manila is at risk, not a supported guarantee.
-All six Actions on1014b72e pass, actual unit4,863/93 files102.07s, but current
-hosting failure/47 replay failures/native authority/atomic commerce/full recovery/
-QA/device/owner acceptance remain. No application/SQL/hosted release in this
-explicitly requested consolidation. Parent CI is not inherited by a new head.
+Published source4fea1607/evidence0fbec296 actually passes selected native PG17
+draft-line waits/CAS/outer transaction/rollback/scope/faults/cleanup: all18 expense/
+draft markers, job117094365266/run38936842687 (untruncated). All six Actions pass;
+unit117094365659 reports4,863/93 files100.43s, zero unexpected/quarantined failures
+(truncated log, final summaries present). No permission, migration,
+application activation or live release. Connected owned original-Bearer receipt-
+expense ingress passes1231/1231 seven suites10.37s/full normal TypeScript, independent review/exact
+preservation; actual installed SDK uses fake HTTP, not live Auth/native roles.
+`evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`. Next exact-head checks and strict
+session/native authority/catalog/all-writer/durable/API/
+private-original/recovery gates still precede draft editing. Current hosting/
+47 replay/native authority/atomic commerce/full recovery/QA/device/owner gates
+remain. Parent CI is not inherited by a new head.
+
+### Historical source checkpoints (superseded sequence)
 
 Source34a90930 adds an unapplied/private single draft-line UPDATE prerequisite,
 not an enabled101+ editor. Final54/54 four files45.847s (20 new), exact-scale

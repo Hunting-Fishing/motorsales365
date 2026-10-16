@@ -4,13 +4,12 @@ Updated: 2026-10-17 (Asia/Manila)
 
 ## Consolidated current delivery authority
 
-Published consolidation40fd9aeed5053ea65bcf8a78f4919a99115b9e54, same draft PR68;
-base/title/prior full body and main unchanged. New38932061829 OCR/lint/native
-pass, build/type/unit running at readback; parent CI not inherited. Current
-Workers7461bcd9 fails. Exact-head permitted summary/detail has no error log;
-no safe evidence-based alternate, so hosting remediation STOPPED and owner
-notified for redacted error output/new permitted diagnostics. No unchanged retry.
-Follow-up notes join next implementation slice, not a docs-only restart.
+Current source in same draft PR68 includes selected actual native PG17 draft-line
+acceptance and connected owned receipt-expense ingress; current resumption below
+supersedes historical consolidation40fd9aee/1014b72e next statements. Base/title/
+prior full body/main remain unchanged. Hosting remediation stays STOPPED after
+permitted summary/detail gave no error log or safe evidenced alternate; no
+unchanged retry. New evidence joins implementation, not a docs-only restart.
 
 Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequence,
 Day 2 feasibility, fail-fast stops, CRM/device acceptance, multi-store ordering /
@@ -26,8 +25,8 @@ ten policy checks, six-file Prettier/diff and two independent read-only reviews
 pass. Existing automation update/readback preserves identity/active30min/thread.
 Same PR68, commit subject "Consolidate 365 delivery, fail-fast and network
 acceptance plan"; new-head CI is separate. No app/SQL/migration/hosted/Buddy change
-or deployment. Exact next implementation: native PG17 draft-line independent
-sessions; authority/provenance/hosting continue independently under fail-fast.
+or deployment in that consolidation. Its next native PG17 step is now complete
+at0fbec296; strict authority/provenance/recovery continue under current board.
 
 ## Authority and source
 
@@ -43,28 +42,34 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
-Resume source4fea16072eb76ffc292a28cb6a9dc549012787c0, direct parent40fd9aee.
-Parent all six Actions38932061829 now pass, including unit117078254223; publication
-hold cleared without cancellation. Publish existing source/evidence in same PR68,
-then verify own native cohorts/cleanup and exact-head checks. Parent unit log is
-unread after prior502 stop; no invented count/runtime or inherited pass. Do not
-repeat unchanged121 local tests or call source/PGlite native acceptance.
+Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
+completed all six Actions; no cancellation/repeated121 tests. Actual new native
+job117094365266/run38936842687 passes PGDG17.11/server170011, all18 ordered
+expense/draft-line proofs, final terminators and EXIT/always cleanup (untruncated).
+Independent-session waits/CAS/outer COMMIT/ROLLBACK/scope/CHECK/late rewrites are
+now selected synthetic PG17 evidence, not real native authority. Parts247/six
+quote groups and bounded69/83/208ms recovery pass;47 replay failures remain.
+Complete CI mergee74556da… has identical whole tree3ea4b80f… to0fbec296.
+All six Actions now pass; unit117094365659 reports4,863/4,863 across93 files100.43s,
+zero unexpected/quarantined failures (truncated log, final summaries present).
+Preview configuration skip/no upload; production/migrations/Supabase Preview skip.
+Workersdc0de1fa/check117094539617 fails, cause unverified; existing stop retained.
+No migration/grant/live/deployment/main/Buddy change. Parent unit log remains
+unread after prior502 initial/one retry; completion status already cleared hold.
 
-Native draft-line PG17 source prerequisite is prepared in same PR68: pure pinned
-seven-span child builder and eight mandatory observed-wait/outer transaction/CAS/
-scope/native CHECK/late rewrite cohorts, with all original expense proofs and
-admission/cleanup/budgets intact. Final121/121 nine suites54.782s, review/format/
-lint/diff/214 assets/existing-output Worker guards pass. Actual new-head Linux
-cohorts and six Actions are separate/pending; do not inherit parent native results
-or cancel its running unit job. No app/migration/grant/live/deploy; C1.07/C1.08/
-R2/R3 remain unaccepted. Next actual PG17 proof, then trusted authority/current
-catalog/all-writer/durable/API/private-original/full recovery before connection.
-`evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md` records exact source/tests/limits.
-Unchanged QA/hosting stops and47 replay/provenance/22 October risk retained.
-Prior hold is superseded by parent completion. Log reads failed HTTP502 initial
+Owned original-Bearer receipt-expense ingress is now connected in source and
+passes1231/1231 seven suites10.37s, full normal TypeScript/full changed-file lint
+(zero errors/two unchanged legacy warnings), independent review and exact14-other-export/
+generated Auth/helper/dependency preservation. Real installed SDK composition
+uses synthetic HTTP, not a live Auth/session/native-role proof. See
+`evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`. Fresh new-head build/full CI
+checks are separate. Strict session/native-shop/team/tenant authority,
+catalog/all-writer/durable outcome/API/private-original/full recovery/owner/device
+gates still precede safe draft editing. C1.07/C1.08/R2/R3 remain unaccepted.
+Evidence: `evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md`.
+Unchanged QA/hosting stops, provenance classifications and22 October risk remain.
 
-- one allowed retry, so that unchanged read stopped; no CLI/dashboard fallback
-  or fresh parent unit count. Current own-head native result is the next dependency.
+### Historical checkpoints (not current resumption instructions)
 
 Published1014b72e/source34a90930 verified canonical remote/same draft PR68/base/
 title/draft/main/original history. All six Actions gates38926258007 pass; unit
