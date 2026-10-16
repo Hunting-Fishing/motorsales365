@@ -32,6 +32,8 @@ import {
   readPrivateFile,
   runBoundedCommand,
   runRecoveryPhase,
+  assertServerIdentity,
+  assertFreshCluster,
 } from "./native-recovery-postgres.mjs";
 
 const moduleUrl = new URL("./native-recovery-postgres.mjs", import.meta.url);
@@ -114,6 +116,62 @@ test("context admits only the fixed CI Linux private source/restored artifact la
     assert.throws(() => validateContext(valid, platform));
   for (const flag of [undefined, "", "false", "1", "TRUE"])
     assert.throws(() => validateContext({ ...valid, GITHUB_ACTIONS: flag }, "linux"));
+});
+
+test("every server identity assertion remains strict in the isolated checkpoint validator", () => {
+  for (const cluster of ["source", "restored"]) {
+    const value = {
+      version: "170011",
+      data: context[cluster].data,
+      socket: context[cluster].socket,
+      port: PORTS[cluster],
+      listen: "",
+      database: "postgres",
+      user: BOOTSTRAPS[cluster],
+      session: BOOTSTRAPS[cluster],
+      recovery: false,
+      encoding: "UTF8",
+      systemId: "7000000000000000001",
+    };
+    assert.equal(assertServerIdentity(value, context, cluster), value.systemId);
+    for (const key of Object.keys(value)) {
+      assert.throws(() => assertServerIdentity({ ...value, [key]: undefined }, context, cluster));
+      assert.throws(() =>
+        assertServerIdentity({ ...value, [key]: "PRIVATE-WRONG-VALUE" }, context, cluster),
+      );
+    }
+    for (const version of ["160011", "180000", 170011, "17.11", "170011\nPRIVATE"])
+      assert.throws(() => assertServerIdentity({ ...value, version }, context, cluster));
+    for (const systemId of ["0", "1\nPRIVATE", "1".repeat(21), 7000000000000000001])
+      assert.throws(() => assertServerIdentity({ ...value, systemId }, context, cluster));
+  }
+});
+
+test("fresh inventory retains exact pristine roles/databases/memberships and no extra keys", () => {
+  for (const cluster of ["source", "restored"]) {
+    const value = {
+      roles: [BOOTSTRAPS[cluster]],
+      databases: ["postgres", "template0", "template1"],
+      memberships: "0",
+    };
+    assert.doesNotThrow(() => assertFreshCluster(value, cluster));
+    for (const patch of [
+      { roles: [] },
+      { roles: [...value.roles, OWNER] },
+      { roles: ["PRIVATE"] },
+      { databases: [...value.databases, DATABASE] },
+      { databases: ["postgres", "template1", "template0"] },
+      { memberships: "1" },
+      { memberships: 0 },
+      { unexpected: "PRIVATE" },
+    ])
+      assert.throws(() => assertFreshCluster({ ...value, ...patch }, cluster));
+    for (const key of Object.keys(value)) {
+      const missing = { ...value };
+      delete missing[key];
+      assert.throws(() => assertFreshCluster(missing, cluster));
+    }
+  }
 });
 
 for (const key of [
@@ -675,6 +733,25 @@ test("short failure marker is bounded fixed vocabulary and cannot carry driver d
     "compare",
     "restored-access",
     "rollback",
+    "identity-read",
+    "identity-json",
+    "identity-version",
+    "identity-data",
+    "identity-socket",
+    "identity-port",
+    "identity-listen",
+    "identity-database",
+    "identity-user",
+    "identity-session",
+    "identity-recovery",
+    "identity-encoding",
+    "identity-system-id",
+    "fresh-read",
+    "fresh-json",
+    "fresh-roles",
+    "fresh-databases",
+    "fresh-memberships",
+    "cluster-distinct",
   ]) {
     const marker = failureMarker(stage, {
       sqlState: "42501",

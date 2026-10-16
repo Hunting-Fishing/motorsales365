@@ -25,6 +25,25 @@ let interrupted = false;
 const stages = new Set([
   "admission",
   "server-identity",
+  "identity-read",
+  "identity-json",
+  "identity-version",
+  "identity-data",
+  "identity-socket",
+  "identity-port",
+  "identity-listen",
+  "identity-database",
+  "identity-user",
+  "identity-session",
+  "identity-recovery",
+  "identity-encoding",
+  "identity-system-id",
+  "fresh-read",
+  "fresh-json",
+  "fresh-roles",
+  "fresh-databases",
+  "fresh-memberships",
+  "cluster-distinct",
   "fixture",
   "source-access",
   "dump",
@@ -464,17 +483,24 @@ async function query(context, cluster, sql, role = BOOTSTRAPS[cluster], database
 }
 
 async function serverIdentity(context, cluster) {
-  const value = JSON.parse(
-    await query(
-      context,
-      cluster,
-      `SELECT jsonb_build_object(
+  stage = "identity-read";
+  const raw = await query(
+    context,
+    cluster,
+    `SELECT jsonb_build_object(
     'version',current_setting('server_version_num'),'data',current_setting('data_directory'),
     'socket',current_setting('unix_socket_directories'),'port',current_setting('port'),
     'listen',current_setting('listen_addresses'),'database',current_database(),'user',current_user,'session',session_user,
     'systemId',(pg_control_system()).system_identifier::text,'recovery',pg_is_in_recovery(),'encoding',current_setting('server_encoding'))::text;`,
-    ),
   );
+  stage = "identity-json";
+  return assertServerIdentity(JSON.parse(raw), context, cluster);
+}
+
+// Same admission assertions, independently exercisable without any SQL or I/O.
+// Diagnostic stages are fixed labels; never publish actual/expected field values.
+export function assertServerIdentity(value, context, cluster) {
+  stage = "identity-version";
   assert.match(value.version, /^17\d{4}$/);
   for (const [key, expected] of Object.entries({
     data: context[cluster].data,
@@ -486,30 +512,41 @@ async function serverIdentity(context, cluster) {
     session: BOOTSTRAPS[cluster],
     recovery: false,
     encoding: "UTF8",
-  }))
+  })) {
+    stage = `identity-${key}`;
     assert.equal(value[key], expected);
+  }
+  stage = "identity-system-id";
   assert.match(value.systemId, /^[1-9][0-9]{0,19}$/);
   return value.systemId;
 }
 
 async function fresh(context, cluster) {
-  assert.deepEqual(
-    JSON.parse(
-      await query(
-        context,
-        cluster,
-        `SELECT jsonb_build_object(
+  stage = "fresh-read";
+  const raw = await query(
+    context,
+    cluster,
+    `SELECT jsonb_build_object(
     'databases',(SELECT jsonb_agg(datname ORDER BY datname) FROM pg_database),
     'roles',(SELECT jsonb_agg(rolname ORDER BY rolname) FROM pg_roles WHERE rolname !~ '^pg_'),
     'memberships',(SELECT count(*)::text FROM pg_auth_members WHERE pg_get_userbyid(member) !~ '^pg_'))::text;`,
-      ),
-    ),
-    {
-      roles: [BOOTSTRAPS[cluster]],
-      databases: ["postgres", "template0", "template1"],
-      memberships: "0",
-    },
   );
+  stage = "fresh-json";
+  assertFreshCluster(JSON.parse(raw), cluster);
+}
+
+export function assertFreshCluster(value, cluster) {
+  const expected = {
+    roles: [BOOTSTRAPS[cluster]],
+    databases: ["postgres", "template0", "template1"],
+    memberships: "0",
+  };
+  for (const [key, fields] of Object.entries(expected)) {
+    stage = `fresh-${key}`;
+    assert.deepEqual(value[key], fields);
+  }
+  stage = "fresh-json";
+  assert.deepEqual(value, expected);
 }
 
 async function roleProbe(context, cluster, role) {
@@ -789,6 +826,7 @@ export async function runRecoveryPhase(phase, pin, env = process.env, platform =
   if (phase === "--prepare") {
     const sourceId = await serverIdentity(context, "source");
     await fresh(context, "source");
+    stage = "cluster-distinct";
     assert.notEqual(sourceId, restoredId);
     stage = "fixture";
     for (const role of [OWNER, ...READERS])

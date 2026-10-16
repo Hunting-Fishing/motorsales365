@@ -276,6 +276,10 @@ test("prepare diagnostics publish only a complete allowlisted marker after child
     source,
     /admission\|server-identity\|fixture\|source-access\|dump\|manifest\|offline-source\|roles-restore\|database-restore\|compare\|restored-access\|rollback/,
   );
+  assert.match(
+    source,
+    /identity-read\|identity-json\|identity-version\|identity-data\|identity-socket\|identity-port\|identity-listen\|identity-database\|identity-user\|identity-session\|identity-recovery\|identity-encoding\|identity-system-id\|fresh-read\|fresh-json\|fresh-roles\|fresh-databases\|fresh-memberships\|cluster-distinct/,
+  );
   assert.match(source, /\[0-9A-Z\]\{5\}\|unavailable/);
   assert.match(
     source,
@@ -336,6 +340,25 @@ test(
       "compare",
       "restored-access",
       "rollback",
+      "identity-read",
+      "identity-json",
+      "identity-version",
+      "identity-data",
+      "identity-socket",
+      "identity-port",
+      "identity-listen",
+      "identity-database",
+      "identity-user",
+      "identity-session",
+      "identity-recovery",
+      "identity-encoding",
+      "identity-system-id",
+      "fresh-read",
+      "fresh-json",
+      "fresh-roles",
+      "fresh-databases",
+      "fresh-memberships",
+      "cluster-distinct",
     ]) {
       for (const state of ["42501", "unavailable"]) {
         const result = runFailureMarker(`FAIL:${stage}:${state}\n.`);
@@ -360,6 +383,9 @@ test(
       "",
       "PRIVATE SQL detail",
       "FAIL:PRIVATE-STAGE:42501\n.",
+      "FAIL:identity-version-extra:42501\n.",
+      "FAIL:fresh-role:42501\n.",
+      "FAIL:cluster-distinct-extra:42501\n.",
       "FAIL:fixture:p0001\n.",
       "FAIL:fixture:4250\n.",
       "FAIL:fixture:425010\n.",

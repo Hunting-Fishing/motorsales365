@@ -215,7 +215,7 @@ for recovery_cluster in source restored; do
 done
 
 report_failure_marker() {
-  local marker=$1 pattern=$'^FAIL:(admission|server-identity|fixture|source-access|dump|manifest|offline-source|roles-restore|database-restore|compare|restored-access|rollback):([0-9A-Z]{5}|unavailable)\n\\.$'
+  local marker=$1 pattern=$'^FAIL:(admission|server-identity|fixture|source-access|dump|manifest|offline-source|roles-restore|database-restore|compare|restored-access|rollback|identity-read|identity-json|identity-version|identity-data|identity-socket|identity-port|identity-listen|identity-database|identity-user|identity-session|identity-recovery|identity-encoding|identity-system-id|fresh-read|fresh-json|fresh-roles|fresh-databases|fresh-memberships|cluster-distinct):([0-9A-Z]{5}|unavailable)\n\\.$'
   [[ "$marker" =~ $pattern ]] || return 1
   printf 'Native recovery phase failed: stage=%s sqlState=%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" >&2
 }
