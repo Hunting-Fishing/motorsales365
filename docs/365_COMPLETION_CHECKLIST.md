@@ -16,6 +16,19 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Owner directive, 2026-10-16: **no Docker**. Do not install/start/use Docker, pull
+images or ask the owner to open Docker Desktop. Continue Docker-free work and
+record any real API/Auth/private-storage/transaction/restore gates that lack a
+valid substitute; mocks or live disposable testing do not satisfy them. The
+owner subsequently requested maximum Docker-free work and authorized a dedicated
+QA login. Reviewed native-PostgreSQL17 Parts CI is committed at `166ff0c4`, with
+the same adversarial SQL/roles/stub/no-SKIP coverage and private scoped cleanup.
+Offline wiring passes; actual Linux installation/SQL/cleanup needs new-head CI.
+Validate that Docker-free candidate, not an older containerized workflow. Do not
+silently remove coverage. Earlier Docker-access requests below are
+historical and superseded. The existing recurring follow-up is updated, unchanged
+in schedule/authority; no duplicate was created.
+
 Owner backend clarification, 2026-10-15: 365 MotorSales must use only hosted
 Supabase project `wjxaajgvddtrxxtocxen`, API `https://wjxaajgvddtrxxtocxen.supabase.co`.
 Project `ujkizgblscqcejghxemb` belongs to 366 AI and is out of scope. No backend
@@ -40,7 +53,62 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest quote/work-order list slice: `8302c62d`, same branch/draft PR #68. Both
+Latest quote-detail/build-freeze/Docker-free CI slice: `166ff0c4`, same branch/draft PR #68; source commit
+and exact final checks are in `evidence/NATIVE_QUOTE_DETAIL_READINESS.md`.
+Fresh matching primary/item read lifetimes, complete fixed projections, 101/100
+visible bounds/counts, generic independent retry and native received-value/date
+display pass 108/108 focused tests. Full TypeScript, targeted lint/format and
+independent review pass. Freeze/CI wiring passes 12/12; release/report/assets
+passes 70/70 on final rerun after documented local subprocess timeouts. Full
+application/artifact verification is recorded in the evidence, not assumed here.
+Local verification blocker: full application passed 2,421/2,422, with the source
+scanner timing out. Coverage-preserving Dirent traversal passes focused 10/10
+(scanner 213ms; identical 1,144-path manifest), but full rerun still fails that one
+assertion (17.117s; 190.22s whole run). No proven root cause/full-suite pass. Keep
+ordinary timeout, coverage and quarantine; verify new-head Linux CI. Fresh complete
+build/Worker/canonical-backend/15 OCR/202 PDF/server-boundary and all 214 tracked public
+Git/source/output checks pass at `166ff0c4`; packaging is not deployment/acceptance.
+
+QA email nomination is received; do not ask for it again. One nominated personal
+address is already registered; preserve it and the company/staff alternative.
+A separate plus-tagged owner-controlled QA email is proposed, not created. Live
+signup is prepared with a synthetic QA name and ordinary Buyer & Private Seller
+choice only; credentials/contact fields/Terms/submission remain for the owner.
+No password/OTP/keys in chat. Initial setup may invoke existing confirmation/
+welcome/onboarding paths; no customer outreach or new email adapter activation.
+Standard Auth/org ownership does not grant trusted native-shop authority. Pilot
+synthetic shop, least-privilege membership and QA session remain unverified.
+
+The unsafe browser quote-conversion handler is removed from the unreleased
+candidate. Its disabled button explicitly awaits an authorized atomic writer;
+fresh already-converted work-order navigation remains. This is **unfinished
+C3.03**, not a scope cut or live restriction. The retained legacy RPC also lacks
+caller/shop/concurrency checks and has incompatible shop/part mappings; do not
+reconnect it or infer stock identity/part_type from quote item names. Next safe
+dependency is actual authorized atomic C3.02-C3.04 creation/conversion, followed
+by financial/stock/concurrent-retry/recovery acceptance, not repeated reader proof.
+
+Hosting access is now available. Prior exact head `65733393` passed all six Actions
+gates (`38788467751`), but independent build
+`c9a76b64-c814-400b-8229-8faf36b15548` failed in automatic
+`bun install --frozen-lockfile`, before the configured npm build/version upload.
+No lockfile/provider setting/token/upload change. WORKERS_CI presence now blocks
+both build entrypoints and prebuild hooks locally; actual npm ignore-scripts
+attempts are tested. This source guard cannot precede automatic installation or
+govern raw/operator-replaced commands; it is not a hosting repair/upload firewall
+or release approval. Keep provider remediation gated. New head needs exact checks.
+
+Docker is now explicitly prohibited, not an owner setup/access request. An earlier
+owner-access check found 1.17 GiB available of 15.71 GiB; the no-Docker response
+check found 2.44 GiB (transient snapshots, not a capacity promise). Controlled
+email nomination is received; dedicated QA/pilot shop/native membership remain
+unverified. No daemon/images/local API/Auth/storage stack, live database
+write, restriction replay, deployment, provider activation, customer send or new
+resource. Original-human/fresh authority/native-team/private custody, baseline/
+replay/atomic financial/stock/recovery/owner/live gates remain open. The seven-day
+target still requires a Day 2 feasibility review against those concrete gaps.
+
+Previous quote/work-order list slice: `8302c62d`, same branch/draft PR #68. Both
 readers now use Auth-loading/account/per-mount private lifetimes, fixed 101/100
 visible-row bounds, qualified counts, generic manual retry and no stale/false-empty
 views. Native UUID aliases, received amounts and native date/time cohorts are

@@ -2,6 +2,17 @@
 
 ## Target and scope
 
+Owner directive, 16 October: no Docker. Do not install/start/use Docker, pull
+images or repeat the Docker Desktop setup request. Use Docker-free validation
+without waiving real API/Auth/private-storage/transaction/restore gates. Existing
+native-PG17 Parts CI is committed at `166ff0c4` and passes offline wiring/syntax/
+review; actual new-head Linux runtime remains pending. Validate that Docker-free
+candidate, not older containerized jobs, while retaining SQL coverage. The owner
+authorized a dedicated QA login and supplied controlled email choices. One is
+already registered; preserve personal/staff identities, and use a separate standard
+QA account with owner-completed credentials/Terms. Native pilot-shop/role/session
+acceptance remains open, not replaced by a basic Auth login.
+
 Owner target: complete the software already built or in progress within seven
 days, by **22 October 2026 at 21:00 Asia/Manila**. Work starts immediately on
 15 October. This is an aggressive delivery target, not a verified forecast or
@@ -78,16 +89,33 @@ amount compatibility and RLS-visible count/cached-read boundaries are explicit.
 Two narrow canonical catalog reads confirm duplicate FK names and incorrect
 quote-conversion child fields, not runtime/schema/baseline acceptance. Six CI
 jobs pin Ubuntu24.04 for candidate stability; deployment/migration gates unchanged.
-Next safe slice is quote-detail lifetimes/complete items and schema-correct,
-current-shop-bound C3.02–C3.04 creation/conversion, alongside actual atomic financial/
-stock writers and recovery. Passing lists do not satisfy the end-to-end flow.
+Quote-detail private lifetimes and bounded complete items at `166ff0c4` pass 108/108 focused
+tests plus TypeScript/lint/review. Exact commit/final artifact and application
+results are in `evidence/NATIVE_QUOTE_DETAIL_READINESS.md`. Unsafe browser conversion
+is temporarily interlocked in the candidate, with fresh existing work-order links
+retained. C3.03 remains unfinished; the legacy RPC is not a safe replacement.
+Next is actual current-shop-authorized atomic C3.02–C3.04 writers and monetary/
+stock/concurrent-retry/recovery acceptance. Passing readers do not close that loop.
 
-Independent hosting failure still needs authenticated diagnostic/configuration
-access. Local synthetic API/Auth/private-storage/transaction and restore acceptance
-is not established; the latest resource snapshot found 1.21 GiB free of 15.71 GiB RAM,
-and no Docker daemon/image/stack was started. Pilot shop/test-account nomination
-remains unanswered. These gaps threaten the seven-day target and must enter the
-Day 2 feasibility review; source test counts are not a reliable completion forecast.
+Authenticated hosting diagnostics are recovered: prior exact `65733393` passes
+all six Actions gates, while independent build `c9a76b64-c814-400b-8229-8faf36b15548`
+fails automatic Bun frozen-lockfile installation before npm build/version upload.
+The new source-entrypoint WORKERS_CI freeze has 10 tests (12 with CI wiring),
+including npm ignore-scripts protection; it does not repair installation, govern
+raw/replaced commands or authorize upload. No provider/lockfile settings changed.
+
+Local synthetic API/Auth/private-storage/transaction and restore acceptance is
+not established. The owner now prohibits Docker; this is no longer a request to
+start Docker Desktop. The earlier owner-access snapshot found 1.17 GiB free of
+15.71 GiB RAM; latest no-Docker response check found 2.44 GiB. No daemon/image/stack
+was started. QA email nomination is received; dedicated QA session and synthetic
+native shop/membership remain unverified. Full local suite still passes only
+2,421/2,422 due to scanner timeout despite focused 10/10; no gate weakened. Fresh
+complete build/Worker/backend/OCR/PDF and 214 tracked asset checks pass at `166ff0c4`.
+Hosting gated
+remediation, native authority/atomic writers, migration/restore and owner acceptance
+threaten the target and must enter Day 2 feasibility review. No scope is dropped;
+source test counts are not a reliable completion forecast.
 
 Each day ends at 21:00 Manila time. QA runs throughout the week, not only on Day 6.
 

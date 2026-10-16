@@ -1465,3 +1465,39 @@ lint has zero errors/warnings, with 15 older findings outside changed lines.
 Source guards 103/103, release/report/inventory/assets 75/75 and new CI wiring
 guards 2/2 pass (five inventory tests overlap). Build/accessibility warnings and
 real-role/financial/private-storage/recovery/owner acceptance remain open.
+
+## Quote detail and explicit conversion release blocker (2026-10-16)
+
+Owner's subsequent no-Docker directive is recorded in the primary checklist and
+ledger and the existing follow-up. No Docker will be installed/started/used or
+requested. Docker-free acceptance must retain real-role/API/private-storage/
+transaction/restore gates. Reviewed native-PG17 Parts CI is committed at `166ff0c4`,
+preserving adversarial SQL coverage; actual Linux runtime remains unverified.
+Do not dispatch older containerized workflows. QA email nomination is received;
+separate standard signup is prepared but credentials/Terms/creation/session and
+trusted synthetic native-shop membership remain pending. Preserve existing
+personal/staff identities; no secrets or personal email in GitHub evidence.
+
+Same candidate/draft PR #68; exact source commit and final checks are in
+`evidence/NATIVE_QUOTE_DETAIL_READINESS.md`. The detail now requires fresh matching
+account/quote primary and item lifetimes, complete bound projections, qualified
+101/100 visible-row counts and independent generic retries. Received numeric/date
+text is preserved without inventing totals, expiry or accounting rules. The
+108 focused tests use the actual route and real QueryClient with synthetic SDK
+responses; TypeScript/lint/format and independent review pass, not actual API/RLS.
+
+The old non-atomic browser conversion dispatch is removed from the unreleased
+candidate; its disabled action explicitly awaits an authorized atomic writer.
+Only current validated already-converted work orders remain navigable. C3.03 is
+unfinished and release-blocking. The retained legacy RPC lacks safe caller/shop/
+retry behavior and compatible shop/part mappings; no legacy reconnection or
+invented inventory/part_type contract. Continue atomic C3.02-C3.04 and financial/
+stock/recovery acceptance rather than repeating list/email reader proofs.
+
+Authenticated hosting logs now identify automatic Bun frozen-lockfile installation
+failure before npm build/upload. A tested source-entrypoint freeze blocks
+WORKERS_CI presence, including ignore-scripts, but is neither install repair nor
+raw-upload protection/release approval. No provider setting/lockfile change,
+SQL/Auth/business write, live restriction, upload/deploy or email activation.
+Local API/private-storage/restore, native authority/claim/team and owner/pilot
+acceptance remain open under the sole hosted 365 backend requirement.
