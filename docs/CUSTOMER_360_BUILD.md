@@ -1,5 +1,18 @@
 # Native Customer 360: first delivery slice
 
+Source34a90930 adds ONLY private/unapplied one-existing-draft-line transaction
+support for safe101+ review/edit. Full prior receipt/item NUMERIC-text CAS,
+seven-field UPDATE/strict bindings/guards/persisted reread preserves IDs/unseen
+rows/header/provenance/consent/order in the selected graph. Final54/54 four files
+45.847s (20 new), review/format/lint/syntax/diff/214 assets/existing Worker guards
+pass. No app/migration/grant/live/deploy or legacy save change; C1.07/C1.08/R2/R3
+remain unaccepted. Next new-head CI/native PG17 independent sessions then trusted
+authority/all-writer/catalog/durable recovery before handler/dialog connection.
+Parent380 all six Actions pass,4,863/93 files74.31s; earlier bridge per-step markers
+are clipped, not separately verified Linux10/10. API/Auth/private originals/
+owner/pilot/full recovery/release/Cloudflare gates remain. Evidence:
+`evidence/DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`.
+
 Sourcef53c8ea8 composes selected full staff/claim/native roster foundation, not
 authority:36 tables/53 functions/41 attachments/no client policies, unchanged
 provider/parent/sequence guards. Final68/68 five suites81.967s, syntax/format/

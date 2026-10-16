@@ -16,6 +16,39 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Source34a90930 adds ONLY an unapplied owner-only single-existing-draft-item SQL
+candidate over unchanged receipt/expense source. Exact receipt/item NUMERIC-text
+CAS, selected account/target/shop and post-wait draft/install/expense/access
+guards, seven-field UPDATE and persisted reread preserve IDs/unseen rows/header/
+provenance/consent/order in the selected model. Final54/54 four suites45.847s
+(20 new), reviews/format/lint/syntax/diff/214 assets/existing-output Worker checks
+pass. No app/legacy writer/permission/migration/live/deploy change. C1.07/C1.08/
+R2/R3 stay unaccepted; no enabled101+ editor, ABA epoch, durable retry or native
+authority. Next new-head CI, then Docker-free PG17 independent-session wait/CAS/
+outer transaction/rollback proof; compatible all-writer/current catalog/owned
+ingress/strict session/native authority/durable recovery before handler/dialog
+connection. Exact constraints, tests, initial invalid seed repair and limits:
+`evidence/DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`. Parent380 all six Actions
+pass,4,863/93 files74.31s; truncated log omits individual bridge markers, not
+invented Linux10/10.47 replay/Cloudflare/QA/private-original/recovery/release gates
+and22 October risk remain. No Docker or scope cut.
+
+Publication380beb40/sourcef53c8ea8 is verified on canonical remote/same draft PR68,
+unchanged title/base/draft/main/history. All six Actions gates pass38922330671;
+unit117045110299 reports4,863/93 files74.31s, zero unexpected/quarantined failures.
+Returned log is truncated; individual earlier bridge markers are not independently
+visible. Normal25min timeout/guarded unconditional composition remain. Build final214 assets/Worker/backend/OCR/PDF/dry-run markers
+are present (truncated log); fetched CI merge3847c810… has the COMPLETE identical
+treec658e602… to published head. Actual native117045110403 untruncated PG17.11/
+Parts247/quotes/ten expense markers/bounded recovery/cleanup pass;47 replay
+failures remain, tiny62/61/185ms not RTO. Preview117045111364 confirms config
+skip/no upload; production/migrations/Supabase Preview skip; Workers865be24a…
+fails, fresh cause unverified. Earlier next-unit/single-item-candidate steps are
+superseded by source34a90930 above. Preserve authority/current-catalog/all-writer/
+recovery gates. Never feed pages to delete/recreate legacy save or
+manufacture SDK UPDATE privileges. Follow-up notes join next source slice, not
+a docs-only restart. Exact evidence: `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`.
+
 Latest source `f53c8ea8` closes the named bounded full platform staff/claim to
 native roster source composition, not authority. Unchanged full parent plus
 retained native selections now guard36 tables/53 functions/41 attachments/two

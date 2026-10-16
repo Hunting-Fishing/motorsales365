@@ -4,6 +4,27 @@
 candidate/draft PR #68. This is a memory-only selected-source dependency proof,
 not a native PostgreSQL/API/Auth/team-authority implementation or approval.
 
+Publication380beb402ee5b07bc19afc608b6ded369dd9ec29 is verified on the canonical
+remote/same draft PR68, unchanged title/base/draft/main. PR body61,669 characters
+preserves49,044-character original history exactly. All six Actions38922330671
+pass; actual unit117045110299 reports4,863/93 files74.31s, zero unexpected/
+quarantined failures. Initial provider HTTP502 resolved; returned log is truncated
+with final unit summaries but earlier individual bridge markers/count clipped.
+Do not invent a separately read Linux10/10. Job passes with normal25min timeout
+and guarded unconditional composition. No alternate diagnostic transport or
+changed timeout is used. Fresh
+build117045110202 has final39.35s/214 media/Worker/backend/OCR/PDF/dry-run markers
+in a truncated log. Fetched CI merge3847c810f5bb03a2a99726a4139fdf599b82febc has
+parents576fb17d…/380beb40 and the COMPLETE identical treec658e602ebcb6ff7d14631e5818067f0c62ff735.
+Native117045110403 is untruncated: PGDG17.11/server170011/Parts247/six quote
+groups/ten expense markers/bounded recovery and cleanup pass;47 replay failures
+remain, tiny62/61/185ms is not RTO. Preview117045111364/run38922331095 confirms
+config skip/no upload; production/migrations/Supabase Preview skip. Workers
+117045188541/build865be24a-aacb-483c-86a0-4bb43d9e5ae1 fails; fresh cause unverified.
+These follow-up notes join source34a90930 without a docs-only CI restart. The
+unapplied single-line prerequisite is now implemented/tested; see
+`DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`, not a newly enabled app editor.
+
 ## What is now composed
 
 The unchanged `withClaims` foundation supplies the selected full Auth/platform
@@ -112,7 +133,7 @@ OCR/PDF, actual native PG17 expense/Parts247/quote/bounded recovery and cleanup
 pass;47 replay failures remain, tiny48/67/148ms not RTO. Preview log confirms
 configuration skip/no upload; migration/production/Supabase Preview skip. Workers
 117028447628/buildaf30218f-3e1f-491d-899c-036176113e12 fails, fresh cause unverified.
-This new source's own exact-head Linux result remains separately required.
+The380beb40 checkpoint above supersedes this earlier pending Linux result.
 
 ## Impact and next dependency
 
@@ -122,11 +143,20 @@ Docker, charge, deployment, merge or change to main in this composition slice.
 R2/C1.04/C3/R3 remain unaccepted. This closes only the named missing bounded source
 composition, not a complete native team/claim or permission protocol.
 
-Next recover new exact-head composition/whole-unit/runtime-budget results without
-repeating this proof; then owned original-token ingress, strict session/native
+Do not repeat the completed bounded composition or parent whole-unit proof.
+Next owned original-token ingress, strict session/native
 role/team/tenant authority, reviewed compatible containment/all-writer transaction
 boundaries and complete catalog/financial/recovery/API/private-original acceptance.
 Safe101+ draft receipt review/edit remains independent and needs unseen-line
-preservation plus locked legacy replace-all refusal. QA signup/pilot/owner/live
+preservation plus locked legacy replace-all refusal. Read-only scout found no
+existing safe single-line candidate at that time: legacy save deletes/recreates all children
+and accepts at most100; authenticated tables are SELECT-only and the complete-
+line DTO is not an edit witness. Source34a90930 now supplies the locked/unapplied
+single-existing-item UPDATE and retained-constraint/rollback/preservation model
+tests; see its evidence rather than duplicating this prerequisite. Next its own
+exact-head CI/native PG17 independent-session tests, not accumulating pages into
+legacy save or adding direct SDK privileges. Trusted native
+authority, compatible all-writer locks and durable recovery remain separate
+before a dedicated handler/dialog can be connected. QA signup/pilot/owner/live
 gates remain open;22 October target remains at risk, with17 October feasibility
 review and no silent scope cuts or guarantee.

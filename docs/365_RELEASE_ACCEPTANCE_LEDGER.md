@@ -6,6 +6,36 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Source34a90930: private unapplied one-existing-draft-line transaction, exact full
+receipt/item NUMERIC-text CAS/target/shop/legacy TRUE/draft/install/expense guards,
+seven-field UPDATE/persisted reread and no client execute. Final54/54 four files
+45.847s,20 new; root/independent reviews/format/lint/syntax/diff/214 assets/existing
+Worker guards pass. Preserves150 IDs/all149 siblings/header/provenance/consent/
+order in selected graph, not arbitrary triggers/global writers/ABA/durable retry/
+native authority/API/restore. C1.07/C1.08/R2/R3 unaccepted; no app/migration/grant/
+live/deploy. Next new exact-head CI then Docker-free PG17 independent-session
+wait/CAS/outer visibility/rollback; complete compatible catalog/all-writer/owned
+ingress/strict session/native authority/durable recovery before UI connection.
+Parent380 all six Actions pass,4,863/93 files74.31s; individual bridge markers
+clipped, not separately read Linux10/10. See
+`evidence/DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`; baseline47 replay,
+Cloudflare, private originals/API/Auth/full recovery/owner/pilot/target-risk stay.
+
+Published380beb40/sourcef53c8ea8 verified canonical remote/same draft PR68/base/
+title/draft/main/history. All six Actions38922330671 pass; unit117045110299 reports
+4,863/93 files74.31s, zero unexpected/quarantined failures. Initial log transport502
+resolved; final returned log is truncated and individual bridge markers clipped.
+Normal25min timeout/unconditional command unchanged. CI build final guards
+and complete merge-tree equality verified; actual native117045110403 PG17.11/
+Parts247/quotes/ten expense markers/bounded recovery/cleanup pass,47 replay
+failures remain and tiny62/61/185ms not RTO. Preview117045111364 config skip/no
+upload; migration/production/Supabase Preview skip; Workers865be24a… fails,
+fresh cause unverified. Earlier pending-unit and next-single-item-candidate steps
+are superseded by34a90930 above; owned ingress/strict session/native authority/
+compatible all-writer/catalog/financial/recovery remain. No legacy replace-all or
+privileged SDK fallback. Follow-up evidence joins the next source slice without
+docs-only restart.
+
 Sourcef53c8ea8 closes ONLY bounded full staff/claim/native roster source
 composition:36 tables/53 functions/41 attachments/two added enums/no client
 policies, unchanged provider/full parent/sequence-without-reset guards. Final
@@ -632,7 +662,7 @@ Prior opener scope and historical receipt mutation gaps are in
 | ID / lane          | Workflow and source anchor                                                                                                                                         | Source / integrated state                                                                                                                                            | Staging | Owner   | Live         | Required acceptance / exact remaining dependency                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1 / release       | Migration provenance, `scripts/ci/migration-provenance.mjs`                                                                                                        | Existing tooling plus typed 12/5/2 ledger; exact 404/423 whole-source mapping unchanged                                                                              | Blocked | Pending | Not verified | Resolve 12 historical source/replay gaps, validate five unapplied candidates and preserve two recorded envelope executions. Verify schema/ACL/trigger provenance and a reviewed forward/recovery path. No destructive history repair or restriction replay.                                                                                          |
-| R2 / release       | Identity, roles, team/offboarding, ownership claims; `src/lib/internal-staff.functions.ts` and `docs/evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`                | Staff/caller fixes integrated; d4538923 command custody is deny-only; f53c8ea8 bounded full staff/claim/native bridge composition passes68/68 locally, not authority | Blocked | Pending | Not verified | New-head Linux composition/whole-unit/runtime-budget result, owned original-token ingress, strict session termination/expiry and fresh native-role/tenant/team authority, atomic manager/claim/offboarding protocols, durable retry/audit, private evidence custody and independent-session races. The selected memory-only composition is complete; retained role-row churn is not idempotency. Preserve restrictions; bans/getClaims/getUser are not strict revocation. |
+| R2 / release       | Identity, roles, team/offboarding, ownership claims; `src/lib/internal-staff.functions.ts` and `docs/evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`                | Staff/caller fixes integrated; d4538923 command custody is deny-only; f53c8ea8 bounded full staff/claim/native bridge composition passes68/68 locally, not authority | Blocked | Pending | Not verified | New draft-line candidate exact-head Linux regressions, owned original-token ingress, strict session termination/expiry and fresh native-role/tenant/team authority, atomic manager/claim/offboarding protocols, durable retry/audit, private evidence custody and independent-session races. The selected memory-only composition is complete; retained role-row churn is not idempotency. Preserve restrictions; bans/getClaims/getUser are not strict revocation. |
 | R3 / release       | Full artifact, hosting, database/private-object recovery                                                                                                           | Complete local artifact/214 copies verified; bounded synthetic PG17 restore/ACL/RLS/sequence/late-failure rollback passes at75974057; source build freeze integrated | Blocked | Pending | Not verified | Full baseline/API/Auth/private-original/configuration/owner/live recovery remains open;47 replay failures retained. Independent Workers installation still needs reviewed remediation, with newest failure cause unverified. Source WORKERS_CI guard does not repair installation or govern raw/replaced commands. Never deploy older sparse output. |
 | U0 / identity      | Native Google login/signup, `src/lib/google-oauth.ts`, `src/hooks/use-google-oauth.ts`, login/signup routes                                                        | PR #9 native-client handoff selectively adapted with URL, single-flight and context-lifetime guards                                                                  | Not run | Pending | Not verified | Verify approved Google provider/callback and Supabase redirect allowlist, actual implicit callback/session, pending-profile application, permitted account/role transitions and recovery. URL generation is not authentication or provisioning. Generated middleware/wrapper, dependencies and broader PR #9 cutover remain unchanged.               |
 | C1 / CRM           | Receipt image/PDF/manual review, `src/components/vehicle-receipt-panel.tsx`, `src/lib/receipt-document.client.ts`, `src/lib/vehicle-receipts.functions.ts`         | OCR and reviewed-entry foundations included; broader workflow acceptance open                                                                                        | Not run | Pending | Not verified | Phone image/PDF/manual correction to confirmed purchase/expense with correct amounts/currency/date/customer/vehicle/work order; no duplicate on retry, originals private. Recover original interrupted scanner/workspace separately or record its unresolved status; do not call source recovery completed by rebuilding.                            |
@@ -672,7 +702,7 @@ responses and a real QueryClient, not real Auth/storage/financial transactions.
 | C1.05 | Discard draft and attachment                   | `5ede72c6` temporarily interlocks all draft removal; disabled accessible UI has no dispatch listener, eligible review retained. Safe discard remains unfinished: durable account/tenant/receipt/key operation identity, all-writer fences, object/row coordination and verified original-byte recovery. Native direct capabilities unchanged; operation reordering alone is not rollback.                                                                                    |
 | C1.06 | Record installation                            | `ee9af3a8` captured seven-field intent, same-client child/parent preflights and void transport acknowledgment; parent-held session/lifetime/unknown fences and actual content cleanup. Purchase never implies installation. Native atomic binding/authority, persisted history, durable retry, correction/removal/consent and real-role/recovery acceptance remain.                                                                                                          |
 | C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                                                                                                                                                                                                                        |
-| C1.08 | View/review receipts over 100 lines            | Read-only complete-line windows/viewer implemented at c8beede8; focused1,542/1,542/type/build/214 assets/review pass. Windows are not merged into writable receipts; native/API/owner/live viewing acceptance and safe101+ review/edit remain open. Existing incomplete/edit/sharing flags and100-line replacement writer are unchanged; no scope cut.                                                                                                                       |
+| C1.08 | View/review receipts over 100 lines            | Read-only windows/viewer c8beede8 remains; private unapplied single-draft-line SQL34a90930 passes20 new/54 combined with exact CAS/preservation/rollback/ACL checks, not an enabled editor. Windows are not merged into writable receipts; native PG17 independent-session/current-catalog/all-writer/authority/durable recovery and handler/dialog/API/owner/live acceptance remain open. Existing incomplete/edit/sharing flags and100-line replacement writer are unchanged; no scope cut.                                                                                                                       |
 
 The C1.03 mixed-consent UI interlock is implemented at `1a49acc5`; it cannot solve
 direct/concurrent SQL sharing. C1.04 transport/lifetime safety and the C1.05
@@ -955,21 +985,25 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 
 ## Next actions and owner dependencies
 
-1. Existing PR #68 publicationb2c0328c passes all six Actions gates38917399787;
-   unit117028294149 reports4,863/93 files100.48s, zero unexpected/quarantined
+1. Existing PR #68 publication380beb40 passes all six Actions gates38922330671;
+   unit117045110299 reports4,863/93 files74.31s, zero unexpected/quarantined
    failures, with truncated log/final summaries. Actual native PG17 expense
    retry/binding/outer transaction/FK/post-wait drift and cleanup passes at
-   117028294367; do not repeat it or promote synthetic owner/GUC to native authority.
+   117045110403; do not repeat it or promote synthetic owner/GUC to native authority.
    Command-strict receipt-expense custody atd4538923 passes978/full TypeScript
    but remains deny-only. The bounded full platform staff/claim/native bridge
-   foundation is now composed atf53c8ea8 (final68/68 locally); recover its own
-   exact-head Linux composition/whole-unit/runtime-budget result next. Then
+   foundation is composed atf53c8ea8 (final68/68 locally); whole Linux job passes,
+   but individual bridge markers are clipped in the returned log, not invented.
+   Private/unapplied one-draft-line SQL34a90930 now passes20 new/54 combined.
+   Recover new exact-head CI next, then native PG17 independent-session wait/
+   stale-CAS/outer visibility/rollback proof for the new line candidate. Then
    compose owned original-token ingress, strict session checks, trusted native
    role/tenant/shop admission, compatible current complete catalog and protected
    all-writer/ledger boundaries before connection.
    Preserve account-phantom/financial/full recovery gates; no client ledger DML or
-   owner grant to make tests work. Safe101+ full-line review/edit is the next
-   independent receipt dependency, not another read-only viewer. Existing private
+   owner grant to make tests work. Safe101+ full-line review/edit still needs
+   compatible catalog/trigger/all-writer/authority/durable recovery and dedicated
+   handler/dialog/DTO/UI acceptance before activation. Existing private
    child/editor/installation/unknown holds and source/read contracts remain.
    Retail assignment is still not atomic/recoverable conversion. Current follow-up
    notes join the next meaningful source slice without a docs-only CI restart.
