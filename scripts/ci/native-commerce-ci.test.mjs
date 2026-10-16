@@ -151,6 +151,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/lib/customer-commercial.functions.test.ts src/lib/customer-communications.functions.test.ts src/components/vehicle-receipt-panel.test.tsx src/lib/vehicle-receipts.test.ts --maxWorkers=1",
     ],
     [
+      "Retail lead assignment caller and private lifetimes (never quarantined)",
+      "npx vitest run src/lib/leads.functions.test.ts 'src/routes/dashboard.team.leads_.$id.test.tsx' --maxWorkers=1",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

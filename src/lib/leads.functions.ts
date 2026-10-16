@@ -2,7 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { withRouteAudit } from "@/integrations/supabase/route-audit.server";
-
+import { getRequest } from "@tanstack/react-start/server";
+import { captureNativeRequestCaller } from "./native-request-caller.server";
 
 const uuid = z.string().uuid();
 
@@ -63,7 +64,10 @@ export const listOrgMembers = createServerFn({ method: "POST" })
       .eq("organization_id", data.orgId);
     if (error) throw new Error(error.message);
     const ids = (members ?? []).map((m: any) => m.user_id);
-    let profilesById = new Map<string, { id: string; full_name: string | null; avatar_url: string | null }>();
+    let profilesById = new Map<
+      string,
+      { id: string; full_name: string | null; avatar_url: string | null }
+    >();
     if (ids.length) {
       const { data: profs, error: pErr } = await supabase
         .from("profiles")
@@ -76,7 +80,6 @@ export const listOrgMembers = createServerFn({ method: "POST" })
       ...m,
       profiles: profilesById.get(m.user_id) ?? null,
     }));
-
   });
 
 export const listOrgLeads = createServerFn({ method: "POST" })
@@ -146,29 +149,143 @@ export const getLead = createServerFn({ method: "POST" })
 
 export const assignLead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; userId: string | null }) => ({
-    id: uuid.parse(d.id),
-    userId: d.userId ? uuid.parse(d.userId) : null,
-  }))
+  .inputValidator((input: unknown) => {
+    const parsed = z
+      .object({
+        id: uuid,
+        userId: uuid.nullable(),
+        expectedAccountId: uuid,
+        expectedOrgId: uuid,
+      })
+      .strict()
+      .safeParse(input);
+    if (!parsed.success) throw new Error("Invalid lead assignment request.");
+    return parsed.data;
+  })
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const orgId = await loadLeadOrg(supabase, userId, data.id);
-    return withRouteAudit({
-      actorId: userId,
-      label: "leads.assignLead",
-      role: "org_manager",
-      targetSummary: { org_id: orgId, lead_id: data.id, assignee: data.userId },
-      check: () => assertOrgManager(supabase, userId, orgId),
-      run: async () => {
-        const { error } = await supabase
-          .from("leads")
-          .update({ assigned_to: data.userId })
-          .eq("id", data.id);
-        if (error) throw new Error(error.message);
-        return { ok: true };
-      },
-    });
+    const failure = "Could not assign this lead. Refresh and try again.";
+    const uncertain =
+      "Assignment outcome could not be confirmed. Review this lead before assigning again.";
+    const { id: leadId, userId: assigneeId, expectedAccountId, expectedOrgId } = data;
+    function assertActor() {
+      if (context?.userId !== expectedAccountId)
+        throw new Error("Account changed. Refresh before assigning this lead.");
+    }
+    assertActor();
+    let dispatched = false;
+    try {
+      const caller = captureNativeRequestCaller(context, expectedAccountId);
+      const request = getRequest();
+      const assertCaller = await caller.verify(request);
+      const { supabase, userId } = context;
+      function ready() {
+        assertActor();
+        assertCaller();
+      }
+      const sameId = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
+      const identity = z.object({ id: uuid, organization_id: uuid }).strict();
+      const acknowledgment = identity.extend({ assigned_to: uuid.nullable() });
+      function exactRow(value: unknown, keys: string[]) {
+        if (typeof value !== "object" || value === null || Array.isArray(value))
+          throw new Error(failure);
+        const descriptors = Object.getOwnPropertyDescriptors(value);
+        if (
+          Reflect.ownKeys(value).length !== keys.length ||
+          keys.some((key) => !Object.hasOwn(descriptors, key) || !("value" in descriptors[key]))
+        )
+          throw new Error(failure);
+        return Object.fromEntries(keys.map((key) => [key, descriptors[key].value]));
+      }
+      async function check(name: "is_org_member" | "can_manage_org", actor: string) {
+        try {
+          ready();
+          const query = supabase
+            .rpc(name, { _user_id: actor, _org_id: expectedOrgId })
+            .abortSignal(request.signal)
+            .retry(false);
+          ready();
+          const result = await query;
+          ready();
+          if (result.error !== null || result.data !== true) throw new Error(failure);
+        } catch {
+          throw new Error(failure);
+        }
+      }
+      ready();
+      const primaryQuery = supabase
+        .from("leads")
+        .select("id,organization_id")
+        .eq("id", leadId)
+        .eq("organization_id", expectedOrgId)
+        .abortSignal(request.signal)
+        .retry(false)
+        .maybeSingle();
+      ready();
+      const primary = await primaryQuery;
+      ready();
+      const lead = identity.safeParse(exactRow(primary.data, ["id", "organization_id"]));
+      if (
+        primary.error !== null ||
+        !lead.success ||
+        !sameId(lead.data.id, leadId) ||
+        !sameId(lead.data.organization_id, expectedOrgId)
+      )
+        throw new Error(failure);
+      await check("is_org_member", userId);
+      ready();
+      const result = await withRouteAudit({
+        actorId: userId,
+        label: "leads.assignLead",
+        role: "org_manager",
+        targetSummary: { org_id: expectedOrgId, lead_id: leadId, assignee: assigneeId },
+        check: () => check("can_manage_org", userId),
+        run: async () => {
+          try {
+            ready();
+            if (assigneeId !== null) await check("is_org_member", assigneeId);
+            ready();
+            const update = supabase
+              .from("leads")
+              .update({ assigned_to: assigneeId })
+              .eq("id", leadId)
+              .eq("organization_id", expectedOrgId)
+              .select("id,organization_id,assigned_to")
+              .abortSignal(request.signal)
+              .retry(false)
+              .maybeSingle();
+            ready();
+            dispatched = true;
+            const updated = await update;
+            ready();
+            const receipt = acknowledgment.safeParse(
+              exactRow(updated.data, ["id", "organization_id", "assigned_to"]),
+            );
+            if (
+              updated.error !== null ||
+              !receipt.success ||
+              !sameId(receipt.data.id, leadId) ||
+              !sameId(receipt.data.organization_id, expectedOrgId) ||
+              (assigneeId === null
+                ? receipt.data.assigned_to !== null
+                : receipt.data.assigned_to === null ||
+                  !sameId(receipt.data.assigned_to, assigneeId))
+            )
+              throw new Error(uncertain);
+            return { ok: true as const, assignment: receipt.data };
+          } catch {
+            throw new Error(dispatched ? uncertain : failure);
+          }
+        },
+      });
+      ready();
+      return result;
+    } catch {
+      throw new Error(dispatched ? uncertain : failure);
+    }
   });
+
+// This caller preflight/receipt is not atomic membership or revocation fencing.
+// Native org helpers, RLS and the existing activity/audit mechanisms remain in force.
 
 export const updateLeadStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -194,7 +311,6 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
       },
     });
   });
-
 
 export const addLeadNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -261,7 +377,6 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
           profilesById = new Map((profs ?? []).map((p: any) => [p.id, p]));
         }
 
-
         const rows = (members ?? []).map((m: any) => {
           const mine = (leads ?? []).filter((l) => l.assigned_to === m.user_id);
           const won = mine.filter((l) => l.status === "won").length;
@@ -287,4 +402,3 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
       },
     });
   });
-

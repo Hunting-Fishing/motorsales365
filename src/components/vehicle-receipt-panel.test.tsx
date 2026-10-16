@@ -399,7 +399,7 @@ describe("private receipt opening lifetime", () => {
       seededKeys.push(event.query.queryKey);
       event.query.setData(
         { receipts: [privateReceipt()], linkedVehicleId: null },
-        { updatedAt: Date.now() + 60_000 },
+        { updatedAt: Date.now() + 60_000, manual: true },
       );
     });
     const invalidate = vi.spyOn(client, "invalidateQueries");
