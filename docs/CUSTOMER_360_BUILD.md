@@ -1,5 +1,24 @@
 # Native Customer 360: first delivery slice
 
+C1.08 source `c8beede8` connects strict separate display-only receipt-line pages
+to the incomplete-receipt viewer, with exact account/target/receipt/parent-version
+and per-mount/page lifetimes. Focused1,542/1,542 across18 suites,241 new cases,
+independent review/format/diff/full TypeScript/lint and fresh complete build/214
+public copies/Worker/backend/OCR/PDF/server checks pass. All prior handlers/editor
+and485 handler/215 panel cases remain. New published-head CI is separate. Safe
+review/edit101+ lines, atomic/native authority and owner/live acceptance remain
+open; no partial-row writer/sharing unlock or SQL/live/deploy. Exact source,
+limitations and next dependencies: `evidence/RECEIPT_COMPLETE_LINE_VIEWER.md`.
+
+Published `75974057` now passes the actual Docker-free synthetic PG17 dump/
+offline-source restore/catalog/ACL/RLS/sequence/late-failure rollback/cleanup
+rehearsal (native job `116912992234`). Parts247/six quote groups pass, 47 replay
+failures retained. All six Actions gates pass at this parent, including application
+4,170/4,170 across87 files (92.02s), zero unexpected/quarantined failures, not new
+C1.08 exact-head proof. Full API/Auth/private-original and production recovery remain
+open. Continue independent C1.08 read-only line viewing, not partial-row writes.
+Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. No migration/live/deploy.
+
 R3 snapshot repair `6fb1e895` retains column permission evidence while removing
 an invalid empty ACL-array fallback. Actual `afde5a81` native execution now passes
 identity/pristine/fixture but fails source-access22023, before dump/restore. Final

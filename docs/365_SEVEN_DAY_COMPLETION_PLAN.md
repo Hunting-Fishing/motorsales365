@@ -1,5 +1,25 @@
 # 365 Seven Day Completion Plan
 
+C1.08 source `c8beede8` implements bounded read-only viewing beyond100 lines,
+with strict account/receipt/target/consent windows and parent/dialog/page lifetime
+fences. Focused1,542/1,542 (18 suites,241 new), full TypeScript, review/format/diff/
+lint and fresh complete build/214 assets/Worker boundaries pass. Safe full-line
+review/edit, native atomic authority and QA/owner/live acceptance remain open;
+the existing partial-set writer/sharing restrictions are not loosened. Next:
+exact published-head CI and full baseline/private-original/native recovery plus
+separate safe review/write contract. No Docker, SQL/live/deploy or scope cut.
+Evidence: `evidence/RECEIPT_COMPLETE_LINE_VIEWER.md`; target/gates unchanged.
+
+Published `75974057` passes the bounded actual native PG17 recovery rehearsal:
+offline-source restore, data/catalog/ACL/RLS/sequence comparison, late-failure
+rollback and cleanup (job `116912992234`). Tiny synthetic timing is not production
+RTO. All six parent Actions gates pass, including application4,170/4,170 across87
+files (92.02s), zero unexpected/quarantined failures; new C1.08 still needs its own
+exact-head CI. Whole baseline/API/Auth/private originals/configuration/owner/live acceptance
+remain open, as do 47 replay failures; the full R3 gate is not complete. Continue
+independent C1.08 read-only viewing now. No Docker/live/deploy. Exact evidence:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`; deadline/feasibility gates unchanged.
+
 R3 repair `6fb1e895` fixes the next source-confirmed column ACL snapshot defect,
 without removing permission comparison. Actual `afde5a81` now passes identity/
 pristine/fixture and fails source-access22023 before dump/restore. Offline101/101,

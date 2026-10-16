@@ -253,6 +253,35 @@ test SHA `3f46cc744f01ae12c35095b5d5221d9b64092fdc99c557df4f2b7f1d278ad15d`.
 Shell/fixture/admission/pin/restore/cleanup are unchanged. Actual repaired Linux
 execution remains required; no Docker, app SQL/live changes or deployment.
 
+### Fifth Linux attempt: bounded synthetic recovery passes
+
+Published `759740574e216eb3d3d81c4f2f6c70cb3f58b269`, native job
+[`116912992234`](https://github.com/Hunting-Fishing/motorsales365/actions/runs/38882590003/job/116912992234),
+has a completed **success** and untruncated log. Actual Docker-free PG17 execution
+passes source identity/pristine checks, synthetic role access/fixture/snapshot,
+custom dump and separate roles archive, externally pinned manifest, verified
+source shutdown, distinct-target roles/database restore, catalog/owner/ACL/FORCE
+RLS/data/exact-number/sequence comparison, non-superuser independent connection
+checks, high-watermark nextval9001 and witnessed late restore-failure rollback.
+EXIT and explicit always-cleanup complete; retained Parts247/six quote groups and
+their cleanup pass. PGDG17.11/server170011 and 47 retained replay failures are
+separate evidence, not whole application baseline recovery.
+
+Observed tiny synthetic timings: dump **66ms**, restore **79ms**, verification
+**205ms**. This proves only this fixed fixture on this ephemeral host, not the
+production dataset's RTO, credentials, Auth/JWT/API/native shop authority or
+private original bytes. All six Actions gates now pass on this exact head.
+Completed unit `116912992545` confirms application4,170/4,170 across87 files
+(92.02s), zero unexpected/quarantined failures; its overall log is truncated but
+final summaries are present. Earlier captures had unit still pending, and two
+in-progress log requests returned502; no fallback or inferred result was used.
+Untruncated preview job `116912624823` confirms the
+`DEPLOY_VIA_ACTIONS` configuration skip and no upload; migrations/production/
+Supabase Preview skip. Workers build
+`2644237e-f3e6-49b1-bc81-0f9dfba76a11` fails with fresh cause unverified.
+These verified results join the next integrated source slice, not a docs-only
+CI restart. No Docker, hosted resource, app migration/live operation or deployment.
+
 ## Open release gates and next dependency
 
 Even a passing rehearsal does not recover the application baseline, real Auth/
@@ -268,8 +297,10 @@ browser check (contact/credential fields blank, Terms unchecked). No form change
 submission, personal/staff reset or privilege grant occurred. Trusted synthetic
 native-shop membership and owner acceptance remain separate.
 
-Next: finish and publish this bounded runner, verify its actual exact-head Linux
-execution, then continue real-stack/private-original recovery prerequisites and
-independent receipt complete-line viewing/atomic workflow work. Carry remaining
+Next: retain this published bounded native result, continue real-stack/private-
+original recovery prerequisites and independent receipt complete-line viewing/
+atomic workflow work. C1.08 read-only server/DTO and UI are now separate bounded
+implementation tasks; they must not unlock incomplete-row editing/sharing or the
+100-line replacement writer. Carry remaining
 access, baseline and acceptance gaps into the 17 October feasibility review; the
 22 October 21:00 Asia/Manila target does not waive them or silently reduce scope.

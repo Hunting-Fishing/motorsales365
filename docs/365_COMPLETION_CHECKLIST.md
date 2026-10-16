@@ -16,6 +16,37 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+C1.08 read-only complete-line viewing is implemented at `c8beede8` on the same
+integrated candidate/PR #68. Strict separate100-line display windows and matching
+account/receipt/target/consent checks connect to an actual Dialog/QueryClient
+viewer fenced by parent read version, session and page lifetimes. Existing editor,
+sharing, installation, expense/discard holds and100-line replacement writer stay
+unchanged. Focused1,542/1,542 across18 suites (35.42s),241 new cases with all485
+handler/215 panel cases retained; independent review/format/diff/full TypeScript
+pass. Changed-line lint zero new findings (six retained), fresh complete build/
+214 public copies/Worker/backend/OCR/PDF/server checks pass. New exact-head CI is
+still required. No SQL/migration/live change/deployment. C1.08 review/edit101+
+lines and real API/native role/atomic writer/QA/owner/live acceptance remain open.
+Next: published-head CI, whole-baseline/private-original/native authority recovery
+and safe full-line review/write contract; no partial-set editor unlock. Evidence:
+`evidence/RECEIPT_COMPLETE_LINE_VIEWER.md`.
+
+R3 bounded synthetic recovery now passes on published `75974057`, native job
+`116912992234` / run `38882590003`: actual PG17 data/catalog/owner/ACL/RLS/sequence
+comparison, offline-source restore, late restore-failure rollback and scoped
+cleanup. Observed tiny-fixture dump66ms/restore79ms/verification205ms, not a
+production RTO. Retained Parts247/six quote groups pass and 47 replay failures
+remain. All six Actions gates now pass on this exact parent; completed unit
+`116912992545` confirms4,170/4,170 across87 files (92.02s), zero unexpected/
+quarantined failures, with a truncated overall log but final summaries present.
+This does not transfer to new C1.08 head. Whole baseline/API/Auth/private-original/
+configuration/owner/live recovery
+are still open; R3 as a whole stays blocked. Continue separate read-only C1.08
+line-window viewing now in implementation, without unlocking incomplete-row
+edit/share/write. These follow-up results join the next source slice, no docs-only
+CI restart. No Docker, app migration/live changes or deployment. Full evidence:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 R3 ACL snapshot repair `6fb1e895` follows actual published `afde5a81` native job
 `116909139334` (run `38881411362`): identity/pristine admission and fixture now
 pass, but source-access fails SQLSTATE22023 before dump/restore. A zero-dimensional
