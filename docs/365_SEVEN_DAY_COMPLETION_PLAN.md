@@ -76,7 +76,25 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
-Latest connected source `a56480a1` composes caller denial into the existing
+Latest connected sources `eb90d15c`/`bd5e4b04` add receipt/link read freshness and
+retail assignment intent/membership/acknowledgment safety. Receipt101/lead151;
+final combined703/703, changed-line lint/review/CI guards pass. Full integrated
+TypeScript/fresh build/214 assets/Worker boundaries pass at `bd5e4b04` with expected
+warnings; publication/exact-head CI results are separately recorded after checks.
+Parent `3dfca78a` now passes all six Actions gates, application2,998/2,998. New
+sources require their own checks. Source safety is not real authorization,
+atomic/durable conversion, private-storage/restore or owner acceptance.
+The action inventory now distinguishes retail triage, parts partnerships and
+the dedicated affiliate program. Linked due tasks, conversion and recruitment
+orchestration remain substantive work. QA form is still unsubmitted in the
+now-available browser; native runtime tools were not found in a bounded local
+probe, not exhaustively absent. Shared authority, baseline/recovery/hosting and
+pilot gaps still threaten the target and require Day 2 feasibility review.
+No scope cut or verified completion forecast. Evidence:
+`evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md`,
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md` and action-level ledger.
+
+Prior connected source `a56480a1` composes caller denial into the existing
 commercial/communications readers and hardens receipt entry preflight/lifetimes/
 acknowledgments/unknown outcomes. Final critical 533/533, full TypeScript,
 changed-line lint/review and CI guards pass. Fresh complete packaging/214 public

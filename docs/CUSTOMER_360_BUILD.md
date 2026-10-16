@@ -1575,3 +1575,23 @@ StrictMode replay is not specifically tested. Receipt/shop-link read freshness,
 bounded reader/caller contracts, remaining writers and durable retry/recovery are
 next. Native authority and real API/private-storage/restore/pilot/owner acceptance
 remain open. No migration, provider activation or deployment.
+
+## Receipt reads and retail assignment follow up (2026-10-16)
+
+Sources `eb90d15c`/`bd5e4b04`, same draft PR #68. Receipt/link per-mount reads hide
+fetching, paused, failed and invalidated snapshots; current-query admission
+guards preserve open editors, installation drafts and unknown holds through
+ordinary refresh. Auth loading is separate teardown. Existing editor/opener/
+installation bodies are unchanged, receipt101/101 passes.
+
+The existing retail detail binds assignment to prior account/org/lead/assignee,
+strict existing memberships and an exact returned row, with fresh member choices,
+duplicate/stale-callback fences and mounted unknown-outcome holds. Lead151/151
+and final combined703/703 pass; lint/review/CI guards pass. Full integrated
+TypeScript/fresh build/214 assets/Worker boundaries pass with expected warnings.
+Publication evidence is separately recorded in
+`evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. Native authority, server receipt DTO/
+attachment completeness, atomic/durable writers, actual-role/private-storage/
+restore/pilot/owner acceptance and complete retail/recruitment workflows remain
+open. No SQL, signup, provider activation, customer send or deployment.

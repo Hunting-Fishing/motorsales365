@@ -3,7 +3,8 @@
 16 October 2026, Asia/Manila. Source
 `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same integrated branch and draft
 [PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68).
-Publication and exact-head CI are recorded separately after verification.
+Publication `3dfca78aebb2e16f1d91fe6271d5b4d965709051`; exact-head CI follow-up
+below joins the next integrated source slice, not a documentation-only CI restart.
 This is connected application safety work, not production acceptance.
 
 ## Connected customer readers
@@ -112,3 +113,44 @@ outcomes and durable retry/recovery remain separate writer work. Trusted fresh
 original-human/native-team/claim/offboarding authority, real API/private-storage/
 transaction/restore, synthetic pilot and owner acceptance remain release gates.
 The 22 October target is not a verified forecast or permission to cut scope.
+
+Read-only follow-up audit pins the next implementation to the panel and its
+tests. Append a per-mount identity after existing receipt/shop-link query-key
+prefixes and forward Query's signal as the server function's top-level `signal`,
+not inside `data`. Gate rows/filter/empty states on a successful non-fetching
+read, with generic errors and explicit retry; a disabled link query must not
+show perpetual loading. Preserve account-scoped invalidation prefixes.
+
+Keep active editor/installation dialogs mounted through ordinary background
+refetch, errors and success. Do not reset their fields, acknowledged IDs or
+unknown-outcome holds, or redispatch mutations. Test deferred account/vehicle/
+shop ABA, logout, retained-data refetch failure, signal forwarding and editor
+hold preservation. Update cache assertions to inspect actual per-mount keys.
+Preserve the existing in-flight StrictMode opener test by seeding its real new
+query key before the first layout commit, not weakening it to a post-replay click.
+Auth bootstrap `loading` is not fresh roles/session/native authority; deliberate
+Auth scope teardown is distinct from query refresh. This audit adds no source or
+runtime acceptance and does not change the already-tested mutation chain.
+
+## Publication follow-up
+
+Canonical remote and attached draft PR #68 confirm `3dfca78a`; base remains
+`security/claim-revision-invalidation-model`, main `70ab892a`. All 214 tracked
+public copies and Worker/backend/OCR/PDF/server boundaries verify at this head.
+Actions run `38848994735`: all six gates pass. Completed unit `116805801841`
+confirms critical 533/533 (12.71s), locked quote 94/94 and full application
+2,998/2,998 across 80 files (64.38s), zero unexpected/quarantined failures. Its
+overall log is truncated but final summaries/checker are present. In-progress
+log reads returned provider HTTP 502; the completed read succeeded without
+CLI/API fallback. This is this publication's result, not acceptance of newer work.
+
+Native job `116805801627` has an untruncated log confirming signed PGDG17.11,
+actual `server_version_num=170011`, all 247 Parts assertions, 47 retained
+migration replay failures, all six independent-session quote scenario groups,
+both server stops and successful scoped always-cleanup. Selected synthetic-
+authority SQL rehearsal is verified, not whole baseline/API/Auth/private-storage/
+restore or financial/owner acceptance. Wrapper `38848994666` preview succeeds
+via its configured `DEPLOY_VIA_ACTIONS` skip path without upload; migrations,
+detection, production and Supabase Preview skip. Independent Workers build
+`a3c621f8-bc5b-41cf-a4ce-fe420b3237ca` fails with ID/link only; its fresh cause and
+source freeze execution are unverified. No deployment/migration/live change.

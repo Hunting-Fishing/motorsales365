@@ -15,10 +15,10 @@ guards/syntax and published `bf091dc7` native Linux install/SQL/cleanup pass,
 including all 247 Parts assertions on PostgreSQL 17.11.
 Validate that Docker-free candidate, not an older service-container workflow.
 Controlled QA email nomination is received; preserve existing personal/staff
-identities. The last verified standard QA signup was not submitted. This turn's
-read-only browser check timed out and recovery returned no enabled surfaces;
-current completion/session is unverified. Trusted synthetic native-shop membership
-remains pending.
+identities. The latest read-only browser check is available again and shows the
+prepared standard QA signup still unsubmitted: contact/credential fields blank,
+Terms unchecked. No form submission, account reset or privileged grant occurred.
+Dedicated session and trusted synthetic native-shop membership remain unverified.
 
 Subsequent published `bf091dc7` native Parts job `116758376432` in run `38833837897`
 passes on PGDG PostgreSQL 17.11: all 247 assertions, install/private-cluster/cleanup
@@ -41,7 +41,20 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest connected slice: `a56480a1`, commercial/communications caller composition
+Latest source slices: receipt reads `eb90d15c` and retail assignment `bd5e4b04`.
+Receipt panel101/101; lead handler106/route45; final combined703/703 across eight
+suites (35.65s), seven-file changed-line lint zero new errors/warnings (23 older
+findings), format/diff/review and mandatory CI guards pass. Full TypeScript and
+fresh complete build/214 public copies/Worker/backend/OCR/PDF/server boundaries
+pass at `bd5e4b04` with expected warnings. Publication results are separately recorded in
+`evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. Per-mount fresh-only reads preserve
+open editors/holds; lead assignment checks prior intent/memberships/exact returned
+rows and holds unknown outcomes. None establishes atomic membership, durable
+replay, positive native-shop authority or new isolated/owner/live acceptance.
+Next: receipt/server link bounded complete DTO/caller/attachment contract and
+typed durable writer recovery, plus shared R2/R3 and pipeline gaps below.
+Prior connected slice: `a56480a1`, commercial/communications caller composition
 and receipt entry preflight/lifetime/acknowledgment/unknown-outcome handling.
 Critical 533/533 across six files (15.19s), full TypeScript, ten-file changed-line
 lint zero new errors/warnings (13 older findings), format/diff, independent review
@@ -52,6 +65,19 @@ a void transport acknowledgment; path ack is not byte provenance. Mounted holds
 are not durable/reopen dedupe; pending server work is not canceled. No new R2,
 isolated/owner/live acceptance, migration or deployment. Next: receipt/shop-link
 read freshness/bounded DTO/caller binding; server typed outcomes/durable retry.
+Publication `3dfca78a` verified on canonical remote/same attached draft PR #68/
+base/unchanged main; final-head 214 public copies/Worker boundaries verify. Run
+`38848994735`: all six Actions gates pass. Completed unit `116805801841` confirms
+critical 533/533 (12.71s), locked quote 94/94 and application 2,998/2,998 across
+80 files (64.38s), zero unexpected/quarantined failures; overall log truncated,
+final summaries/checker present. Native `116805801627` untruncated log confirms
+PG17.11/Parts 247/247/six quote groups/server stops/scoped cleanup and 47 retained
+replay failures. In-progress unit-log reads returned HTTP 502; completed read
+succeeded without fallback. Wrapper `38848994666` preview skip succeeds without upload;
+migrations/detection/production and Supabase Preview skip. Workers build
+`a3c621f8-bc5b-41cf-a4ce-fe420b3237ca` fails, ID/link only/fresh cause unverified.
+Follow-up notes join the next integrated source slice, no documentation-only CI restart,
+deployment, migration or live write.
 Prior connected slice: `9a4059bd`, customer detail current-record/captured caller
 denial and private receipt read-lifetime fencing. Critical suites 192/192 (5.77s;
 helper92/handler67/receipt33), full TypeScript/seven-file changed-line lint,
@@ -187,6 +213,14 @@ route is not evidence that the changed candidate has passed those gates.
 
 ## Workflow ledger
 
+Current C1/C2/U1 safety: `eb90d15c` masks stale receipt/link snapshots and preserves
+editor/installation/unknown holds; `bd5e4b04` binds retail assignment intent and
+checks membership/returned rows with current-only route callbacks. The 703 passing
+focused tests are synthetic source evidence. Backend receipt DTO/completeness,
+native authority, assignment races, durable conversion and real private-object/
+transaction/restore/pilot acceptance remain open. New U1/U2 inventory below is not
+a claim that triage or application forms complete those workflows.
+
 Connected C1/C2 safety at `a56480a1`: commercial126/communications135 caller
 tests, receipt panel82/shared schema31 tests, combined critical533/533. These
 include the prior private opener33/customer detail67/caller helper92 cases.
@@ -225,6 +259,41 @@ bounded agents were available for this reconciliation run with non-overlapping
 ownership and no branch changes; capacity must be checked again when needed.
 Do not promise parallel throughput or continuous execution
 between scheduled turns.
+
+## Retail and recruitment action inventory
+
+Source audit at `3dfca78a`, not runtime acceptance. U2 contains two separate
+existing application flows: B2B parts partnerships use
+`partner-applications.functions.ts` and `components/admin/partner-applications-tab.tsx`;
+affiliate applications use `partner-program.functions.ts` and
+`routes/admin.partner-program.tsx`. Neither is a complete recruitment pipeline.
+The parts form also offers an affiliate partnership category; that category does
+not merge its application records with the dedicated affiliate program.
+Existing user/business sales-rep follow-ups are not lead/application-linked tasks.
+All actions below remain isolated-role/API unverified, owner pending and live
+unverified; this inventory does not grant new access or execute approvals.
+
+| ID    | Existing action and source                                                                                          | Required closure                                                                                                                                                                                                                                                  |
+| ----- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| U1.01 | Org inbox/search/status filters; `leads.functions.ts`, `dashboard.team.leads.tsx`                                   | Account/org lifetimes, generic errors rather than false-empty inboxes, complete bounded results and actual-role visibility.                                                                                                                                       |
+| U1.02 | Assign/unassign; `leads.functions.ts`, `dashboard.team.leads_.$id.tsx`                                              | `bd5e4b04` implements actual-org picker, captured intent, member/returned-row checks and route fences; 151 synthetic tests pass. Membership/revocation races, durable retry and real-role/recovery acceptance still require separately authorized atomic closure. |
+| U1.03 | Four statuses, internal notes and activity; same lead detail                                                        | Status authorization policy, exact affected-row/partial-note outcomes, private lifetimes, concurrency and recovery. Marking won currently changes status only, not customer/order conversion.                                                                     |
+| U1.04 | Performance counts/CSV; `getOrgPerformance` and team performance route                                              | Current role/account scope, complete reporting source, attribution and reconciliation. Unbounded selected rows are not accepted totals.                                                                                                                           |
+| U1.05 | Lead-linked due tasks/reminders, consent-aware follow-up and conversion                                             | Absent from the audited connected surfaces; implement native lead/task linkage, permission/consent controls and recoverable conversion. Do not count generic sales-rep follow-ups as this workflow.                                                               |
+| U2.01 | Supplier public submission/admin review/document viewing/storefront publishing; `partner-applications.functions.ts` | Recruiter assignment, next-contact/due task, stage history, conversion reporting, private documents and actual role/approval/recovery acceptance. Existing stages are pending/reviewing/approved/rejected.                                                        |
+| U2.02 | Affiliate application/admin reject/approve; `partner-program.functions.ts`                                          | Distinct pending/approved/rejected workflow. Approval makes separate partner and application writes without matched acknowledgments; race-safe conversion/idempotency and rollback remain open.                                                                   |
+| U2.03 | Affiliate referral/bounty/Shop Manager-access flags; same affiliate handlers                                        | Verified authority, exact values/affected rows, entitlement and financial provenance/recovery. No bounty, access, payment or policy changes are authorized by this audit.                                                                                         |
+
+The bounded source audit found no later authenticated partner-table write grant
+after the retained SELECT-only grant beside its admin-write RLS policy. Table
+privilege and RLS are separate. This requires canonical catalog/role verification,
+not a claimed live permission failure or permission to add grants. Likewise,
+manager-labelled status audit text is not authorization: the existing status
+handler checks org membership, and that policy must not be silently changed.
+
+These task/conversion/recruitment gaps and shared authority/restore/hosting/QA
+gates are substantive Day 2 feasibility inputs, not final polish. No defensible
+completion-date forecast follows from source test counts or this inventory.
 
 ## Shop Manager financial action inventory
 
@@ -456,15 +525,22 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 1. Verify existing PR #68's exact latest published CI head; continue on the same
    branch/PR. Parent `2cbf20a4` passed all six gates, including native quote races
    and locked quote94/94; connected `9a4059bd` published as `a69903a7` now passes
-   all six gates, application2,745/2,745. New source `a56480a1` needs its own checks.
+   all six gates, application2,745/2,745. Publication `3dfca78a` now passes all six
+   gates, critical533/533/application2,998/2,998. New `eb90d15c`/`bd5e4b04` need
+   their own final publication/exact-head checks.
    Do not substitute prior-head CI for new-head checks or repeat its completed
    selected proof as new acceptance. Continue strict session/native-shop authority
-   and receipt list/mutation freshness after the implemented commercial/
-   communications guard and editor mounted holds. Next bounded implementation
-   is receipt/shop-link per-mount fresh-only reads, then bounded reader DTO/caller
-   binding and typed server outcomes/durable retry. Retain native primary/link/
+   and remaining receipt mutation scope after the implemented commercial/
+   communications guard, editor holds and per-mount fresh-only reads. Next bounded
+   implementation is receipt/link bounded complete DTO/caller/attachment binding
+   and typed server outcomes/durable retry. Retail assignment safety is connected,
+   not atomic/recoverable pipeline conversion. Retain native primary/link/
    projection contracts; no early quote-candidate activation or positive authority
    claim from these caller-denial changes.
+   Read-only follow-up audit is recorded in the new evidence: keep open editor/
+   installation state and uncertainty holds mounted through ordinary refetch;
+   preserve per-mount StrictMode in-flight tests and invalidation prefixes.
+   Auth bootstrap loading is not fresh roles/session authority.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
    `.env` contents or bulk merge the provider cleanup. Next native email work is
@@ -499,8 +575,8 @@ Reference sources, authority crosswalk and commercial/expansion limits:
    No new costs, project creation or production mutation are authorized here.
 5. Controlled email choices are received. Preserve the already-registered personal
    account and company-domain staff alternative; dedicated QA signup was last
-   verified prepared, not submitted. Current browser/session check is unavailable,
-   not evidence of logout or completion. Owner completes credentials/Terms privately, then verify the QA
+   verified prepared, not submitted. The latest browser check is available again
+   and shows the same unsubmitted form, not a dedicated QA session. Owner completes credentials/Terms privately, then verify the QA
    session and nominate a synthetic pilot shop/least-privilege native membership.
    No passwords/OTPs/keys in chat or personal emails in GitHub evidence. Safe local
    tests remain synthetic; basic Auth/org ownership is not native-shop authority.

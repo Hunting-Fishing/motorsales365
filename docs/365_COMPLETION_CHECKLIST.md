@@ -54,7 +54,40 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest connected slice: `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same draft PR #68.
+Latest integrated source slices: receipt reads `eb90d15c1805cb7f004bdb7a7db384b89219aa6b`
+and retail assignment `bd5e4b0406c899d84d348386e5bfcebfb0f9d7cc`, same draft PR #68.
+Receipt/shop-link per-mount queries now mask fetching, paused, failed and
+invalidated snapshots, forward signals, offer generic explicit retries and check
+current cache state at new-action admission. Open editors/installations/unknown
+holds survive ordinary refresh; retained-user Auth loading is separate teardown.
+Existing opener/editor/install bodies are byte-identical. Receipt panel 101/101.
+Retail assignment now captures account/prior-org/lead/assignee intent, checks
+strict existing memberships/manager authority, filters the update by lead/org and
+requires an exact returned assignment. Its real detail route has fresh private
+reads, actual-org choices, duplicate/stale-callback fences and mounted uncertainty
+holds. Handler106/route45 pass; other status/note server policies are unchanged.
+Final combined 703/703 across eight suites (35.65s), seven-file changed-line lint
+zero new errors/warnings (23 older findings), format/diff/independent review and
+mandatory CI guards pass. One test-only QueryCache manual-seed flag corrected the
+sole first full-TypeScript diagnostic without weakening in-flight StrictMode.
+Full TypeScript and fresh complete build now pass at `bd5e4b04`; all 214 tracked
+public Git/source/output copies, Worker/canonical backend/15 OCR/202 PDF/server
+boundary verify. Expected route-test/module/chunk/Wrangler warnings remain.
+Publication/exact-head CI are recorded separately after verification.
+Evidence: `evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. No SQL/migration/live write/deployment.
+Next connected dependency: receipt/server link expected-account denial, complete
+bounded DTO/attachment evidence and safe editor eligibility, then typed writer
+outcomes/durable retry. Do not relabel these separate HTTP checks as atomic
+membership, strict session/native authority or recovery acceptance. U1/U2 action
+inventory now distinguishes retail triage, parts-network partnerships and the
+dedicated affiliate program; linked due tasks/conversion/recruitment remain real
+implementation gaps. QA signup remains unsubmitted in the now-available browser;
+native pilot membership, original-human/native-team/claim/offboarding, full
+baseline/recovery/hosting and owner acceptance still threaten the seven-day target.
+No scope reduction; Day 2 feasibility review remains required.
+
+Prior connected slice: `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same draft PR #68.
 The existing customer commercial/communications readers now compose the captured
 caller/current-record denial guard while preserving primary visibility,
 projections/ordering/caps and legacy invoice TEXT values. Receipt entry has one
@@ -75,6 +108,23 @@ No migration/live write/deployment or positive authority acceptance.
 Next: receipt/shop-link per-mount read freshness and generic failure handling;
 then bounded reader DTO/caller binding and server typed outcomes/durable retry.
 Real API/Auth/private-storage/transaction/recovery/pilot/owner gates remain open.
+
+Publication `3dfca78aebb2e16f1d91fe6271d5b4d965709051` verified on the canonical
+remote and same attached draft PR #68/base; main unchanged at `70ab892a`. All 214
+tracked public copies and Worker boundaries verify again at publication. Run
+`38848994735`: all six Actions gates pass. Completed unit `116805801841` confirms
+critical 533/533 (12.71s), locked quote 94/94 and application 2,998/2,998 across
+80 files (64.38s), zero unexpected/quarantined failures. The overall unit log is
+truncated but final summaries/checker are present. Native `116805801627` has an untruncated
+log confirming actual PG17.11 (`170011`), Parts 247/247, six quote scenario groups,
+both server stops and scoped always-cleanup, with 47 retained replay failures.
+In-progress unit-log reads returned provider HTTP 502; the completed read
+succeeded without CLI/API fallback. Wrapper `38848994666` preview succeeds via its configured
+skip path, not an upload; migrations/detection/production and Supabase Preview
+skip. Independent Workers build `a3c621f8-bc5b-41cf-a4ce-fe420b3237ca` fails with
+ID/link only; fresh cause unverified. These follow-up notes join the next
+integrated source slice, avoiding a documentation-only CI restart. No live
+write, upload, deployment or migration; do not replay completed SQL/approvals.
 
 Prior connected slice: `9a4059bde546ed81eaa886124cc3e5b59529b5bc`, same draft PR #68.
 Customer 360's existing reader now adds same-caller explicit-token Auth record
