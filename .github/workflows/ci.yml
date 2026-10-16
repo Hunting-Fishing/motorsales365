@@ -194,6 +194,9 @@ jobs:
       - name: Native quote detail private lifetimes and conversion interlock (never quarantined)
         run: npx vitest run src/components/shop-manager/quote-detail.test.tsx --maxWorkers=1
 
+      - name: Native quote and work-order creation callers (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-create.test.tsx src/components/shop-manager/work-order-create.test.tsx --maxWorkers=1
+
       - name: Independent Workers build source freeze (offline, never quarantined)
         run: node --test scripts/ci/independent-workers-build.test.mjs
 

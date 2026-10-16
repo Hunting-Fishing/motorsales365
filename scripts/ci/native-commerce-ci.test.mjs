@@ -112,6 +112,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "npx vitest run src/components/shop-manager/quote-detail.test.tsx --maxWorkers=1",
     ],
     [
+      "Native quote and work-order creation callers (never quarantined)",
+      "npx vitest run src/components/shop-manager/quote-create.test.tsx src/components/shop-manager/work-order-create.test.tsx --maxWorkers=1",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

@@ -1,0 +1,157 @@
+{
+  "formatVersion": 1,
+  "mode": "read-only-selected-system-catalog",
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOnAsiaManila": "2026-10-16",
+  "repositoryHeadAtObservation": "bf091dc7bdecf2a7a024c9d1db9a999344ad3bba",
+  "scope": "Only five native creation tables' RLS flags, selected policies/trigger attachments and selected helper definition fingerprints; no business/Auth rows, function bodies, ACL-wide dump, private objects or server files; no writes.",
+  "query": "SELECT jsonb_build_object('policies',(SELECT jsonb_agg(x) FROM (SELECT c.relname AS table_name,p.polname AS policy_name,p.polcmd AS command,p.polpermissive AS permissive,pg_catalog.pg_get_expr(p.polqual,p.polrelid) AS using_expression,pg_catalog.pg_get_expr(p.polwithcheck,p.polrelid) AS check_expression FROM pg_catalog.pg_policy p JOIN pg_catalog.pg_class c ON c.oid=p.polrelid JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='shop_manager' AND c.relname IN ('quotes','quote_items','customers','vehicles','work_orders') ORDER BY c.relname,p.polname LIMIT 60) x),'triggers',(SELECT jsonb_agg(x) FROM (SELECT c.relname AS table_name,t.tgname AS trigger_name,t.tgenabled AS enabled,pg_catalog.pg_get_triggerdef(t.oid) AS definition,t.tgfoid::regprocedure::text AS function_signature,md5(pg_catalog.pg_get_functiondef(t.tgfoid)) AS function_definition_md5 FROM pg_catalog.pg_trigger t JOIN pg_catalog.pg_class c ON c.oid=t.tgrelid JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='shop_manager' AND c.relname IN ('quotes','quote_items','customers','vehicles','work_orders') AND NOT t.tgisinternal ORDER BY c.relname,t.tgname LIMIT 60) x),'helpers',(SELECT jsonb_agg(x) FROM (SELECT p.oid::regprocedure::text AS function_signature,p.prosecdef AS security_definer,pg_catalog.pg_get_userbyid(p.proowner) AS owner,md5(pg_catalog.pg_get_functiondef(p.oid)) AS function_definition_md5 FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='shop_manager' AND p.proname IN ('get_current_user_shop_id','user_belongs_to_shop','is_owner_or_admin','get_current_user_roles','generate_work_order_number') ORDER BY p.oid::regprocedure::text LIMIT 20) x),'rls',(SELECT jsonb_agg(x) FROM (SELECT c.relname AS table_name,c.relrowsecurity AS enabled,c.relforcerowsecurity AS forced FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='shop_manager' AND c.relname IN ('quotes','quote_items','customers','vehicles','work_orders') ORDER BY c.relname LIMIT 5) x)) AS selected_metadata;",
+  "rows": [
+    {
+      "selected_metadata": {
+        "rls": [
+          {
+            "forced": false,
+            "enabled": true,
+            "table_name": "customers"
+          },
+          {
+            "forced": false,
+            "enabled": true,
+            "table_name": "quote_items"
+          },
+          {
+            "forced": false,
+            "enabled": true,
+            "table_name": "quotes"
+          },
+          {
+            "forced": false,
+            "enabled": true,
+            "table_name": "vehicles"
+          },
+          {
+            "forced": false,
+            "enabled": true,
+            "table_name": "work_orders"
+          }
+        ],
+        "helpers": [
+          {
+            "owner": "postgres",
+            "security_definer": true,
+            "function_signature": "shop_manager.generate_work_order_number()",
+            "function_definition_md5": "94ee5e0783dd6d6a95b54e5b23608614"
+          },
+          {
+            "owner": "postgres",
+            "security_definer": true,
+            "function_signature": "shop_manager.get_current_user_shop_id()",
+            "function_definition_md5": "be63946995c909e4a224b0e4989eaaf7"
+          },
+          {
+            "owner": "postgres",
+            "security_definer": true,
+            "function_signature": "shop_manager.is_owner_or_admin(uuid)",
+            "function_definition_md5": "869849c9428ef51ca5d9ac2fab605570"
+          },
+          {
+            "owner": "postgres",
+            "security_definer": true,
+            "function_signature": "shop_manager.user_belongs_to_shop(uuid,uuid)",
+            "function_definition_md5": "ef1de965a932a522f9dd61a203338d17"
+          }
+        ],
+        "policies": [
+          {
+            "command": "r",
+            "permissive": true,
+            "table_name": "customers",
+            "policy_name": "sm_customers_self_select",
+            "check_expression": null,
+            "using_expression": "(user_id = auth.uid())"
+          },
+          {
+            "command": "*",
+            "permissive": true,
+            "table_name": "customers",
+            "policy_name": "sm_customers_shop_all",
+            "check_expression": "((shop_id = shop_manager.get_current_user_shop_id()) AND (shop_id IS NOT NULL))",
+            "using_expression": "((shop_id = shop_manager.get_current_user_shop_id()) AND (shop_id IS NOT NULL))"
+          },
+          {
+            "command": "*",
+            "permissive": true,
+            "table_name": "quote_items",
+            "policy_name": "sm_quote_items_shop_all",
+            "check_expression": "(quote_id IN ( SELECT q.id\n   FROM (shop_manager.quotes q\n     JOIN shop_manager.customers c ON ((c.id = q.customer_id)))\n  WHERE (c.shop_id = shop_manager.get_current_user_shop_id())))",
+            "using_expression": "(quote_id IN ( SELECT q.id\n   FROM (shop_manager.quotes q\n     JOIN shop_manager.customers c ON ((c.id = q.customer_id)))\n  WHERE (c.shop_id = shop_manager.get_current_user_shop_id())))"
+          },
+          {
+            "command": "*",
+            "permissive": true,
+            "table_name": "quotes",
+            "policy_name": "sm_quotes_shop_all",
+            "check_expression": "(customer_id IN ( SELECT customers.id\n   FROM shop_manager.customers\n  WHERE (customers.shop_id = shop_manager.get_current_user_shop_id())))",
+            "using_expression": "(customer_id IN ( SELECT customers.id\n   FROM shop_manager.customers\n  WHERE (customers.shop_id = shop_manager.get_current_user_shop_id())))"
+          },
+          {
+            "command": "*",
+            "permissive": true,
+            "table_name": "vehicles",
+            "policy_name": "sm_vehicles_shop_all",
+            "check_expression": "(customer_id IN ( SELECT customers.id\n   FROM shop_manager.customers\n  WHERE (customers.shop_id = shop_manager.get_current_user_shop_id())))",
+            "using_expression": "(customer_id IN ( SELECT customers.id\n   FROM shop_manager.customers\n  WHERE (customers.shop_id = shop_manager.get_current_user_shop_id())))"
+          },
+          {
+            "command": "*",
+            "permissive": true,
+            "table_name": "work_orders",
+            "policy_name": "sm_work_orders_shop_all",
+            "check_expression": "((shop_id = shop_manager.get_current_user_shop_id()) AND (shop_id IS NOT NULL))",
+            "using_expression": "((shop_id = shop_manager.get_current_user_shop_id()) AND (shop_id IS NOT NULL))"
+          }
+        ],
+        "triggers": [
+          {
+            "enabled": "O",
+            "definition": "CREATE TRIGGER employee_operation_audit AFTER INSERT OR DELETE OR UPDATE ON shop_manager.customers FOR EACH ROW EXECUTE FUNCTION shop_manager.capture_employee_operation()",
+            "table_name": "customers",
+            "trigger_name": "employee_operation_audit",
+            "function_signature": "shop_manager.capture_employee_operation()",
+            "function_definition_md5": "64fbe3febc15ff0c70f2fa3a0e2e052e"
+          },
+          {
+            "enabled": "O",
+            "definition": "CREATE TRIGGER trg_generate_quote_number BEFORE INSERT ON shop_manager.quotes FOR EACH ROW EXECUTE FUNCTION shop_manager.generate_quote_number()",
+            "table_name": "quotes",
+            "trigger_name": "trg_generate_quote_number",
+            "function_signature": "shop_manager.generate_quote_number()",
+            "function_definition_md5": "1df1dbbdb87e548167a8aefc4bdb71c7"
+          },
+          {
+            "enabled": "O",
+            "definition": "CREATE TRIGGER employee_operation_audit AFTER INSERT OR DELETE OR UPDATE ON shop_manager.work_orders FOR EACH ROW EXECUTE FUNCTION shop_manager.capture_employee_operation()",
+            "table_name": "work_orders",
+            "trigger_name": "employee_operation_audit",
+            "function_signature": "shop_manager.capture_employee_operation()",
+            "function_definition_md5": "64fbe3febc15ff0c70f2fa3a0e2e052e"
+          },
+          {
+            "enabled": "O",
+            "definition": "CREATE TRIGGER trg_generate_work_order_number BEFORE INSERT ON shop_manager.work_orders FOR EACH ROW EXECUTE FUNCTION shop_manager.generate_work_order_number()",
+            "table_name": "work_orders",
+            "trigger_name": "trg_generate_work_order_number",
+            "function_signature": "shop_manager.generate_work_order_number()",
+            "function_definition_md5": "94ee5e0783dd6d6a95b54e5b23608614"
+          }
+        ]
+      }
+    }
+  ],
+  "limits": [
+    "This bounded capture does not establish fresh native shop/team/session authority or full schema/ACL/source replay parity.",
+    "RLS enabled and a SECURITY DEFINER helper fingerprint do not prove current role/tenant authorization.",
+    "No transaction, API/Auth/private-storage/recovery/owner/live acceptance or migration approval."
+  ]
+}
