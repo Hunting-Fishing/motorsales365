@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef, useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { hashKey, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
@@ -75,9 +75,25 @@ const blankLine = (): ReceiptLine => ({
 });
 const num = (s: string) => (s === "" ? null : Number(s));
 
+// Invalidation alone need not change QueryObserver's result when staleTime is
+// zero. Subscribe to this exact state's boolean, not all cached private data.
+function useReadInvalidation(client: QueryClient, key: readonly unknown[]) {
+  const queryHash = hashKey(key);
+  return useSyncExternalStore(
+    (notify) =>
+      client.getQueryCache().subscribe((event) => {
+        if (event.query.queryHash === queryHash) notify();
+      }),
+    () => client.getQueryCache().get(queryHash)?.state.isInvalidated ?? false,
+    () => false,
+  );
+}
+
 export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget) {
-  const { user } = useAuth();
-  if (!user) return null;
+  const { user, loading } = useAuth();
+  // Bootstrap loading deliberately tears down the committed private scope,
+  // even if Auth temporarily retains a user. It is not a fresh-role proof.
+  if (loading || !user) return null;
 
   // Remount account-local editors and connection codes as well as changing the
   // query keys. A receipt opened by the previous account must not remain visible.
@@ -97,17 +113,39 @@ function AuthenticatedVehicleReceiptPanel({
   shopVehicleId,
 }: ReceiptTarget & { userId: string }) {
   const target = vehicleId ? { vehicleId } : { shopVehicleId: shopVehicleId! };
+  const readLifetime = useId();
+  const receiptKey = ["vehicle-receipts", userId, vehicleId, shopVehicleId, readLifetime] as const;
   const qc = useQueryClient();
   const fetchFn = useServerFn(getVehicleReceipts);
   const signFn = useServerFn(getPrivateReceiptUrl);
   const shareFn = useServerFn(setReceiptSharing);
   const discardFn = useServerFn(discardReceiptDraft);
   const expenseFn = useServerFn(recordVehicleReceiptExpense);
-  const { data, error, isLoading } = useQuery({
-    queryKey: ["vehicle-receipts", userId, vehicleId, shopVehicleId],
+  const receipts = useQuery({
+    queryKey: receiptKey,
     enabled: Boolean(userId),
-    queryFn: () => fetchFn({ data: target }),
+    queryFn: ({ signal }) => fetchFn({ data: target, signal }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    retry: false,
+    placeholderData: undefined,
   });
+  const receiptInvalidated = useReadInvalidation(qc, receiptKey);
+  const data =
+    receipts.isSuccess && receipts.fetchStatus === "idle" && !receiptInvalidated
+      ? receipts.data
+      : undefined;
+  function canUseReceiptRead() {
+    const current = qc.getQueryState(receiptKey);
+    return Boolean(
+      data &&
+      current?.status === "success" &&
+      current.fetchStatus === "idle" &&
+      !current.isInvalidated &&
+      current.data === data,
+    );
+  }
   const [edit, setEdit] = useState<VehicleReceipt | "new" | null>(null);
   const [install, setInstall] = useState<VehicleReceipt["items"][number] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -153,6 +191,7 @@ function AuthenticatedVehicleReceiptPanel({
     void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
   };
   async function action(id: string, fn: () => Promise<unknown>) {
+    if (!canUseReceiptRead()) return;
     setBusy(id);
     try {
       await fn();
@@ -182,18 +221,55 @@ function AuthenticatedVehicleReceiptPanel({
         <Button
           type="button"
           size="sm"
-          disabled={Boolean(error) || isLoading || data?.canWrite === false}
-          onClick={() => setEdit("new")}
+          disabled={!data || data.canWrite === false}
+          onClick={() => {
+            if (canUseReceiptRead() && data?.canWrite !== false) setEdit("new");
+          }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add receipt
         </Button>
       </div>
-      <VehicleShopConnections {...target} userId={userId} onChanged={refresh} />
-      {isLoading && <p className="text-sm">Loading receipts…</p>}
-      {error && <p className="text-sm text-destructive">{error.message}</p>}
+      <VehicleShopConnections
+        {...target}
+        userId={userId}
+        onChanged={refresh}
+        receiptReady={Boolean(data)}
+        canUseReceiptRead={canUseReceiptRead}
+      />
+      {(receipts.isPending || receipts.fetchStatus !== "idle") && (
+        <p role="status" className="text-sm">
+          Loading receipts…
+        </p>
+      )}
+      {receipts.isError && receipts.fetchStatus === "idle" && (
+        <div role="alert" className="space-y-2 text-sm text-destructive">
+          <p>Could not load receipts. Please try again.</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void receipts.refetch({ cancelRefetch: false })}
+          >
+            Retry receipts
+          </Button>
+        </div>
+      )}
+      {receiptInvalidated && receipts.isSuccess && receipts.fetchStatus === "idle" && (
+        <div className="space-y-2 text-sm">
+          <p role="status">Refresh receipts to view this snapshot.</p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void receipts.refetch({ cancelRefetch: false })}
+          >
+            Refresh receipts
+          </Button>
+        </div>
+      )}
       {data && !data.receipts.length && (
         <p className="rounded border border-dashed p-4 text-sm text-muted-foreground">
-          No receipts yet. Upload a receipt or enter purchases manually.
+          No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.
         </p>
       )}
       {data?.receipts.length ? (
@@ -205,7 +281,9 @@ function AuthenticatedVehicleReceiptPanel({
             id={`receipt-category-filter-${vehicleId || shopVehicleId}`}
             className="h-10 w-full rounded-md border bg-background px-3 text-sm"
             value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
+            onChange={(e) => {
+              if (canUseReceiptRead()) setCategoryFilter(e.target.value);
+            }}
           >
             <option value="">All categories</option>
             {Object.entries(PART_CATEGORIES).map(([k, v]) => (
@@ -237,7 +315,9 @@ function AuthenticatedVehicleReceiptPanel({
                     size="sm"
                     variant="outline"
                     disabled={busy === r.id || openingReceiptId !== null}
-                    onClick={() => openPrivateReceipt(r.id)}
+                    onClick={() => {
+                      if (canUseReceiptRead()) void openPrivateReceipt(r.id);
+                    }}
                   >
                     <FileText className="mr-1 h-3 w-3" /> Receipt
                   </Button>
@@ -263,7 +343,12 @@ function AuthenticatedVehicleReceiptPanel({
                   )}
                 {r.status === "draft" && r.can_write !== false && (
                   <>
-                    <Button size="sm" onClick={() => setEdit(r)}>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        if (canUseReceiptRead()) setEdit(r);
+                      }}
+                    >
                       Review
                     </Button>
                     <Button
@@ -304,7 +389,13 @@ function AuthenticatedVehicleReceiptPanel({
                     </p>
                   </div>
                   {r.status === "confirmed" && r.can_write !== false && !i.installed_on && (
-                    <Button size="sm" variant="outline" onClick={() => setInstall(i)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        if (canUseReceiptRead()) setInstall(i);
+                      }}
+                    >
                       <Wrench className="mr-1 h-3 w-3" /> Record installation
                     </Button>
                   )}
@@ -1011,7 +1102,14 @@ function VehicleShopConnections({
   vehicleId,
   shopVehicleId,
   onChanged,
-}: ReceiptTarget & { userId: string; onChanged: () => void }) {
+  receiptReady,
+  canUseReceiptRead,
+}: ReceiptTarget & {
+  userId: string;
+  onChanged: () => void;
+  receiptReady: boolean;
+  canUseReceiptRead: () => boolean;
+}) {
   const request = useServerFn(requestShopVehicleLink),
     approve = useServerFn(approveShopVehicleLink),
     list = useServerFn(listVehicleShopLinks),
@@ -1020,12 +1118,36 @@ function VehicleShopConnections({
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const qc = useQueryClient();
+  const readLifetime = useId();
+  const linkKey = ["vehicle-shop-links", userId, vehicleId, readLifetime] as const;
+  const linksEnabled = Boolean(userId && vehicleId);
   const links = useQuery({
-    queryKey: ["vehicle-shop-links", userId, vehicleId],
-    enabled: Boolean(userId && vehicleId),
-    queryFn: () => list({ data: { vehicleId: vehicleId! } }),
+    queryKey: linkKey,
+    enabled: linksEnabled,
+    queryFn: ({ signal }) => list({ data: { vehicleId: vehicleId! }, signal }),
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: true,
+    retry: false,
+    placeholderData: undefined,
   });
-  async function run(fn: () => Promise<unknown>) {
+  const linksInvalidated = useReadInvalidation(qc, linkKey);
+  const data =
+    linksEnabled && links.isSuccess && links.fetchStatus === "idle" && !linksInvalidated
+      ? links.data
+      : undefined;
+  function canUseLinkRead() {
+    const current = qc.getQueryState(linkKey);
+    return Boolean(
+      data &&
+      current?.status === "success" &&
+      current.fetchStatus === "idle" &&
+      !current.isInvalidated &&
+      current.data === data,
+    );
+  }
+  async function run(fn: () => Promise<unknown>, scope: "links" | "receipt" = "links") {
+    if (scope === "receipt" ? !canUseReceiptRead() : !canUseLinkRead()) return;
     setBusy(true);
     setError("");
     try {
@@ -1051,8 +1173,10 @@ function VehicleShopConnections({
             <Button
               variant="outline"
               size="sm"
-              disabled={busy}
-              onClick={() => run(async () => setCode(await request({ data: { shopVehicleId } })))}
+              disabled={busy || !receiptReady}
+              onClick={() =>
+                run(async () => setCode(await request({ data: { shopVehicleId } })), "receipt")
+              }
             >
               Create owner connection code
             </Button>
@@ -1080,7 +1204,7 @@ function VehicleShopConnections({
             />
             <Button
               size="sm"
-              disabled={busy || !code}
+              disabled={busy || !code || !data}
               onClick={() =>
                 run(async () => {
                   await approve({ data: { vehicleId: vehicleId!, code } });
@@ -1091,7 +1215,42 @@ function VehicleShopConnections({
             >
               Approve connection
             </Button>
-            {links.data
+            {(links.isPending || links.fetchStatus !== "idle") && linksEnabled && (
+              <p role="status">Loading shop connections…</p>
+            )}
+            {links.isError && links.fetchStatus === "idle" && linksEnabled && (
+              <div role="alert" className="space-y-2 text-destructive">
+                <p>Could not load shop connections. Please try again.</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => void links.refetch({ cancelRefetch: false })}
+                >
+                  Retry shop connections
+                </Button>
+              </div>
+            )}
+            {linksInvalidated &&
+              links.isSuccess &&
+              links.fetchStatus === "idle" &&
+              linksEnabled && (
+                <div className="space-y-2">
+                  <p role="status">Refresh shop connections to view this snapshot.</p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void links.refetch({ cancelRefetch: false })}
+                  >
+                    Refresh shop connections
+                  </Button>
+                </div>
+              )}
+            {data && !data.some((link) => link.active) && (
+              <p className="text-muted-foreground">No active shop connections in this snapshot.</p>
+            )}
+            {data
               ?.filter((l) => l.active)
               .map((l) => (
                 <div key={l.shop_vehicle_id} className="flex items-center justify-between">

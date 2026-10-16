@@ -1,16 +1,16 @@
 import { StrictMode, useLayoutEffect, useRef } from "react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { act, render, screen, fireEvent, waitFor, within } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { onlineManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { VehicleReceiptPanel } from "./vehicle-receipt-panel";
 import * as api from "@/lib/vehicle-receipts.functions";
 import type { ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
-const auth = vi.hoisted(() => ({ userId: "owner-a" as string | null }));
+const auth = vi.hoisted(() => ({ userId: "owner-a" as string | null, loading: false }));
 const localOcr = vi.hoisted(() => ({ scan: vi.fn(), upload: vi.fn() }));
 vi.mock("@/lib/receipt-document.client", () => ({ scanReceiptDocument: localOcr.scan }));
 vi.mock("@/hooks/use-auth", () => ({
-  useAuth: () => ({ user: auth.userId ? { id: auth.userId } : null }),
+  useAuth: () => ({ user: auth.userId ? { id: auth.userId } : null, loading: auth.loading }),
 }));
 vi.mock("@tanstack/react-start", () => ({
   useServerFn: (fn: unknown) => fn,
@@ -92,8 +92,11 @@ beforeEach(() => {
     ],
   });
   auth.userId = "owner-a";
-  vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
-  vi.mocked(api.listVehicleShopLinks).mockResolvedValue([]);
+  auth.loading = false;
+  vi.mocked(api.getVehicleReceipts)
+    .mockReset()
+    .mockResolvedValue({ receipts: [], linkedVehicleId: null });
+  vi.mocked(api.listVehicleShopLinks).mockReset().mockResolvedValue([]);
   vi.mocked(api.startVehicleReceipt)
     .mockReset()
     .mockImplementation(async (options) => {
@@ -380,9 +383,24 @@ describe("private receipt opening lifetime", () => {
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false, staleTime: Infinity } },
     });
-    client.setQueryData(["vehicle-receipts", "owner-a", vehicle, undefined], {
-      receipts: [privateReceipt()],
-      linkedVehicleId: null,
+    const seededKeys: (readonly unknown[])[] = [];
+    const unsubscribe = client.getQueryCache().subscribe((event) => {
+      if (event.type !== "added" || event.query.queryKey[0] !== "vehicle-receipts") return;
+      // Seed the real useId-suffixed key during Query construction, before the
+      // first layout commit. A future test-only timestamp avoids an optimistic
+      // stale refetch hiding the button; no hook/key or opener is substituted.
+      expect(event.query.queryKey.slice(0, 4)).toEqual([
+        "vehicle-receipts",
+        "owner-a",
+        vehicle,
+        undefined,
+      ]);
+      expect(event.query.queryKey).toHaveLength(5);
+      seededKeys.push(event.query.queryKey);
+      event.query.setData(
+        { receipts: [privateReceipt()], linkedVehicleId: null },
+        { updatedAt: Date.now() + 60_000 },
+      );
     });
     const invalidate = vi.spyOn(client, "invalidateQueries");
     let cleanups = 0;
@@ -407,6 +425,8 @@ describe("private receipt opening lifetime", () => {
         </QueryClientProvider>
       </StrictMode>,
     );
+    unsubscribe();
+    expect(seededKeys.length).toBeGreaterThan(0);
     expect(cleanups).toBe(1);
     expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
     const button = screen.getByRole("button", { name: /^Receipt$/ });
@@ -968,6 +988,16 @@ describe("vehicle receipt workflow", () => {
     const { rerender, view, client } = show();
     await screen.findByText("Account A private supplier");
     await screen.findByText("Account A linked shop");
+    const oldReceiptKey = client
+      .getQueryCache()
+      .find({ queryKey: ["vehicle-receipts", "owner-a"], exact: false })!.queryKey;
+    const oldLinkKey = client
+      .getQueryCache()
+      .find({ queryKey: ["vehicle-shop-links", "owner-a"], exact: false })!.queryKey;
+    expect(oldReceiptKey).toHaveLength(5);
+    expect(oldLinkKey).toHaveLength(4);
+    expect(client.getQueryData(oldReceiptKey)).toBeDefined();
+    expect(client.getQueryData(oldLinkKey)).toBeDefined();
 
     auth.userId = "owner-b";
     vi.mocked(api.getVehicleReceipts).mockResolvedValue({
@@ -984,10 +1014,18 @@ describe("vehicle receipt workflow", () => {
     await screen.findByText("Account B linked shop");
     expect(api.getVehicleReceipts).toHaveBeenCalledTimes(2);
     expect(api.listVehicleShopLinks).toHaveBeenCalledTimes(2);
-    expect(client.getQueryData(["vehicle-receipts", "owner-a", vehicle, undefined])).toBeDefined();
-    expect(client.getQueryData(["vehicle-receipts", "owner-b", vehicle, undefined])).toBeDefined();
-    expect(client.getQueryData(["vehicle-shop-links", "owner-a", vehicle])).toBeDefined();
-    expect(client.getQueryData(["vehicle-shop-links", "owner-b", vehicle])).toBeDefined();
+    const newReceiptKey = client
+      .getQueryCache()
+      .find({ queryKey: ["vehicle-receipts", "owner-b"], exact: false })!.queryKey;
+    const newLinkKey = client
+      .getQueryCache()
+      .find({ queryKey: ["vehicle-shop-links", "owner-b"], exact: false })!.queryKey;
+    expect(newReceiptKey.slice(0, 4)).toEqual(["vehicle-receipts", "owner-b", vehicle, undefined]);
+    expect(newLinkKey.slice(0, 3)).toEqual(["vehicle-shop-links", "owner-b", vehicle]);
+    expect(newReceiptKey[4]).not.toBe(oldReceiptKey[4]);
+    expect(newLinkKey[3]).not.toBe(oldLinkKey[3]);
+    expect(client.getQueryData(newReceiptKey)).toBeDefined();
+    expect(client.getQueryData(newLinkKey)).toBeDefined();
   });
 
   it("does not fetch or render private cached data while signed out", async () => {
@@ -1026,7 +1064,9 @@ describe("vehicle receipt workflow", () => {
     auth.userId = "owner-b";
     vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
     rerender(view());
-    await screen.findByText("No receipts yet. Upload a receipt or enter purchases manually.");
+    await screen.findByText(
+      "No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.",
+    );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(screen.queryByText("Account A editor supplier")).not.toBeInTheDocument();
   });
@@ -1044,7 +1084,9 @@ describe("vehicle receipt workflow", () => {
     vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
     rerender(view());
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    await screen.findByText("No receipts yet. Upload a receipt or enter purchases manually.");
+    await screen.findByText(
+      "No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.",
+    );
   });
 
   it("invalidates only the current account's receipt and shop-link caches after connecting a shop", async () => {
@@ -1053,6 +1095,9 @@ describe("vehicle receipt workflow", () => {
     fireEvent.change(screen.getByLabelText("Shop connection code"), {
       target: { value: "0123456789abcdef0123456789abcdef" },
     });
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Approve connection" })).toBeEnabled(),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Approve connection" }));
     await waitFor(() =>
       expect(invalidate).toHaveBeenCalledWith({ queryKey: ["vehicle-shop-links", "owner-a"] }),
@@ -1060,5 +1105,597 @@ describe("vehicle receipt workflow", () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ["vehicle-receipts", "owner-a"] });
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: ["vehicle-shop-links"] });
     expect(invalidate).not.toHaveBeenCalledWith({ queryKey: ["vehicle-receipts"] });
+  });
+});
+
+// Actual panel + React Query; every transport/Auth result remains synthetic.
+// Read cancellation does not prove server/DB cancellation, role revocation or
+// bounded/complete backend DTOs. Existing mutation chains are not changed here.
+describe("receipt and shop-link read snapshots", () => {
+  type ReceiptRead = Awaited<ReturnType<typeof api.getVehicleReceipts>>;
+  type LinkRead = Awaited<ReturnType<typeof api.listVehicleShopLinks>>;
+  const otherVehicle = "10000000-0000-4000-8000-000000000002";
+  const shopVehicle = "10000000-0000-4000-8000-000000000003";
+  const otherShopVehicle = "10000000-0000-4000-8000-000000000004";
+  const empty =
+    "No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.";
+  const reply = (vendor: string): ReceiptRead => ({
+    receipts: [receipt(vendor)],
+    linkedVehicleId: null,
+    canWrite: true,
+  });
+  const links = (shop: string): LinkRead => [
+    { shop_vehicle_id: "synthetic-shop", shop_name: shop, active: true },
+  ];
+  function installedCandidate(): VehicleReceipt {
+    return {
+      ...receipt("Confirmed supplier"),
+      id: "confirmed-receipt",
+      status: "confirmed",
+      items: [
+        {
+          id: "item-1",
+          description: "Reviewed brake part",
+          category: "brakes",
+          brand: null,
+          part_number: null,
+          quantity: 1,
+          total: null,
+          confidence: 1,
+          reviewed: true,
+          installed_on: null,
+          odometer_km: null,
+          public_summary_allowed: false,
+        },
+      ],
+    };
+  }
+  function expectNoListWrites() {
+    for (const fn of [
+      api.startVehicleReceipt,
+      api.saveVehicleReceipt,
+      api.installReceiptItem,
+      api.getPrivateReceiptUrl,
+      api.setReceiptSharing,
+      api.discardReceiptDraft,
+      api.recordVehicleReceiptExpense,
+      api.requestShopVehicleLink,
+      api.approveShopVehicleLink,
+      api.revokeShopVehicleLink,
+    ])
+      expect(fn).not.toHaveBeenCalled();
+  }
+  beforeEach(() => {
+    for (const fn of [
+      api.installReceiptItem,
+      api.setReceiptSharing,
+      api.discardReceiptDraft,
+      api.recordVehicleReceiptExpense,
+      api.requestShopVehicleLink,
+      api.approveShopVehicleLink,
+      api.revokeShopVehicleLink,
+      api.getPrivateReceiptUrl,
+    ])
+      vi.mocked(fn).mockReset();
+    vi.spyOn(toast, "success").mockImplementation(() => 0);
+    vi.spyOn(toast, "error").mockImplementation(() => 0);
+  });
+  afterEach(() => {
+    onlineManager.setOnline(true);
+    vi.restoreAllMocks();
+  });
+
+  it("uses actual per-mount keys and forwards each Query signal outside data", async () => {
+    const { client, unmount } = show();
+    await screen.findByText(empty);
+    await screen.findByText("No active shop connections in this snapshot.");
+    const receiptKey = client
+      .getQueryCache()
+      .findAll({ queryKey: ["vehicle-receipts"] })[0].queryKey;
+    const linkKey = client
+      .getQueryCache()
+      .findAll({ queryKey: ["vehicle-shop-links"] })[0].queryKey;
+    expect(receiptKey.slice(0, 4)).toEqual(["vehicle-receipts", "owner-a", vehicle, undefined]);
+    expect(linkKey.slice(0, 3)).toEqual(["vehicle-shop-links", "owner-a", vehicle]);
+    expect(receiptKey).toHaveLength(5);
+    expect(linkKey).toHaveLength(4);
+    expect(typeof receiptKey[4]).toBe("string");
+    expect(typeof linkKey[3]).toBe("string");
+    const receiptCall = vi.mocked(api.getVehicleReceipts).mock.calls[0][0] as unknown as {
+      data: ReceiptTarget;
+      signal: AbortSignal;
+    };
+    const linkCall = vi.mocked(api.listVehicleShopLinks).mock.calls[0][0] as unknown as {
+      data: { vehicleId: string };
+      signal: AbortSignal;
+    };
+    expect(receiptCall.data).toEqual({ vehicleId: vehicle });
+    expect(linkCall.data).toEqual({ vehicleId: vehicle });
+    expect(receiptCall.signal).toBeInstanceOf(AbortSignal);
+    expect(linkCall.signal).toBeInstanceOf(AbortSignal);
+    expect(receiptCall.signal).not.toBe(linkCall.signal);
+    unmount();
+  });
+
+  it("does not reuse legacy cached rows/permissions/links or invent an empty state during a new read", async () => {
+    const pending = deferred<ReceiptRead>();
+    const pendingLinks = deferred<LinkRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(pending.promise);
+    vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(pendingLinks.promise);
+    const client = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } });
+    client.setQueryData(
+      ["vehicle-receipts", "owner-a", vehicle, undefined],
+      reply("Legacy cached private supplier"),
+    );
+    client.setQueryData(["vehicle-shop-links", "owner-a", vehicle], links("Legacy cached shop"));
+    show(client);
+    expect(screen.queryByText("Legacy cached private supplier")).not.toBeInTheDocument();
+    expect(screen.queryByText("Legacy cached shop")).not.toBeInTheDocument();
+    expect(screen.queryByText(empty)).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Revoke access" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
+    await act(async () => {
+      pending.resolve({ receipts: [], linkedVehicleId: null, canWrite: false });
+      pendingLinks.resolve([]);
+    });
+    await screen.findByText(empty);
+    expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
+    expectNoListWrites();
+  });
+
+  it("retained-user Auth loading mounts no private scope and commits a teardown of an active editor", async () => {
+    auth.loading = true;
+    const { container, rerender, view, client } = show();
+    expect(container).toBeEmptyDOMElement();
+    expect(api.getVehicleReceipts).not.toHaveBeenCalled();
+    expect(api.listVehicleShopLinks).not.toHaveBeenCalled();
+    auth.loading = false;
+    rerender(view());
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    const firstKey = client.getQueryCache().findAll({ queryKey: ["vehicle-receipts"] })[0].queryKey;
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    fireEvent.change(screen.getByLabelText("Item description"), {
+      target: { value: "Private pending entry" },
+    });
+    const pending = deferred<Awaited<ReturnType<typeof api.startVehicleReceipt>>>();
+    vi.mocked(api.startVehicleReceipt).mockReturnValueOnce(pending.promise);
+    fireEvent.click(screen.getByRole("button", { name: "Save draft" }));
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+    auth.loading = true;
+    rerender(view());
+    expect(container).toBeEmptyDOMElement();
+    auth.loading = false;
+    rerender(view());
+    await screen.findByText(empty);
+    const nextKey = client
+      .getQueryCache()
+      .findAll({ queryKey: ["vehicle-receipts"] })
+      .find((query) => query.getObserversCount() > 0)!.queryKey;
+    expect(nextKey[4]).not.toBe(firstKey[4]);
+    await act(async () => pending.resolve({ id: draftId, file_path: null }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  for (const transition of ["account", "vehicle", "shop"] as const) {
+    it.each(["resolve", "reject"] as const)(
+      `${transition} ABA ignores an original pending %s and requires a new mounted read`,
+      async (settle) => {
+        const old = deferred<ReceiptRead>(),
+          current = deferred<ReceiptRead>();
+        const oldLinks = deferred<LinkRead>(),
+          currentLinks = deferred<LinkRead>();
+        vi.mocked(api.getVehicleReceipts)
+          .mockReturnValueOnce(old.promise)
+          .mockResolvedValueOnce(reply("B supplier"))
+          .mockReturnValueOnce(current.promise);
+        if (transition !== "shop")
+          vi.mocked(api.listVehicleShopLinks)
+            .mockReturnValueOnce(oldLinks.promise)
+            .mockResolvedValueOnce(links("B shop"))
+            .mockReturnValueOnce(currentLinks.promise);
+        const initialTarget =
+          transition === "shop" ? { shopVehicleId: shopVehicle } : { vehicleId: vehicle };
+        const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        const keys: (readonly unknown[])[] = [];
+        const unsubscribe = client.getQueryCache().subscribe((event) => {
+          if (event.type === "added" && event.query.queryKey[0] === "vehicle-receipts")
+            keys.push(event.query.queryKey);
+        });
+        const { rerender, view } = show(client, initialTarget);
+        const oldSignal = (
+          vi.mocked(api.getVehicleReceipts).mock.calls[0][0] as unknown as { signal: AbortSignal }
+        ).signal;
+        if (transition === "account") {
+          auth.userId = "owner-b";
+          rerender(view());
+        } else
+          rerender(
+            view(
+              transition === "vehicle"
+                ? { vehicleId: otherVehicle }
+                : { shopVehicleId: otherShopVehicle },
+            ),
+          );
+        await screen.findByText("B supplier");
+        if (transition !== "shop") await screen.findByText("B shop");
+        if (transition === "account") auth.userId = "owner-a";
+        rerender(view());
+        expect(api.getVehicleReceipts).toHaveBeenCalledTimes(3);
+        expect(oldSignal.aborted).toBe(true);
+        expect(screen.queryByText("B supplier")).not.toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
+        await act(async () => {
+          if (settle === "resolve") {
+            old.resolve(reply("PRIVATE original A"));
+            if (transition !== "shop") oldLinks.resolve(links("PRIVATE original shop"));
+          } else {
+            old.reject(new Error("PRIVATE original read failure"));
+            if (transition !== "shop") oldLinks.reject(new Error("PRIVATE old link failure"));
+          }
+        });
+        expect(screen.queryByText("PRIVATE original A")).not.toBeInTheDocument();
+        expect(screen.queryByText("PRIVATE original shop")).not.toBeInTheDocument();
+        expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+        expect(screen.queryByText(empty)).not.toBeInTheDocument();
+        await act(async () => {
+          current.resolve(reply("Fresh A supplier"));
+          if (transition !== "shop") currentLinks.resolve(links("Fresh A shop"));
+        });
+        await screen.findByText("Fresh A supplier");
+        if (transition !== "shop") await screen.findByText("Fresh A shop");
+        expect(keys).toHaveLength(3);
+        expect(keys[0].slice(0, 4)).toEqual(keys[2].slice(0, 4));
+        expect(new Set(keys.map((key) => key[4])).size).toBe(3);
+        expectNoListWrites();
+        unsubscribe();
+      },
+    );
+  }
+
+  it.each(["logout", "unmount"] as const)(
+    "ignores both late list outcomes after %s and forwards abort to pending reads",
+    async (transition) => {
+      const pending = deferred<ReceiptRead>(),
+        pendingLinks = deferred<LinkRead>();
+      vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(pending.promise);
+      vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(pendingLinks.promise);
+      const { rerender, view, unmount, container } = show();
+      const readSignal = (
+        vi.mocked(api.getVehicleReceipts).mock.calls[0][0] as unknown as { signal: AbortSignal }
+      ).signal;
+      const linkSignal = (
+        vi.mocked(api.listVehicleShopLinks).mock.calls[0][0] as unknown as { signal: AbortSignal }
+      ).signal;
+      if (transition === "logout") {
+        auth.userId = null;
+        rerender(view());
+      } else unmount();
+      expect(readSignal.aborted).toBe(true);
+      expect(linkSignal.aborted).toBe(true);
+      await act(async () => {
+        pending.resolve(reply("PRIVATE late row"));
+        pendingLinks.reject(new Error("PRIVATE late link error"));
+      });
+      expect(container).toBeEmptyDOMElement();
+      expect(toast.error).not.toHaveBeenCalled();
+      expectNoListWrites();
+    },
+  );
+
+  it("hides retained rows/filter/empty/actions on independent refetch errors and retries with generic copy", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(reply("Visible supplier"));
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValueOnce(links("Visible shop"));
+    const { client } = show();
+    await screen.findByText("Visible supplier");
+    await screen.findByText("Visible shop");
+    const read = deferred<ReceiptRead>(),
+      linkRead = deferred<LinkRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(read.promise);
+    vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(linkRead.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    await screen.findByText("Loading receipts…");
+    expect(screen.queryByText("Visible supplier")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Filter parts by section")).not.toBeInTheDocument();
+    expect(screen.getByText("Visible shop")).toBeInTheDocument();
+    await act(async () => read.reject(new Error("PRIVATE receipt cause")));
+    await screen.findByText("Could not load receipts. Please try again.");
+    expect(screen.queryByText(empty)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-shop-links", "owner-a"] });
+    });
+    await screen.findByText("Loading shop connections…");
+    expect(screen.queryByText("Visible shop")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Revoke access" })).not.toBeInTheDocument();
+    await act(async () => linkRead.reject(new Error("PRIVATE link cause")));
+    await screen.findByText("Could not load shop connections. Please try again.");
+    expect(screen.queryByText(/PRIVATE/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No active shop connections in this snapshot."),
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Retry receipts" }));
+    await screen.findByText(empty);
+    expect(
+      screen.getByText("Could not load shop connections. Please try again."),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Retry shop connections" }));
+    await screen.findByText("No active shop connections in this snapshot.");
+    expect(api.getVehicleReceipts).toHaveBeenCalledTimes(3);
+    expect(api.listVehicleShopLinks).toHaveBeenCalledTimes(3);
+    expectNoListWrites();
+  });
+
+  it("blocks old DOM list controls in the exact tick invalidation begins", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
+      receipts: [privateReceipt(), installedCandidate()],
+      linkedVehicleId: null,
+      canWrite: true,
+    });
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValueOnce(links("Current shop"));
+    const { client } = show();
+    await screen.findByText("Current shop");
+    const buttons = [
+      screen.getByRole("button", { name: "Add receipt" }),
+      screen.getByRole("button", { name: "Review" }),
+      screen.getByRole("button", { name: "Discard draft" }),
+      screen.getByRole("button", { name: /^Receipt$/ }),
+      screen.getByRole("button", { name: "Record installation" }),
+      screen.getByRole("button", { name: "Revoke access" }),
+    ];
+    fireEvent.change(screen.getByLabelText("Shop connection code"), {
+      target: { value: "synthetic-code" },
+    });
+    buttons.push(screen.getByRole("button", { name: "Approve connection" }));
+    const checkboxes = screen.getAllByRole("checkbox");
+    const read = deferred<ReceiptRead>(),
+      linkRead = deferred<LinkRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(read.promise);
+    vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(linkRead.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+      void client.invalidateQueries({ queryKey: ["vehicle-shop-links", "owner-a"] });
+      buttons.forEach((button) => button.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+      checkboxes.forEach((checkbox) =>
+        checkbox.dispatchEvent(new MouseEvent("click", { bubbles: true })),
+      );
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expectNoListWrites();
+    await act(async () => {
+      read.resolve({ receipts: [], linkedVehicleId: null });
+      linkRead.resolve([]);
+    });
+  });
+
+  it("masks paused and invalidated-without-refetch snapshots instead of treating them as fresh", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(reply("Previously visible supplier"));
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValue(links("Previously visible shop"));
+    const { client } = show();
+    await screen.findByText("Previously visible supplier");
+    await screen.findByText("Previously visible shop");
+    act(() => {
+      void client.invalidateQueries({
+        queryKey: ["vehicle-receipts", "owner-a"],
+        refetchType: "none",
+      });
+      void client.invalidateQueries({
+        queryKey: ["vehicle-shop-links", "owner-a"],
+        refetchType: "none",
+      });
+    });
+    expect(screen.queryByText("Previously visible supplier")).not.toBeInTheDocument();
+    expect(screen.queryByText("Previously visible shop")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Refresh receipts" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Refresh shop connections" })).toBeEnabled();
+    expect(api.getVehicleReceipts).toHaveBeenCalledTimes(1);
+    expect(api.listVehicleShopLinks).toHaveBeenCalledTimes(1);
+    act(() => onlineManager.setOnline(false));
+    fireEvent.click(screen.getByRole("button", { name: "Refresh receipts" }));
+    fireEvent.click(screen.getByRole("button", { name: "Refresh shop connections" }));
+    await waitFor(() => {
+      expect(
+        client.getQueryCache().find({ queryKey: ["vehicle-receipts"], exact: false })!.state
+          .fetchStatus,
+      ).toBe("paused");
+      expect(
+        client.getQueryCache().find({ queryKey: ["vehicle-shop-links"], exact: false })!.state
+          .fetchStatus,
+      ).toBe("paused");
+    });
+    expect(screen.queryByText("Previously visible supplier")).not.toBeInTheDocument();
+    expect(screen.queryByText("Previously visible shop")).not.toBeInTheDocument();
+    expect(screen.queryByText(empty)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
+    act(() => onlineManager.setOnline(true));
+    await screen.findByText("Previously visible supplier");
+    await screen.findByText("Previously visible shop");
+  });
+
+  it.each(["receipts", "shop connections"] as const)(
+    "repeated old %s retry clicks join a pending read instead of cancelling/restarting it",
+    async (kind) => {
+      const isReceipts = kind === "receipts";
+      if (isReceipts)
+        vi.mocked(api.getVehicleReceipts).mockRejectedValueOnce(new Error("PRIVATE receipt cause"));
+      else
+        vi.mocked(api.listVehicleShopLinks).mockRejectedValueOnce(new Error("PRIVATE link cause"));
+      show();
+      const retry = await screen.findByRole("button", { name: `Retry ${kind}` });
+      const pending = deferred<ReceiptRead | LinkRead>();
+      if (isReceipts)
+        vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(
+          pending.promise as Promise<ReceiptRead>,
+        );
+      else
+        vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(
+          pending.promise as Promise<LinkRead>,
+        );
+      act(() => {
+        retry.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        retry.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      });
+      expect(isReceipts ? api.getVehicleReceipts : api.listVehicleShopLinks).toHaveBeenCalledTimes(
+        2,
+      );
+      const call = (isReceipts
+        ? vi.mocked(api.getVehicleReceipts).mock.calls[1][0]
+        : vi.mocked(api.listVehicleShopLinks).mock.calls[1][0]) as unknown as {
+        signal: AbortSignal;
+      };
+      expect(call.signal.aborted).toBe(false);
+      await act(async () =>
+        pending.resolve(isReceipts ? reply("Retried supplier") : links("Retried shop")),
+      );
+      await screen.findByText(isReceipts ? "Retried supplier" : "Retried shop");
+    },
+  );
+
+  it("has no perpetual disabled-link loading in native-shop mode and guards same-tick code/expense admission", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
+      receipts: [{ ...installedCandidate(), shop_vehicle_id: shopVehicle }],
+      linkedVehicleId: null,
+      canWrite: true,
+      canRecordExpense: true,
+    });
+    const { client } = show(undefined, { shopVehicleId: shopVehicle });
+    const code = await screen.findByRole("button", { name: "Create owner connection code" });
+    await waitFor(() => expect(code).toBeEnabled());
+    expect(api.listVehicleShopLinks).not.toHaveBeenCalled();
+    expect(screen.queryByText("Loading shop connections…")).not.toBeInTheDocument();
+    const expense = screen.getByRole("button", { name: "Record shop expense" });
+    const pending = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(pending.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+      code.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      expense.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    expect(api.requestShopVehicleLink).not.toHaveBeenCalled();
+    expect(api.recordVehicleReceiptExpense).not.toHaveBeenCalled();
+    await act(async () => pending.resolve({ receipts: [], linkedVehicleId: null, canWrite: true }));
+    vi.mocked(api.requestShopVehicleLink).mockResolvedValueOnce("synthetic-owner-code");
+    fireEvent.click(screen.getByRole("button", { name: "Create owner connection code" }));
+    await waitFor(() =>
+      expect(screen.getByLabelText("Owner connection code")).toHaveValue("synthetic-owner-code"),
+    );
+  });
+
+  it("keeps review and installation drafts mounted across fetching/error/success without applying new rows to them", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
+      receipts: [receipt("Original supplier"), installedCandidate()],
+      linkedVehicleId: null,
+      canWrite: true,
+    });
+    const { client } = show();
+    fireEvent.click(await screen.findByRole("button", { name: "Review" }));
+    const editor = screen.getByRole("dialog");
+    fireEvent.change(within(editor).getByLabelText("Supplier / shop"), {
+      target: { value: "Unsaved private draft" },
+    });
+    const read = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(read.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    expect(screen.getByRole("dialog")).toBe(editor);
+    expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Unsaved private draft");
+    await act(async () => read.reject(new Error("PRIVATE refresh failure")));
+    await screen.findByText("Could not load receipts. Please try again.");
+    expect(screen.getByRole("dialog")).toBe(editor);
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
+      receipts: [receipt("New row supplier"), installedCandidate()],
+      linkedVehicleId: null,
+      canWrite: false,
+    });
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    await screen.findByText("New row supplier");
+    expect(screen.getByRole("dialog")).toBe(editor);
+    expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Unsaved private draft");
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
+      receipts: [installedCandidate()],
+      linkedVehicleId: null,
+      canWrite: true,
+    });
+    fireEvent.click(within(editor).getAllByRole("button", { name: /^Close$/ })[0]);
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await screen.findByRole("button", { name: "Record installation" });
+    fireEvent.click(screen.getByRole("button", { name: "Record installation" }));
+    const install = screen.getByRole("dialog");
+    fireEvent.change(within(install).getByLabelText("Odometer (km, optional)"), {
+      target: { value: "12345" },
+    });
+    const installRead = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(installRead.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    expect(screen.getByRole("dialog")).toBe(install);
+    await act(async () => installRead.reject(new Error("PRIVATE install refresh failure")));
+    await screen.findByText("Could not load receipts. Please try again.");
+    expect(screen.getByRole("dialog")).toBe(install);
+    expect(within(install).getByLabelText("Odometer (km, optional)")).toHaveValue(12345);
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    await screen.findByText(empty);
+    expect(screen.getByRole("dialog")).toBe(install);
+    expect(within(install).getByLabelText("Odometer (km, optional)")).toHaveValue(12345);
+    expectNoListWrites();
+  });
+
+  it("preserves an unknown editor hold and acknowledged ID across both list refresh failures/retries", async () => {
+    vi.mocked(api.saveVehicleReceipt).mockRejectedValueOnce(new Error("PRIVATE unknown save"));
+    const { client } = show();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Add receipt" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Add receipt" }));
+    const editor = screen.getByRole("dialog");
+    fireEvent.change(within(editor).getByLabelText("Supplier / shop"), {
+      target: { value: "Held supplier" },
+    });
+    fireEvent.change(within(editor).getByLabelText("Item description"), {
+      target: { value: "Held part" },
+    });
+    fireEvent.click(within(editor).getByRole("button", { name: "Save draft" }));
+    await within(editor).findByText(/Receipt change could not be confirmed/);
+    expect(api.saveVehicleReceipt).toHaveBeenCalledWith({
+      data: expect.objectContaining({ id: draftId }),
+    });
+    const read = deferred<ReceiptRead>(),
+      linkRead = deferred<LinkRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(read.promise);
+    vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(linkRead.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+      void client.invalidateQueries({ queryKey: ["vehicle-shop-links", "owner-a"] });
+    });
+    expect(screen.getByRole("dialog")).toBe(editor);
+    await act(async () => {
+      read.reject(new Error("PRIVATE receipt refresh"));
+      linkRead.reject(new Error("PRIVATE link refresh"));
+    });
+    await screen.findByText("Could not load receipts. Please try again.");
+    await screen.findByText("Could not load shop connections. Please try again.");
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+      void client.refetchQueries({ queryKey: ["vehicle-shop-links", "owner-a"] });
+    });
+    await screen.findByText(empty);
+    expect(screen.getByRole("dialog")).toBe(editor);
+    expect(within(editor).getByLabelText("Supplier / shop")).toHaveValue("Held supplier");
+    expect(within(editor).getByLabelText("Item description")).toHaveValue("Held part");
+    expect(within(editor).getByRole("button", { name: "Save draft" })).toBeDisabled();
+    expect(within(editor).getByRole("button", { name: "Close and check receipts" })).toBeEnabled();
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+    expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1);
+    expect(localOcr.upload).not.toHaveBeenCalled();
+    expect(api.discardReceiptDraft).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });
