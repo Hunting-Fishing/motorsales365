@@ -41,7 +41,18 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest connected slice: `9a4059bd`, customer detail current-record/captured caller
+Latest connected slice: `a56480a1`, commercial/communications caller composition
+and receipt entry preflight/lifetime/acknowledgment/unknown-outcome handling.
+Critical 533/533 across six files (15.19s), full TypeScript, ten-file changed-line
+lint zero new errors/warnings (13 older findings), format/diff, independent review
+and CI guards 2/2 pass. Fresh complete build/214 public copies/Worker boundaries
+pass with existing warnings. Publication/exact-head CI are separately recorded
+in `evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md`. Null-save is only
+a void transport acknowledgment; path ack is not byte provenance. Mounted holds
+are not durable/reopen dedupe; pending server work is not canceled. No new R2,
+isolated/owner/live acceptance, migration or deployment. Next: receipt/shop-link
+read freshness/bounded DTO/caller binding; server typed outcomes/durable retry.
+Prior connected slice: `9a4059bd`, customer detail current-record/captured caller
 denial and private receipt read-lifetime fencing. Critical suites 192/192 (5.77s;
 helper92/handler67/receipt33), full TypeScript/seven-file changed-line lint,
 format/independent review and mandatory CI guards pass. Nine older lint findings
@@ -52,6 +63,18 @@ CI remains separately recorded after verification. No native
 authority, strict session-revocation or real Auth/API/Storage/restore acceptance
 is claimed. Generated middleware/SQL/permissions/packages/config/media unchanged;
 see `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md` for next dependencies.
+Publication `a69903a7` verified on canonical remote/same attached draft PR #68/
+base/unchanged main; final-head 214 assets verify. Run `38846180291`: native
+Parts/quote `116797113332` passes; untruncated log confirms actual PG17.11,
+six quote scenario groups/cleanup, 247 Parts assertions and 47 retained replay
+failures. All six Actions gates pass. Completed unit `116797113345` confirms
+critical192/192 (3.95s), locked quote94/94 and application2,745/2,745 across80files
+(52.00s), zero unexpected/quarantined failures; overall log truncated, final
+summaries/checker present. This green is not newer-head acceptance. Wrapper `38846180356`
+preview skip path succeeds without upload; migration/detection/production and
+Supabase Preview skipped. Workers build `ef57aefb-0ec5-4e48-8daf-81514569432c`
+failed (ID/link only, fresh cause unverified). Follow-up notes join the next
+integrated slice; no deployment/live change.
 Prior source slice: `ad776aa8`, locked expected-shop intent and same-name guard;
 94/94 PGlite tests retain all 88 prior cases. Shared pinned setup and separate
 private native-PG17 independent-session CI path implemented, not yet executed on
@@ -164,11 +187,16 @@ route is not evidence that the changed candidate has passed those gates.
 
 ## Workflow ledger
 
-Connected C1/C2 safety at `9a4059bd`: private receipt opening has 33/33 lifetime
-tests; customer detail adds 92 helper and 67 connected caller-denial tests.
+Connected C1/C2 safety at `a56480a1`: commercial126/communications135 caller
+tests, receipt panel82/shared schema31 tests, combined critical533/533. These
+include the prior private opener33/customer detail67/caller helper92 cases.
+Editor mounted holds/preflight/checked acknowledgments are implemented, not
+durable financial/recovery or real-object acceptance. Receipt list freshness,
+same-account authority and remaining writers still need work. Evidence:
+`evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md`.
 Current-record lookup and observed context fencing do not close R2 fresh-session/
 native-team authority or the rows' real-role/private-storage/recovery acceptance.
-Exact scope and unchanged receipt mutation gaps are in
+Prior opener scope and historical receipt mutation gaps are in
 `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`.
 
 | ID / lane          | Workflow and source anchor                                                                                                                                         | Source / integrated state                                                                                                                       | Staging | Owner   | Live         | Required acceptance / exact remaining dependency                                                                                                                                                                                                                                                                                                     |
@@ -427,14 +455,16 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 
 1. Verify existing PR #68's exact latest published CI head; continue on the same
    branch/PR. Parent `2cbf20a4` passed all six gates, including native quote races
-   and locked quote94/94; connected `9a4059bd` still needs its own publication/CI.
+   and locked quote94/94; connected `9a4059bd` published as `a69903a7` now passes
+   all six gates, application2,745/2,745. New source `a56480a1` needs its own checks.
    Do not substitute prior-head CI for new-head checks or repeat its completed
    selected proof as new acceptance. Continue strict session/native-shop authority
-   and receipt list/editor/mutation lifetime/unknown-outcome gaps after this
-   caller-denial/private-opener slice. Next bounded connected implementation is
-   the existing customer commercial/communications readers' same-caller guard,
-   retaining their own primary/link/projection contracts; not another unwired
-   authority codec or early quote-candidate activation.
+   and receipt list/mutation freshness after the implemented commercial/
+   communications guard and editor mounted holds. Next bounded implementation
+   is receipt/shop-link per-mount fresh-only reads, then bounded reader DTO/caller
+   binding and typed server outcomes/durable retry. Retain native primary/link/
+   projection contracts; no early quote-candidate activation or positive authority
+   claim from these caller-denial changes.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
    `.env` contents or bulk merge the provider cleanup. Next native email work is

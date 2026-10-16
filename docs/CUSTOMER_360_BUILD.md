@@ -1554,3 +1554,24 @@ private-storage or mutation/retry acceptance. Existing receipt list/editor/mutat
 and current-role/session, tenant/team/offboarding, durable financial/stock writers,
 restore and designated pilot/owner gates remain open. No deployment, live SQL/
 Auth/business write, new hosted resource/cost, Docker or provider activation.
+
+## Connected reader and receipt entry follow-up (2026-10-16)
+
+Source `a56480a1`, same draft PR #68: existing commercial/communications handlers
+now add the captured caller/current-user denial guard without changing native
+primary visibility, projections, sort/caps or invoice TEXT values. Receipt entry
+uses shared preflight, a synchronous cross-action latch, committed lifetime fences
+and checked draft/upload/void-save acknowledgments. Unacknowledged writes hold
+the mounted editor without deleting entries or blind retry. An acknowledged
+upload followed by scan failure still supports manual saving to the same draft.
+
+Final critical 533/533, full TypeScript, changed-line lint/review and CI guards
+pass. Fresh complete build/214 public copies/Worker boundaries pass with existing
+warnings. Publication checks are recorded separately in
+`evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md`. Null-save is not proof of
+persisted financial values; path ack is not file-byte provenance. Mounted holds
+do not cancel backend work or survive close/reopen, and new editor in-flight
+StrictMode replay is not specifically tested. Receipt/shop-link read freshness,
+bounded reader/caller contracts, remaining writers and durable retry/recovery are
+next. Native authority and real API/private-storage/restore/pilot/owner acceptance
+remain open. No migration, provider activation or deployment.

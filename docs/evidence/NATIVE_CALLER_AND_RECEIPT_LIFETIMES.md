@@ -1,8 +1,10 @@
 # Connected customer caller checks and private receipt opening
 
 16 October 2026, Asia/Manila. Same integrated candidate and draft PR #68.
-Source `9a4059bde546ed81eaa886124cc3e5b59529b5bc`; publication is recorded after
-local verification below. Existing draft PR #68/base/main are preserved.
+Source `9a4059bde546ed81eaa886124cc3e5b59529b5bc`; publication
+`a69903a750a07f8758be4f3adc934b023729a312`. Existing draft PR #68/base/main are
+preserved. Publication follow-up below joins the next integrated source slice,
+not a documentation-only CI restart.
 These are connected application changes, not a new authority model or permission
 grant. No production action or acceptance flag is supplied by this evidence.
 
@@ -108,3 +110,24 @@ deployment or merge occurred. Sole hosted backend remains
 fresh/original-actor/native-team authority, durable monetary/stock/retry writers,
 private evidence/recovery and reviewed pilot acceptance. The seven-day date is a
 target, not a verified forecast; no scope is silently removed.
+
+## Publication follow-up
+
+Canonical remote and same attached draft PR #68 confirm `a69903a7`; base remains
+`security/claim-revision-invalidation-model`, main remains `70ab892a`. Final-head
+214 public copies verify again. Run `38846180291`: native Parts/quote
+`116797113332` passes, with an untruncated log confirming actual PG17.11
+(`server_version_num=170011`), all six named quote scenario groups, 247 Parts
+assertions, 47 retained migration replay failures, both server stops and the
+successful quote always-cleanup step. All six Actions gates pass. Completed unit
+`116797113345` confirms critical192/192 (3.95s), locked quote94/94 and application
+2,745/2,745 across80files (52.00s), zero unexpected/quarantined failures. Its
+overall log is truncated but contains final summaries/checker. This is this
+head's CI result, not acceptance of newer source. Selected native SQL proof is
+verified, not R2/Auth/API/Storage/restore or financial acceptance.
+
+Wrapper `38846180356` preview uses its successful configured skip path, not an
+upload; migration detection/migrations/production and Supabase Preview skipped.
+Independent Workers build `ef57aefb-0ec5-4e48-8daf-81514569432c` failed. Only its
+reported ID/link is verified, not the fresh cause or source freeze execution.
+No deployment, migration or authority adoption follows from this publication.

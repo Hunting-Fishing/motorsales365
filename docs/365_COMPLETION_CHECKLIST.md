@@ -54,7 +54,29 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest connected slice: `9a4059bde546ed81eaa886124cc3e5b59529b5bc`, same draft PR #68.
+Latest connected slice: `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same draft PR #68.
+The existing customer commercial/communications readers now compose the captured
+caller/current-record denial guard while preserving primary visibility,
+projections/ordering/caps and legacy invoice TEXT values. Receipt entry has one
+synchronous cross-action latch, committed account/target lifetime fences, shared
+manual/file preflight and checked draft/upload/void-save acknowledgments.
+Unacknowledged writes hold this mounted editor without deleting entries or blind
+retry; acknowledged upload plus scan failure still permits manual entry against
+the same draft. This is not durable idempotency, cancellation or persisted-value
+proof. Final critical suites 533/533 across six files (15.19s), full TypeScript,
+ten-file changed-line lint zero new errors/warnings (13 older findings), format/
+diff, independent review and mandatory CI guards 2/2 pass. A test-only inference
+fix and serialized compiler retry after a 1536-MiB heap exhaustion preserve
+source/timeouts/assertions. Fresh complete build and 214 public copies/Worker/
+canonical backend/15 OCR/202 PDF/server boundary verify; existing warnings remain.
+Publication/new-head CI are separately recorded in
+`evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md` after capture.
+No migration/live write/deployment or positive authority acceptance.
+Next: receipt/shop-link per-mount read freshness and generic failure handling;
+then bounded reader DTO/caller binding and server typed outcomes/durable retry.
+Real API/Auth/private-storage/transaction/recovery/pilot/owner gates remain open.
+
+Prior connected slice: `9a4059bde546ed81eaa886124cc3e5b59529b5bc`, same draft PR #68.
 Customer 360's existing reader now adds same-caller explicit-token Auth record
 checks, strict credential/verified-subject binding, a bounded wait and observed
 context-loss denial before/after private reads. Receipt file opening has a
@@ -72,13 +94,28 @@ caller denial/read lifetime safety, not strict session revocation, original-huma
 native-shop authority, storage/transaction/recovery or owner acceptance. Evidence:
 `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`. Generated middleware, permissions,
 SQL, package/configuration/media and other hosted projects remain unchanged.
-Next safe application dependency: compose this additional caller-denial guard
-with existing commercial/communications readers, retaining their native primary/
-link/projection tests; continue receipt list/editor/mutation lifetime and unknown
-outcome handling separately. Do not treat read locks as purchase dedupe or new
+Its commercial/communications and editor follow-up is implemented at `a56480a1`
+above. Receipt list/read freshness and remaining mutation paths still need work.
+Do not treat read locks or mounted uncertainty holds as purchase dedupe or new
 positive native authority. Shared original-human/fresh session/role/tenant,
 native-team/claim/offboarding, durable financial/stock writers and real private-
 object/restore/pilot acceptance remain release-blocking.
+
+Publication `a69903a750a07f8758be4f3adc934b023729a312` is verified on the canonical
+remote and same attached draft PR #68/base; main stays `70ab892a`. Final-head 214
+public copies verify. Exact-head run `38846180291`: native Parts/quote job
+`116797113332` passes, untruncated log confirms actual PG17.11 (`170011`), all
+six quote scenario groups, 247 Parts assertions, 47 retained replay failures,
+server stops and successful always-cleanup. All six Actions gates pass. Completed
+unit job `116797113345` confirms critical192/192 (3.95s), locked quote94/94 and
+application2,745/2,745 across80files (52.00s), zero unexpected/quarantined failures.
+The overall unit log is truncated but contains final summaries/checker. Do not
+reuse this green for newer source. Wrapper `38846180356` preview succeeds
+through its configured skip path, not an upload; migration/detection/production
+and Supabase Preview skipped. Independent Workers build
+`ef57aefb-0ec5-4e48-8daf-81514569432c` failed with ID/link only; fresh cause is
+unverified. These publication/check notes join the next integrated slice,
+avoiding a documentation-only CI restart. No live mutation/deployment.
 
 Prior backend slice: `ad776aa8a18ed181293bbc6fd01a65518ca62949`, same draft PR #68.
 Locked/unapplied quote SQL now requires prior expected-shop intent and refuses

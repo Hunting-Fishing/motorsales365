@@ -76,7 +76,21 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
-Latest connected source `9a4059bd` adds customer detail caller/current-user denial
+Latest connected source `a56480a1` composes caller denial into the existing
+commercial/communications readers and hardens receipt entry preflight/lifetimes/
+acknowledgments/unknown outcomes. Final critical 533/533, full TypeScript,
+changed-line lint/review and CI guards pass. Fresh complete packaging/214 public
+copies/Worker boundaries pass with existing warnings. Parent `a69903a7` now passes
+all six Actions gates, application 2,745/2,745; the new source needs its own
+publication/exact-head results. This is mounted safety, not durable retry,
+original-human/native authority or real API/private-storage/restore acceptance.
+Next bounded work is receipt/shop-link read freshness and bounded caller/DTO
+contracts, then server outcomes/durable recovery. Full acceptance scope remains
+open; no deadline guarantee or silent scope reduction. Day 2 reassessment on
+17 October still requires concrete access/capacity/decision and release gaps.
+Evidence: `evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md`.
+
+Prior connected source `9a4059bd` adds customer detail caller/current-user denial
 and private receipt opening lifetime/duplicate-read fences. Critical suites
 192/192, full TypeScript, changed-line lint/review and mandatory CI guards pass.
 Fresh complete packaging/214 public copies/Worker boundaries pass with existing
