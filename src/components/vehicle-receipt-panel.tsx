@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
@@ -104,7 +104,43 @@ function AuthenticatedVehicleReceiptPanel({
   const [edit, setEdit] = useState<VehicleReceipt | "new" | null>(null);
   const [install, setInstall] = useState<VehicleReceipt["items"][number] | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [openingReceiptId, setOpeningReceiptId] = useState<string | null>(null);
+  const privateRead = useRef({ active: false, lifetime: 0, attempt: null as symbol | null });
   const [categoryFilter, setCategoryFilter] = useState("");
+  useLayoutEffect(() => {
+    const scope = privateRead.current;
+    scope.lifetime += 1;
+    scope.active = true;
+    scope.attempt = null;
+    setOpeningReceiptId(null);
+    return () => {
+      // A later setup (including StrictMode replay) must never revive this read.
+      scope.active = false;
+      scope.lifetime += 1;
+      scope.attempt = null;
+    };
+  }, []);
+  async function openPrivateReceipt(id: string) {
+    const scope = privateRead.current;
+    if (!scope.active || scope.attempt !== null) return;
+    const lifetime = scope.lifetime;
+    const attempt = Symbol();
+    scope.attempt = attempt;
+    setOpeningReceiptId(id);
+    const current = () => scope.active && scope.lifetime === lifetime && scope.attempt === attempt;
+    try {
+      const url = await signFn({ data: { id } });
+      if (!current()) return;
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch {
+      if (current()) toast.error("Could not open receipt. Please try again.");
+    } finally {
+      if (current()) {
+        scope.attempt = null;
+        setOpeningReceiptId(null);
+      }
+    }
+  }
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });
     void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
@@ -193,13 +229,8 @@ function AuthenticatedVehicleReceiptPanel({
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={busy === r.id}
-                    onClick={() =>
-                      action(r.id, async () => {
-                        const url = await signFn({ data: { id: r.id } });
-                        window.open(url, "_blank", "noopener,noreferrer");
-                      })
-                    }
+                    disabled={busy === r.id || openingReceiptId !== null}
+                    onClick={() => openPrivateReceipt(r.id)}
                   >
                     <FileText className="mr-1 h-3 w-3" /> Receipt
                   </Button>

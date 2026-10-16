@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { StrictMode, useLayoutEffect, useRef } from "react";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { act, render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { VehicleReceiptPanel } from "./vehicle-receipt-panel";
 import * as api from "@/lib/vehicle-receipts.functions";
-import type { VehicleReceipt } from "@/lib/vehicle-receipts";
+import type { ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 const auth = vi.hoisted(() => ({ userId: "owner-a" as string | null }));
 const localOcr = vi.hoisted(() => ({ scan: vi.fn(), upload: vi.fn() }));
 vi.mock("@/lib/receipt-document.client", () => ({ scanReceiptDocument: localOcr.scan }));
@@ -53,10 +55,11 @@ function receipt(vendor: string): VehicleReceipt {
 }
 function show(
   client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity } } }),
+  initialTarget: ReceiptTarget = { vehicleId: vehicle },
 ) {
-  const view = () => (
+  const view = (target: ReceiptTarget = initialTarget) => (
     <QueryClientProvider client={client}>
-      <VehicleReceiptPanel vehicleId={vehicle} />
+      <VehicleReceiptPanel {...target} />
     </QueryClientProvider>
   );
   return { ...render(view()), view, client };
@@ -88,6 +91,328 @@ beforeEach(() => {
   vi.mocked(api.startVehicleReceipt).mockResolvedValue({ id: "receipt-1", file_path: null });
   vi.mocked(api.saveVehicleReceipt).mockResolvedValue(null);
 });
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((yes, no) => {
+    resolve = yes;
+    reject = no;
+  });
+  return { promise, resolve, reject };
+}
+
+function privateReceipt(id = "private-receipt-1"): VehicleReceipt {
+  return {
+    ...receipt("Private supplier"),
+    id,
+    file_path: `owner-a/${id}/original.pdf`,
+    file_name: "Private receipt.pdf",
+    media_type: "application/pdf",
+  };
+}
+
+describe("private receipt opening lifetime", () => {
+  beforeEach(() => {
+    vi.mocked(api.getPrivateReceiptUrl).mockReset();
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
+      receipts: [privateReceipt()],
+      linkedVehicleId: null,
+    });
+    vi.spyOn(window, "open").mockReturnValue(null);
+    vi.spyOn(toast, "error").mockImplementation(() => 0);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("opens a current signed receipt exactly once without invalidating mutation caches", async () => {
+    const signed = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl).mockReturnValueOnce(signed.promise);
+    const { client } = show();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledExactlyOnceWith({
+      data: { id: "private-receipt-1" },
+    });
+    expect(button).toBeDisabled();
+    expect(window.open).not.toHaveBeenCalled();
+    await act(async () => signed.resolve("https://private.example/current-bearer"));
+    expect(window.open).toHaveBeenCalledExactlyOnceWith(
+      "https://private.example/current-bearer",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(button).toBeEnabled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+    expect(api.getVehicleReceipts).toHaveBeenCalledTimes(1);
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.recordVehicleReceiptExpense).not.toHaveBeenCalled();
+  });
+
+  it("releases a completed read for a separate explicit opening", async () => {
+    vi.mocked(api.getPrivateReceiptUrl)
+      .mockResolvedValueOnce("https://private.example/first")
+      .mockResolvedValueOnce("https://private.example/second");
+    show();
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    await waitFor(() => expect(window.open).toHaveBeenCalledTimes(1));
+    fireEvent.click(button);
+    await waitFor(() => expect(window.open).toHaveBeenCalledTimes(2));
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(window.open).toHaveBeenLastCalledWith(
+      "https://private.example/second",
+      "_blank",
+      "noopener,noreferrer",
+    );
+  });
+
+  it("uses a synchronous lock before React commits duplicate clicks", async () => {
+    const signed = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl).mockReturnValueOnce(signed.promise);
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
+      receipts: [privateReceipt(), privateReceipt("private-receipt-2")],
+      linkedVehicleId: null,
+    });
+    show();
+    const buttons = await screen.findAllByRole("button", { name: /^Receipt$/ });
+    act(() => {
+      buttons[0].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      buttons[0].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      buttons[1].dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+    expect(buttons[0]).toBeDisabled();
+    expect(buttons[1]).toBeDisabled();
+    await act(async () => signed.resolve("https://private.example/one-read"));
+    expect(window.open).toHaveBeenCalledTimes(1);
+    expect(buttons[0]).toBeEnabled();
+    expect(buttons[1]).toBeEnabled();
+  });
+
+  it("shows only a generic current failure and permits an explicit retry", async () => {
+    const signed = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl)
+      .mockReturnValueOnce(signed.promise)
+      .mockResolvedValueOnce("https://private.example/retry");
+    const { client } = show();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    await act(async () => signed.reject(new Error("secret bearer and private database cause")));
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith(
+      "Could not open receipt. Please try again.",
+    );
+    expect(window.open).not.toHaveBeenCalled();
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    await waitFor(() => expect(window.open).toHaveBeenCalledTimes(1));
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it("redacts a synchronous signing failure and releases the current attempt", async () => {
+    vi.mocked(api.getPrivateReceiptUrl).mockImplementationOnce(() => {
+      throw new Error("private signing cause");
+    });
+    show();
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    expect(toast.error).toHaveBeenCalledExactlyOnceWith(
+      "Could not open receipt. Please try again.",
+    );
+    expect(button).toBeEnabled();
+    expect(window.open).not.toHaveBeenCalled();
+  });
+
+  it("redacts a current popup exception and allows an explicit retry", async () => {
+    vi.mocked(api.getPrivateReceiptUrl).mockResolvedValue("https://private.example/current");
+    vi.mocked(window.open).mockImplementationOnce(() => {
+      throw new Error("private bearer popup cause");
+    });
+    const { client } = show();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const button = await screen.findByRole("button", { name: /^Receipt$/ });
+    fireEvent.click(button);
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledExactlyOnceWith(
+        "Could not open receipt. Please try again.",
+      ),
+    );
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    await waitFor(() => expect(window.open).toHaveBeenCalledTimes(2));
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it.each(["account", "sign-out", "vehicle", "shop vehicle", "unmount"] as const)(
+    "does not open or refresh an old signed receipt after committed %s change",
+    async (transition) => {
+      const signed = deferred<string>();
+      vi.mocked(api.getPrivateReceiptUrl).mockReturnValueOnce(signed.promise);
+      const { client, rerender, view, unmount } = show();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(await screen.findByRole("button", { name: /^Receipt$/ }));
+      if (transition === "account") {
+        auth.userId = "owner-b";
+        rerender(view());
+      } else if (transition === "sign-out") {
+        auth.userId = null;
+        rerender(view());
+      } else if (transition === "vehicle") {
+        rerender(view({ vehicleId: "10000000-0000-4000-8000-000000000002" }));
+      } else if (transition === "shop vehicle") {
+        rerender(view({ shopVehicleId: "10000000-0000-4000-8000-000000000003" }));
+      } else {
+        unmount();
+      }
+      await act(async () => signed.resolve("https://private.example/old-bearer"));
+      expect(window.open).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+      expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each(["account", "sign-out", "vehicle", "shop vehicle", "unmount"] as const)(
+    "does not toast a late private failure after committed %s change",
+    async (transition) => {
+      const signed = deferred<string>();
+      vi.mocked(api.getPrivateReceiptUrl).mockReturnValueOnce(signed.promise);
+      const { client, rerender, view, unmount } = show();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(await screen.findByRole("button", { name: /^Receipt$/ }));
+      if (transition === "account") {
+        auth.userId = "owner-b";
+        rerender(view());
+      } else if (transition === "sign-out") {
+        auth.userId = null;
+        rerender(view());
+      } else if (transition === "vehicle") {
+        rerender(view({ vehicleId: "10000000-0000-4000-8000-000000000002" }));
+      } else if (transition === "shop vehicle") {
+        rerender(view({ shopVehicleId: "10000000-0000-4000-8000-000000000003" }));
+      } else {
+        unmount();
+      }
+      await act(async () => signed.reject(new Error("old private signing cause")));
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(window.open).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["account", "vehicle", "shop vehicle"] as const)(
+    "never revives the first %s read after an A to B to A return or releases a newer read",
+    async (transition) => {
+      const oldRead = deferred<string>();
+      const currentRead = deferred<string>();
+      vi.mocked(api.getPrivateReceiptUrl)
+        .mockReturnValueOnce(oldRead.promise)
+        .mockReturnValueOnce(currentRead.promise);
+      const { client, rerender, view } = show(
+        undefined,
+        transition === "shop vehicle"
+          ? { shopVehicleId: "10000000-0000-4000-8000-000000000003" }
+          : { vehicleId: vehicle },
+      );
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(await screen.findByRole("button", { name: /^Receipt$/ }));
+      if (transition === "account") {
+        auth.userId = "owner-b";
+        rerender(view());
+        auth.userId = "owner-a";
+        rerender(view());
+      } else if (transition === "vehicle") {
+        rerender(view({ vehicleId: "10000000-0000-4000-8000-000000000002" }));
+        rerender(view());
+      } else {
+        rerender(view({ shopVehicleId: "10000000-0000-4000-8000-000000000004" }));
+        rerender(view());
+      }
+      const currentButton = await screen.findByRole("button", { name: /^Receipt$/ });
+      expect(currentButton).toBeEnabled();
+      fireEvent.click(currentButton);
+      expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+      await act(async () => oldRead.resolve("https://private.example/old-aba"));
+      expect(window.open).not.toHaveBeenCalled();
+      expect(currentButton).toBeDisabled();
+      fireEvent.click(currentButton);
+      expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+      await act(async () => currentRead.resolve("https://private.example/current-aba"));
+      expect(window.open).toHaveBeenCalledExactlyOnceWith(
+        "https://private.example/current-aba",
+        "_blank",
+        "noopener,noreferrer",
+      );
+      expect(currentButton).toBeEnabled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    },
+  );
+
+  it("permanently fences a read started before StrictMode effect cleanup and allows a new attempt", async () => {
+    const oldRead = deferred<string>();
+    const currentRead = deferred<string>();
+    vi.mocked(api.getPrivateReceiptUrl)
+      .mockReturnValueOnce(oldRead.promise)
+      .mockReturnValueOnce(currentRead.promise);
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+    });
+    client.setQueryData(["vehicle-receipts", "owner-a", vehicle, undefined], {
+      receipts: [privateReceipt()],
+      linkedVehicleId: null,
+    });
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    let cleanups = 0;
+    function StartReadDuringFirstCommit() {
+      const started = useRef(false);
+      useLayoutEffect(() => {
+        if (!started.current) {
+          started.current = true;
+          screen.getByRole("button", { name: /^Receipt$/ }).click();
+        }
+        return () => {
+          cleanups += 1;
+        };
+      }, []);
+      return null;
+    }
+    render(
+      <StrictMode>
+        <QueryClientProvider client={client}>
+          <VehicleReceiptPanel vehicleId={vehicle} />
+          <StartReadDuringFirstCommit />
+        </QueryClientProvider>
+      </StrictMode>,
+    );
+    expect(cleanups).toBe(1);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(1);
+    const button = screen.getByRole("button", { name: /^Receipt$/ });
+    expect(button).toBeEnabled();
+    fireEvent.click(button);
+    expect(api.getPrivateReceiptUrl).toHaveBeenCalledTimes(2);
+    await act(async () => oldRead.resolve("https://private.example/pre-cleanup"));
+    expect(window.open).not.toHaveBeenCalled();
+    expect(button).toBeDisabled();
+    await act(async () => currentRead.resolve("https://private.example/post-cleanup"));
+    expect(window.open).toHaveBeenCalledExactlyOnceWith(
+      "https://private.example/post-cleanup",
+      "_blank",
+      "noopener,noreferrer",
+    );
+    expect(button).toBeEnabled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+});
+
 describe("vehicle receipt workflow", () => {
   it("scans a selected photo without creating a receipt, uploading or calling the AI provider", async () => {
     show();
