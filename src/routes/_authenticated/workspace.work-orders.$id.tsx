@@ -1009,6 +1009,7 @@ function AddPartDialog({
   assertCanWrite,
   onWritten,
 }: EditorScope) {
+  const partFieldId = useId();
   const qc = useQueryClient();
   const isMounted = useActiveScope();
   const isCurrent = () => isMounted() && isScopeCurrent();
@@ -1070,27 +1071,46 @@ function AddPartDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Part name *</Label>
-            <Input value={partName} onChange={(e) => setPartName(e.target.value)} />
+            <Label htmlFor={`${partFieldId}-name`}>Part name *</Label>
+            <Input
+              id={`${partFieldId}-name`}
+              value={partName}
+              onChange={(e) => setPartName(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Part #</Label>
-              <Input value={partNumber} onChange={(e) => setPartNumber(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-number`}>Part #</Label>
+              <Input
+                id={`${partFieldId}-number`}
+                value={partNumber}
+                onChange={(e) => setPartNumber(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Supplier</Label>
-              <Input value={supplier} onChange={(e) => setSupplier(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-supplier`}>Supplier</Label>
+              <Input
+                id={`${partFieldId}-supplier`}
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label>Qty *</Label>
-              <Input type="number" min="1" value={qty} onChange={(e) => setQty(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-quantity`}>Qty *</Label>
+              <Input
+                id={`${partFieldId}-quantity`}
+                type="number"
+                min="1"
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Price ₱ *</Label>
+              <Label htmlFor={`${partFieldId}-price`}>Price ₱ *</Label>
               <Input
+                id={`${partFieldId}-price`}
                 type="number"
                 step="0.01"
                 value={price}
@@ -1098,9 +1118,9 @@ function AddPartDialog({
               />
             </div>
             <div>
-              <Label>Type</Label>
+              <Label htmlFor={`${partFieldId}-type`}>Type</Label>
               <Select value={partType} onValueChange={setPartType}>
-                <SelectTrigger>
+                <SelectTrigger id={`${partFieldId}-type`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

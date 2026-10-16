@@ -6,6 +6,27 @@ QA login or hosting actions, or activate a financial writer.
 
 ## Observed defect and bounded correction
 
+Published7de40ba2870920a6e49892d2bd85e4e3437111e5/same draft PR68/comment6225360928,
+exact canonical remote/body/title/non-main base/draft/main preserved. Own build
+117212338681/type117212338504/OCR117212338318/lint117212338642/native117212338611
+pass; unit117212338746 completes: actual5,034/96 files103.93s with zero unexpected/
+quarantined failures (truncated/final summaries). All six38971996346 Actions pass,
+including actual16 detail tests/new job-line regressions, not inherited. Actual
+native log is untruncated: PG17.11/Parts247/quote6/all21 exact ordered expense/
+draft/Auth-user markers/both terminators/EXIT+always-cleanup. Complete marker
+vector equals the previously admitted frozen21, whose shell/candidate source is
+unchanged in this UI slice. Selected recovery54/58/160ms is not full/RTO;47
+failures remain. Actual build final214media/15OCR/202PDF/server-boundary/Worker+
+sole365/dry-run summaries pass (returned log truncated). COMPLETE CI merge
+ced464d0555c7c17581f6250d9acb06ccddbc736 equals candidate tree
+12c3f7d21b2358c9725e60871fc78997c00202e1,2,592 current objects0missing, not history
+recovery. Actual untruncated Preview117212338625 skips configuration/no upload;
+production/migrations/Supabase Preview skip. Existing follow-up updated/read back
+in place, exact prompt/identity/active30min/thread/creation preserved. New Workers
+117212416701 failure cause unverified, hosting STOP unchanged; no unchanged
+diagnostic/retry. These post-publication notes join next implementation slice,
+not a docs-only CI restart. No main/live/deploy/SQL/permission activation.
+
 The existing work-order detail `AddJobLineDialog` renders six visible labels as
 siblings of native inputs/textarea, with no `htmlFor`/`id` association. In
 particular, Category has no other accessible name. The installed UI Label

@@ -567,3 +567,90 @@ describe("Accessible work-order job-line controls", () => {
     expect(state.navigate).not.toHaveBeenCalled();
   });
 });
+
+describe("Accessible work-order part controls", () => {
+  const fields = [
+    ["Part name *", "textbox"],
+    ["Part #", "textbox"],
+    ["Supplier", "textbox"],
+    ["Qty *", "spinbutton"],
+    ["Price ₱ *", "spinbutton"],
+    ["Type", "combobox"],
+  ] as const;
+
+  it("associates all six labels including the native combobox without changing quantity, price or type defaults", async () => {
+    show();
+    await ready();
+    fireEvent.click(screen.getByRole("button", { name: "Add part" }));
+    const dialog = within(screen.getByRole("dialog"));
+    const ids = fields.map(([name, role]) => {
+      const control = dialog.getByRole(role, { name }) as HTMLInputElement | HTMLButtonElement;
+      expect(dialog.getByLabelText(name)).toBe(control);
+      expect(control.id).not.toBe("");
+      const labels = Array.from(control.labels ?? []);
+      expect(labels).toHaveLength(1);
+      expect(labels[0].textContent).toBe(name);
+      expect(labels[0].htmlFor).toBe(control.id);
+      expect(document.getElementById(control.id)).toBe(control);
+      return control.id;
+    });
+    expect(new Set(ids).size).toBe(6);
+    expect(dialog.getByRole("spinbutton", { name: "Qty *" })).toHaveAttribute("min", "1");
+    expect(dialog.getByRole("spinbutton", { name: "Qty *" })).toHaveValue(1);
+    expect(dialog.getByRole("spinbutton", { name: "Price ₱ *" })).toHaveAttribute("step", "0.01");
+    await waitFor(() =>
+      expect(dialog.getByRole("combobox", { name: "Type" })).toHaveTextContent("New"),
+    );
+    expect(state.write).not.toHaveBeenCalled();
+  });
+
+  it("uses IDs distinct from the job dialog and keeps them stable through part edits and cancel/reopen without writes", async () => {
+    show();
+    await ready();
+    fireEvent.click(screen.getByRole("button", { name: "Add job line" }));
+    const jobDialog = within(screen.getByRole("dialog"));
+    const jobIds = [
+      "Job name *",
+      "Category",
+      "Est. hours",
+      "Labor rate ₱/hr",
+      "Total ₱",
+      "Description",
+    ].map((name) => jobDialog.getByLabelText(name).id);
+    fireEvent.click(jobDialog.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    const open = () => fireEvent.click(screen.getByRole("button", { name: "Add part" }));
+    const ids = () => {
+      const dialog = within(screen.getByRole("dialog"));
+      return fields.map(([name]) => dialog.getByLabelText(name).id);
+    };
+    open();
+    const initialIds = ids();
+    expect(initialIds.every((id) => !jobIds.includes(id))).toBe(true);
+    const dialog = within(screen.getByRole("dialog"));
+    for (const [name, value] of [
+      ["Part name *", "Oil filter"],
+      ["Part #", "FILTER-123"],
+      ["Supplier", "Synthetic supplier"],
+      ["Qty *", "2"],
+      ["Price ₱ *", "125.50"],
+    ]) {
+      fireEvent.change(dialog.getByLabelText(name), { target: { value } });
+      expect(ids()).toEqual(initialIds);
+    }
+    expect(dialog.getByRole("combobox", { name: "Type" })).toHaveTextContent("New");
+    expect(state.write).not.toHaveBeenCalled();
+    fireEvent.click(dialog.getByRole("button", { name: "Cancel" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(state.write).not.toHaveBeenCalled();
+    open();
+    expect(ids()).toEqual(initialIds);
+    const reopened = within(screen.getByRole("dialog"));
+    expect(reopened.getByLabelText("Part name *")).toHaveValue("Oil filter");
+    expect(reopened.getByRole("combobox", { name: "Type" })).toHaveTextContent("New");
+    expect(state.write).not.toHaveBeenCalled();
+    expect(state.success).not.toHaveBeenCalled();
+    expect(state.error).not.toHaveBeenCalled();
+    expect(state.navigate).not.toHaveBeenCalled();
+  });
+});

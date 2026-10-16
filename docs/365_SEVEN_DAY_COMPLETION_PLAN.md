@@ -2,6 +2,24 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Current C3/U6 Add Part source joins the retained job-line fix: twelve associated
+label/control pairs, including the Type combobox. Root18/18 actual-route detail
+DOM tests in30.97s, full normal TypeScript/lint0 errors15 unchanged warnings and
+independent review pass; no stock/pricing/payload/write/lifetime change.
+Same PR68/commit subject `Associate part editor controls with accessible labels`;
+own-head CI separate. Parent7de40ba2 all six38971996346 Actions now pass, actual
+5,034/96 files103.93s, zero unexpected/quarantined failures (truncated/final
+summaries). [Exact evidence](evidence/SHOP_MANAGER_PART_LABELS.md).
+The next independent critical source dependency is combined inquiry/B2B holds:
+the retained inquiry availability sum omits Parts reservations. Prepare isolated
+private/unapplied SQL correction, not live stock activation or global no-oversell
+acceptance. Current catalog/all-writer/native concurrency/native authority/
+durable recovery remain required. Auth-source/QA/hosting STOPs await changed
+conditions; no unchanged retries. All18+N1–N3/47/12/5/2 remain and22 October21:00
+is still at risk, not a supported forecast. Current sequence belongs to the board.
+
+### Closed source checkpoints
+
 Independent C3/U6 Add job line label fix has154/154 focused three-suite checks
 in41.68s and clear review, preserving all previous behavior/guards. Normal full
 TypeScript/nine-file format/diff/lint0 errors15 retained warnings pass; same PR68/

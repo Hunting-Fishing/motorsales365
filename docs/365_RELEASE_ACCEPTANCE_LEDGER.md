@@ -10,8 +10,40 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Current C3/U6 Add Part source binds six visible labels to native controls,
+including Type's actual Radix combobox button. Together with retained Add job
+line labels, twelve controls are associated; no C3/U6 workflow is marked complete.
+Root18/18 actual-route DOM tests in30.97s, full normal TypeScript, ESLint0 errors/
+15 unchanged warnings and independent review pass. Entire previous16-test prefix
+and all pricing/stock/payload/write/readiness/private-lifetime logic are preserved.
+Same draft PR68/commit subject `Associate part editor controls with accessible labels`;
+exact publication goes in evidence comment, own-head required CI remains separate.
+No migration, permission, financial/stock writer, browser/device/owner or deployed
+acceptance. [Exact evidence](evidence/SHOP_MANAGER_PART_LABELS.md).
+Parent7de40ba2 all six38971996346 Actions pass; actual unit5,034/96 files103.93s,
+zero unexpected/quarantined failures (truncated/final summaries); prior native21/
+build/artifact verification is not inherited by this head.
+
+Next stock dependency is retained-source inquiry/B2B mixed-hold over-reservation:
+10 on hand +8 B2B held +new5 inquiry is admitted by the inquiry-only sum. Prepare
+private/unapplied selected-schema correction and SQL regressions; live behavior,
+all-writer/catalog/authority/native concurrency/durable recovery are unverified.
+No historical replay or current stock mutation. Existing stopped actions, all
+18+N1–N3/47/12/5/2, main/release gates and22 October risk remain unchanged.
+
+### Closed job-line checkpoint
+
 Independent C3/U6 source fix associates all six Add job line controls with visible
-labels/stable useId suffixes. Two appended actual-route DOM tests plus retained
+labels using stable React useId suffixes. Published7de40ba2870920a6e49892d2bd85e4e3437111e5/same draft PR68/comment
+6225360928 with exact remote/body/title/base/draft/main preserved. Own build/type/
+OCR/lint/native/unit pass, all six38971996346 Actions. Actual unit117212338746
+5,034/96 files103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native21 ordered markers/
+cleanup and current build/full artifact2,592 objects0missing verified separately,
+not inherited; selected54/58/160ms not full/RTO,47 failures remain. Actual Preview
+skips upload. Follow-up exact prompt/identity/schedule/thread/creation retained.
+These notes join next implementation, no docs-only CI restart.
+Two appended actual-route DOM tests plus retained
 quote/work-order list/detail checks pass154/154 in41.68s. No existing tests or
 state/payload/handlers/guards/private lifetimes/other dialogs changed. ESLint0
 errors/15 retained legacy warnings, independent review/full normal TypeScript/

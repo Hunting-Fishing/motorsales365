@@ -2,6 +2,22 @@
 
 ## Current delivery authority (17 October 2026)
 
+Current Add Part source complements the published Add job line correction:
+twelve fields now have explicit visible-label associations, including Type's
+native combobox trigger. Root18/18 detail DOM tests in30.97s, full normal
+TypeScript, lint0 errors/15 unchanged warnings and independent review pass;
+all prior16 tests and state/pricing/stock/payload/guards/lifetimes retained.
+Same PR68/commit subject `Associate part editor controls with accessible labels`,
+own-head CI separate. Parent7de40ba2 all six38971996346 Actions pass, actual
+5,034/96 files103.93s with zero unexpected/quarantined failures (truncated/final
+summaries). [Exact scope](evidence/SHOP_MANAGER_PART_LABELS.md). This is not real-
+role/browser/device/full-CRM acceptance. Next isolated stock source work closes
+the inquiry-only sum's omission of B2B holds, without activating a writer or
+claiming global no-oversell. Native authority/all-writer/catalog/durable recovery,
+all18+N1–N3/47/12/5/2, stopped actions and22 October risk remain under the board.
+
+### Closed source checkpoints
+
 Independent Add job line accessibility source now binds six visible labels and
 controls using stable IDs; root154/154 three suites41.68s and independent review
 pass, all prior business/privacy/lifetime logic preserved. Normal full TypeScript,

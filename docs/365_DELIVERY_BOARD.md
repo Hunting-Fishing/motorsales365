@@ -12,7 +12,58 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current C3/U6 slice: accessible Add Part controls.** The two existing editors
+now have twelve explicitly associated label/control pairs: six job-line fields
+and six part fields, including the real Type combobox trigger. The Add Part slice
+passes18/18 actual-route DOM tests in30.97s, full normal TypeScript, changed-file
+ESLint0 errors/15 unchanged legacy warnings and independent review. It preserves
+the entire prior16-test prefix and all pricing/stock/payload/write/lifetime logic.
+Same draft PR68; commit subject `Associate part editor controls with accessible labels`.
+Exact publication goes in its evidence comment; own-head CI is separate. No
+migration, permissions, financial writer, live deployment or real-device claim.
+[Exact scope and validation](evidence/SHOP_MANAGER_PART_LABELS.md).
+
+The parent7de40ba2 is closed: all six38971996346 Actions pass, actual unit5,034/
+96 files103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+Its native21/build/current artifact evidence below is retained, not rerun or
+inherited. Auth-source inventory, QA login and hosting STOP conditions remain
+unchanged; no new recovery route or repeated notification is authorized.
+
+**Next critical independent stock dependency:** retained inquiry reservation
+source sums inquiry holds only, while later B2B acceptance creates Parts holds
+on the same inventory. With10 on hand, an8-unit B2B hold plus a5-unit inquiry
+can be admitted by the old inquiry body. This is a concrete retained-source
+defect, not verified hosted behavior. Prepare a private/unapplied INVOKER
+candidate and pinned selected-schema SQL regressions for both hold families;
+do not replay the historical migration or activate a writer. Selected-fixture
+tests, native independent-session waits, current catalog/all-writer ordering,
+native authority and durable unknown-outcome/recovery proof remain separate.
+`adjustBusinessInventory` still has a split movement/read/update path; no global
+no-oversell claim. Work on the isolated correction follows this UI publication.
+All18+N1–N3,47 replay failures/12 historical/five unapplied/two recorded envelopes,
+full recovery/device/owner/main/live gates and22 October risk remain open.
+
+### Closed job-line source checkpoint
+
 **Current independent slice: accessible Add job line controls (C3/U6).**
+Published7de40ba2870920a6e49892d2bd85e4e3437111e5/same draft PR68/comment6225360928;
+canonical remote/base/title/draft/exact prior body/main preserved. Own build
+117212338681/type117212338504/OCR117212338318/lint117212338642/native117212338611
+pass; unit117212338746 now completes: actual5,034/96 files103.93s, zero unexpected/
+quarantined failures (truncated/final summaries). All six38971996346 Actions pass,
+including actual16 detail tests/new job-line regressions; no inherited pass.
+Actual native untruncated PG17.11/Parts247/quote6/all21 exact ordered expense
+markers/terminators/cleanup verified. Selected54/58/160ms not full/RTO;47 failures
+remain. Own build final214media/15OCR/202PDF/server-boundary/canonical Worker+365/
+dry-run passes (truncated/final summaries); complete CI mergeced464d0555c7c17581f6250d9acb06ccddbc736
+equals candidate tree12c3f7d21b2358c9725e60871fc78997c00202e1,2,592 current objects/
+zero missing, not history recovery. Actual Preview117212338625 configuration
+skip/no upload, production/migrations/Supabase Preview skip. Existing follow-up
+updated/read back in place with exact identity/schedule/thread/creation preserved.
+New Workers
+117212416701 fails cause unverified, existing hosting STOP unchanged. These
+read-back notes join the next implementation slice, no docs-only CI restart.
+
 While the existing Auth source/QA/hosting actions remain stopped, six controls in
 the existing work-order dialog now have explicit visible-label associations using
 one stable React useId prefix. Two actual-route DOM regressions are appended;

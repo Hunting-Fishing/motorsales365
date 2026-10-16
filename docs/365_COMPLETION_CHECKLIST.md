@@ -42,8 +42,38 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
-Independent C3/U6 Add job line label fix now associates six controls with stable
-React IDs; two appended real-route DOM regressions preserve all prior tests and
+Current C3/U6 Add Part slice associates six controls, including the Type combobox
+trigger, with stable visible labels. Together with published job-line labels,
+twelve fields are explicitly associated. Actual-route DOM18/18 in30.97s, full
+normal TypeScript, ESLint0 errors/15 unchanged warnings and independent review
+pass; all prior16 tests and stock/pricing/payload/write/lifetime behavior retained.
+Same draft PR68/commit subject `Associate part editor controls with accessible labels`;
+exact publication in evidence comment, own-head required CI separate. No SQL/
+permission/live activation or real-role/device/full-CRM acceptance.
+[Exact source and limitations](evidence/SHOP_MANAGER_PART_LABELS.md).
+Parent7de40ba2 all six38971996346 Actions are now complete: actual5,034/96 files
+103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+
+Next independent critical source work is a private, unapplied combined inquiry/
+B2B hold correction: the retained inquiry writer omits Parts holds from its
+availability sum. Isolated selected-schema reproduction/correction is not current
+catalog, native authority, independent-session or all-writer/durable recovery
+acceptance. No historical migration replay or live stock write. Auth-source/
+QA/hosting STOPs, all18+N1–N3/47/12/5/2 and the at-risk22 October target remain.
+
+### Closed job-line checkpoint
+
+Independent C3/U6 Add job line label fix associates six controls with stable React
+IDs. Published7de40ba2870920a6e49892d2bd85e4e3437111e5/same draft PR68/comment
+6225360928, exact remote/body/title/base/draft/main preserved. Own build/type/OCR/
+lint/native/unit pass, all six38971996346 Actions. Actual unit117212338746 has
+5,034/96 files103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native all21 ordered markers/
+cleanup and current build/full artifact2,592 objects0missing verified separately;
+selected54/58/160ms not full/RTO,47 failures remain. Actual Preview skips upload.
+Existing follow-up exact prompt/identity/schedule/thread/creation read-back passes.
+Notes join next implementation, no docs-only push or inherited acceptance.
+Two appended real-route DOM regressions preserve all prior tests and
 business/lifetime logic. Root154/154 three suites41.68s, lint0 errors/15 retained
 legacy warnings, independent review, full normal TypeScript and nine-file format/
 diff pass; own-head CI pending. Same PR68/commit subject `Associate native job-line
