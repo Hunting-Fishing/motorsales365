@@ -169,6 +169,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs",
     ],
     [
+      "Locked single draft receipt line candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-edit-candidate.test.mjs",
+    ],
+    [
       "Native expense source parity and runner safety (offline, never quarantined)",
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs",
     ],
