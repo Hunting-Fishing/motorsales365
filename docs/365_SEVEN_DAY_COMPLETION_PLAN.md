@@ -2,6 +2,19 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Mixed inquiry/B2B reservation defect adds a required atomic-stock correction and
+native mixed-writer proof to the Day2 dependency, not a scope reduction. Root
+actual isolated SQL16/16 in14.6660125s now reproduces legacy10+8+5=13 and verifies
+private/unapplied candidate reject5/permit2. Actual selected NUMERIC/FKs/trigger/
+denial/rollback retained; synthetic owner/Auth support is not native authority.
+Mandatory serialized CI/wiring2/2 in93.3995ms/ESLint0 pass. Same PR68/publication
+waits for currentc59 unit, exact hash in comment. No app/grants/migration/live
+stock activation. [Exact frontier](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
+Next native independent-session wait/commit/rollback/mixed-writer races, current
+catalog/all-writer/native authority/TTL/durable outcomes/full recovery. Atomic
+stock milestone remains open; all18+N1–N3/47/12/5/2/stops/owner/main/live gates and
+at-risk22 October target retained. No defensible full-scope forecast yet.
+
 Current C3/U6 Add Part source joins the retained job-line fix: twelve associated
 label/control pairs, including the Type combobox. Root18/18 actual-route detail
 DOM tests in30.97s, full normal TypeScript/lint0 errors15 unchanged warnings and

@@ -12,6 +12,51 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current critical stock slice: mixed inquiry/B2B reservation mechanics.** Root
+actual isolated SQL16/16 in14.6660125s, zero fail/skip/cancel, reproduces legacy
+stock10+B2B8+inquiry5=13 and verifies the private candidate rejects5/permits2.
+Twelve whole retained-source pins/41 exact spans preserve12 complete retained
+tables plus one synthetic Auth id table,28 real FKs, actual NUMERIC(12,2),
+constraints and response trigger. Only Auth
+id/uid/manager support and owner invocation are synthetic, NOT native authority.
+One private INVOKER function changes only the matching inquiry; ordinary/service
+execution withheld, no old migration/function/app/stock/order/money activation.
+Exact source pins and limits: [mixed-hold evidence](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
+
+Mandatory non-quarantined single-worker CI is added; parsed-YAML exact unique/
+unconditional/non-continue-on-error wiring2/2 passes93.3995ms, changed-script
+ESLint0 findings. Review found a positive-test whole-target normalization gap;
+ONE bounded test-only whitelist correction preserves all unrelated target fields
+and independently asserts responded_at. No failed SQL trial occurred. One review
+agent reported capacity failure; the available independent reviewer completed the
+same read-only scope as the ONE safe alternative, no model/permission bypass.
+Native PG17 independent-session wait/commit/rollback/mixed-writer race proof is
+the next stock dependency; sequential PGlite is not that acceptance. Current
+catalog, all legacy/direct stock writers (including split adjustBusinessInventory),
+native authority, TTL/revocation and durable unknown-outcome/recovery gates remain.
+The Day2 atomic-stock milestone is still open; this necessary correction and its
+native proof add work to an already at-risk22 October target, not a scope cut.
+Same PR68/commit subject `Prepare private mixed stock reservation correction`;
+exact commit/publication in evidence comment. Hold publication untilc59 unit
+completes; no cancelling a running unit or inheriting its results.
+
+Published Add Part sourcec59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/
+comment6225907444; canonical remote/exact body/title/non-main base/draft/main
+preserved. Own38976025387 build/type/OCR/lint/native pass; unit still running at
+read-back, not all-six acceptance. Actual own untruncated native117225560643 has
+PG17.11/server170011/Parts247/quote6/all21 ordered expense/draft/Auth-user markers,
+terminators/EXIT+always-cleanup; full vector equals the admitted21, whose source
+is unchanged. Selected65/82/211ms not full/RTO,47 failures remain. Actual own
+Preview117225560832 configuration skips/no upload; production/migrations/Supabase
+Preview skip. New Workers117225619725 cause unverified, existing hosting STOP
+unchanged. Existing follow-up exact prompt/identity/schedule/thread/creation
+read-back passes. Actual build final214media/15OCR/202PDF/server-boundary/Worker+
+sole365/dry-run summaries verified (returned log truncated). Complete CI merge
+06e8f212394afc19017f358cefa2790bd5cccfdf equals candidate tree
+6ebdc3206b4b9dd3d8a336b744f7066d8d720b5e/2,594 current objects0missing, not
+history recovery. These notes join this stock implementation, not docs-only push
+while unit runs.
+
 **Current C3/U6 slice: accessible Add Part controls.** The two existing editors
 now have twelve explicitly associated label/control pairs: six job-line fields
 and six part fields, including the real Type combobox trigger. The Add Part slice

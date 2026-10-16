@@ -5,6 +5,24 @@ candidate and draft PR68. No database, permissions, financial/stock writer or
 deployment activation. Exact commit/publication is recorded in the same PR's
 evidence comment, subject `Associate part editor controls with accessible labels`.
 
+Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444;
+exact prior64,364-character body/title/non-main base/draft/main preserved. Own
+38976025387 build117225560656/type117225560644/OCR117225560784/lint117225560426/native117225560643
+pass; unit117225560774 still running at read-back, not all-six
+acceptance. Actual untruncated native PG17.11/server170011/Parts247/quote6/all21
+ordered expense/draft/Auth-user markers/both terminators/EXIT+always-cleanup pass;
+root compares complete vector to the admitted frozen21, unchanged source. Selected
+65/82/211ms is not full recovery/RTO;47 replay failures remain. Actual untruncated
+Preview117225560832 skips configuration/no upload; production/migrations/Supabase
+Preview skip. New Workers117225619725 fails with unverified cause; existing hosting
+STOP unchanged. Follow-up exact prompt/identity/active30min/thread/creation
+read-back passes. These notes join next implementation without docs-only push
+while unit runs. Actual own build final214media/15OCR/202PDF/server-boundary/
+canonical Worker+sole365/dry-run summaries pass (returned log truncated). COMPLETE
+CI merge06e8f212394afc19017f358cefa2790bd5cccfdf equals candidate tree
+6ebdc3206b4b9dd3d8a336b744f7066d8d720b5e/2,594 current objects0missing, not
+history recovery. These notes join the mixed-stock implementation.
+
 ## Correction and preservation
 
 The existing Add Part dialog had six visible labels with no explicit control

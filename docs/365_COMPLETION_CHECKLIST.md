@@ -42,6 +42,32 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Current independent stock slice is private/unapplied mixed inquiry+B2B hold
+correction, actual isolated SQL16/16 in14.6660125s, zero fail/skip/cancel. Legacy
+10+8+5=13 reproduces; candidate rejects5/permits2 with real selected NUMERIC/
+28FK/trigger/late-fault rollback and ordinary/service denial.12 complete retained
+tables plus one synthetic Auth id table/12 whole pins/41 spans, no invented
+stock/business/order DDL. Owner/GUC Auth
+support is synthetic, no native authority or app/grant/migration activation.
+Mandatory serialized non-quarantined CI/wiring2/2 in93.3995ms and changed-script
+ESLint0 pass; one test-only review correction narrows target normalization.
+Same PR68/commit subject `Prepare private mixed stock reservation correction`;
+hold publication untilc59 unit completes, exact hash in evidence comment.
+Next native independent-session mixed-writer wait/commit/rollback, then current
+catalog/all-writer/native authority/TTL/durable outcome/full recovery acceptance.
+Atomic stock Day2 remains open;22 October still at risk, no scope cut.
+[Exact scope, pins and limits](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
+
+Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444,
+exact prior body/title/base/draft/main preserved. Own build/type/OCR/lint/native
+pass, unit pending, no all-six claim. Actual untruncated native117225560643 proves
+PG17.11/Parts247/quote6/all21 exact ordered expense markers/terminators/cleanup,
+vector equals unchanged admitted21. Selected65/82/211ms not full/RTO;47 failures
+remain. Actual Preview skips upload; hosting STOP unchanged. Follow-up identity/
+schedule/thread/creation/exact prompt retained. Actual build guards and complete
+current CI merge06e8f212…=candidate tree6ebdc320…/2,594 objects0missing verified,
+not history recovery. No docs-only push while unit runs.
+
 Current C3/U6 Add Part slice associates six controls, including the Type combobox
 trigger, with stable visible labels. Together with published job-line labels,
 twelve fields are explicitly associated. Actual-route DOM18/18 in30.97s, full

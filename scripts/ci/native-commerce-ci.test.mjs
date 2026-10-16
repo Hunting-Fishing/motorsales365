@@ -245,6 +245,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1",
     ],
     [
+      "Mixed inquiry and B2B stock reservation candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

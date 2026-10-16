@@ -10,6 +10,35 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Current stock prerequisite implements a private/unapplied INVOKER mixed-hold
+candidate, not an accepted stock workflow. Root actual isolated SQL16/16 in
+14.6660125s reproduces the old inquiry-only10+8+5=13 admission and corrected
+reject5/permit2.12 complete retained tables plus one synthetic Auth id table,
+12 pins/41 spans retain actual NUMERIC(12,2),28FKs/checks/response trigger;
+owner/id-only Auth/GUC/manager support is synthetic.
+Ordinary/service denial, exact binding/lifecycle/decimals, suppressed/rewritten
+ack/inventory fault, real lateFK and outer rollback/full selected graph equality
+pass. One test-only review correction replaces whole-target normalization with
+seven-field whitelist. Serialized mandatory CI/wiring2/2 in93.3995ms/ESLint0
+pass; native/timeouts/quarantine/coverage unchanged. Same PR68/commit subject
+`Prepare private mixed stock reservation correction`, exact hash in comment;
+publication waits for currentc59 unit completion. No app/old source/grants/
+migration/live activation. Next actual native mixed-writer independent sessions,
+current catalog/all-writer/native authority/TTL/durable unknown outcome/recovery
+acceptance; selected sequential mechanics are not global no-oversell or release.
+All18+N1–N3/47/12/5/2/stops/main gates remain; Day2 stock and22 October risk open.
+[Exact source/validation frontier](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
+
+Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444,
+exact body/title/non-main base/draft/main retained. Own build/type/OCR/lint/native
+pass, unit pending, no all-six claim. Actual native117225560643 untruncated PG17.11/
+Parts247/quote6/all21 exact ordered markers/terminators/cleanup matches admitted
+unchanged21; selected65/82/211ms not full/RTO,47 failures remain. Actual Preview
+configuration skips/no upload; production/migrations skip, hosting STOP unchanged.
+Existing follow-up exact prompt/identity/schedule/thread/creation preserved.
+Actual build guards/current CI tree2,594 objects0missing verified, not history
+recovery. Read-back notes join stock implementation, no docs-only unit cancellation.
+
 Current C3/U6 Add Part source binds six visible labels to native controls,
 including Type's actual Radix combobox button. Together with retained Add job
 line labels, twelve controls are associated; no C3/U6 workflow is marked complete.

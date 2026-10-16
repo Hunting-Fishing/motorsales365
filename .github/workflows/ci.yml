@@ -81,6 +81,9 @@ jobs:
       - name: Buddy delivery handoff contract (offline, never quarantined)
         run: npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1
 
+      - name: Mixed inquiry and B2B stock reservation candidate (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db

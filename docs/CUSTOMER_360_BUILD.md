@@ -2,6 +2,17 @@
 
 ## Current delivery authority (17 October 2026)
 
+Current independent atomic-stock prerequisite counts both inquiry/B2B holds in
+one private/unapplied INVOKER candidate. Root isolated SQL16/16 in14.6660125s
+reproduces legacy10+8+5=13 and candidate reject5/permit2, with actual selected
+NUMERIC/FK/trigger/denial/rollback controls. Owner/GUC/Auth support is synthetic,
+not CRM/native authority. Mandatory CI/wiring2/2 in93.3995ms and ESLint0 pass;
+same PR68, publication waits for currentc59 unit, exact hash in evidence comment.
+[Exact selected scope](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md). No app/
+grants/migration/stock/payment activation. Native independent-session mixed-writer
+proof, all-writer/current catalog/native authority/TTL/durable recovery remain
+before connection; no fullCRM/global no-oversell/consumer ordering completion.
+
 Current Add Part source complements the published Add job line correction:
 twelve fields now have explicit visible-label associations, including Type's
 native combobox trigger. Root18/18 detail DOM tests in30.97s, full normal
