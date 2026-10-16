@@ -2,7 +2,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
-import { captureNativeRequestCaller } from "./native-request-caller.server";
+import {
+  captureNativeCommandCaller,
+  captureNativeRequestCaller,
+} from "./native-request-caller.server";
 import {
   receiptLinesRequestSchema,
   RECEIPT_LINES_FAILURE,
@@ -703,7 +706,8 @@ export const recordVehicleReceiptExpense = createServerFn({ method: "POST" })
     if (context?.userId !== intent.expectedAccountId)
       throw new Error("Account changed. Refresh before recording a receipt expense.");
     try {
-      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      // Denial-only session custody; this does not authorize or replace the legacy RPC.
+      const caller = captureNativeCommandCaller(context, intent.expectedAccountId);
       const request = getRequest();
       const assertCurrent = await caller.verify(request);
       assertCurrent();

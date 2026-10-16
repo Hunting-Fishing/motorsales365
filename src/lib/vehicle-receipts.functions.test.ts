@@ -57,6 +57,19 @@ const account = uid(1),
   receiptId = uid(4),
   itemId = uid(5);
 const token = "fixture.access.token";
+// Synthetic verified claims, not a signed credential or live session fixture.
+const issuedAt = Math.floor(Date.now() / 1_000) - 60;
+const commandClaims = () => ({
+  sub: account,
+  role: "authenticated",
+  is_anonymous: false,
+  iss: "https://wjxaajgvddtrxxtocxen.supabase.co/auth/v1",
+  aud: "authenticated",
+  session_id: uid(98),
+  iat: issuedAt,
+  exp: issuedAt + 86_400,
+  aal: "aal1",
+});
 const receiptFailure = "Could not load this vehicle's receipts. Refresh and try again.";
 const linkFailure = "Could not load this vehicle's shop connections. Refresh and try again.";
 const privatePath = `${uid(99)}/${receiptId}/original.pdf`;
@@ -306,9 +319,13 @@ function client(
   });
   return {
     auth: {
+      getClaims: vi.fn(
+        (_token: string): Promise<unknown> =>
+          Promise.resolve({ data: { claims: commandClaims() }, error: null }),
+      ),
       getUser: vi.fn(
         (_token: string): Promise<unknown> =>
-          Promise.resolve({ data: { user: { id: account } }, error: null }),
+          Promise.resolve({ data: { user: { id: account, is_anonymous: false } }, error: null }),
       ),
     },
     from: vi.fn((table: string) =>
@@ -351,7 +368,7 @@ function client(
 }
 const context = (supabase: ReturnType<typeof client>) => ({
   userId: account,
-  claims: { sub: account, role: "authenticated", is_anonymous: false },
+  claims: commandClaims(),
   supabase,
 });
 async function receipts(data: unknown, ctx: unknown) {
@@ -1475,7 +1492,11 @@ describe("receipt expense caller and transport boundary", () => {
     await expect(receiptExpense(expenseRequest(), context(caller))).resolves.toEqual(
       expenseAcknowledgment(),
     );
+    expect(caller.auth.getClaims).toHaveBeenCalledExactlyOnceWith(token);
     expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.auth.getClaims.mock.invocationCallOrder[0]).toBeLessThan(
+      caller.auth.getUser.mock.invocationCallOrder[0],
+    );
     expect(caller.from).toHaveBeenCalledExactlyOnceWith("vehicle_receipts");
     expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("record_vehicle_receipt_expense", {
       _id: receiptId,
@@ -1511,6 +1532,157 @@ describe("receipt expense caller and transport boundary", () => {
     expect(result).toEqual(expenseAcknowledgment());
     expect(Object.isFrozen(result)).toBe(true);
   });
+
+  it.each([
+    ["session_id", uid(97)],
+    ["iss", "https://another-project.example/auth/v1"],
+    ["aud", "service_role"],
+    ["iat", issuedAt - 1],
+    ["exp", issuedAt + 86_399],
+    ["aal", "aal2"],
+    ["nbf", issuedAt],
+    ["is_anonymous", true],
+  ] as const)(
+    "denies same-account request credentials with different verified %s before target/native dispatch",
+    async (field, value) => {
+      const caller = client();
+      caller.auth.getClaims.mockResolvedValue({
+        data: { claims: { ...commandClaims(), [field]: value } },
+        error: null,
+      });
+      await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+        RECEIPT_EXPENSE_FAILURE,
+      );
+      expect(caller.auth.getClaims).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it("does not adopt a different session for the same account from getRequest", async () => {
+    const caller = client();
+    caller.auth.getClaims.mockImplementation((credential: string) =>
+      Promise.resolve({
+        data: {
+          claims: {
+            ...commandClaims(),
+            session_id: credential === token ? uid(98) : uid(97),
+          },
+        },
+        error: null,
+      }),
+    );
+    mocks.request.mockImplementationOnce(() => ({
+      ...currentRequest(),
+      headers: new Headers({ authorization: "Bearer changed.access.token" }),
+    }));
+    await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+      RECEIPT_EXPENSE_FAILURE,
+    );
+    expect(caller.auth.getClaims).toHaveBeenCalledExactlyOnceWith("changed.access.token");
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it.each(["session_id", "iss", "aud", "iat", "exp", "aal", "nbf"] as const)(
+    "captures middleware %s before getRequest rather than adopting hook changes",
+    async (field) => {
+      const caller = client(),
+        ctx = context(caller);
+      mocks.request.mockImplementationOnce(() => {
+        Object.assign(ctx.claims, { [field]: field === "session_id" ? uid(97) : "PRIVATE" });
+        return currentRequest();
+      });
+      await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      expect(caller.auth.getClaims).not.toHaveBeenCalled();
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  for (const phase of ["expenseTarget", "expense"] as const) {
+    it.each(["session_id", "iss", "aud", "iat", "exp", "aal", "nbf", "getClaims"] as const)(
+      `denies %s mutation at ${phase} result without returning a financial acknowledgment`,
+      async (field) => {
+        const caller = client({
+            onResult: (read) => {
+              if (read.stage !== phase) return;
+              if (field === "getClaims") {
+                caller.auth.getClaims = vi.fn(() =>
+                  Promise.resolve({ data: { claims: commandClaims() }, error: null }),
+                );
+              } else {
+                Object.assign(ctx.claims, {
+                  [field]: field === "session_id" ? uid(97) : "PRIVATE",
+                });
+              }
+            },
+          }),
+          ctx = context(caller);
+        await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(
+          RECEIPT_EXPENSE_FAILURE,
+        );
+        expect(caller.auth.getClaims).toHaveBeenCalledTimes(field === "getClaims" ? 0 : 1);
+        if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
+        else expect(caller.rpc).toHaveBeenCalledTimes(1);
+        // A rejected post-dispatch acknowledgment is unknown, not proof of rollback.
+      },
+    );
+
+    it(`rejects expiry during ${phase} wait without refreshing credentials or claiming rollback`, async () => {
+      vi.useFakeTimers();
+      const pending = deferred<Response>(),
+        caller = client({ responses: { [phase]: pending.promise } }),
+        ctx = context(caller);
+      ctx.claims.exp = Math.floor(Date.now() / 1_000) + 2;
+      caller.auth.getClaims.mockResolvedValue({ data: { claims: { ...ctx.claims } }, error: null });
+      const result = receiptExpense(expenseRequest(), ctx);
+      const assertion = expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      await vi.waitFor(() => expect(caller.reads.map((read) => read.stage)).toContain(phase));
+      await vi.advanceTimersByTimeAsync(2_000);
+      pending.resolve({
+        data:
+          phase === "expenseTarget" ? { id: receiptId, shop_vehicle_id: shopVehicle } : expenseId,
+        error: null,
+      });
+      await assertion;
+      expect(caller.auth.getClaims).toHaveBeenCalledTimes(1);
+      expect(caller.auth.getUser).toHaveBeenCalledTimes(1);
+      if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
+      else expect(caller.rpc).toHaveBeenCalledTimes(1);
+    });
+  }
+
+  it.each(["resolve", "reject"] as const)(
+    "bounds both Auth operations to one ten-second wait and observes late getUser %s",
+    async (settlement) => {
+      vi.useFakeTimers();
+      const claims = deferred<unknown>(),
+        user = deferred<unknown>(),
+        caller = client();
+      caller.auth.getClaims.mockReturnValue(claims.promise);
+      caller.auth.getUser.mockReturnValue(user.promise);
+      const result = receiptExpense(expenseRequest(), context(caller));
+      const assertion = expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      await vi.advanceTimersByTimeAsync(6_000);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      claims.resolve({ data: { claims: commandClaims() }, error: null });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      await vi.advanceTimersByTimeAsync(4_000);
+      await assertion;
+      if (settlement === "resolve")
+        user.resolve({ data: { user: { id: account, is_anonymous: false } }, error: null });
+      else user.reject(new Error("PRIVATE late current-record response"));
+      await Promise.resolve();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
 
   it.each([
     null,
@@ -1613,6 +1785,7 @@ describe("receipt expense caller and transport boundary", () => {
     { data: { user: null }, error: null },
     { data: { user: { id: uid(9) } }, error: null },
     { data: { user: { id: account, is_anonymous: true } }, error: null },
+    { data: { user: { id: account } }, error: null },
     { data: { user: { id: account } }, error: { message: "PRIVATE Auth" } },
   ])("refuses unconfirmed expense current Auth: %j", async (response) => {
     const caller = client();
@@ -1669,6 +1842,7 @@ describe("receipt expense caller and transport boundary", () => {
       mocks.request.mockReturnValue(request);
       caller.auth.getUser.mockReturnValue(pending.promise);
       const result = receiptExpense(expenseRequest(), ctx);
+      await vi.waitFor(() => expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token));
       loseCaller(ctx, loss, request);
       pending.resolve({ data: { user: { id: account } }, error: null });
       await expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
