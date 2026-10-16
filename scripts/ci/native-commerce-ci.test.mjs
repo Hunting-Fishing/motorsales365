@@ -237,6 +237,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test scripts/ci/auth-session-catalog-review.test.mjs",
     ],
     [
+      "Auth provider migration-version provenance (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/auth-provider-migration-review.test.mjs",
+    ],
+    [
       "Buddy delivery handoff contract (offline, never quarantined)",
       "npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1",
     ],

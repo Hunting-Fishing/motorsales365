@@ -1,5 +1,16 @@
 # One bounded native recovery alternative
 
+Selected trial now PASSES at source49008932/publication28295c1001f7e8a3280a12ab6569588bc435bfee,
+same draft PR68/comment6223834920. Actual native117174018706/run38960489710 is
+untruncated PG17.11/Parts247/quote6/selected recovery/all21 ordered expense/draft/
+Auth-user proofs/terminators/EXIT+always-cleanup. Alternative1 is consumed;
+original source-stop cause remains unconfirmed. No second guessed repair if it
+recurs. Bounded50/75/166ms is not full recovery/RTO;47 failures remain. Build/type/
+OCR/lint pass, unit117174018596 running, no cancellation/inherited acceptance.
+Current next provider-version prerequisite and exact limits:
+[AUTH_PROVIDER_VERSION_PREREQUISITE.md](AUTH_PROVIDER_VERSION_PREREQUISITE.md).
+Older preparation/failure/hold statements below are historical, not a new retry.
+
 17 October 2026, Asia/Manila. Same integrated candidate/draft PR68. This is the
 ONE selected safe alternative for the20dd5a3e native recovery failure, not a
 confirmed root-cause fix or accepted restore. No new native trial has run yet.

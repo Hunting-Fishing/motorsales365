@@ -42,6 +42,31 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Current provider-version source prerequisite follows actual28295c10 native21
+success: untruncated job117174018706/run38960489710 proves PG17.11/Parts247/quote6/
+selected recovery/all21 ordered markers/terminators/cleanup. Alternative1 consumed
+and selected trial passes; original cause unconfirmed. No repeat/second repair
+for recurrence. Bounded50/75/166ms not full/RTO;47 failures retained. Own build/
+type/OCR/lint pass, unit117174018596 running; no cancellation/inherited pass.
+
+Actual bounded sole365 READ ONLY migration-VERSION observation recovers82 IDs,
+including00, complete/nontruncated/zero invalid/duplicate; query8832dd2c… and
+JSONd845ba39… pinned. No users/sessions/keys/config reads, all provider-version/
+body/baseline/authority/release flags false. Local19/19 three-suite gate passes
+in2.1727946s after reviewed parsed-YAML mandatory-step correction;
+mandatory serialized non-quarantined CI added, no limits/coverage relaxation.
+Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
+hold source publication until282 unit completes, exact commit in PR comment.
+Unit log117174018596 initial+ONE same-tool retry returned HTTP502; retrieval
+STOPPED/owner notified once. Completion status may clear hold without log count/
+runtime claim; no unchanged log retry/CLI/dashboard fallback.
+Next pinned upstream/bootstrap/body mapping and reviewed native Auth isolation,
+not ordinary Auth grants/admin fallback/another wrapper or synthetic authority.
+All scope/47/12/5/2/stops/owner/device/main/live gates and deadline risk retained.
+[Exact native/metadata evidence](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
+
+### Historical recovery publication and initial failure checkpoints
+
 Current ONE recovery alternative source490089329470d771b382f5c111544b45cbc1a538
 is verified unchanged at reviewed hashes,23/23 local validation not rerun.
 Parent20dd unit117153435216 now passes actual5,032/96 files90.94s, zero unexpected/
@@ -52,7 +77,7 @@ expense21/terminators/cleanup. New-head required gates are separate. If alternat
 fails STOP/notify once; no second guessed repair or old-job rerun. No app/live/
 permissions/main/Buddy/366 change, no unchanged tests, all release gates retained.
 
-### Auth-user ordering / initial recovery failure checkpoint
+### Historical Auth-user ordering / initial recovery failure checkpoint
 
 Publication20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
 draft PR68/comment6223011064, exact body/title/base/draft/main preserved. Own build/

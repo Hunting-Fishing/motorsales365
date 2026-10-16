@@ -12,7 +12,51 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
-**Current slice: ONE native recovery PID-exit alternative.**
+**Current slice: provider migration-version provenance after native21 success.**
+Recovery source49008932/publication28295c1001f7e8a3280a12ab6569588bc435bfee is
+verified same canonical branch/draft PR68/comment6223834920, exact body/title/
+base/draft/main preserved. Actual own native117174018706/run38960489710 passes
+untruncated PG17.11/server170011/Parts247/quote6/selected recovery/all21 exact
+ordered expense+draft+Auth-user markers/terminators/EXIT+always-cleanup. Root
+compared full actual vector to the required shell list. Alternative1 consumed,
+selected trial passed; original failure cause still unconfirmed. No unchanged
+rerun or second guessed repair if the same source-stop failure recurs. Bounded
+dump50/restore75/verify166ms is NOT full recovery/RTO;47 replay failures remain.
+Own build/type/OCR/lint pass, unit117174018596 running; no cancellation or inherited
+new-head passes. Preview success is a verified configuration skip
+(`DEPLOY_VIA_ACTIONS` not true), not upload/deployment; production/migrations skip.
+Workersaa067e57 fails cause unverified, hosting STOP unchanged.
+
+The next independent provenance slice implements a bounded READ ONLY provider
+version query and mandatory serialized offline gate. Actual sole365 observation
+2026-10-16T20:23:01.943209UTC/server170006 captures82 distinct canonical version
+IDs, including legitimate00; complete/nontruncated, zero unexpected/duplicates.
+No Auth users/sessions/keys/config rows. Query8832dd2c…/JSONd845ba39… pinned, all
+service-version/body/baseline/session-authority/release flags FALSE. Review-driven
+RLS-active/C-byte refusal prevents partial-reader metadata certification. Final
+local19/19 three-suite model/capture/privacy/wiring gate passes in2.1727946s after
+one reviewed parsed-YAML mandatory-step guard correction; no unchanged
+23/111/app suite. Existing baseline manifest/pins/flags remain unchanged.
+Source publication must wait for282 unit completion; no docs-only cancellation.
+Unit log117174018596 returned HTTP502 initially and after ONE same-tool retry;
+that log read is STOPPED. Completion status can clear the hold without inventing
+count/runtime or retrying the log; no CLI/dashboard fallback. Record fresh status.
+Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
+exact source/publication will be in its evidence comment.
+[Exact observation, native proof and limits](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
+
+Next exact-head completed checks, immutable upstream/bootstrap/body mapping of82
+version IDs, then reviewed fresh Docker-free native Auth API isolation. A numeric
+version ledger does NOT identify hosted Auth binary or prove migration bodies.
+Current original-human/session/native-shop positive admission remains blocked by
+reviewed provider lifecycle/config and native membership/revocation privilege
+boundary; do not duplicate getUser wrappers or add Auth grants/admin fallback.
+No native Auth binary ran/installed here, no schema repair/app activation/live/
+main/Buddy/366/deployment. All18+N1–N3,47/12/5/2, QA/hosting/device/owner/recovery
+gates and22 October risk remain.
+
+### Historical recovery single-alternative publication checkpoint
+
 Reviewed source490089329470d771b382f5c111544b45cbc1a538 is verified unchanged:
 shellbe5d8000…/test8ebd8263…, original57a5e3f8… reconstructs exactly. Parent20dd
 unit117153435216 now completes: actual5,032/96 files90.94s, zero unexpected/
@@ -28,7 +72,7 @@ admission. No unchanged23/111/app tests; no main/hosted/Buddy/366/deployment cha
 All scope/stops/47/12/5/2 and22 October risk remain. Independent source/read-only
 review confirms no permissions, signal, final absence or cleanup weakening.
 
-### Auth-user ordering / initial recovery failure checkpoint
+### Historical Auth-user ordering / initial recovery failure checkpoint
 
 Published20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified on
 canonical branch/same draft PR68/comment6223011064; exact body/title/base/draft/
@@ -341,6 +385,22 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
 | Cloudflare build remediation         | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried. | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
 | Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                    | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
 | Parent40fd9aee unit log retrieval    | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                    | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
+
+Unit log117174018596 at28295c10: initial HTTP502 plus ONE same-tool retry also502
+on2026-10-16T20:34UTC. Retrieval STOPPED and owner notified once. Do not repeat the
+unchanged read or use CLI/dashboard logs. A later completed exact-head status can
+clear the publication hold without a fresh count/runtime; actual log access needs
+new provider/access evidence or owner direction. The19/19 local slice is not a
+substitute for this full unit job. All other independent lanes remain available.
+
+Native recovery attempt20dd failed; alternative1 is consumed and PASSES actual
+28295c10 native117174018706. This selected dependency is closed, not an active
+stop or confirmed original cause. If the same source-stop failure recurs, STOP
+without a second guessed repair and require new sanitized substage/config/access
+evidence or owner direction. Separate native authority/full recovery gates remain.
+Upstream Auth directory/API listing research exhausted its initial+one safe
+alternative and that fetch path is stopped; individually available primary raw
+files are not complete repository recovery. Do not repeat that unchanged path.
 
 ## One scope and dependency board
 

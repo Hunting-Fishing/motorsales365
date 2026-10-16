@@ -10,6 +10,34 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Actual28295c10 native117174018706/run38960489710 passes untruncated PG17.11/
+Parts247/quote6/selected recovery/all21 ordered expense/draft/Auth-user proofs/
+terminators/cleanup, not parent/model-inferred. Alternative1 consumed and selected
+trial passes; cause remains unconfirmed, no second repair for recurrence. Bounded
+50/75/166ms not full/RTO;47 failures remain. Own build/type/OCR/lint pass, unit
+117174018596 running; no inherited/new-head pass or cancellation. Same PR68/exact
+prior body/title/non-main base/draft/main preserved; hosting/QA stops unchanged.
+
+Next independent provider-version query source captures82 actual sole365 IDs
+(including00) at2026-10-16T20:23:01.943209UTC/server170006, complete/nontruncated/
+zero invalid/duplicate, no user/session/key/config data. Query8832dd2c…/JSONd845ba39…
+pinned, all service/body/baseline/authority/release flags false. Final19/19 three-
+suite model/capture/privacy/wiring passes in2.1727946s after parsed-YAML mandatory-
+step correction; mandatory serialized offline CI gate,
+normal limits/adversarial/transaction coverage preserved. Hold source publication
+until282 unit finishes, same PR68/commit subject `Capture bounded Auth provider
+migration-version provenance`; exact commit in evidence comment. Unit log
+117174018596 initial+ONE same-tool retry HTTP502: retrieval STOPPED/owner notified
+once, no unchanged read/fallback. Completed exact-head status can clear hold
+without fresh count/runtime. Next immutable
+upstream/bootstrap/body correspondence and reviewed native Auth isolation,
+original-human/native membership/revocation boundary and all-writer/durable proof.
+No Auth grants/admin fallback/app/live/main/Buddy/366 changes. All scope/47/12/5/2/
+stops/device/owner/full recovery/release risk remain.
+[Exact native proof and metadata limits](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
+
+### Historical recovery publication and initial failure checkpoints
+
 Current ONE recovery alternative source490089329470d771b382f5c111544b45cbc1a538
 is verified at frozen shell/test hashes;23/23 offline validation unchanged.
 Parent20dd unit117153435216 now completes, actual5,032/96 files90.94s, zero
@@ -20,7 +48,7 @@ recovery/expense21/terminators/cleanup and required CI; no inherited acceptance.
 If alternative fails STOP/notify once, no second guessed repair/old-job rerun.
 All scope,47/12/5/2, QA/hosting/authority/device/owner/main/live gates retained.
 
-### Auth-user ordering / initial recovery failure checkpoint
+### Historical Auth-user ordering / initial recovery failure checkpoint
 
 Published20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
 draft PR68/comment6223011064 with exact prior body/title/base/draft/main preserved.

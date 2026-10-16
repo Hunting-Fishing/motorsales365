@@ -75,6 +75,9 @@ jobs:
       - name: Native Auth session catalog privacy and dependencies (offline, never quarantined)
         run: node --test scripts/ci/auth-session-catalog-review.test.mjs
 
+      - name: Auth provider migration-version provenance (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/auth-provider-migration-review.test.mjs
+
       - name: Buddy delivery handoff contract (offline, never quarantined)
         run: npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1
 
