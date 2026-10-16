@@ -23,7 +23,8 @@ valid substitute; mocks or live disposable testing do not satisfy them. The
 owner subsequently requested maximum Docker-free work and authorized a dedicated
 QA login. Reviewed native-PostgreSQL17 Parts CI is committed at `166ff0c4`, with
 the same adversarial SQL/roles/stub/no-SKIP coverage and private scoped cleanup.
-Offline wiring passes; actual Linux installation/SQL/cleanup needs new-head CI.
+Offline wiring and published `bf091dc7` Linux installation/SQL/cleanup pass;
+all 247 Parts assertions ran on native PostgreSQL 17.11 without Docker.
 Validate that Docker-free candidate, not an older containerized workflow. Do not
 silently remove coverage. Earlier Docker-access requests below are
 historical and superseded. The existing recurring follow-up is updated, unchanged
@@ -53,7 +54,23 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest quote-detail/build-freeze/Docker-free CI slice: `166ff0c4`, same branch/draft PR #68; source commit
+Latest creation caller slice: `bcc253507d65294d5dc73f37b39e91c13e7c87d8`, same
+branch/draft PR #68. Quote/work-order creation now uses account/mount-scoped bounded
+options, fresh selected-record revalidation, exact returned identities/values and
+mounted uncertainty holds. Invalid quote shop/type/tax representation mappings are
+corrected; text encoding/resource checks precede dispatch, and abandoned renders
+do not cancel committed quote saves. Quote 84/84 and work-order 89/89 pass;
+combined creation/security run 183/183 (18.68s), full TypeScript, five-file changed
+line lint and independent final review pass. Mandatory creation CI wiring passes
+2/2. Exact artifact/publication results and limits are in
+`evidence/NATIVE_COMMERCE_CREATION_READINESS.md`.
+No SQL/ACL, live business/Auth write, email, upload or deployment. C3.02–C3.04
+remain unfinished: browser preflight/acknowledgments are not fresh native authority,
+atomic header/items/scope, durable retry, stock/financial/recovery or owner proof.
+Next is the complete authorized C3.02 quote transaction and shared authority/
+API/private-storage/restore acceptance, not repeated reader-only tests.
+
+Prior quote-detail/build-freeze/Docker-free CI slice: `166ff0c4`, same branch/draft PR #68; source commit
 and exact final checks are in `evidence/NATIVE_QUOTE_DETAIL_READINESS.md`.
 Fresh matching primary/item read lifetimes, complete fixed projections, 101/100
 visible bounds/counts, generic independent retry and native received-value/date
@@ -78,6 +95,24 @@ No password/OTP/keys in chat. Initial setup may invoke existing confirmation/
 welcome/onboarding paths; no customer outreach or new email adapter activation.
 Standard Auth/org ownership does not grant trusted native-shop authority. Pilot
 synthetic shop, least-privilege membership and QA session remain unverified.
+
+Published evidence head `bf091dc7` is verified on the canonical remote, same draft
+PR #68; main unchanged. Actual Docker-free Parts CI passed in run `38833837897`,
+job `116758376432`: native PGDG PostgreSQL 17.11 and all 247 adversarial assertions.
+Native install/private-cluster/cleanup steps passed. The retained replay reports
+47 local migration failures, so this is Parts SQL coverage, not whole baseline/
+replay or Supabase API/Auth/Storage/restore acceptance. Lint/OCR/typecheck also
+passed at capture; build and unit subsequently passed, completing all six Actions
+gates on `bf091dc7`. Linux application tests pass 2,422/2,422 across 77 files
+(69.02s); the report checker records zero unexpected or quarantined failures.
+The security scanner file passes 10/10 (118ms); Windows full-run failure remains
+recorded, not fixed by this Linux result. Wrapper migration/production and
+Supabase Preview skipped; independent Workers build
+`42f57dc7-de56-48cd-8cc3-3e2518596bc0` failed. Authenticated current-head hosting
+logs confirm automatic `bun install --frozen-lockfile` fails before npm build or
+version upload; the source freeze was not reached. Verify current
+exact-head checks; no deployment claim. These follow-up CI notes are local until
+the next integrated commit; new source still needs its own exact-head checks.
 
 The unsafe browser quote-conversion handler is removed from the unreleased
 candidate. Its disabled button explicitly awaits an authorized atomic writer;

@@ -6,7 +6,9 @@ Owner directive, 16 October: no Docker. Do not install/start/use Docker, pull
 images or repeat the Docker Desktop setup request. Use Docker-free validation
 without waiving real API/Auth/private-storage/transaction/restore gates. Existing
 native-PG17 Parts CI is committed at `166ff0c4` and passes offline wiring/syntax/
-review; actual new-head Linux runtime remains pending. Validate that Docker-free
+review. Published `bf091dc7` native Linux Parts CI passes all 247 assertions on
+PostgreSQL 17.11 with successful scoped cleanup; 47 retained migration replay
+failures still prevent whole baseline/API/Auth/Storage/restore proof. Validate that Docker-free
 candidate, not older containerized jobs, while retaining SQL coverage. The owner
 authorized a dedicated QA login and supplied controlled email choices. One is
 already registered; preserve personal/staff identities, and use a separate standard
@@ -73,6 +75,18 @@ recorded-unapplied and two recorded embedded executions. Mapping remains 404/423
 classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
+
+Creation caller slice `bcc25350` adds 84 quote and 89 work-order route tests;
+combined security/creation 183/183, full TypeScript/lint/review and mandatory
+creation CI wiring pass. Scoped selection, native scalar/type compatibility,
+exact receipts and uncertain-save handling improve the actual forms but do not
+complete C3.02–C3.04 atomic/native authority/recovery gates. Evidence and next
+backend dependency: `evidence/NATIVE_COMMERCE_CREATION_READINESS.md`.
+Prior published `bf091dc7` now passes all six Actions gates, including Linux
+application 2,422/2,422 (77 files,69.02s). The Windows scanner timeout remains
+separate. Authenticated `bf091dc7` hosting still fails automatic Bun install
+before build/upload; no remediation or release is activated. New source requires
+its own exact-head CI, not the prior green result.
 
 Inactive Auth reservation/receipt and bounded fake-provider modules at `0271fc09`
 pass focused 550/550; full application 2,043/2,043 and TypeScript pass. These are

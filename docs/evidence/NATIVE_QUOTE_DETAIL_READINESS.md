@@ -147,7 +147,7 @@ confirm the selected flags; syntax and offline wiring checks pass. Combined
 freeze/wiring regressions at the committed source pass 12/12 (1.106s), including
 the native-PG17 path. No packages/server/container were installed or started
 locally. Actual Linux installation, extensions, cluster cleanup and adversarial
-SQL acceptance remain pending the new exact-head CI job. Docker-free Parts SQL
+SQL were pending at source-commit capture; see the later accepted CI run below. Docker-free Parts SQL
 coverage still does not provide real Supabase Auth, API or private Storage.
 
 Focused actual-route/real QueryClient tests pass **108/108** (10.66s), with
@@ -194,15 +194,42 @@ script or workflow was weakened; earlier failed runs remain part of this record.
 
 ## Deployment, next dependency and blockers
 
+Subsequent exact published head `bf091dc7bdecf2a7a024c9d1db9a999344ad3bba` is
+verified on the canonical remote; main remains unchanged. [Native Parts CI job](https://github.com/Hunting-Fishing/motorsales365/actions/runs/38833837897/job/116758376432)
+completed successfully. Purpose-built CI diagnostics supplied the complete job
+log, including PGDG package `17.11-1.pgdg24.04+2`, PostgreSQL/psql 17.11, private
+cluster execution and all 247 adversarial assertions. Always cleanup passed.
+No Docker service/container was used. Retained replay reports **47 local migration
+failures**; unchanged tolerant harness semantics do not prove baseline/schema/
+replay, Auth/API/Storage or database/private-object recovery. Those gates stay open.
+
+At the same exact-head check lint, OCR and full TypeScript passed; build and unit
+later passed, completing all six Actions gates. The final unit log tail confirms
+Linux application **2,422/2,422 across 77 files (69.02s)**, source scanner file
+10/10 at 118ms, and report-checker zero unexpected/quarantined failures. The
+purpose-tool log is truncated overall; these explicit final summary lines and
+successful job are present, not an assertion that the entire log was retrieved.
+This Linux pass does not erase the failed Windows full run or prove its cause.
+Two earlier attempted purpose-tool unit-log reads
+returned provider HTTP 502; no alternate CLI diagnostics or test pass is inferred.
+Wrapper `38833837904` migration/production skipped and Supabase
+Preview skipped. Independent Workers build `42f57dc7-de56-48cd-8cc3-3e2518596bc0`
+failed. A subsequent authenticated browser read of that exact-head build confirms
+17 seconds, automatic `bun install --frozen-lockfile`, and frozen-lockfile changes
+failure before configured npm build/version upload. The source freeze was not
+reached. Build variables remain shown as None; no settings, retry, token or
+lockfile change was made. No upload or live revision is inferred. Recheck current exact-head
+results, not old green. These follow-up notes are local pending the next integrated
+commit; new source still needs its own exact-head checks.
+
 Subsequent owner directive, 16 October: no Docker. No Docker installation/start/
 use or image pulls; do not ask the owner to open Docker Desktop. The existing
 follow-up is updated, same schedule and authority. Docker-free tests may proceed,
 but real API/Auth/private-storage/transaction/restore gates cannot become mocks
-or risky live tests. Existing remote Parts RLS service-container use awaits the
-once-asked everywhere-versus-local clarification or a reviewed Docker-free
-replacement; do not dispatch an older containerized workflow or silently drop
-coverage. The reviewed native-PG17 replacement is now committed; a new-head native
-CI run may validate it without Docker. Existing older container paths stay unused.
+or risky live tests. The native-PG17 replacement is committed and the subsequent
+published Linux run passed all 247 Parts assertions. Do not dispatch an older
+containerized workflow or silently drop coverage. Existing older container paths
+stay unused.
 
 The owner subsequently authorized a dedicated QA login and nominated controlled
 email addresses. A bounded read-only EXISTS check on those exact nominated
@@ -229,9 +256,11 @@ Sole hosted backend remains `wjxaajgvddtrxxtocxen`; 366 AI and Barangay Buddy ar
 untouched. Mapping remains 404/423 with typed 12/5/2; full baseline/schema/replay/
 parity/release gates remain blocked. Existing approved restrictions are preserved.
 
-Immediate resume: verify publication/exact-head Docker-free Linux CI, finish the
-full-vs-focused scanner diagnosis and complete artifact verification; reconcile
-the QA credential handoff without modifying personal/staff identities. Then close actual authorized atomic
+Subsequent creation caller source `bcc25350` is documented in
+`NATIVE_COMMERCE_CREATION_READINESS.md`; it does not complete the atomic writer.
+Docker-free `bf091dc7` Linux CI is accepted above; do not repeat its installation
+or erase the separate Windows failure. Reconcile the QA credential handoff without
+modifying personal/staff identities. Immediate resume: close actual authorized atomic
 C3.02-C3.04 writers and financial/stock/retry/recovery acceptance; do not repeat
 these reader/email source proofs. Independent local API/Auth/private-storage/
 restore acceptance remains unavailable. Docker is prohibited, not an access/setup

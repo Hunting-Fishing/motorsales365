@@ -1472,7 +1472,10 @@ Owner's subsequent no-Docker directive is recorded in the primary checklist and
 ledger and the existing follow-up. No Docker will be installed/started/used or
 requested. Docker-free acceptance must retain real-role/API/private-storage/
 transaction/restore gates. Reviewed native-PG17 Parts CI is committed at `166ff0c4`,
-preserving adversarial SQL coverage; actual Linux runtime remains unverified.
+preserving adversarial SQL coverage. Published `bf091dc7` native Linux Parts CI
+passes all 247 assertions on PostgreSQL 17.11 with successful scoped cleanup;
+retained replay's 47 migration failures still prevent whole baseline/replay or
+Supabase API/Auth/private-storage/restore acceptance.
 Do not dispatch older containerized workflows. QA email nomination is received;
 separate standard signup is prepared but credentials/Terms/creation/session and
 trusted synthetic native-shop membership remain pending. Preserve existing
@@ -1501,3 +1504,22 @@ raw-upload protection/release approval. No provider setting/lockfile change,
 SQL/Auth/business write, live restriction, upload/deploy or email activation.
 Local API/private-storage/restore, native authority/claim/team and owner/pilot
 acceptance remain open under the sole hosted 365 backend requirement.
+
+## Native quote and work order creation callers (2026-10-16)
+
+Same branch/draft PR #68, source `bcc25350`: actual creation forms now scope
+choices and draft/write outcomes to the current account/mount, revalidate the
+selected customer/vehicle before dispatch, check complete returned identities/
+values and hold unknown saves without blind resubmission. Quote field/type/tax
+representation mismatches are corrected with exact decimal checks; invalid text
+is rejected before any header save, and abandoned renders no longer abort a valid
+committed save. Quote 84/84, work-order 89/89, combined creation/security 183/183
+(18.68s), full TypeScript, changed-line lint, mandatory CI guards and independent
+review pass. Exact artifact/publication results are in
+`evidence/NATIVE_COMMERCE_CREATION_READINESS.md`.
+
+Quote header/items remain separate writes; selected customer shop metadata is not
+trusted native authority, and mounted locks are not durable retry protocols.
+No SQL/ACL/business/Auth mutation, provider activation, email or deployment. Close
+the authorized atomic C3.02 transaction first, then C3.03–C3.04 with shared fresh
+authority, private-storage/transaction/restore and designated owner acceptance.
