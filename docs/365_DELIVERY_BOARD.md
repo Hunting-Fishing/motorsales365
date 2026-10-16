@@ -12,6 +12,12 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+Owned-ingress source commit29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5 follows
+0fbec296 on the same integrated candidate/draft PR68. Local1231/1231/full normal
+TypeScript/review/lint/format/preservation pass; publish with this evidence and
+read its OWN exact-head checks next, not inherited0fbec296 acceptance. No main,
+migration/grant, live deployment, Buddy or account change. Keep hosting/QA stops.
+
 Source4fea16072eb76ffc292a28cb6a9dc549012787c0 and evidence publication
 0fbec296a24b1ceebe235d2487c40cf5869edd13 are now on the canonical branch/same
 draft PR68. Parent40fd9aee completed all six Actions before publication; no

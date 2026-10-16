@@ -42,6 +42,11 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Owned-ingress source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5 follows0fbec296,
+same candidate/draft PR68. Final local1231/1231/full normal TypeScript/review/
+lint/format/exact preservation pass. Publish with evidence, then own exact-head
+checks; parent passes do not accept this source. No main/deploy/migration/grant.
+
 Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
 completed all six Actions; no cancellation/repeated121 tests. Actual new native
 job117094365266/run38936842687 passes PGDG17.11/server170011, all18 ordered

@@ -10,6 +10,11 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Owned-ingress source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5, parent0fbec296,
+same candidate/draft PR68:1231/1231/full normal TypeScript/review/lint/format/
+preservation pass. Publish with evidence and read separate exact-head checks;
+no inherited acceptance, main/deploy/migration/grant/Buddy/account change.
+
 Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
 all-six completion. New native117094365266/run38936842687 actually passes
 PGDG17.11/server170011, all18 ordered expense/draft-line proofs, final terminators

@@ -4,6 +4,10 @@
 Connected source is a denial boundary, not completed financial/native authority,
 strict session revocation, safe draft editing or production acceptance.
 
+Source29172a0b6b5c34f6bd60e97992a6bf4f869fe2f5 follows parent0fbec296; publish
+source/evidence together in same draft PR68. Required actual own-head CI results
+are separate and must be read next; no inherited parent acceptance or release.
+
 ## Connected source
 
 Only `recordVehicleReceiptExpense` adopts the new owned middleware. It captures
@@ -148,4 +152,4 @@ Supabase security guidance informed ordinary publishable-client separation and
 the explicit limit that verified claims/current user are not strict revocation:
 [getClaims](https://supabase.com/docs/reference/javascript/auth-getclaims),
 [getUser](https://supabase.com/docs/reference/javascript/auth-getuser),
-[API keys](https://supabase.com/docs/guides/api/api-keys).
+[API keys](https://supabase.com/docs/guides/getting-started/api-keys).
