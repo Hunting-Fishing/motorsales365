@@ -68,6 +68,17 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+16 October connected receipt source `f50aaa0d` now includes account-bound server readers,
+fixed counted pages and item completeness/edit compatibility. It preserves open
+editors and mounted uncertain-write holds while preventing replacement from a
+truncated item list. Final 966/966 across ten suites, full TypeScript and changed-line
+lint/review/CI guards and fresh complete build/214 assets/Worker boundaries pass,
+with existing warnings. See `evidence/RECEIPT_READ_CONTRACTS.md` for exact source,
+tests/publication and limitations. Full-line viewing, typed durable receipt
+writers, real Auth/private storage/recovery, trusted pilot roles, hosting and
+retail/recruitment remain substantive gaps; the target and Day2 reassessment are
+unchanged. No release gate or scope item is removed.
+
 Current Day 1 status, 16 October: integrated candidate/draft PR #68 is established;
 complete local media and source guards pass. The original nineteen outside exact
 whole-source mapping are classified as twelve historical unresolved, five
@@ -76,7 +87,7 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
-Latest connected sources `eb90d15c`/`bd5e4b04` add receipt/link read freshness and
+Previous connected sources `eb90d15c`/`bd5e4b04` add receipt/link read freshness and
 retail assignment intent/membership/acknowledgment safety. Receipt101/lead151;
 final combined703/703, changed-line lint/review/CI guards pass. Full integrated
 TypeScript/fresh build/214 assets/Worker boundaries pass at `bd5e4b04` with expected

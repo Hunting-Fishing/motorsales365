@@ -1,5 +1,15 @@
 # Native Customer 360: first delivery slice
 
+Latest connected receipt source `f50aaa0d` (16 October): expected-account-bound
+server reads, fixed counted receipt/link pages, complete-item evidence and safe
+new-editor eligibility are integrated with the existing panel. Open editor,
+installation and uncertain-write state survives ordinary paging/refresh.
+Final focused 966/966, full TypeScript, changed-line lint/review/CI guards and fresh
+complete build/214 public assets/Worker boundaries pass with existing warnings.
+`evidence/RECEIPT_READ_CONTRACTS.md` records source/tests/publication and the
+remaining writer, complete-line, private-object and release dependencies. This
+does not establish native authority, atomic snapshots or live acceptance.
+
 This change extends the existing Shop Manager customer detail screen. It does not
 introduce a second CRM database or duplicate customer identity.
 

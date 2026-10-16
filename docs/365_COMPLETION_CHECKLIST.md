@@ -16,6 +16,22 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Current connected receipt source `f50aaa0d` adds account-bound server readers, fixed DTOs,
+exact visible counts, receipt/link pages of 25/100 and four-worker item reads with a
+100-line display cap. Missing attachment-access evidence fails closed. New review
+requires complete, entry-compatible draft fields and no installation/public-summary
+metadata that the unchanged replacement writer would lose; empty interrupted
+drafts remain resumable. UI paging preserves open editors/installation/unknown
+holds and fences old DOM admission synchronously. Final focused 966/966 across ten
+suites (43.49s), full TypeScript, seven-file changed-line lint (zero new findings),
+format/diff/independent review and mandatory CI guards pass. Fresh complete build,
+214 public Git/source/output copies, Worker/canonical backend/OCR/PDF/server
+boundaries pass at this source, with existing warnings. Publication and
+remaining gates are in `evidence/RECEIPT_READ_CONTRACTS.md`; this is not an atomic
+snapshot or trusted native authority. Next: typed writer outcomes/durable retry,
+complete-line viewing, private URL caller binding, then the shared release and
+retail/recruitment dependencies. No SQL, live write or deployment is included.
+
 Owner directive, 2026-10-16: **no Docker**. Do not install/start/use Docker, pull
 images or ask the owner to open Docker Desktop. Continue Docker-free work and
 record any real API/Auth/private-storage/transaction/restore gates that lack a
@@ -54,7 +70,7 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest integrated source slices: receipt reads `eb90d15c1805cb7f004bdb7a7db384b89219aa6b`
+Previous published source slices: receipt reads `eb90d15c1805cb7f004bdb7a7db384b89219aa6b`
 and retail assignment `bd5e4b0406c899d84d348386e5bfcebfb0f9d7cc`, same draft PR #68.
 Receipt/shop-link per-mount queries now mask fetching, paused, failed and
 invalidated snapshots, forward signals, offer generic explicit retries and check
@@ -76,9 +92,9 @@ boundary verify. Expected route-test/module/chunk/Wrangler warnings remain.
 Publication/exact-head CI are recorded separately after verification.
 Evidence: `evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
 `evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. No SQL/migration/live write/deployment.
-Next connected dependency: receipt/server link expected-account denial, complete
-bounded DTO/attachment evidence and safe editor eligibility, then typed writer
-outcomes/durable retry. Do not relabel these separate HTTP checks as atomic
+The receipt/server link expected-account denial, counted DTO/attachment evidence
+and safe editor eligibility are now implemented at `f50aaa0d` above. Next: typed
+writer outcomes/durable retry and complete-line viewing. Do not relabel separate HTTP checks as atomic
 membership, strict session/native authority or recovery acceptance. U1/U2 action
 inventory now distinguishes retail triage, parts-network partnerships and the
 dedicated affiliate program; linked due tasks/conversion/recruitment remain real
@@ -86,6 +102,22 @@ implementation gaps. QA signup remains unsubmitted in the now-available browser;
 native pilot membership, original-human/native-team/claim/offboarding, full
 baseline/recovery/hosting and owner acceptance still threaten the seven-day target.
 No scope reduction; Day 2 feasibility review remains required.
+
+Publication `3242e7dfcbfc14154ace182ed0c743984d838557` verified on the canonical
+remote/same attached draft PR #68/base; main remains `70ab892a`. Final-head 214
+public copies and Worker/backend/OCR/PDF/server boundaries verify. Run
+`38853369943`: build/lint/browser OCR/native Parts pass; typecheck and unit
+`116819315311` remain in progress at capture. Native job `116819315343` has an
+untruncated log: actual PG17.11 (`170011`), Parts247/247, all six quote scenario
+groups, both server stops/scoped cleanup and 47 retained replay failures. This is
+selected SQL rehearsal, not full baseline/API/Auth/private-storage/restore proof.
+Wrapper `38853369954` preview succeeds through its confirmed configuration skip
+without upload; detection/migrations/production and Supabase Preview skip.
+Independent Workers build `095169aa-05f0-422b-9c69-cce4a7c502be` fails with ID/link
+only; fresh cause unverified. These follow-up notes remain local for the next
+integrated source slice, not a documentation-only CI restart. Next: verify this
+exact head's remaining checks, then receipt/server link caller/DTO/attachment
+completeness and writer/recovery dependencies above. No deployment/live write.
 
 Prior connected slice: `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same draft PR #68.
 The existing customer commercial/communications readers now compose the captured

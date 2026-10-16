@@ -4,7 +4,8 @@
 [PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68).
 The existing retail lead assignment path now binds the prior account,
 organization, lead and selected assignee. Source
-`bd5e4b0406c899d84d348386e5bfcebfb0f9d7cc`; final integrated
+`bd5e4b0406c899d84d348386e5bfcebfb0f9d7cc`; publication
+`3242e7dfcbfc14154ace182ed0c743984d838557`. Final integrated
 TypeScript/build checks pass below, with publication/exact-head CI separately recorded.
 This is connected assignment safety, not a completed sales/recruitment pipeline.
 
@@ -118,3 +119,20 @@ and the dedicated affiliate program. Their due tasks, conversion, reporting and
 independent-role acceptance gaps are substantive Day 2 feasibility inputs, not
 final polish. The seven-day date is a target, not a verified forecast; no scope is
 silently removed.
+
+## Publication follow up
+
+Canonical remote/same attached draft PR #68/base/unchanged main confirm
+`3242e7df`. Final-head 214 tracked public copies and Worker boundaries verify.
+Run `38853369943`: build/lint/browser OCR/native Parts pass, typecheck and unit
+`116819315311` in progress at capture. Native `116819315343` untruncated log has
+actual PG17.11/170011, Parts247/247/six quote groups/server stops/scoped cleanup
+and 47 retained replay failures. This selected SQL proof is not native authority,
+whole baseline/API/Storage/restore or financial acceptance. Verify remaining new-
+head checks rather than substituting parent green or local703/703.
+
+Wrapper `38853369954` preview's confirmed skip path is not upload; migrations/
+detection/production and Supabase Preview skip. Workers build
+`095169aa-05f0-422b-9c69-cce4a7c502be` fails with ID/link only; fresh cause unverified.
+These follow-up notes remain local for the next integrated source slice, without
+a documentation-only CI restart, deployment, migration or live mutation.

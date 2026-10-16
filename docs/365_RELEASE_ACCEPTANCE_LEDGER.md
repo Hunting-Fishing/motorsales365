@@ -41,7 +41,12 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Latest source slices: receipt reads `eb90d15c` and retail assignment `bd5e4b04`.
+Current source: receipt server DTO/caller/pages `f50aaa0d`, final focused 966/966,
+full TypeScript, changed-line lint/review/CI guards and fresh complete build/214
+public copies/Worker/backend/OCR/PDF/server boundaries pass with existing warnings.
+Publication and
+limitations are in `evidence/RECEIPT_READ_CONTRACTS.md`; no SQL/live/release change.
+Previous published slices: receipt reads `eb90d15c` and retail assignment `bd5e4b04`.
 Receipt panel101/101; lead handler106/route45; final combined703/703 across eight
 suites (35.65s), seven-file changed-line lint zero new errors/warnings (23 older
 findings), format/diff/review and mandatory CI guards pass. Full TypeScript and
@@ -52,8 +57,20 @@ pass at `bd5e4b04` with expected warnings. Publication results are separately re
 open editors/holds; lead assignment checks prior intent/memberships/exact returned
 rows and holds unknown outcomes. None establishes atomic membership, durable
 replay, positive native-shop authority or new isolated/owner/live acceptance.
-Next: receipt/server link bounded complete DTO/caller/attachment contract and
-typed durable writer recovery, plus shared R2/R3 and pipeline gaps below.
+The receipt/server link counted DTO/caller/attachment contract is now integrated
+at `f50aaa0d`; next are typed durable writer recovery, complete-line viewing and
+shared R2/R3/pipeline gaps below.
+Publication `3242e7df` verified on canonical remote/same attached draft PR #68/
+base/main; final-head 214 assets/Worker boundaries verify. Run `38853369943`:
+build/lint/browser OCR/native Parts pass; typecheck/unit `116819315311` still in
+progress at capture. Native `116819315343` untruncated log confirms actual
+PG17.11/Parts247/247/six quote groups/server stops/scoped cleanup and 47 retained
+replay failures, not whole baseline/API/restore acceptance. Wrapper `38853369954`
+confirmed preview skip is not upload; migration/detection/production and Supabase
+Preview skip. Workers build `095169aa-05f0-422b-9c69-cce4a7c502be` fails with ID/link
+only, fresh cause unverified. Follow-up notes stay local for the next integrated
+source slice, no CI restart, deployment or live change. Verify remaining exact-head
+checks before advancing source verification; owner/isolated/live statuses unchanged.
 Prior connected slice: `a56480a1`, commercial/communications caller composition
 and receipt entry preflight/lifetime/acknowledgment/unknown-outcome handling.
 Critical 533/533 across six files (15.19s), full TypeScript, ten-file changed-line
@@ -212,6 +229,16 @@ No new staging, owner or live acceptance is claimed below. An existing productio
 route is not evidence that the changed candidate has passed those gates.
 
 ## Workflow ledger
+
+Current C1 source `f50aaa0d` adds expected-account denial, exact visible
+counted pages, parent/target DTO checks and strict per-receipt attachment evidence.
+Partial item sets and editor-incompatible metadata cannot open the replacement
+editor or change summary sharing; zero-item draft recovery remains. Final 966/966
+across ten suites (43.49s), full TypeScript, changed-line lint/review/CI guards pass.
+Source tests
+and publication status: `evidence/RECEIPT_READ_CONTRACTS.md`. Typed/durable writers,
+full-line viewing, concurrent-edit conflicts and real-role/private-object/restore/
+pilot acceptance are still open. Paging is not an immutable or atomic snapshot.
 
 Current C1/C2/U1 safety: `eb90d15c` masks stale receipt/link snapshots and preserves
 editor/installation/unknown holds; `bd5e4b04` binds retail assignment intent and

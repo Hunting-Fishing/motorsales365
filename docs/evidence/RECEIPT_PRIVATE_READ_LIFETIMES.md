@@ -1,7 +1,8 @@
 # Receipt and shop link read lifetimes
 
 16 October 2026, Asia/Manila. Source
-`eb90d15c1805cb7f004bdb7a7db384b89219aa6b`, same integrated candidate and draft
+`eb90d15c1805cb7f004bdb7a7db384b89219aa6b`, test-seed fix `bd5e4b04`, publication
+`3242e7dfcbfc14154ace182ed0c743984d838557`, same integrated candidate and draft
 [PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68).
 Receipt and owner shop-link lists now separate each mounted account/target read
 from older cached results. This closes selected UI privacy gaps, not the server
@@ -110,3 +111,20 @@ Native `psql`/`pg_ctl`/`postgres`/Go/Supabase CLI were not on PATH and the stand
 Program Files PostgreSQL directory was absent in this bounded local probe. This
 does not inventory every possible installation; it supplies no real local API/
 Auth/Storage/restore acceptance. Docker remains prohibited, not a setup request.
+
+## Publication follow up
+
+Canonical remote/same attached draft PR #68/base/main confirm `3242e7df`; final
+214 tracked public copies and Worker/backend/OCR/PDF/server boundary verify.
+Run `38853369943`: build/lint/browser OCR/native Parts pass; typecheck and unit
+`116819315311` remain in progress at capture. Native `116819315343` untruncated
+log confirms actual PG17.11/170011, Parts247/247, six independent-session quote
+groups, both server stops and scoped cleanup; 47 retained replay failures remain.
+Local703/703 and parent green are not the complete new-head CI result, and selected
+SQL is not whole baseline/API/Auth/private-object/restore acceptance.
+
+Wrapper `38853369954` preview succeeds through its confirmed configuration skip,
+not an upload; detection/migrations/production and Supabase Preview skip. Workers
+build `095169aa-05f0-422b-9c69-cce4a7c502be` fails with ID/link only, fresh cause
+unverified. These notes stay local for the next integrated source slice rather
+than restarting CI for documentation alone. No deployment or live mutation.
