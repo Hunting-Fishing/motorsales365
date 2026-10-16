@@ -2026,3 +2026,192 @@ describe("receipt and shop-link read snapshots", () => {
     expect(toast.success).not.toHaveBeenCalled();
   });
 });
+
+describe("temporary mixed receipt public-sharing interlock", () => {
+  const shopControl = "Share with linked shops";
+  const publicControl = "Show parts summary on public ride/passport";
+  function line(publicSummary: boolean, index: number): VehicleReceipt["items"][number] {
+    return {
+      id: `sharing-item-${index}`,
+      description: `Sharing test item ${index}`,
+      category: index === 0 ? "brakes" : "engine",
+      brand: null,
+      part_number: null,
+      quantity: 1,
+      total: null,
+      confidence: 1,
+      reviewed: true,
+      installed_on: null,
+      odometer_km: null,
+      public_summary_allowed: publicSummary,
+    };
+  }
+  function sharingRow(flags: boolean[], shareWithShop = false) {
+    return {
+      ...receipt("Sharing preference supplier"),
+      status: "confirmed" as const,
+      share_with_shop: shareWithShop,
+      items: flags.map(line),
+    };
+  }
+  function rawChange(checkbox: HTMLElement) {
+    const input = checkbox as HTMLInputElement;
+    const delivered = vi.fn();
+    input.addEventListener("click", delivered);
+    act(() => {
+      // Deliberately bypass DOM disabled admission. The component's onChange
+      // must independently refuse this event; native disabled behavior alone
+      // is not the privacy interlock under test.
+      input.disabled = false;
+      input.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      input.disabled = true;
+    });
+    expect(delivered).toHaveBeenCalledTimes(1);
+    input.removeEventListener("click", delivered);
+  }
+  beforeEach(() => {
+    vi.mocked(api.setReceiptSharing).mockReset().mockResolvedValue(null);
+  });
+
+  for (const filter of ["", "brakes", "engine"] as const) {
+    it.each([
+      [true, false],
+      [false, true],
+    ])(
+      `preserves mixed %s/%s choices and refuses both raw controls with category '${filter || "all"}'`,
+      async (first, second) => {
+        const row = sharingRow([first, second], first);
+        vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+          receiptPage({ receipts: [row], linkedVehicleId: null }),
+        );
+        const { client } = show();
+        const invalidate = vi.spyOn(client, "invalidateQueries");
+        await screen.findByText("Sharing preference supplier");
+        if (filter)
+          fireEvent.change(screen.getByLabelText("Filter parts by section"), {
+            target: { value: filter },
+          });
+        if (filter === "brakes")
+          expect(screen.queryByText("Sharing test item 1")).not.toBeInTheDocument();
+        if (filter === "engine")
+          expect(screen.queryByText("Sharing test item 0")).not.toBeInTheDocument();
+        const shop = screen.getByRole("checkbox", { name: shopControl });
+        const summary = screen.getByRole("checkbox", { name: publicControl });
+        expect(shop).toBeDisabled();
+        expect(summary).toBeDisabled();
+        expect(shop).toHaveProperty("checked", first);
+        expect(summary).not.toBeChecked();
+        expect(
+          screen.getByText(/These items have different public-sharing choices/),
+        ).toHaveTextContent(
+          "A separate control is needed to change shop access without changing individual public choices.",
+        );
+        rawChange(shop);
+        rawChange(summary);
+        expect(api.setReceiptSharing).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalled();
+        expect(row.items.map((item) => item.public_summary_allowed)).toEqual([first, second]);
+        expect(api.getVehicleReceipts).toHaveBeenCalledTimes(1);
+      },
+    );
+  }
+
+  it.each([
+    { allPublic: false, shared: false },
+    { allPublic: false, shared: true },
+    { allPublic: true, shared: false },
+    { allPublic: true, shared: true },
+  ])(
+    "retains homogeneous receipt intent without changing the other choice: %j",
+    async ({ allPublic, shared }) => {
+      const row = sharingRow([allPublic, allPublic], shared);
+      vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+        receiptPage({ receipts: [row], linkedVehicleId: null }),
+      );
+      show();
+      await screen.findByText("Sharing preference supplier");
+      expect(
+        screen.queryByText(/These items have different public-sharing choices/),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("checkbox", { name: shopControl })).toBeEnabled();
+      expect(screen.getByRole("checkbox", { name: publicControl })).toHaveProperty(
+        "checked",
+        allPublic,
+      );
+      fireEvent.click(screen.getByRole("checkbox", { name: shopControl }));
+      await waitFor(() =>
+        expect(api.setReceiptSharing).toHaveBeenCalledExactlyOnceWith({
+          data: { id: row.id, shareWithShop: !shared, publicSummary: allPublic },
+        }),
+      );
+      await waitFor(() =>
+        expect(screen.getByRole("checkbox", { name: publicControl })).toBeEnabled(),
+      );
+      fireEvent.click(screen.getByRole("checkbox", { name: publicControl }));
+      await waitFor(() => expect(api.setReceiptSharing).toHaveBeenCalledTimes(2));
+      expect(api.setReceiptSharing).toHaveBeenNthCalledWith(2, {
+        data: { id: row.id, shareWithShop: shared, publicSummary: !allPublic },
+      });
+      expect(row.items.map((item) => item.public_summary_allowed)).toEqual([allPublic, allPublic]);
+    },
+  );
+
+  it.each([false, true])(
+    "keeps existing zero-item sharing behavior for shop preference %s",
+    async (shared) => {
+      const row = sharingRow([], shared);
+      vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+        receiptPage({ receipts: [row], linkedVehicleId: null }),
+      );
+      show();
+      await screen.findByText("Sharing preference supplier");
+      expect(screen.getByRole("checkbox", { name: shopControl })).toBeEnabled();
+      expect(screen.getByRole("checkbox", { name: publicControl })).toBeEnabled();
+      expect(screen.getByRole("checkbox", { name: publicControl })).not.toBeChecked();
+      fireEvent.click(screen.getByRole("checkbox", { name: shopControl }));
+      await waitFor(() =>
+        expect(api.setReceiptSharing).toHaveBeenCalledExactlyOnceWith({
+          data: { id: row.id, shareWithShop: !shared, publicSummary: false },
+        }),
+      );
+      await waitFor(() =>
+        expect(screen.getByRole("checkbox", { name: publicControl })).toBeEnabled(),
+      );
+      fireEvent.click(screen.getByRole("checkbox", { name: publicControl }));
+      await waitFor(() => expect(api.setReceiptSharing).toHaveBeenCalledTimes(2));
+      expect(api.setReceiptSharing).toHaveBeenNthCalledWith(2, {
+        data: { id: row.id, shareWithShop: shared, publicSummary: true },
+      });
+    },
+  );
+
+  it.each([
+    [false, false],
+    [true, true],
+    [true, false],
+  ])(
+    "retains the incomplete-set guard for visible %s/%s choices without guessing hidden choices",
+    async (first, second) => {
+      const row = sharingRow([first, second]);
+      vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+        receiptPage({
+          receipts: [{ ...row, items_complete: false, item_count: 101 }],
+          linkedVehicleId: null,
+        }),
+      );
+      show();
+      await screen.findByText("Sharing preference supplier");
+      expect(screen.getByText(/Showing 2 of 101 lines/)).toBeInTheDocument();
+      expect(
+        screen.queryByText(/These items have different public-sharing choices/),
+      ).not.toBeInTheDocument();
+      for (const name of [shopControl, publicControl]) {
+        const control = screen.getByRole("checkbox", { name });
+        expect(control).toBeDisabled();
+        rawChange(control);
+      }
+      expect(api.setReceiptSharing).not.toHaveBeenCalled();
+      expect(row.items.map((item) => item.public_summary_allowed)).toEqual([first, second]);
+    },
+  );
+});

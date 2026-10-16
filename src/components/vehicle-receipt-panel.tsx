@@ -89,6 +89,13 @@ function useReadInvalidation(client: QueryClient, key: readonly unknown[]) {
   );
 }
 
+function hasMixedPublicChoices(items: VehicleReceipt["items"]): boolean {
+  return (
+    items.some((item) => item.public_summary_allowed === true) &&
+    items.some((item) => item.public_summary_allowed === false)
+  );
+}
+
 export function VehicleReceiptPanel({ vehicleId, shopVehicleId }: ReceiptTarget) {
   const { user, loading } = useAuth();
   // Bootstrap loading deliberately tears down the committed private scope,
@@ -470,9 +477,10 @@ function AuthenticatedVehicleReceiptPanel({
                   <input
                     type="checkbox"
                     checked={r.share_with_shop}
-                    disabled={busy === r.id || !r.items_complete}
+                    disabled={busy === r.id || !r.items_complete || hasMixedPublicChoices(r.items)}
                     onChange={(e) =>
                       r.items_complete &&
+                      !hasMixedPublicChoices(r.items) &&
                       action(r.id, () =>
                         shareFn({
                           data: {
@@ -490,9 +498,10 @@ function AuthenticatedVehicleReceiptPanel({
                   <input
                     type="checkbox"
                     checked={r.items.length > 0 && r.items.every((i) => i.public_summary_allowed)}
-                    disabled={busy === r.id || !r.items_complete}
+                    disabled={busy === r.id || !r.items_complete || hasMixedPublicChoices(r.items)}
                     onChange={(e) =>
                       r.items_complete &&
+                      !hasMixedPublicChoices(r.items) &&
                       action(r.id, () =>
                         shareFn({
                           data: {
@@ -506,6 +515,13 @@ function AuthenticatedVehicleReceiptPanel({
                   />{" "}
                   Show parts summary on public ride/passport
                 </label>
+                {r.items_complete && hasMixedPublicChoices(r.items) && (
+                  <p role="status" className="w-full text-muted-foreground">
+                    These items have different public-sharing choices, which are preserved.
+                    Receipt-level sharing is temporarily unavailable. A separate control is needed
+                    to change shop access without changing individual public choices.
+                  </p>
+                )}
               </div>
             )}
           </div>
