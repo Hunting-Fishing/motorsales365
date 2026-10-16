@@ -1,6 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getRequest } from "@tanstack/react-start/server";
+import { captureNativeRequestCaller } from "./native-request-caller.server";
+import {
+  readReceiptRequestSchema,
+  readLinkRequestSchema,
+  RECEIPT_PAGE_SIZE,
+  LINK_PAGE_SIZE,
+  RECEIPT_ITEM_LIMIT,
+  receiptReadProjections,
+  parseReceiptWorkspaceAccess,
+  parseActiveReceiptLink,
+  parseReceiptWindow,
+  parseReceiptItems,
+  parseReceiptAttachments,
+  assembleReceiptReadPage,
+  parseLinkWindow,
+} from "./vehicle-receipt-read-contract";
 import {
   receiptDate,
   receiptSaveSchema,
@@ -8,12 +25,42 @@ import {
   categoryKeys,
   validateReceiptFile,
 } from "./vehicle-receipts";
-import type { VehicleReceipt } from "./vehicle-receipts";
 
 const uuid = z.string().uuid();
-const target = z
-  .object({ vehicleId: uuid.optional(), shopVehicleId: uuid.optional() })
-  .refine((d) => Boolean(d.vehicleId) !== Boolean(d.shopVehicleId), "Choose one vehicle");
+type ReceiptReadResponse = { data: unknown; error: unknown; count?: unknown };
+type ReceiptReadBuilder = PromiseLike<ReceiptReadResponse> & {
+  select(projection: string, options?: { count: "exact" }): ReceiptReadBuilder;
+  eq(column: string, value: unknown): ReceiptReadBuilder;
+  or(filters: string): ReceiptReadBuilder;
+  order(column: string, options: { ascending: boolean }): ReceiptReadBuilder;
+  range(from: number, to: number): ReceiptReadBuilder;
+  limit(count: number): ReceiptReadBuilder;
+  maybeSingle(): ReceiptReadBuilder;
+  abortSignal(signal: AbortSignal): ReceiptReadBuilder;
+  retry(enabled: false): ReceiptReadBuilder;
+};
+type ReceiptReadClient = {
+  from(
+    table: "vehicle_receipts" | "vehicle_receipt_items" | "vehicle_shop_links",
+  ): ReceiptReadBuilder;
+  rpc(
+    name: "vehicle_receipt_workspace_access" | "vehicle_receipt_attachment_status",
+    args: Record<string, unknown>,
+  ): ReceiptReadBuilder;
+};
+function receiptReadResult(value: unknown, counted: boolean): ReceiptReadResponse {
+  if (typeof value !== "object" || value === null || Array.isArray(value))
+    throw new Error("Invalid receipt read response.");
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  const fields = counted ? ["data", "error", "count"] : ["data", "error"];
+  if (fields.some((key) => !Object.hasOwn(descriptors, key) || !("value" in descriptors[key])))
+    throw new Error("Invalid receipt read response.");
+  return {
+    data: descriptors.data.value,
+    error: descriptors.error.value,
+    ...(counted ? { count: descriptors.count.value } : {}),
+  };
+}
 async function rpc(client: any, name: string, args: Record<string, unknown>) {
   const { data, error } = await client.rpc(name, args);
   if (error) throw new Error(error.message);
@@ -21,59 +68,155 @@ async function rpc(client: any, name: string, args: Record<string, unknown>) {
 }
 export const getVehicleReceipts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => target.parse(d))
-  .handler(
-    async ({
-      data,
-      context,
-    }): Promise<{
-      receipts: VehicleReceipt[];
-      linkedVehicleId: string | null;
-      canWrite?: boolean;
-      canRecordExpense?: boolean;
-    }> => {
-      const db = context.supabase as any;
-      const access = await rpc(db, "vehicle_receipt_workspace_access", {
-        _vehicle_id: data.vehicleId ?? null,
-        _shop_vehicle_id: data.shopVehicleId ?? null,
-      });
-      const linked = data.shopVehicleId
-        ? await db
+  .inputValidator((input: unknown) => {
+    const parsed = readReceiptRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid receipt snapshot request.");
+    return parsed.data;
+  })
+  .handler(async ({ data, context }) => {
+    const intent = Object.freeze({
+      expectedAccountId: data.expectedAccountId,
+      vehicleId: data.vehicleId,
+      shopVehicleId: data.shopVehicleId,
+      page: data.page,
+    });
+    const failure = "Could not load this vehicle's receipts. Refresh and try again.";
+    function assertActor() {
+      if (context?.userId !== intent.expectedAccountId)
+        throw new Error("Account changed. Refresh before loading receipts.");
+    }
+    assertActor();
+    let failed = false;
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCaller = await caller.verify(request);
+      const db = context.supabase as unknown as ReceiptReadClient;
+      function ready() {
+        if (failed) throw new Error(failure);
+        assertActor();
+        assertCaller();
+      }
+      async function read(query: ReceiptReadBuilder, counted = false) {
+        ready();
+        const response = await query;
+        ready();
+        const result = receiptReadResult(response, counted);
+        ready();
+        if (result.error !== null) throw new Error(failure);
+        return result;
+      }
+      ready();
+      const accessResponse = await read(
+        db
+          .rpc("vehicle_receipt_workspace_access", {
+            _vehicle_id: intent.vehicleId ?? null,
+            _shop_vehicle_id: intent.shopVehicleId ?? null,
+          })
+          .abortSignal(request.signal)
+          .retry(false),
+      );
+      const access = parseReceiptWorkspaceAccess(accessResponse.data);
+      ready();
+      let linkedVehicleId: string | null = null;
+      if (intent.shopVehicleId) {
+        const linked = await read(
+          db
             .from("vehicle_shop_links")
-            .select("vehicle_id")
-            .eq("shop_vehicle_id", data.shopVehicleId)
+            .select(receiptReadProjections.activeLink)
+            .eq("shop_vehicle_id", intent.shopVehicleId)
             .eq("active", true)
-            .maybeSingle()
-        : null;
-      if (linked?.error) throw new Error(linked.error.message);
-      // The database evaluates ownership, staff module access, and each receipt's sharing choice.
-      const query = db
+            .abortSignal(request.signal)
+            .retry(false)
+            .maybeSingle(),
+        );
+        linkedVehicleId = parseActiveReceiptLink(linked.data, intent.shopVehicleId);
+        ready();
+      }
+      let headers = db
         .from("vehicle_receipts")
-        .select("*,items:vehicle_receipt_items(*)")
-        .order("created_at", { ascending: false });
-      const { data: rows, error } = data.vehicleId
-        ? await query.eq("vehicle_id", data.vehicleId)
-        : await query.or(
-            `shop_vehicle_id.eq.${data.shopVehicleId}${linked?.data?.vehicle_id ? `,vehicle_id.eq.${linked.data.vehicle_id}` : ""}`,
+        .select(receiptReadProjections.receipt, { count: "exact" })
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .range(
+          intent.page * RECEIPT_PAGE_SIZE,
+          intent.page * RECEIPT_PAGE_SIZE + RECEIPT_PAGE_SIZE - 1,
+        );
+      headers = intent.vehicleId
+        ? headers.eq("vehicle_id", intent.vehicleId)
+        : headers.or(
+            `shop_vehicle_id.eq.${intent.shopVehicleId}${linkedVehicleId ? `,vehicle_id.eq.${linkedVehicleId}` : ""}`,
           );
-      if (error) throw new Error(error.message);
-      const attachments = await rpc(db, "vehicle_receipt_attachment_status", {
-        _ids: (rows ?? []).map((r: VehicleReceipt) => r.id),
-      });
-      return {
-        receipts: (rows ?? []).map((r: VehicleReceipt) => ({
-          ...r,
-          attachment_uploaded: Boolean(attachments[r.id]),
-          can_write: Boolean(
-            access.can_write && (data.vehicleId || r.shop_vehicle_id === data.shopVehicleId),
-          ),
-        })),
-        linkedVehicleId: linked?.data?.vehicle_id ?? null,
-        canWrite: Boolean(access.can_write),
-        canRecordExpense: Boolean(access.can_record_expense),
-      };
-    },
-  );
+      const rows = await read(headers.abortSignal(request.signal).retry(false), true);
+      const window = parseReceiptWindow(rows.data, rows.count, intent, linkedVehicleId);
+      ready();
+      const itemSets: Array<{ receiptId: string; rows: unknown; count: unknown }> = new Array(
+        window.rows.length,
+      );
+      const itemIds = new Set<string>();
+      let next = 0;
+      async function worker() {
+        try {
+          while (!failed) {
+            ready();
+            const index = next++;
+            if (index >= window.rows.length) return;
+            const receiptId = window.rows[index].id;
+            const items = await read(
+              db
+                .from("vehicle_receipt_items")
+                .select(receiptReadProjections.item, { count: "exact" })
+                .eq("receipt_id", receiptId)
+                .order("sort_order", { ascending: true })
+                .order("id", { ascending: true })
+                .limit(RECEIPT_ITEM_LIMIT)
+                .abortSignal(request.signal)
+                .retry(false),
+              true,
+            );
+            const parsedItems = parseReceiptItems(items.data, items.count, receiptId);
+            for (const item of parsedItems.items) {
+              const id = item.id.toLowerCase();
+              if (itemIds.has(id)) throw new Error(failure);
+              itemIds.add(id);
+            }
+            ready();
+            itemSets[index] = { receiptId, rows: parsedItems.items, count: parsedItems.item_count };
+          }
+        } catch {
+          failed = true;
+          throw new Error(failure);
+        }
+      }
+      await Promise.all(Array.from({ length: Math.min(4, window.rows.length) }, () => worker()));
+      ready();
+      let attachments: Record<string, boolean> = {};
+      if (window.rows.length) {
+        const ids = window.rows.map((row) => row.id);
+        const status = await read(
+          db
+            .rpc("vehicle_receipt_attachment_status", { _ids: ids })
+            .abortSignal(request.signal)
+            .retry(false),
+        );
+        attachments = parseReceiptAttachments(status.data, ids);
+        ready();
+      }
+      const result = assembleReceiptReadPage(
+        window,
+        itemSets,
+        attachments,
+        access,
+        intent,
+        linkedVehicleId,
+      );
+      ready();
+      return result;
+    } catch {
+      failed = true;
+      throw new Error(failure);
+    }
+  });
 export const startVehicleReceipt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
@@ -268,14 +411,50 @@ export const approveShopVehicleLink = createServerFn({ method: "POST" })
   );
 export const listVehicleShopLinks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ vehicleId: uuid }).parse(d))
+  .inputValidator((input: unknown) => {
+    const parsed = readLinkRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid shop-link snapshot request.");
+    return parsed.data;
+  })
   .handler(async ({ data, context }) => {
-    const { data: rows, error } = await (context.supabase as any)
-      .from("vehicle_shop_links")
-      .select("shop_vehicle_id,shop_id,active,shop_name")
-      .eq("vehicle_id", data.vehicleId);
-    if (error) throw new Error(error.message);
-    return rows as Array<{ shop_vehicle_id: string; shop_name: string | null; active: boolean }>;
+    const intent = Object.freeze({
+      expectedAccountId: data.expectedAccountId,
+      vehicleId: data.vehicleId,
+      page: data.page,
+    });
+    const failure = "Could not load this vehicle's shop connections. Refresh and try again.";
+    if (context?.userId !== intent.expectedAccountId)
+      throw new Error("Account changed. Refresh before loading shop connections.");
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCaller = await caller.verify(request);
+      const db = context.supabase as unknown as ReceiptReadClient;
+      function ready() {
+        if (context?.userId !== intent.expectedAccountId) throw new Error(failure);
+        assertCaller();
+      }
+      ready();
+      const query = db
+        .from("vehicle_shop_links")
+        .select(receiptReadProjections.link, { count: "exact" })
+        .eq("vehicle_id", intent.vehicleId)
+        .order("shop_vehicle_id", { ascending: true })
+        .range(intent.page * LINK_PAGE_SIZE, intent.page * LINK_PAGE_SIZE + LINK_PAGE_SIZE - 1)
+        .abortSignal(request.signal)
+        .retry(false);
+      ready();
+      const response = await query;
+      ready();
+      const rows = receiptReadResult(response, true);
+      ready();
+      if (rows.error !== null) throw new Error(failure);
+      const result = parseLinkWindow(rows.data, rows.count, intent);
+      ready();
+      return result;
+    } catch {
+      throw new Error(failure);
+    }
   });
 export const revokeShopVehicleLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

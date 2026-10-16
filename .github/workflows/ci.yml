@@ -209,6 +209,9 @@ jobs:
       - name: Retail lead assignment caller and private lifetimes (never quarantined)
         run: npx vitest run src/lib/leads.functions.test.ts 'src/routes/dashboard.team.leads_.$id.test.tsx' --maxWorkers=1
 
+      - name: Receipt read DTO and caller contracts (never quarantined)
+        run: npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts --maxWorkers=1
+
       - name: Independent Workers build source freeze (offline, never quarantined)
         run: node --test scripts/ci/independent-workers-build.test.mjs
 

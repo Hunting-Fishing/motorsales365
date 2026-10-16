@@ -114,7 +114,16 @@ function AuthenticatedVehicleReceiptPanel({
 }: ReceiptTarget & { userId: string }) {
   const target = vehicleId ? { vehicleId } : { shopVehicleId: shopVehicleId! };
   const readLifetime = useId();
-  const receiptKey = ["vehicle-receipts", userId, vehicleId, shopVehicleId, readLifetime] as const;
+  const [page, setPage] = useState(0);
+  const pageIntent = useRef(0);
+  const receiptKey = [
+    "vehicle-receipts",
+    userId,
+    vehicleId,
+    shopVehicleId,
+    readLifetime,
+    page,
+  ] as const;
   const qc = useQueryClient();
   const fetchFn = useServerFn(getVehicleReceipts);
   const signFn = useServerFn(getPrivateReceiptUrl);
@@ -124,7 +133,8 @@ function AuthenticatedVehicleReceiptPanel({
   const receipts = useQuery({
     queryKey: receiptKey,
     enabled: Boolean(userId),
-    queryFn: ({ signal }) => fetchFn({ data: target, signal }),
+    queryFn: ({ signal }) =>
+      fetchFn({ data: { ...target, expectedAccountId: userId, page }, signal }),
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: true,
@@ -133,13 +143,17 @@ function AuthenticatedVehicleReceiptPanel({
   });
   const receiptInvalidated = useReadInvalidation(qc, receiptKey);
   const data =
-    receipts.isSuccess && receipts.fetchStatus === "idle" && !receiptInvalidated
+    receipts.isSuccess &&
+    receipts.fetchStatus === "idle" &&
+    !receiptInvalidated &&
+    receipts.data.page === page
       ? receipts.data
       : undefined;
   function canUseReceiptRead() {
     const current = qc.getQueryState(receiptKey);
     return Boolean(
       data &&
+      data.page === pageIntent.current &&
       current?.status === "success" &&
       current.fetchStatus === "idle" &&
       !current.isInvalidated &&
@@ -152,6 +166,13 @@ function AuthenticatedVehicleReceiptPanel({
   const [openingReceiptId, setOpeningReceiptId] = useState<string | null>(null);
   const privateRead = useRef({ active: false, lifetime: 0, attempt: null as symbol | null });
   const [categoryFilter, setCategoryFilter] = useState("");
+  function changePage(next: number) {
+    if (!Number.isSafeInteger(next) || next < 0 || next > 1_000_000) return;
+    // Fence old DOM controls in the same tick, before the new query commits.
+    pageIntent.current = next;
+    setCategoryFilter("");
+    setPage(next);
+  }
   useLayoutEffect(() => {
     const scope = privateRead.current;
     scope.lifetime += 1;
@@ -221,9 +242,9 @@ function AuthenticatedVehicleReceiptPanel({
         <Button
           type="button"
           size="sm"
-          disabled={!data || data.canWrite === false}
+          disabled={!data || data.canWrite !== true}
           onClick={() => {
-            if (canUseReceiptRead() && data?.canWrite !== false) setEdit("new");
+            if (canUseReceiptRead() && data?.canWrite === true) setEdit("new");
           }}
         >
           <Plus className="mr-1 h-4 w-4" /> Add receipt
@@ -272,6 +293,30 @@ function AuthenticatedVehicleReceiptPanel({
           No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.
         </p>
       )}
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={page === 0}
+          onClick={() => changePage(pageIntent.current - 1)}
+        >
+          Previous receipts
+        </Button>
+        <span>
+          Receipt page {page + 1}
+          {data ? ` · ${data.totalCount} visible receipts at read time` : ""}
+        </span>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!data?.hasNext || page >= 1_000_000}
+          onClick={() => {
+            if (canUseReceiptRead() && data?.hasNext) changePage(pageIntent.current + 1);
+          }}
+        >
+          Next receipts
+        </Button>
+      </div>
       {data?.receipts.length ? (
         <div>
           <Label htmlFor={`receipt-category-filter-${vehicleId || shopVehicleId}`}>
@@ -292,6 +337,10 @@ function AuthenticatedVehicleReceiptPanel({
               </option>
             ))}
           </select>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Filters apply to displayed lines on this page. Pages can change as records are added or
+            removed.
+          </p>
         </div>
       ) : null}
       {data?.receipts
@@ -306,7 +355,7 @@ function AuthenticatedVehicleReceiptPanel({
                 </Badge>
                 <p className="text-xs text-muted-foreground">
                   Purchased: {r.purchased_on || "Date needed"}
-                  {r.total !== null ? ` · ${r.currency} ${Number(r.total).toLocaleString()}` : ""}
+                  {r.total !== null ? ` · ${r.currency} ${String(r.total)}` : ""}
                 </p>
               </div>
               <div className="flex flex-wrap gap-1">
@@ -341,16 +390,18 @@ function AuthenticatedVehicleReceiptPanel({
                       Record shop expense
                     </Button>
                   )}
-                {r.status === "draft" && r.can_write !== false && (
+                {r.status === "draft" && r.can_write === true && (
                   <>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        if (canUseReceiptRead()) setEdit(r);
-                      }}
-                    >
-                      Review
-                    </Button>
+                    {r.edit_eligible && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          if (canUseReceiptRead() && r.edit_eligible === true) setEdit(r);
+                        }}
+                      >
+                        Review
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"
@@ -364,10 +415,22 @@ function AuthenticatedVehicleReceiptPanel({
                 )}
               </div>
             </div>
+            {!r.items_complete && (
+              <p role="status" className="text-sm text-muted-foreground">
+                Showing {r.items.length} of {r.item_count} lines. This partial receipt cannot be
+                reviewed or change summary sharing.
+              </p>
+            )}
+            {r.status === "draft" && r.items_complete && !r.edit_eligible && (
+              <p role="status" className="text-sm text-muted-foreground">
+                This retained receipt contains values the current editor cannot preserve. Review is
+                unavailable; the original data is unchanged.
+              </p>
+            )}
             {r.items
               .filter((i) => !categoryFilter || i.category === categoryFilter)
               .slice()
-              .sort((a, b) => ((a as any).sort_order ?? 0) - ((b as any).sort_order ?? 0))
+              .sort((a, b) => a.sort_order - b.sort_order)
               .map((i) => (
                 <div
                   key={i.id}
@@ -388,7 +451,7 @@ function AuthenticatedVehicleReceiptPanel({
                         : "Not recorded as installed"}
                     </p>
                   </div>
-                  {r.status === "confirmed" && r.can_write !== false && !i.installed_on && (
+                  {r.status === "confirmed" && r.can_write === true && !i.installed_on && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -407,8 +470,9 @@ function AuthenticatedVehicleReceiptPanel({
                   <input
                     type="checkbox"
                     checked={r.share_with_shop}
-                    disabled={busy === r.id}
+                    disabled={busy === r.id || !r.items_complete}
                     onChange={(e) =>
+                      r.items_complete &&
                       action(r.id, () =>
                         shareFn({
                           data: {
@@ -426,8 +490,9 @@ function AuthenticatedVehicleReceiptPanel({
                   <input
                     type="checkbox"
                     checked={r.items.length > 0 && r.items.every((i) => i.public_summary_allowed)}
-                    disabled={busy === r.id}
+                    disabled={busy === r.id || !r.items_complete}
                     onChange={(e) =>
+                      r.items_complete &&
                       action(r.id, () =>
                         shareFn({
                           data: {
@@ -1119,12 +1184,15 @@ function VehicleShopConnections({
     [error, setError] = useState("");
   const qc = useQueryClient();
   const readLifetime = useId();
-  const linkKey = ["vehicle-shop-links", userId, vehicleId, readLifetime] as const;
+  const [page, setPage] = useState(0);
+  const pageIntent = useRef(0);
+  const linkKey = ["vehicle-shop-links", userId, vehicleId, readLifetime, page] as const;
   const linksEnabled = Boolean(userId && vehicleId);
   const links = useQuery({
     queryKey: linkKey,
     enabled: linksEnabled,
-    queryFn: ({ signal }) => list({ data: { vehicleId: vehicleId! }, signal }),
+    queryFn: ({ signal }) =>
+      list({ data: { vehicleId: vehicleId!, expectedAccountId: userId, page }, signal }),
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: true,
@@ -1133,13 +1201,18 @@ function VehicleShopConnections({
   });
   const linksInvalidated = useReadInvalidation(qc, linkKey);
   const data =
-    linksEnabled && links.isSuccess && links.fetchStatus === "idle" && !linksInvalidated
+    linksEnabled &&
+    links.isSuccess &&
+    links.fetchStatus === "idle" &&
+    !linksInvalidated &&
+    links.data.page === page
       ? links.data
       : undefined;
   function canUseLinkRead() {
     const current = qc.getQueryState(linkKey);
     return Boolean(
       data &&
+      data.page === pageIntent.current &&
       current?.status === "success" &&
       current.fetchStatus === "idle" &&
       !current.isInvalidated &&
@@ -1247,11 +1320,40 @@ function VehicleShopConnections({
                   </Button>
                 </div>
               )}
-            {data && !data.some((link) => link.active) && (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={page === 0}
+                onClick={() => {
+                  pageIntent.current = Math.max(0, pageIntent.current - 1);
+                  setPage(pageIntent.current);
+                }}
+              >
+                Previous connections
+              </Button>
+              <span>
+                Connection page {page + 1}
+                {data ? ` · ${data.totalCount} visible connections at read time` : ""}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!data?.hasNext || page >= 1_000_000}
+                onClick={() => {
+                  if (!canUseLinkRead() || !data?.hasNext) return;
+                  pageIntent.current += 1;
+                  setPage(pageIntent.current);
+                }}
+              >
+                Next connections
+              </Button>
+            </div>
+            {data && !data.links.some((link) => link.active) && (
               <p className="text-muted-foreground">No active shop connections in this snapshot.</p>
             )}
-            {data
-              ?.filter((l) => l.active)
+            {data?.links
+              .filter((l) => l.active)
               .map((l) => (
                 <div key={l.shop_vehicle_id} className="flex items-center justify-between">
                   <span>{l.shop_name || "Linked shop"}</span>

@@ -36,6 +36,50 @@ vi.mock("@/lib/vehicle-receipts.functions", () => ({
 }));
 const vehicle = "10000000-0000-4000-8000-000000000001";
 const draftId = "20000000-0000-4000-8000-000000000001";
+type ReceiptRead = Awaited<ReturnType<typeof api.getVehicleReceipts>>;
+type LinkRead = Awaited<ReturnType<typeof api.listVehicleShopLinks>>;
+// UI transport fixtures remain synthetic; server tests exercise the actual DTO parser.
+function receiptPage(
+  input: {
+    receipts: Array<VehicleReceipt & Partial<Omit<ReceiptRead["receipts"][number], "items">>>;
+    linkedVehicleId: string | null;
+    canWrite?: boolean;
+    canRecordExpense?: boolean;
+  },
+  page = 0,
+  totalCount = input.receipts.length,
+): ReceiptRead {
+  return {
+    ...input,
+    receipts: input.receipts.map((r) => ({
+      ...r,
+      items: r.items.map((item, index) => ({ ...item, receipt_id: r.id, sort_order: index })),
+      created_at: "2026-10-16T00:00:00Z",
+      can_write: r.can_write ?? true,
+      attachment_uploaded: r.attachment_uploaded ?? Boolean(r.file_path),
+      item_count: r.item_count ?? r.items.length,
+      items_complete: r.items_complete ?? true,
+      edit_eligible: r.edit_eligible ?? true,
+    })),
+    canWrite: input.canWrite ?? true,
+    canRecordExpense: input.canRecordExpense ?? false,
+    page,
+    totalCount,
+    hasNext: (page + 1) * 25 < totalCount,
+  };
+}
+function linkPage(
+  links: Array<{ shop_vehicle_id: string; shop_name: string | null; active: boolean }>,
+  page = 0,
+  totalCount = links.length,
+): LinkRead {
+  return {
+    links: links.map((l) => ({ ...l, vehicle_id: vehicle })),
+    page,
+    totalCount,
+    hasNext: (page + 1) * 100 < totalCount,
+  };
+}
 function receipt(vendor: string): VehicleReceipt {
   return {
     id: "receipt-1",
@@ -95,8 +139,8 @@ beforeEach(() => {
   auth.loading = false;
   vi.mocked(api.getVehicleReceipts)
     .mockReset()
-    .mockResolvedValue({ receipts: [], linkedVehicleId: null });
-  vi.mocked(api.listVehicleShopLinks).mockReset().mockResolvedValue([]);
+    .mockResolvedValue(receiptPage({ receipts: [], linkedVehicleId: null }));
+  vi.mocked(api.listVehicleShopLinks).mockReset().mockResolvedValue(linkPage([]));
   vi.mocked(api.startVehicleReceipt)
     .mockReset()
     .mockImplementation(async (options) => {
@@ -133,10 +177,12 @@ function privateReceipt(id = "private-receipt-1"): VehicleReceipt {
 describe("private receipt opening lifetime", () => {
   beforeEach(() => {
     vi.mocked(api.getPrivateReceiptUrl).mockReset();
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [privateReceipt()],
-      linkedVehicleId: null,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [privateReceipt()],
+        linkedVehicleId: null,
+      }),
+    );
     vi.spyOn(window, "open").mockReturnValue(null);
     vi.spyOn(toast, "error").mockImplementation(() => 0);
   });
@@ -191,10 +237,12 @@ describe("private receipt opening lifetime", () => {
   it("uses a synchronous lock before React commits duplicate clicks", async () => {
     const signed = deferred<string>();
     vi.mocked(api.getPrivateReceiptUrl).mockReturnValueOnce(signed.promise);
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [privateReceipt(), privateReceipt("private-receipt-2")],
-      linkedVehicleId: null,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [privateReceipt(), privateReceipt("private-receipt-2")],
+        linkedVehicleId: null,
+      }),
+    );
     show();
     const buttons = await screen.findAllByRole("button", { name: /^Receipt$/ });
     act(() => {
@@ -395,12 +443,12 @@ describe("private receipt opening lifetime", () => {
         vehicle,
         undefined,
       ]);
-      expect(event.query.queryKey).toHaveLength(5);
+      expect(event.query.queryKey).toHaveLength(6);
       seededKeys.push(event.query.queryKey);
-      event.query.setData(
-        { receipts: [privateReceipt()], linkedVehicleId: null },
-        { updatedAt: Date.now() + 60_000, manual: true },
-      );
+      event.query.setData(receiptPage({ receipts: [privateReceipt()], linkedVehicleId: null }), {
+        updatedAt: Date.now() + 60_000,
+        manual: true,
+      });
     });
     const invalidate = vi.spyOn(client, "invalidateQueries");
     let cleanups = 0;
@@ -942,27 +990,29 @@ describe("vehicle receipt workflow", () => {
     expect(api.installReceiptItem).not.toHaveBeenCalled();
   });
   it("offers manual entry when AI scanning fails without approving inferred data", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      linkedVehicleId: null,
-      receipts: [
-        {
-          id: "receipt-1",
-          vehicle_id: vehicle,
-          shop_vehicle_id: null,
-          created_by: "owner",
-          file_path: "owner/receipt/original.pdf",
-          file_name: "Receipt.pdf",
-          media_type: "application/pdf",
-          vendor: null,
-          purchased_on: null,
-          currency: "PHP",
-          total: null,
-          status: "draft",
-          share_with_shop: false,
-          items: [],
-        },
-      ],
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        linkedVehicleId: null,
+        receipts: [
+          {
+            id: "receipt-1",
+            vehicle_id: vehicle,
+            shop_vehicle_id: null,
+            created_by: "owner",
+            file_path: "owner/receipt/original.pdf",
+            file_name: "Receipt.pdf",
+            media_type: "application/pdf",
+            vendor: null,
+            purchased_on: null,
+            currency: "PHP",
+            total: null,
+            status: "draft",
+            share_with_shop: false,
+            items: [],
+          },
+        ],
+      }),
+    );
     vi.mocked(api.extractVehicleReceipt).mockRejectedValue(
       new Error("AI scanning is not configured yet. You can enter the receipt manually."),
     );
@@ -978,13 +1028,15 @@ describe("vehicle receipt workflow", () => {
   });
 
   it("separates cached receipts and linked shops when the authenticated account changes", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [receipt("Account A private supplier")],
-      linkedVehicleId: null,
-    });
-    vi.mocked(api.listVehicleShopLinks).mockResolvedValue([
-      { shop_vehicle_id: "shop-a", shop_name: "Account A linked shop", active: true },
-    ]);
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [receipt("Account A private supplier")],
+        linkedVehicleId: null,
+      }),
+    );
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValue(
+      linkPage([{ shop_vehicle_id: "shop-a", shop_name: "Account A linked shop", active: true }]),
+    );
     const { rerender, view, client } = show();
     await screen.findByText("Account A private supplier");
     await screen.findByText("Account A linked shop");
@@ -994,19 +1046,21 @@ describe("vehicle receipt workflow", () => {
     const oldLinkKey = client
       .getQueryCache()
       .find({ queryKey: ["vehicle-shop-links", "owner-a"], exact: false })!.queryKey;
-    expect(oldReceiptKey).toHaveLength(5);
-    expect(oldLinkKey).toHaveLength(4);
+    expect(oldReceiptKey).toHaveLength(6);
+    expect(oldLinkKey).toHaveLength(5);
     expect(client.getQueryData(oldReceiptKey)).toBeDefined();
     expect(client.getQueryData(oldLinkKey)).toBeDefined();
 
     auth.userId = "owner-b";
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [receipt("Account B private supplier")],
-      linkedVehicleId: null,
-    });
-    vi.mocked(api.listVehicleShopLinks).mockResolvedValue([
-      { shop_vehicle_id: "shop-b", shop_name: "Account B linked shop", active: true },
-    ]);
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [receipt("Account B private supplier")],
+        linkedVehicleId: null,
+      }),
+    );
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValue(
+      linkPage([{ shop_vehicle_id: "shop-b", shop_name: "Account B linked shop", active: true }]),
+    );
     rerender(view());
     expect(screen.queryByText("Account A private supplier")).not.toBeInTheDocument();
     expect(screen.queryByText("Account A linked shop")).not.toBeInTheDocument();
@@ -1031,10 +1085,13 @@ describe("vehicle receipt workflow", () => {
   it("does not fetch or render private cached data while signed out", async () => {
     auth.userId = null;
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-    client.setQueryData(["vehicle-receipts", "owner-a", vehicle, undefined], {
-      receipts: [receipt("Cached private supplier")],
-      linkedVehicleId: null,
-    });
+    client.setQueryData(
+      ["vehicle-receipts", "owner-a", vehicle, undefined],
+      receiptPage({
+        receipts: [receipt("Cached private supplier")],
+        linkedVehicleId: null,
+      }),
+    );
     client.setQueryData(
       ["vehicle-shop-links", "owner-a", vehicle],
       [{ shop_vehicle_id: "shop-a", shop_name: "Cached private shop", active: true }],
@@ -1046,10 +1103,12 @@ describe("vehicle receipt workflow", () => {
   });
 
   it("removes an open private receipt editor on sign-out and does not reopen it for another account", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [receipt("Account A editor supplier")],
-      linkedVehicleId: null,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [receipt("Account A editor supplier")],
+        linkedVehicleId: null,
+      }),
+    );
     const { rerender, view, container } = show();
     fireEvent.click(await screen.findByRole("button", { name: "Review" }));
     expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Account A editor supplier");
@@ -1062,7 +1121,9 @@ describe("vehicle receipt workflow", () => {
     expect(api.listVehicleShopLinks).toHaveBeenCalledTimes(1);
 
     auth.userId = "owner-b";
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({ receipts: [], linkedVehicleId: null }),
+    );
     rerender(view());
     await screen.findByText(
       "No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.",
@@ -1072,16 +1133,20 @@ describe("vehicle receipt workflow", () => {
   });
 
   it("resets an open private receipt editor on a direct account switch", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({
-      receipts: [receipt("Account A editor supplier")],
-      linkedVehicleId: null,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({
+        receipts: [receipt("Account A editor supplier")],
+        linkedVehicleId: null,
+      }),
+    );
     const { rerender, view } = show();
     fireEvent.click(await screen.findByRole("button", { name: "Review" }));
     expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Account A editor supplier");
 
     auth.userId = "owner-b";
-    vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(
+      receiptPage({ receipts: [], linkedVehicleId: null }),
+    );
     rerender(view());
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await screen.findByText(
@@ -1108,6 +1173,161 @@ describe("vehicle receipt workflow", () => {
   });
 });
 
+describe("bounded receipt and connection pages", () => {
+  it("binds receipt pages to the account and keeps an open editor during page changes", async () => {
+    const first = receiptPage(
+      {
+        receipts: Array.from({ length: 25 }, (_, i) => ({
+          ...receipt(`Page zero supplier ${i}`),
+          id: `page-zero-${i}`,
+        })),
+        linkedVehicleId: null,
+      },
+      0,
+      26,
+    );
+    const next = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts)
+      .mockResolvedValueOnce(first)
+      .mockReturnValueOnce(next.promise);
+    show();
+    const review = (await screen.findAllByRole("button", { name: "Review" }))[0];
+    const oldAdd = screen.getByRole("button", { name: "Add receipt" });
+    const nextButton = screen.getByRole("button", { name: "Next receipts" });
+    const previousButton = screen.getByRole("button", { name: "Previous receipts" });
+    fireEvent.click(review);
+    const editor = screen.getByRole("dialog");
+    fireEvent.change(within(editor).getByLabelText("Supplier / shop"), {
+      target: { value: "Preserved page draft" },
+    });
+    act(() => {
+      // The modal correctly hides background controls from accessibility. Retain
+      // their pre-modal references to exercise same-tick background callbacks.
+      nextButton.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      oldAdd.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await waitFor(() => expect(api.getVehicleReceipts).toHaveBeenCalledTimes(2));
+    expect(vi.mocked(api.getVehicleReceipts).mock.calls[1][0]).toMatchObject({
+      data: { expectedAccountId: "owner-a", vehicleId: vehicle, page: 1 },
+    });
+    expect(screen.queryByText("Page zero supplier 0")).not.toBeInTheDocument();
+    expect(screen.getByRole("dialog")).toBe(editor);
+    await act(async () =>
+      next.resolve(
+        receiptPage({ receipts: [receipt("Page one supplier")], linkedVehicleId: null }, 1, 26),
+      ),
+    );
+    await screen.findByText("Page one supplier");
+    expect(within(editor).getByLabelText("Supplier / shop")).toHaveValue("Preserved page draft");
+    expect(nextButton).toBeDisabled();
+    expect(previousButton).toBeEnabled();
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+  });
+
+  it("lets a failed later page return to a fresh first-page read", async () => {
+    vi.mocked(api.getVehicleReceipts)
+      .mockResolvedValueOnce(
+        receiptPage({ receipts: [receipt("First page supplier")], linkedVehicleId: null }, 0, 26),
+      )
+      .mockRejectedValueOnce(new Error("private later page cause"))
+      .mockResolvedValueOnce(
+        receiptPage({ receipts: [receipt("Fresh first page")], linkedVehicleId: null }),
+      );
+    show();
+    await screen.findByText("First page supplier");
+    fireEvent.click(screen.getByRole("button", { name: "Next receipts" }));
+    await screen.findByText("Could not load receipts. Please try again.");
+    expect(screen.queryByText("First page supplier")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Previous receipts" }));
+    await screen.findByText("Fresh first page");
+    expect(api.getVehicleReceipts).toHaveBeenCalledTimes(3);
+    expect(vi.mocked(api.getVehicleReceipts).mock.calls[2][0]).toMatchObject({ data: { page: 0 } });
+  });
+
+  it.each([
+    { items_complete: false, edit_eligible: false, item_count: 101 },
+    { items_complete: true, edit_eligible: false, item_count: 0 },
+  ])("does not review a partial or nonrepresentable retained draft %j", async (eligibility) => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [{ ...receipt("Read only retained supplier"), ...eligibility }],
+        linkedVehicleId: null,
+      }),
+    );
+    show();
+    await screen.findByText("Read only retained supplier");
+    expect(screen.queryByRole("button", { name: "Review" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+  });
+
+  it("cannot change summary sharing from an incomplete item set and displays the unrounded total", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [
+          {
+            ...receipt("Partial confirmed supplier"),
+            status: "confirmed",
+            total: 12.345678,
+            items_complete: false,
+            item_count: 101,
+            edit_eligible: false,
+          },
+        ],
+        linkedVehicleId: null,
+      }),
+    );
+    show();
+    await screen.findByText("Partial confirmed supplier");
+    expect(screen.getByText(/PHP 12\.345678/)).toBeInTheDocument();
+    for (const checkbox of screen.getAllByRole("checkbox")) {
+      expect(checkbox).toBeDisabled();
+      fireEvent.click(checkbox);
+    }
+    expect(api.setReceiptSharing).not.toHaveBeenCalled();
+    expect(screen.getByText(/Showing 0 of 101 lines/)).toBeInTheDocument();
+  });
+
+  it("pages connections independently and fences the old revoke control before commit", async () => {
+    vi.mocked(api.listVehicleShopLinks).mockResolvedValueOnce(
+      linkPage(
+        [{ shop_vehicle_id: "old-shop", shop_name: "First page shop", active: true }],
+        0,
+        101,
+      ),
+    );
+    const next = deferred<LinkRead>();
+    vi.mocked(api.listVehicleShopLinks).mockReturnValueOnce(next.promise);
+    show();
+    await screen.findByText("First page shop");
+    const oldRevoke = screen.getByRole("button", { name: "Revoke access" });
+    act(() => {
+      screen
+        .getByRole("button", { name: "Next connections" })
+        .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      oldRevoke.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await waitFor(() => expect(api.listVehicleShopLinks).toHaveBeenCalledTimes(2));
+    expect(api.revokeShopVehicleLink).not.toHaveBeenCalled();
+    expect(vi.mocked(api.listVehicleShopLinks).mock.calls[1][0]).toMatchObject({
+      data: { expectedAccountId: "owner-a", vehicleId: vehicle, page: 1 },
+    });
+    await act(async () =>
+      next.resolve(
+        linkPage(
+          [{ shop_vehicle_id: "next-shop", shop_name: "Second page shop", active: true }],
+          1,
+          101,
+        ),
+      ),
+    );
+    await screen.findByText("Second page shop");
+    expect(screen.queryByText("First page shop")).not.toBeInTheDocument();
+    expect(api.getVehicleReceipts).toHaveBeenCalledTimes(1);
+  });
+});
+
 // Actual panel + React Query; every transport/Auth result remains synthetic.
 // Read cancellation does not prove server/DB cancellation, role revocation or
 // bounded/complete backend DTOs. Existing mutation chains are not changed here.
@@ -1119,14 +1339,14 @@ describe("receipt and shop-link read snapshots", () => {
   const otherShopVehicle = "10000000-0000-4000-8000-000000000004";
   const empty =
     "No receipts are visible in this snapshot. Upload a receipt or enter purchases manually.";
-  const reply = (vendor: string): ReceiptRead => ({
-    receipts: [receipt(vendor)],
-    linkedVehicleId: null,
-    canWrite: true,
-  });
-  const links = (shop: string): LinkRead => [
-    { shop_vehicle_id: "synthetic-shop", shop_name: shop, active: true },
-  ];
+  const reply = (vendor: string): ReceiptRead =>
+    receiptPage({
+      receipts: [receipt(vendor)],
+      linkedVehicleId: null,
+      canWrite: true,
+    });
+  const links = (shop: string): LinkRead =>
+    linkPage([{ shop_vehicle_id: "synthetic-shop", shop_name: shop, active: true }]);
   function installedCandidate(): VehicleReceipt {
     return {
       ...receipt("Confirmed supplier"),
@@ -1197,8 +1417,8 @@ describe("receipt and shop-link read snapshots", () => {
       .findAll({ queryKey: ["vehicle-shop-links"] })[0].queryKey;
     expect(receiptKey.slice(0, 4)).toEqual(["vehicle-receipts", "owner-a", vehicle, undefined]);
     expect(linkKey.slice(0, 3)).toEqual(["vehicle-shop-links", "owner-a", vehicle]);
-    expect(receiptKey).toHaveLength(5);
-    expect(linkKey).toHaveLength(4);
+    expect(receiptKey).toHaveLength(6);
+    expect(linkKey).toHaveLength(5);
     expect(typeof receiptKey[4]).toBe("string");
     expect(typeof linkKey[3]).toBe("string");
     const receiptCall = vi.mocked(api.getVehicleReceipts).mock.calls[0][0] as unknown as {
@@ -1209,8 +1429,8 @@ describe("receipt and shop-link read snapshots", () => {
       data: { vehicleId: string };
       signal: AbortSignal;
     };
-    expect(receiptCall.data).toEqual({ vehicleId: vehicle });
-    expect(linkCall.data).toEqual({ vehicleId: vehicle });
+    expect(receiptCall.data).toEqual({ vehicleId: vehicle, expectedAccountId: "owner-a", page: 0 });
+    expect(linkCall.data).toEqual({ vehicleId: vehicle, expectedAccountId: "owner-a", page: 0 });
     expect(receiptCall.signal).toBeInstanceOf(AbortSignal);
     expect(linkCall.signal).toBeInstanceOf(AbortSignal);
     expect(receiptCall.signal).not.toBe(linkCall.signal);
@@ -1236,8 +1456,8 @@ describe("receipt and shop-link read snapshots", () => {
     expect(screen.queryByRole("button", { name: "Revoke access" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
     await act(async () => {
-      pending.resolve({ receipts: [], linkedVehicleId: null, canWrite: false });
-      pendingLinks.resolve([]);
+      pending.resolve(receiptPage({ receipts: [], linkedVehicleId: null, canWrite: false }));
+      pendingLinks.resolve(linkPage([]));
     });
     await screen.findByText(empty);
     expect(screen.getByRole("button", { name: "Add receipt" })).toBeDisabled();
@@ -1431,11 +1651,13 @@ describe("receipt and shop-link read snapshots", () => {
   });
 
   it("blocks old DOM list controls in the exact tick invalidation begins", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
-      receipts: [privateReceipt(), installedCandidate()],
-      linkedVehicleId: null,
-      canWrite: true,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [privateReceipt(), installedCandidate()],
+        linkedVehicleId: null,
+        canWrite: true,
+      }),
+    );
     vi.mocked(api.listVehicleShopLinks).mockResolvedValueOnce(links("Current shop"));
     const { client } = show();
     await screen.findByText("Current shop");
@@ -1467,8 +1689,8 @@ describe("receipt and shop-link read snapshots", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expectNoListWrites();
     await act(async () => {
-      read.resolve({ receipts: [], linkedVehicleId: null });
-      linkRead.resolve([]);
+      read.resolve(receiptPage({ receipts: [], linkedVehicleId: null }));
+      linkRead.resolve(linkPage([]));
     });
   });
 
@@ -1556,12 +1778,14 @@ describe("receipt and shop-link read snapshots", () => {
   );
 
   it("has no perpetual disabled-link loading in native-shop mode and guards same-tick code/expense admission", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
-      receipts: [{ ...installedCandidate(), shop_vehicle_id: shopVehicle }],
-      linkedVehicleId: null,
-      canWrite: true,
-      canRecordExpense: true,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [{ ...installedCandidate(), shop_vehicle_id: shopVehicle }],
+        linkedVehicleId: null,
+        canWrite: true,
+        canRecordExpense: true,
+      }),
+    );
     const { client } = show(undefined, { shopVehicleId: shopVehicle });
     const code = await screen.findByRole("button", { name: "Create owner connection code" });
     await waitFor(() => expect(code).toBeEnabled());
@@ -1577,7 +1801,9 @@ describe("receipt and shop-link read snapshots", () => {
     });
     expect(api.requestShopVehicleLink).not.toHaveBeenCalled();
     expect(api.recordVehicleReceiptExpense).not.toHaveBeenCalled();
-    await act(async () => pending.resolve({ receipts: [], linkedVehicleId: null, canWrite: true }));
+    await act(async () =>
+      pending.resolve(receiptPage({ receipts: [], linkedVehicleId: null, canWrite: true })),
+    );
     vi.mocked(api.requestShopVehicleLink).mockResolvedValueOnce("synthetic-owner-code");
     fireEvent.click(screen.getByRole("button", { name: "Create owner connection code" }));
     await waitFor(() =>
@@ -1586,11 +1812,13 @@ describe("receipt and shop-link read snapshots", () => {
   });
 
   it("keeps review and installation drafts mounted across fetching/error/success without applying new rows to them", async () => {
-    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
-      receipts: [receipt("Original supplier"), installedCandidate()],
-      linkedVehicleId: null,
-      canWrite: true,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [receipt("Original supplier"), installedCandidate()],
+        linkedVehicleId: null,
+        canWrite: true,
+      }),
+    );
     const { client } = show();
     fireEvent.click(await screen.findByRole("button", { name: "Review" }));
     const editor = screen.getByRole("dialog");
@@ -1607,22 +1835,26 @@ describe("receipt and shop-link read snapshots", () => {
     await act(async () => read.reject(new Error("PRIVATE refresh failure")));
     await screen.findByText("Could not load receipts. Please try again.");
     expect(screen.getByRole("dialog")).toBe(editor);
-    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
-      receipts: [receipt("New row supplier"), installedCandidate()],
-      linkedVehicleId: null,
-      canWrite: false,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [receipt("New row supplier"), installedCandidate()],
+        linkedVehicleId: null,
+        canWrite: false,
+      }),
+    );
     act(() => {
       void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
     });
     await screen.findByText("New row supplier");
     expect(screen.getByRole("dialog")).toBe(editor);
     expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Unsaved private draft");
-    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce({
-      receipts: [installedCandidate()],
-      linkedVehicleId: null,
-      canWrite: true,
-    });
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [installedCandidate()],
+        linkedVehicleId: null,
+        canWrite: true,
+      }),
+    );
     fireEvent.click(within(editor).getAllByRole("button", { name: /^Close$/ })[0]);
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     await screen.findByRole("button", { name: "Record installation" });
