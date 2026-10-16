@@ -1,5 +1,33 @@
 # 365 Seven Day Completion Plan
 
+Source `d4538923` connects bounded command-strict session-claim custody to receipt
+expense recording only. Final978/9784 suites12.65s, full TypeScript, review/
+format/diff/changed-line lint and214 assets/existing-output Worker guards pass;
+2 retained full-file lint warnings, zero errors. New-head CI remains independent;
+no fresh local build with low memory. This denies observed tuple/expiry/lifetime
+drift, not original-token custody, strict revocation/native authority or financial
+acceptance. Generated middleware/legacy RPC/private SQL/reader behavior unchanged.
+Next owned ingress/session/native-shop authority and bounded full staff/claim/
+native bridge composition, complete catalog/all-writer/financial/recovery closure;
+safe101+ edit remains independent. QA signup still unsubmitted on fresh read-only
+check, native pilot/owner/API/private-original/full recovery/release and Cloudflare
+failure gates remain. Target22 October is at risk; Day2 reassessment17 October is
+retained without scope cuts or guarantees. Evidence:
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md`. No Docker/hosted write/deploy.
+
+Published0eae8692 actual native PG17 expense rehearsal passes116999369392/
+38908883680 with server170011/ten ordered markers/EXIT+always-cleanup; retry,
+binding, outer visibility, real account+ledger FK and post-wait drift pass.
+Owner/GUC remains synthetic, not native human/session/shop/API/private-original/
+restore acceptance. All six Actions gates pass, unit116999369587:4,696/92 files
+96.87s, zero unexpected/quarantined failures; returned log truncated/final
+summaries present. Parts247/quote/bounded recovery pass,47 replay failures remain; Preview
+config skip/no upload, Workers latest fresh cause unverified. Next trusted
+command admission/current-catalog/all-writer/financial/full recovery,
+plus independent safe101+ edit. QA/pilot/owner/live and22 October risk/17 October
+review remain; no scope cuts/guarantee/live/deploy. Notes join next source slice,
+not a docs-only restart; earlier pending-native text is superseded.
+
 Latest source `7d866ce0` prepares the Docker-free native PG17 expense session
 harness, frozen-source builder and safe cleanup/diagnostics. Root104/104 (39.882s),
 no skips/failures, reviews/format/lint/214 assets/Worker guards pass; actual Linux

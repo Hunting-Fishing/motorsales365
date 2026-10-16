@@ -1,5 +1,29 @@
 # Native Customer 360: first delivery slice
 
+Source `d4538923` connects strict command session-claim custody to receipt expense
+recording only: same-client observed-token claims/current-user tuple, expiry and
+shared monotonic10s Auth wait; legacy RPC/private transaction/generated middleware
+and reader behavior unchanged. Final978/9784 suites12.65s, full TypeScript,
+review/format/diff/changed-line lint pass;2 retained full-file lint warnings,
+zero errors.214 tracked assets/existing-output Worker/backend/OCR/PDF guards pass,
+not a fresh build or actual Auth/private-storage/financial acceptance. See
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md`. New-head CI is separate. Next owned
+ingress/strict session/native authority/full staff-claim-native composition and
+catalog/all-writer/financial/recovery closure before candidate activation; safe
+101+ editing stays open. QA signup still unsubmitted; no SQL/grant/live/deploy.
+
+Published0eae8692 actual native PG17 expense rehearsal passes job116999369392/
+run38908883680, untruncated server170011/ten ordered markers/EXIT+always-cleanup.
+Retry/binding/outer visibility/real account+ledger FK/post-wait drift pass with
+synthetic owner/GUC only, not real Auth/native-shop/private-original/recovery.
+All six Actions gates pass, unit116999369587:4,696/92 files96.87s, zero unexpected/
+quarantined failures; returned unit log truncated with final summaries present.
+Parts247/quote/bounded recovery pass,47 replay failures remain; Preview config
+skip/no upload, latest Workers fresh failure cause unverified. Next
+trusted human/session/shop command admission/current-catalog/all-writer/financial/
+full recovery before connection; safe101+ edit remains. No live/migration/grant/
+deploy. Notes join next source slice; older pending-native statements superseded.
+
 Latest source `7d866ce0` prepares Docker-free native PG17 expense independent
 sessions with exact frozen-source parity and conservative cleanup/reporting.
 Root104/104 (39.882s), no skips/failures, frozen reviews/format/lint/214 assets/

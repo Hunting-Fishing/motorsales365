@@ -16,12 +16,47 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest source `d4538923` (initial source50cf029c plus checked-callable typing fix)
+connects command-strict session-claim custody ONLY to receipt expense recording.
+Same-client exact-observed-bearer claims/current-user checks, immutable security
+tuple/expiry/lifetime and a shared monotonic10s Auth budget deny observed drift.
+Reader compatibility/generated middleware/legacy RPC/private SQL stay unchanged.
+Final978/978 across4 suites12.65s, full TypeScript, root/independent review,
+format/diff and changed-line lint pass; full-file lint has2 retained legacy
+warnings, zero errors.214 tracked assets and existing-output Worker/backend/OCR/
+PDF guards pass; no new local build due low memory, new-head CI is independent.
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md` records pins and exact limits.
+No strict session revocation, original-token/native authority or financial
+acceptance is claimed. Next owned ingress/session/native authority and bounded
+full staff/claim/native bridge composition, current catalog/all-writer/financial/
+recovery closure before private SQL connection; safe101+ edit remains separate.
+QA signup is still unsubmitted on fresh read-only browser check; no repeated
+question, grant, Docker, hosted write, migration, provider activation or deploy.
+Earlier next-dependency wording below is superseded, not repeated work.
+
+Published `0eae8692` now passes actual native expense PG17 job116999369392/
+run38908883680: untruncated server170011/all ten ordered markers, observed retry/
+binding/outer-transaction/real account+ledger FK/post-wait drift and EXIT+always-
+cleanup proofs. Synthetic owner/GUC only, no native human/Auth/API/private-original/
+restore/release promotion. Parts247/quote/bounded recovery pass,47 replay failures
+remain; tiny66/81/209ms not RTO. All six Actions gates now pass, including
+unit116999369587:4,696/92 files96.87s, zero unexpected/quarantined failures;
+returned unit log truncated with final summaries. Preview confirms skip/no upload;
+migration/production/Supabase Preview skip; newest Workersf5173470… fails with
+fresh cause unverified. Current214 media/Worker checks/remote/main/PR body verified.
+Next trusted original-human/fresh session/native-shop command
+admission and current-catalog/all-writer/account-phantom/financial/full recovery
+closure before connection; safe101+ review/edit remains independent unfinished
+receipt work. Do not repeat completed native harness/restrictions/recovery or
+manufacture authority with grants. Follow-up notes join the next source slice,
+not a docs-only CI restart. QA/pilot/owner/live and deadline-risk gates remain.
+
 Latest source `7d866ce0`: Docker-free native PG17 expense session harness and
 frozen-source builder, same candidate/PR #68. Final root104/104 (39.882s), no
 skips/failures, independent frozen reviews/syntax/format/six-file lint/diff and214
 assets/Worker guards pass. Actual new native execution remains PENDING; owner/GUC
 positives are synthetic, ordinary roles deny only, no grant/activation/live change.
-Verify exact new-head native server/cohorts/EXIT+always-cleanup before acceptance.
+The following pending-native text is superseded by the verified checkpoint above.
 Parent92d05890 all six Actions pass, application4,696/92 files93.50s, zero
 unexpected/quarantined failures (truncated log/final summaries). Bounded native
 Parts/quote/recovery pass,47 replay failures remain; Preview config skip/no upload,

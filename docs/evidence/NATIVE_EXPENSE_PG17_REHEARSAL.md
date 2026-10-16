@@ -1,9 +1,27 @@
 # Docker-free native receipt-expense rehearsal
 
 16 October 2026. Source `7d866ce01a6300f305a01cff939ba753ab6217d0`, same integrated
-branch/draft PR #68. Harness source and offline guards are implemented. **Actual
-Linux PostgreSQL17 execution is pending**: no native-session success is inferred
-from the local tests below. No application, migration or hosted change.
+branch/draft PR #68. Publication `0eae86921ecae9d819e6a7eae79ab3149271c16b` is
+verified on the canonical remote/same draft PR, with unchanged title/base/main.
+**Actual Linux PostgreSQL17 expense rehearsal passes** in job116999369392,
+run38908883680. This remains synthetic owner/GUC admission, not real Auth/native
+shop/API/private-storage/restore or release acceptance. No hosted change.
+
+The untruncated log verifies server170011/private identity, all ten ordered PASS
+markers, exact final completion, child/group checks and EXIT+always-cleanup.
+Same-request replay, different-operation and complete-binding conflicts, outer
+visibility/competing writer/rollback, genuine account+ledger FK23503 and customer/
+vehicle/four financial-row post-wait drift cohorts pass. Retained Parts247/six
+quote groups/bounded recovery/cleanup pass; tiny66/81/209ms is not production RTO.
+47 replay failures remain. All six Actions gates now pass, including
+unit116999369587:4,696/4,696 across92 files96.87s, zero unexpected/quarantined
+failures; returned unit log truncated with final summaries, not inferred from
+parent92d05890. Preview
+116999366702/run38908883415 log confirms config skip/no upload; migration/
+production/Supabase Preview skip. Separate Workers116999425502/build
+f5173470-a650-49ae-9914-2dff972549b3 fails, fresh cause unverified.
+These follow-up notes join the next meaningful source slice without a docs-only
+CI restart; no actual native result is fabricated from the offline counts.
 
 ## Isolated execution boundary
 
@@ -116,9 +134,9 @@ groups/bounded synthetic recovery/cleanup; tiny49/83/198ms is not production RTO
 skip/no upload; migration/production/Supabase Preview skip. Workers116987860374,
 build9ed05e15-93dd-4fd6-8e55-28680df107e1, fails with fresh cause unverified.
 
-Next: verify this harness's exact published-head native package/server/cohort/
-EXIT+always-cleanup result through the CI diagnostic tool; repair a concrete
-failure without weakening checks. Then close native human/session/shop authority,
+Next: recover current0eae8692 unit result, then compose trusted original-human/
+fresh-session/native-shop command admission without granting clients ledger DML
+or promoting schema-owner/GUC proof. Close current human/session/shop authority,
 current whole catalog/baseline, all-writer/phantom/financial/recovery gates before
 connection.404/423 correspondence/12 historical/5 unapplied/2 envelopes/47 replay
 failures remain. Safe101+ reviewed edits, real private originals/API/Auth, QA

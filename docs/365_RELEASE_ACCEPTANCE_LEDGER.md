@@ -6,6 +6,34 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Source `d4538923` connects command-strict session-claim custody to C1.04 ONLY.
+Final978/9784 suites12.65s, full TypeScript, root/independent review, format/diff/
+changed-line lint pass;2 retained full-file warnings, zero errors.214 tracked
+assets/existing-output Worker/backend/OCR/PDF guards pass, not a new local build.
+New-head CI is independent. Same-client observed-token tuple/current-user/expiry/
+lifetime plus shared monotonic10s Auth wait deny observed drift; original-token
+custody, auth.sessions termination/native-shop/transaction authority remain open.
+Legacy RPC/private SQL/generated middleware/readers unchanged; no grant/live/
+activation/deploy. C1.04/R2/R3/C3 stay unaccepted. Fresh QA browser check still
+unsubmitted. Next owned ingress/session/native authority and bounded full staff/
+claim/native bridge composition, catalog/all-writer/financial/full recovery before
+private SQL connection; safe101+ draft review/edit is separate. Exact tests,
+metadata-only hosted observation and limits:
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md`. Earlier next steps superseded.
+
+Published0eae8692 actual native PG17 expense rehearsal passes116999369392/
+38908883680: untruncated server170011/ten ordered markers/EXIT+always-cleanup,
+observed retry/binding/outer visibility/real account+ledger FK/post-wait drift.
+Owner/GUC is still synthetic; C1.04/C3/R2/R3 remain unaccepted for trusted human/
+session/shop/all-writer/account-phantom/financial/current-catalog/API/Auth/private
+original/complete recovery. No grant/activation/live/deploy. All six Actions gates
+pass, unit116999369587:4,696/92 files96.87s, zero unexpected/quarantined failures;
+returned log truncated/final summaries present. Parts247/quote/bounded recovery
+pass,47 replay failures remain; Preview config skip/no upload, Workersf5173470…
+fresh failure cause unverified. Next trusted command admission/
+remaining acceptance; safe101+ edit remains independent. Follow-up notes join
+next source slice without docs-only restart; older pending-native text superseded.
+
 Latest source `7d866ce0`: Docker-free native PG17 expense session harness, exact
 frozen-source parity and bounded private-cluster cleanup/markers. Root104/104,
 39.882s, no skips/failures; reviews/format/lint/214 assets/Worker guards pass.
@@ -574,7 +602,7 @@ Prior opener scope and historical receipt mutation gaps are in
 | ID / lane          | Workflow and source anchor                                                                                                                                         | Source / integrated state                                                                                                                                            | Staging | Owner   | Live         | Required acceptance / exact remaining dependency                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | R1 / release       | Migration provenance, `scripts/ci/migration-provenance.mjs`                                                                                                        | Existing tooling plus typed 12/5/2 ledger; exact 404/423 whole-source mapping unchanged                                                                              | Blocked | Pending | Not verified | Resolve 12 historical source/replay gaps, validate five unapplied candidates and preserve two recorded envelope executions. Verify schema/ACL/trigger provenance and a reviewed forward/recovery path. No destructive history repair or restriction replay.                                                                                          |
-| R2 / release       | Identity, roles, team/offboarding, ownership claims; `src/lib/internal-staff.functions.ts` and `docs/evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`                | Staff returned-response/lifetime fixes integrated; authority and claim models are incomplete/unwired                                                                 | Blocked | Pending | Not verified | Original-human and fresh session/role/tenant checks, trusted native-team bindings, atomic manager/claim/offboarding protocols, durable retry/audit, private evidence custody and independent-session races. Preserve approved restrictions; do not treat bans as session revocation.                                                                 |
+| R2 / release       | Identity, roles, team/offboarding, ownership claims; `src/lib/internal-staff.functions.ts` and `docs/evidence/CLAIM_REVISION_INVALIDATION_MODEL.md`                | Staff/caller fixes integrated; d4538923 receipt-expense claim custody is deny-only; native authority/claim protocols unresolved | Blocked | Pending | Not verified | Owned original-token ingress, strict session termination/expiry and fresh native-role/tenant/team authority, atomic manager/claim/offboarding protocols, durable retry/audit, private evidence custody and independent-session races. Full platform staff/claim/native bridge composition remains separate. Preserve restrictions; bans/getClaims/getUser are not strict revocation. |
 | R3 / release       | Full artifact, hosting, database/private-object recovery                                                                                                           | Complete local artifact/214 copies verified; bounded synthetic PG17 restore/ACL/RLS/sequence/late-failure rollback passes at75974057; source build freeze integrated | Blocked | Pending | Not verified | Full baseline/API/Auth/private-original/configuration/owner/live recovery remains open;47 replay failures retained. Independent Workers installation still needs reviewed remediation, with newest failure cause unverified. Source WORKERS_CI guard does not repair installation or govern raw/replaced commands. Never deploy older sparse output. |
 | U0 / identity      | Native Google login/signup, `src/lib/google-oauth.ts`, `src/hooks/use-google-oauth.ts`, login/signup routes                                                        | PR #9 native-client handoff selectively adapted with URL, single-flight and context-lifetime guards                                                                  | Not run | Pending | Not verified | Verify approved Google provider/callback and Supabase redirect allowlist, actual implicit callback/session, pending-profile application, permitted account/role transitions and recovery. URL generation is not authentication or provisioning. Generated middleware/wrapper, dependencies and broader PR #9 cutover remain unchanged.               |
 | C1 / CRM           | Receipt image/PDF/manual review, `src/components/vehicle-receipt-panel.tsx`, `src/lib/receipt-document.client.ts`, `src/lib/vehicle-receipts.functions.ts`         | OCR and reviewed-entry foundations included; broader workflow acceptance open                                                                                        | Not run | Pending | Not verified | Phone image/PDF/manual correction to confirmed purchase/expense with correct amounts/currency/date/customer/vehicle/work order; no duplicate on retry, originals private. Recover original interrupted scanner/workspace separately or record its unresolved status; do not call source recovery completed by rebuilding.                            |
@@ -610,7 +638,7 @@ responses and a real QueryClient, not real Auth/storage/financial transactions.
 | C1.01 | Phone image/PDF/manual review                  | Existing OCR and manual editor with preflight and mounted holds. Actual phone/PDF corrections, controlled provider/local OCR recovery, totals/date/currency and original-byte custody remain required.                                                                                                                                                                                                                                                                       |
 | C1.02 | Receipt/shop-link pages and private attachment | `f50aaa0d` counted DTOs; `39a1ab1e` caller/key/URL binding and late-result discard. Actual roles/objects/expiry, retained key compatibility and byte/HTTP bounds remain unverified.                                                                                                                                                                                                                                                                                          |
 | C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                                                                                                                                                                                                             |
-| C1.04 | Record shop expense                            | Connected caller5bd1a715 remains unchanged. Private unapplied CREATE candidatef7632817 passes20 SQL cases/combined56, with exact full binding, single posting, outcome ledger, replay/drift refusal and real late-FK rollback. No client grant/activation; owner admission is synthetic. Native independent sessions/current catalog/authority/all-writer/account phantoms/financial policy/complete recovery and real API acceptance remain. |
+| C1.04 | Record shop expense                            | Connected strict claim custody d4538923:978 focused/full TypeScript pass, deny-only, not original-token/session/native authority. Private unapplied CREATE candidate f7632817 passes20 SQL cases/combined56 and actual native PG17 retry/binding/outer transaction/late-FK/post-wait drift/cleanup at0eae8692. No client grant/activation; owner/GUC is synthetic. Current complete catalog/native authority/all-writer/account phantoms/financial policy/full recovery/API acceptance stay open. |
 | C1.05 | Discard draft and attachment                   | `5ede72c6` temporarily interlocks all draft removal; disabled accessible UI has no dispatch listener, eligible review retained. Safe discard remains unfinished: durable account/tenant/receipt/key operation identity, all-writer fences, object/row coordination and verified original-byte recovery. Native direct capabilities unchanged; operation reordering alone is not rollback.                                                                                    |
 | C1.06 | Record installation                            | `ee9af3a8` captured seven-field intent, same-client child/parent preflights and void transport acknowledgment; parent-held session/lifetime/unknown fences and actual content cleanup. Purchase never implies installation. Native atomic binding/authority, persisted history, durable retry, correction/removal/consent and real-role/recovery acceptance remain.                                                                                                          |
 | C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                                                                                                                                                                                                                        |
@@ -897,25 +925,23 @@ Reference sources, authority crosswalk and commercial/expansion limits:
 
 ## Next actions and owner dependencies
 
-1. Verify existing PR #68's exact latest published CI head; continue on the same
-   branch/PR. Parent `2cbf20a4` passed all six gates, including native quote races
-   and locked quote94/94; connected `9a4059bd` published as `a69903a7` now passes
-   all six gates, application2,745/2,745. Publication `3dfca78a` now passes all six
-   gates, critical533/533/application2,998/2,998. New `eb90d15c`/`bd5e4b04` need
-   their own final publication/exact-head checks.
-   Do not substitute prior-head CI for new-head checks or repeat its completed
-   selected proof as new acceptance. Continue strict session/native-shop authority
-   and remaining receipt mutation scope after the implemented commercial/
-   communications guard, editor holds and per-mount fresh-only reads. Next bounded
-   implementation is receipt/link bounded complete DTO/caller/attachment binding
-   and typed server outcomes/durable retry. Retail assignment safety is connected,
-   not atomic/recoverable pipeline conversion. Retain native primary/link/
-   projection contracts; no early quote-candidate activation or positive authority
-   claim from these caller-denial changes.
-   Read-only follow-up audit is recorded in the new evidence: keep open editor/
-   installation state and uncertainty holds mounted through ordinary refetch;
-   preserve per-mount StrictMode in-flight tests and invalidation prefixes.
-   Auth bootstrap loading is not fresh roles/session authority.
+1. Existing PR #68 published0eae8692 now passes all six Actions gates;
+   unit116999369587 reports4,696/92 files96.87s, zero unexpected/quarantined
+   failures, with truncated log/final summaries. Actual native PG17 expense
+   retry/binding/outer transaction/FK/post-wait drift and cleanup passes at
+   116999369392; do not repeat it or promote synthetic owner/GUC to native authority.
+   Source7d866ce0/offline104/104/evidence has exact limits. Command-strict
+   receipt-expense custody atd4538923 passes978/full TypeScript but remains
+   deny-only. Next compose owned original-token ingress, strict session checks,
+   trusted native role/tenant/shop admission and the bounded full platform
+   staff/claim/native bridge foundation, current
+   complete catalog and protected all-writer/ledger boundaries before connection.
+   Preserve account-phantom/financial/full recovery gates; no client ledger DML or
+   owner grant to make tests work. Safe101+ full-line review/edit is the next
+   independent receipt dependency, not another read-only viewer. Existing private
+   child/editor/installation/unknown holds and source/read contracts remain.
+   Retail assignment is still not atomic/recoverable conversion. Current follow-up
+   notes join the next meaningful source slice without a docs-only CI restart.
 2. Continue the remaining PR #9 reconciliation, including provider/generated middleware,
    configuration, assets and its legacy-URL migration. Do not expose tracked
    `.env` contents or bulk merge the provider cleanup. Next native email work is
