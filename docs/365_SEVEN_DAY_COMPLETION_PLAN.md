@@ -1,5 +1,22 @@
 # 365 Seven Day Completion Plan
 
+Latest source `f7632817` adds an unapplied private receipt CREATE transaction and
+full-binding outcome ledger. Local20/20 plus combined56/56 (32.361s), frozen
+reviews/format/lint/214 assets/Worker guards pass; no client execute/ledger grant,
+app connection, migration or live change. Parent50baa80a all six Actions pass,
+application4,696/92 files92.72s, zero unexpected/quarantined failures; unit tail
+truncated with final summaries. Native bounded Parts/quote/restore pass,47 replay
+failures remain; Preview config skip/no upload, separate Workers fresh cause
+unverified. Next: Docker-free PG17 independent-session/commit/rollback/post-wait
+drift acceptance, preserving synthetic authority and unresolved account-phantom/
+all-writer/financial/current-catalog/full recovery gates. Source evidence:
+`evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`; new-head CI is separate.
+QA signup remains unsubmitted; native pilot membership, full API/Auth/private
+originals, migration baseline, owner/release acceptance and safe101+ review/edit
+still threaten22 October.17 October feasibility review remains mandatory; no
+deadline guarantee, scope cut, repeated staging/cost/email question or Docker.
+Earlier next-transaction entries are superseded, not repeated recovery work.
+
 Latest source `10d23d37` implements the next unconnected receipt CREATE operation
 contract: exact cents/native receipt bounds/full payload binding and strict
 reported expense/journal results, no writer/ledger/grant/live change. Root36/36

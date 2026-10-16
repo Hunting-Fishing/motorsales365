@@ -4,7 +4,12 @@
 contract is not imported by the application, an SQL command or a migration. It
 does not create an expense, journal, operation ledger, hosted resource or live
 session. Source `10d23d37a26fe475046c5b77ac1281dd2f1dd922`; evidence/publication
-joins this integrated slice. New exact-head CI remains required. Do not describe
+joins this integrated slice. Published50baa80a now passes all six Actions gates;
+application4,696/92 files92.72s, zero unexpected/quarantined failures (truncated
+unit log with final summaries). Its bounded native Parts/quote/restore passes,
+47 replay failures, Preview config skip/no upload and separate Workers failure
+do not establish release acceptance. New transaction candidatef7632817 is
+documented in `EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`; do not describe
 it as an accepted atomic writer.
 
 ## Intent and reported result

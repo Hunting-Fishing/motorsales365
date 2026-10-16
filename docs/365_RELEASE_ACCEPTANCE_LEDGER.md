@@ -6,6 +6,23 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Latest source `f7632817`: unapplied private receipt CREATE transaction and full
+request-bound outcome ledger; single retained posting, legacy conflict refusal,
+ordered post-wait financial row locks/rechecks and unchanged replay acknowledgments.
+Local20/20 (23.724s), combined56/56 (32.361s), frozen reviews/format/lint/214
+assets/Worker boundaries pass. No client execute/ledger grants or app/live change.
+Owner/test.user is synthetic; row locks do not close account phantoms, global
+writers, human/native authority, accounting policy or recovery. C1.04/C3 remain
+unaccepted. Parent50baa80a all six Actions pass, application4,696/92 files92.72s,
+zero unexpected/quarantined failures, truncated log with final summaries; bounded
+native Parts/quote/restore pass,47 replay failures remain; Preview config skip/no
+upload, Workers fresh failure cause unverified. New-head CI separate. Next native
+PG17 independent-session retry/outer transaction/rollback/post-wait drift tests,
+then authority/current-catalog/all-writer/financial/full recovery closure before
+connection. `evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md` has exact tests,
+pins, migration impact and limitations. Earlier next-transaction entries are
+superseded; QA/pilot/owner/live and target-risk gates stay open.
+
 Latest source `10d23d37`: unconnected receipt CREATE exact-money/full-payload
 operation and reported-posting contract, not an SQL writer or durable ledger.
 Root36/36 (8.906s:22 pure/12 retained SQL/2 CI guards), review/syntax/format/full
@@ -578,7 +595,7 @@ responses and a real QueryClient, not real Auth/storage/financial transactions.
 | C1.01 | Phone image/PDF/manual review                  | Existing OCR and manual editor with preflight and mounted holds. Actual phone/PDF corrections, controlled provider/local OCR recovery, totals/date/currency and original-byte custody remain required.                                                                                                                                                                                                                                                                       |
 | C1.02 | Receipt/shop-link pages and private attachment | `f50aaa0d` counted DTOs; `39a1ab1e` caller/key/URL binding and late-result discard. Actual roles/objects/expiry, retained key compatibility and byte/HTTP bounds remain unverified.                                                                                                                                                                                                                                                                                          |
 | C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                                                                                                                                                                                                             |
-| C1.04 | Record shop expense                            | `5bd1a715` adds captured account/selected-shop intent, non-atomic target preflight, checked UUID transport acknowledgment and neutral current-only feedback/mounted holds. Retained posting fixture7804bd98 passes12/12 locally plus CI guards14/14; confirms rounding/conflict/zero/NaN and genuine selected late-FK rollback, not a fixed writer. Exact money, native authority/current catalog, payload-bound durable posting/recovery and real-role transactions remain. |
+| C1.04 | Record shop expense                            | Connected caller5bd1a715 remains unchanged. Private unapplied CREATE candidatef7632817 passes20 SQL cases/combined56, with exact full binding, single posting, outcome ledger, replay/drift refusal and real late-FK rollback. No client grant/activation; owner admission is synthetic. Native independent sessions/current catalog/authority/all-writer/account phantoms/financial policy/complete recovery and real API acceptance remain. |
 | C1.05 | Discard draft and attachment                   | `5ede72c6` temporarily interlocks all draft removal; disabled accessible UI has no dispatch listener, eligible review retained. Safe discard remains unfinished: durable account/tenant/receipt/key operation identity, all-writer fences, object/row coordination and verified original-byte recovery. Native direct capabilities unchanged; operation reordering alone is not rollback.                                                                                    |
 | C1.06 | Record installation                            | `ee9af3a8` captured seven-field intent, same-client child/parent preflights and void transport acknowledgment; parent-held session/lifetime/unknown fences and actual content cleanup. Purchase never implies installation. Native atomic binding/authority, persisted history, durable retry, correction/removal/consent and real-role/recovery acceptance remain.                                                                                                          |
 | C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                                                                                                                                                                                                                        |

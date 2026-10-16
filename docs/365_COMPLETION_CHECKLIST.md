@@ -16,6 +16,24 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest source `f7632817`: private, unapplied receipt CREATE transaction and full
+payload-bound outcome ledger; one retained posting, no legacy adoption/repost,
+post-wait financial row locks/rechecks and exact retry/drift refusal. Root20/20
+standalone (23.724s), combined56/56 (32.361s), two frozen reviews/syntax/format/
+full changed-file ESLint/diff and214 assets/Worker boundaries pass. No client
+execute/ledger grants, connected writer, migration, hosted change or deployment.
+Owner/test.user authority is synthetic; account phantoms/all-writer/native-role/
+policy/recovery remain unaccepted. Parent50baa80a now passes all six Actions,
+application4,696/92 files92.72s, zero unexpected/quarantined failures; truncated
+unit log has final summaries. Native bounded Parts/quote/restore pass,47 replay
+failures remain; Preview config skip/no upload, independent Workers failure cause
+unverified. Next: Docker-free PG17 independent-session retry/visibility/rollback/
+post-wait drift acceptance, then authority/current-catalog/all-writer/financial/
+full recovery closure before connection. Evidence:
+`evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`. Previous next-transaction
+entries below are superseded, not duplicate unfinished work. QA/owner/live and
+22 October risk/17 October feasibility gates remain. New-head CI is separate.
+
 Latest resumption source `10d23d37`: unconnected receipt CREATE operation contract
 prepares exact-cent intent, complete normalized payload binding and strict
 reported expense/journal/two-line results, including null-vendor/fallback collision

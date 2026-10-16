@@ -1,5 +1,20 @@
 # Native Customer 360: first delivery slice
 
+Latest source `f7632817`: unapplied private receipt CREATE transaction plus
+full-binding outcome ledger, single retained posting/no legacy adoption,
+post-wait financial row locks/rechecks and exact retry/drift refusal. Local20/20
+(23.724s), combined56/56 (32.361s), frozen reviews/format/lint/214 assets/Worker
+guards pass. No ordinary execute/ledger grant, app connection, migration or live
+change. Native authority/all-writer/account-phantom/financial/restore gates remain.
+Parent50baa80a all six Actions pass, application4,696/92 files92.72s, zero
+unexpected/quarantined failures; returned log truncated with final summaries.
+Native bounded Parts/quote/restore pass,47 replay failures remain; Preview config
+skip/no upload, separate Workers failure fresh cause unverified. Next: native
+PG17 independent sessions/commit visibility/rollback/post-wait drift, then trusted
+authority/current-catalog/full acceptance before connection. See
+`evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`; source is not owner/live
+acceptance. Earlier next-transaction entries are superseded. New-head CI separate.
+
 Latest source `10d23d37`: unconnected receipt CREATE operation contract with exact
 money/native receipt bounds/full payload binding and strict reported expense/
 journal/two-line results; no connected writer, SQL, ledger, grant or live change.
