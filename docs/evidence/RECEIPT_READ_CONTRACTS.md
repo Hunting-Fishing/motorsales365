@@ -1,5 +1,32 @@
 # Receipt read contracts
 
+## Publication of signing and mixed-consent candidate
+
+Canonical remote and the same attached draft PR #68 confirm publication
+`20198972dcab3afb35acf93749ef9e8ff98b8561`. Title/base/draft and main `70ab892a`
+are unchanged; PR body preserves all earlier evidence. Final-head 214 public
+Git/source/output copies and Worker/canonical-backend/OCR/PDF/server checks pass.
+
+Run `38864305932`: all six Actions gates pass. Completed unit `116853501011`
+confirms application 3,645/3,645 across 85 files (89.38s), zero unexpected or
+quarantined failures; the overall log is truncated but final summaries/checker
+are present. Completed native `116853501063`
+has an untruncated actual log: official PGDG17.11 packages, server marker170011,
+Parts247/247, six independent-session quote groups, both server stops/scoped
+cleanup and 47 retained local migration replay failures. This remains selected
+synthetic SQL rehearsal, not whole baseline/API/Auth/private-storage/restore proof.
+Wrapper `38864305961` preview `116853500746` is a confirmed DEPLOY_VIA_ACTIONS
+configuration skip without upload; migrations/production/Supabase Preview skip.
+Independent Workers build `39487f97-afab-4b78-865a-b1e7ab794b33` fails with ID/link
+only. Fresh cause and source-freeze execution are unverified, not inferred from an
+older Bun failure. No CI CLI/API fallback was used.
+
+These notes join the next integrated source slice without a docs-only CI restart.
+C1.04 expense-only caller/acknowledgment/lifetime/unknown handling is in progress;
+other receipt writers/shared RPC and SQL remain outside that bounded edit.
+Exact-money/conflict, native authority, durable retry/recovery, pilot/owner and
+live acceptance stay open. No deployment, grant, live write or Docker use.
+
 ## Mixed-consent follow-up and integrated candidate
 
 Source `1a49acc58355f48a1f0d2cd365d21e62ecb98418` adds an interim receipt-level

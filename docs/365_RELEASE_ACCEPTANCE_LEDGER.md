@@ -41,6 +41,34 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+Current C1.04 source `5bd1a715` adds captured account/selected-shop intent,
+same-client target preflight and checked UUID transport acknowledgment; panel
+synchronous admission/current-only neutral feedback/mounted unknown hold.
+Focused 1,415/1,415 across 12 suites (28.51s), all 124 retained panel cases plus
+37 new, independent review/format/diff/CI guards and final full TypeScript pass.
+Two new mock typing diagnostics receive erased fixture casts without runtime or
+assertion changes. Changed-line lint has zero new findings; fresh complete
+build/214 public copies/Worker/backend/OCR/PDF/server checks pass with retained
+warnings. Evidence/publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`.
+Atomic target/posting, exact-money/conflict, native authority, durable recovery
+and isolated/owner/live acceptance remain open. The real legacy expense query key
+is preserved, not hardened by invalidation. Next: C1.05/sharing/install boundaries.
+
+Publication `20198972` is verified on canonical remote/same attached draft PR #68/
+base/title/main; final 214 assets/Worker boundaries verify. Run `38864305932`
+now has all six Actions gates passing. Completed unit `116853501011` confirms
+application 3,645/3,645 across 85 files (89.38s), zero unexpected/quarantined
+failures; overall log truncated, final summaries/checker present.
+Untruncated native `116853501063` confirms PGDG17.11/170011, Parts247/247, six quote
+groups/stops/scoped cleanup and 47 retained replay failures, not full baseline/
+API/private-storage/restore proof. Wrapper preview `116853500746` is confirmed
+configuration skip without upload; migrations/production/Supabase Preview skip.
+Workers build `39487f97-afab-4b78-865a-b1e7ab794b33` fails with fresh cause unverified.
+These follow-up notes join the next source slice; no docs-only CI restart.
+C1.04 expense caller/typed transport acknowledgment/UI lifetime and mounted
+unknown hold are in progress; exact financial/authority/durable recovery remains
+unaccepted. No live write, deployment, scope cut or new owner acceptance.
+
 Integrated source `1a49acc5` adds a temporary mixed-consent sharing interlock on
 top of `39a1ab1e`. Final combined 1,180/1,180 across 11 suites (24.98s), including
 all 109 retained panel tests plus 15 new cases; independent review/format/diff
@@ -331,16 +359,16 @@ or a complete application inventory. All remain isolated-role/API/private-object
 unverified, owner pending and live unverified. Source tests use synthetic SDK
 responses and a real QueryClient, not real Auth/storage/financial transactions.
 
-| ID    | Existing action                                | Current source evidence and exact remaining closure                                                                                                                                                                                                                                 |
-| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| C1.01 | Phone image/PDF/manual review                  | Existing OCR and manual editor with preflight and mounted holds. Actual phone/PDF corrections, controlled provider/local OCR recovery, totals/date/currency and original-byte custody remain required.                                                                              |
-| C1.02 | Receipt/shop-link pages and private attachment | `f50aaa0d` counted DTOs; `39a1ab1e` caller/key/URL binding and late-result discard. Actual roles/objects/expiry, retained key compatibility and byte/HTTP bounds remain unverified.                                                                                                 |
-| C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                    |
-| C1.04 | Record shop expense                            | UUID payload currently ignored by UI. Require current-caller/lifetime and typed acknowledgment/unknown holds, then exact NUMERIC precision, existing amount/shop/vehicle conflict validation, durable posting/reconciliation and real-role transactions. No JS rounding substitute. |
-| C1.05 | Discard draft and attachment                   | Existing separate Storage removal then DB discard can partially complete. Require caller/acknowledgment/unknown handling and durable recoverable object/row coordination; operation reordering alone is not rollback.                                                               |
-| C1.06 | Record installation                            | Purchase never implies installation. Installation dialog still needs caller/lifetime/acknowledgment/unknown guards, exact receipt/item/vehicle binding, correction/removal/history consent and real-role acceptance.                                                                |
-| C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                               |
-| C1.08 | View/review receipts over 100 lines            | Current partial display is explicit and cannot replace the full item set. Complete-line viewing and a safe edit contract remain unfinished; the display cap does not remove these receipts from scope.                                                                              |
+| ID    | Existing action                                | Current source evidence and exact remaining closure                                                                                                                                                                                                                                                                                                                   |
+| ----- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1.01 | Phone image/PDF/manual review                  | Existing OCR and manual editor with preflight and mounted holds. Actual phone/PDF corrections, controlled provider/local OCR recovery, totals/date/currency and original-byte custody remain required.                                                                                                                                                                |
+| C1.02 | Receipt/shop-link pages and private attachment | `f50aaa0d` counted DTOs; `39a1ab1e` caller/key/URL binding and late-result discard. Actual roles/objects/expiry, retained key compatibility and byte/HTTP bounds remain unverified.                                                                                                                                                                                   |
+| C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                                                                                                      |
+| C1.04 | Record shop expense                            | `5bd1a715` adds captured account/selected-shop intent, non-atomic target preflight, checked UUID transport acknowledgment and neutral current-only feedback/mounted holds. Exact NUMERIC precision, persisted amount/shop/vehicle conflict validation, native authority, durable posting/reconciliation and real-role transactions remain. No JS rounding substitute. |
+| C1.05 | Discard draft and attachment                   | Existing separate Storage removal then DB discard can partially complete. Require caller/acknowledgment/unknown handling and durable recoverable object/row coordination; operation reordering alone is not rollback.                                                                                                                                                 |
+| C1.06 | Record installation                            | Purchase never implies installation. Installation dialog still needs caller/lifetime/acknowledgment/unknown guards, exact receipt/item/vehicle binding, correction/removal/history consent and real-role acceptance.                                                                                                                                                  |
+| C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                                                                                                                 |
+| C1.08 | View/review receipts over 100 lines            | Current partial display is explicit and cannot replace the full item set. Complete-line viewing and a safe edit contract remain unfinished; the display cap does not remove these receipts from scope.                                                                                                                                                                |
 
 The C1.03 mixed-consent UI interlock is implemented at `1a49acc5`; it cannot solve
 direct/concurrent SQL sharing. Next bounded source action is C1.04/C1.05 row-action

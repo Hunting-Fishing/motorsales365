@@ -16,6 +16,35 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+C1.04 source `5bd1a715` adds captured account/receipt/selected-shop intent,
+same-client target preflight, checked UUID transport acknowledgment, synchronous
+expense admission and current-only neutral feedback/mounted unknown holds.
+Focused 1,415/1,415 across 12 suites (28.51s), all 124 prior panel cases plus 37
+new, independent review/format/diff/CI guards and final full TypeScript pass.
+Two test-only fixture casts repair mock typing without runtime/assertion changes.
+Changed-line lint has zero new findings; fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Evidence and
+publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`. The target check is
+not atomic or proof of persisted financial mapping; the separate expense reader
+retains its legacy unscoped key. Exact-money/conflict, native authority and durable
+recovery stay open. Next: C1.05 discard and remaining sharing/install caller/
+acknowledgment/lifetime boundaries, preserving editor/unknown holds. No SQL/live
+write or deployment.
+
+Publication `20198972` is verified on canonical remote/same attached draft PR #68,
+with title/base/draft and main `70ab892a` unchanged. Final-head 214 public assets
+and Worker/backend/OCR/PDF/server checks pass. Run `38864305932` has five Actions
+gates passing initially; completed unit `116853501011` now makes all six green.
+Linux application 3,645/3,645 across 85 files (89.38s), zero unexpected/quarantined
+failures; overall log truncated, final summaries/checker present. Completed
+untruncated native `116853501063` confirms PGDG17.11/170011, Parts247/247, six quote
+groups, both stops/scoped cleanup and 47 retained replay failures. Wrapper preview
+`116853500746` is a confirmed configuration skip, not upload; migrations/production/
+Supabase Preview skip. Workers build `39487f97-afab-4b78-865a-b1e7ab794b33` fails
+with ID/link only, fresh cause unverified. These notes join the next source slice;
+no docs-only restart. C1.04 expense-only caller/acknowledgment/lifetime/unknown
+handling is now in progress, without changing other receipt writers or SQL.
+
 Mixed-consent source `1a49acc5` now refuses both receipt-level sharing operations
 when complete items have different public preferences. Disabled controls plus
 event predicates inspect the full unfiltered set; the visible notice preserves

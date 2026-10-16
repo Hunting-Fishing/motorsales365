@@ -1,5 +1,17 @@
 # Native Customer 360: first delivery slice
 
+C1.04 source `5bd1a715` (16 October) adds captured account/receipt/selected-shop
+expense intent, same-client preflight, checked transport acknowledgment and
+neutral current-only feedback. A synchronous per-mount fence/unknown hold
+survives ordinary receipt refresh/paging; other writers/editor/install stay
+unchanged. Focused 1,415/1,415 across 12 suites (28.51s), all 124 prior panel cases
+plus 37 new, review/format/diff/CI guards and final full TypeScript pass.
+Changed-line lint zero new findings and fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Evidence and
+publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`. Financial/conflict
+reconciliation, atomic target/native authority and durable recovery remain open;
+the expense reader still uses a legacy unscoped key. Next: C1.05/sharing/install.
+
 Mixed-consent source `1a49acc5` (16 October) adds a temporary receipt-level sharing
 interlock while preserving individual public choices. Both disabled and event
 guards use the full returned items, including category-filtered-out lines. Final

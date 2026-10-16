@@ -68,6 +68,19 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+16 October C1.04 source `5bd1a715` adds expense account/selected-shop caller and
+typed acknowledgment safety, with synchronous admission and mounted uncertainty/
+current-only neutral callbacks. Focused 1,415/1,415 across 12 suites (28.51s), all
+retained panel coverage plus 37 cases, review/format/diff/CI guards and final full
+TypeScript pass. Changed-line lint zero new findings and fresh complete build/214
+public copies/Worker/backend/OCR/PDF/server checks pass with retained warnings.
+Evidence/publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`.
+This is not atomic target binding, financial posting/reconciliation, native
+authority or durable retry. C1.05/sharing/install boundaries are next; exact-money/
+conflict/Storage recovery and shared release/pipeline gaps still threaten the
+target. Day 2 review on 17 October and 22 October 21:00 target remain unchanged;
+no scope cut or verified forecast.
+
 16 October connected source `1a49acc5` adds an interim mixed per-item consent
 interlock without replacing editor/install/expense or existing lifetimes. All
 1,180 focused cases pass across 11 suites (24.98s), including 15 new consent
