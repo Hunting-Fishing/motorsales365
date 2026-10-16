@@ -10,6 +10,8 @@
 -- Financial row locks do not prevent phantom account-code/line inserts: native
 -- chart_of_accounts lacks UNIQUE(shop_id,code), and legacy writers do not share
 -- this protocol. No independent-session/global-writer consistency is accepted.
+-- The early Auth-user KEY SHARE is deletion/FK ordering only. It does not block
+-- non-key user changes or establish session expiry/ban/native authority.
 BEGIN;
 SET LOCAL search_path = pg_catalog, pg_temp;
 CREATE SCHEMA receipt_expense_candidate;
@@ -250,13 +252,20 @@ DECLARE
   v_state text;
 BEGIN
   v_intent := receipt_expense_candidate.validate_intent(p_intent,p_binding);
+  -- Take the eventual outcome account FK target before any outcome lookup or
+  -- receipt/native/financial lock. A user deleted while this lock waits must
+  -- not proceed to posting; KEY SHARE is not a non-key update/session fence.
+  PERFORM u.id FROM auth.users u WHERE u.id=(v_intent->>'expectedAccountId')::uuid FOR KEY SHARE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION USING ERRCODE='42501', MESSAGE='Expense operation failed.';
+  END IF;
   SELECT o.* INTO v_before FROM receipt_expense_candidate.outcomes o
     WHERE o.account_id=(v_intent->>'expectedAccountId')::uuid AND o.operation_id=(v_intent->>'operationId')::uuid;
   v_had_before := FOUND;
   IF v_had_before AND (v_before.payload IS DISTINCT FROM v_intent OR v_before.binding IS DISTINCT FROM p_binding) THEN
     RAISE EXCEPTION USING ERRCODE='22023', MESSAGE='Expense operation failed.';
   END IF;
-  -- Consistent candidate lock order: receipt -> customer -> vehicle. Other
+  -- Candidate lock order: Auth user -> receipt -> customer -> vehicle. Other
   -- existing writers do NOT yet share this protocol; no global deadlock claim.
   SELECT r.* INTO v_receipt FROM public.vehicle_receipts r WHERE r.id=(v_intent->>'receiptId')::uuid FOR UPDATE;
   IF NOT FOUND OR v_receipt.shop_vehicle_id IS DISTINCT FROM (v_intent->>'expectedShopVehicleId')::uuid THEN

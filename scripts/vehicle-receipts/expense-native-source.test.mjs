@@ -106,7 +106,7 @@ test("documented frozen native-consumer API preserves setup order and exact unap
   assert.equal(first.candidateSQL, read(metadata.candidatePath));
   assert.equal(
     first.candidateSha256,
-    "ddea3f2c59cc8ec385c6273d700ea4a8ee2a010eeac14c3f6475cd3f7b3c1368",
+    "eec735a6274708f21b87a05883f43ec420b20e9dd37b4487cf6977ecb6cce570",
   );
   assert.equal(first.signature, "receipt_expense_candidate.create_operation(jsonb,text)");
   assert.ok(

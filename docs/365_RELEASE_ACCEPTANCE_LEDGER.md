@@ -10,6 +10,39 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Private/unapplied receipt-expense Auth-user KEY SHARE now precedes outcome and
+business locks; missing42501 prevents posting. SQLSHAeec735a6…; no Auth grants,
+definer/admin fallback, app connection or hosted changes. Four new synthetic
+native scenarios require observed delete waits, receipt NOWAIT, COMMIT/ROLLBACK/
+replay and graph/Auth equality with existing FKs. All18 prior markers plus three
+new markers remain mandatory; cleanup/timeouts/adversarial coverage preserved.
+Root75/75 in35.5518278s and retained draft36/36 in11.6102602s pass, zero fail/skip/
+cancel; lint/syntax/format/diff/independent review clear. New native21-marker/
+required own-head CI pending, not inherited. Parentcaa unit completion required
+before source push; same PR68/commit subject `Order private receipt expense
+Auth-user lock before business writes`, exact commit in publication comment.
+No native-human/session/non-key update/role/tenant/global-writer/API/private-object/
+full recovery acceptance. Next fresh native result then strict transaction
+authority/all-writer/durable reconciliation. All18+N1–N3,47/12/5/2, QA/hosting stops,
+owner/device/main/live gates and22 October risk remain.
+[Exact implementation and limits](evidence/AUTH_USER_EXPENSE_LOCK_ORDER.md).
+
+### Proposed Buddy contract checkpoint
+
+Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified same draft PR68/
+comment6222580829; prior full body/title/base/main preserved. Own38951117451
+Build117142431562/OCR/type/lint/native pass, unit117142431397 running separately,
+not accepted/inherited/cancelled. Actual native117142431134 untruncated PG17.11/
+Parts247/all18 ordered selected proofs/cleanup,47 failures retained; bounded
+57/59/157ms not full/RTO. Preview actually config-skips/no upload; production/
+migration/Supabase Preview skip. Workers0eb20ff8 fails fresh cause unknown,
+hosting stop unchanged. Existing automation source checkpoint updated/readback,
+same ID/settings/thread/creation. Notes join next implementation without docs-only
+restart; actual build final214/Worker/backend/OCR/PDF/server/dry-run guards exist
+(truncated); COMPLETE merge14a1878c… equals current candidate tree8c0a4920…,
+2,586 current objects/zero missing, not history recovery. Next completed own-head
+unit result, no unchanged24/1231/121 rerun or native/preview log reread.
+
 Independent N3 proposed365-side request/offer contract is implemented only:
 fixed v1, distinct references, required expected store/order/leg consistency,
 immutable whole comparison and contact-minimized offers. Final24/24 in1.44s,

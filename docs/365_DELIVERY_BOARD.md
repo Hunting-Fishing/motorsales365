@@ -12,7 +12,54 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
-**Current slice: proposed365-side Buddy request/offer contract.**
+**Current slice: private receipt-expense Auth-user deletion/FK ordering.**
+Source adds exact Auth-user KEY SHARE after immutable intent validation and before
+outcome/receipt/native/financial locks; missing user fails42501 before posting.
+CandidateSHAeec735a6… stays INVOKER/private/unapplied, client/service grants withheld.
+No session/non-key user/native authority/global-writer or production acceptance.
+Four dedicated noncreator native scenarios preserve creator/outcome FKs and
+require observed waits, independent receipt NOWAIT, COMMIT/ROLLBACK/replay and
+financial/draft/Auth equality. All18 prior markers plus three new markers remain
+mandatory; timeouts, cleanup, role denials and Parts coverage are unchanged.
+Root serial75/75 in35.5518278s plus retained draft36/36 in11.6102602s pass, zero
+fail/skip/cancel; lint/syntax/format/diff/independent review pass. Actual new native
+21-marker execution and own-head required checks remain pending, not inherited.
+Publication waits for parentcaa1e4c4 unit completion, no docs-only cancellation.
+Same draft PR68, commit subject `Order private receipt expense Auth-user lock
+before business writes`; exact commit recorded in its publication comment.
+No app activation/live change/main promotion/deployment.
+[Exact implementation and limits](evidence/AUTH_USER_EXPENSE_LOCK_ORDER.md).
+
+Next fresh native21-marker/cleanup and own-head required checks, then reviewed
+original-human/fresh-session/native-shop transaction authority, compatible all-
+writer financial/stock/refresh/role ordering and durable outcome reconciliation.
+Actual ordinary/service Auth SELECT/UPDATE remain absent; no privileged fallback.
+All scope,47/12/5/2, QA/hosting stops and deadline risk remain. N1/N2 authoritative
+stock/order/outbox still precedes signed N3. One documentation patch had an
+unmatched optional row context and changed nothing; one inspected exact-anchor
+alternative succeeded, no build/native action failure or new stopped action.
+
+### Proposed Buddy contract checkpoint
+
+Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified canonical branch/same
+draft PR68/comment6222580829, exact prior64,364-character body/title/base/draft/
+main70ab892a… preserved. Own38951117451 build117142431562/OCR/type/lint/native pass;
+unit117142431397 is running, not inherited/accepted/cancelled. Actual native
+117142431134 log is untruncated PG17.11/Parts247/all18 ordered selected expense/
+draft proofs/terminators/EXIT+always cleanup;47 failures retained, bounded
+57/59/157ms recovery not full/RTO. Preview117142433032 actually config-skips/no
+upload; production/migration/Supabase Preview skip. Workers0eb20ff8/check117142467128
+fails, fresh cause unverified; hosting stop unchanged, no diagnostics/redispatch.
+Existing automation updated/read back same identity/active30min/thread/creation,
+exact new source/limits/next dependency, no duplicate. These follow-up notes join
+next integrated source without cancelling this unit via a docs-only push. Next
+read actual completed current-head unit; no unchanged24/1231/121 reruns. Actual
+build log is truncated but final214 tracked assets/Worker motorsales365/canonical
+365/15OCR/202PDF/server-boundary/dry-run markers exist. Fetched COMPLETE CI merge
+14a1878c3ecd0f7d01569a476b1668f3172d30bb equals candidate whole current tree
+8c0a4920731258ced1f9dae39e102214a3b70f2d; current2,586 objects/zero missing,
+not ancestor-history recovery. No repeated native/preview log read.
+
 Independent N3 source implements fixed v1 data, required independent expected
 store/order/leg consistency, frozen detached full-payload canonical comparison
 and minimized offers without contact/internal order references. It is UNWIRED:

@@ -23,6 +23,7 @@ import {
   PsqlSession,
   invokeSQL,
   SNAPSHOT_SQL,
+  AUTH_USER_SNAPSHOT_SQL,
   runNativeExpense,
 } from "./native-expense-postgres.mjs";
 import { buildExpenseNativeSource } from "../vehicle-receipts/expense-native-source.mjs";
@@ -558,7 +559,7 @@ test("fixture boundary pins exact source, statements terminated, no client privi
   assert.equal(built.signature, "receipt_expense_candidate.create_operation(jsonb,text)");
   assert.equal(
     built.candidateSha256,
-    "ddea3f2c59cc8ec385c6273d700ea4a8ee2a010eeac14c3f6475cd3f7b3c1368",
+    "eec735a6274708f21b87a05883f43ec420b20e9dd37b4487cf6977ecb6cce570",
   );
   assert.equal(built.setupStatements.length, 29);
   assert.ok(built.setupStatements.every((sql) => sql.trim().endsWith(";")));
@@ -611,4 +612,62 @@ test("all cohorts use observed lock barriers, exact errors, privacy-safe markers
     source,
     /NOT authority policy global-writer phantom API Auth Storage restore or release acceptance/,
   );
+});
+
+test("Auth-user cohort snapshot preserves old selected graph and hashes draft/Auth rows without exposing them", () => {
+  assert.ok(AUTH_USER_SNAPSHOT_SQL.includes(SNAPSHOT_SQL.slice(0, -1)));
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /'selectedGraph'/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /'draftGraph'/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /'authUsers'/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /FROM auth\.users t/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /FROM public\.vehicle_receipt_items t/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /FROM public\.vehicle_shop_links t/);
+  assert.match(AUTH_USER_SNAPSHOT_SQL, /encode\(sha256\(convert_to/);
+  assert.match(source, /assertAuthUserState\(observer, accountId, true\)/);
+  assert.match(source, /assertAuthUserState\(observer, accountId, false\)/);
+  assert.match(source, /profile: \{ id: accountId, userId: accountId, shopId: ids\.shop \}/);
+  assert.match(source, /assert\.equal\(await snapshot\(observer\), beforeFinancial\)/);
+  assert.match(source, /assert\.equal\(await authUserSnapshot\(observer\), deletedGraph\)/);
+});
+
+test("new Auth-user cohorts follow every old proof and require real wait, receipt NOWAIT and FK controls before PASS", () => {
+  const oldLast = source.indexOf("await rehearseDraftLine({");
+  const commandFirst = source.indexOf('stage = "auth-user-command-first";');
+  const deleteRollback = source.indexOf('stage = "auth-user-delete-rollback";');
+  const deleteCommit = source.indexOf('stage = "auth-user-delete-commit";');
+  const complete = source.indexOf('stage = "complete";', deleteCommit);
+  assert.ok(oldLast > 0 && commandFirst > oldLast);
+  assert.ok(
+    deleteRollback > commandFirst && deleteCommit > deleteRollback && complete > deleteCommit,
+  );
+  const passes = [
+    "auth user command-first observed wait retains FK denial and outer ROLLBACK",
+    "auth user delete-first observed wait precedes receipt lock; ROLLBACK permits command",
+    "auth user delete-first COMMIT denies missing actor without financial changes",
+  ];
+  const positions = passes.map((name) => source.indexOf(JSON.stringify(name), commandFirst));
+  assert.ok(positions[0] > commandFirst && positions[0] < deleteRollback);
+  assert.ok(positions[1] > deleteRollback && positions[1] < deleteCommit);
+  assert.ok(positions[2] > deleteCommit && positions[2] < complete);
+  const cohort = source.slice(commandFirst, complete);
+  assert.match(cohort, /authUserRequest\(91001\)/);
+  assert.match(cohort, /authUserRequest\(91002\)/);
+  assert.match(cohort, /authUserRequest\(91003\)/);
+  assert.match(cohort, /authUserRequest\(91004\)/);
+  assert.match(cohort, /assert\.notEqual\(accountId, ids\.manager\)/);
+  assert.match(cohort, /SELECT created_by::text FROM public\.vehicle_receipts/);
+  assert.match(cohort, /c\.confrelid='auth\.users'::regclass/);
+  assert.match(cohort, /c\.convalidated AND c\.confdeltype='a'/);
+  assert.match(cohort, /receiptCreator: "1", outcomeAccount: "1"/);
+  assert.match(cohort, /FOR UPDATE NOWAIT/);
+  assert.match(cohort, /await observedBlock\(observer, deleter, owner\)/);
+  assert.equal((cohort.match(/await receiptRemainsUnlocked\(probe, value\)/g) ?? []).length, 2);
+  assert.equal((cohort.match(/await observedBlock\(observer, owner, deleter\)/g) ?? []).length, 4);
+  assert.match(cohort, /"23503"/);
+  assert.match(cohort, /"42501"/);
+  assert.match(cohort, /await owner\.command\("ROLLBACK;"\)/);
+  assert.match(cohort, /await deleter\.command\("ROLLBACK;"\)/);
+  assert.match(cohort, /await deleter\.command\("COMMIT;"\)/);
+  assert.doesNotMatch(cohort, /ALTER TABLE|DROP CONSTRAINT|DISABLE TRIGGER|SET ROLE|GRANT /);
+  assert.doesNotMatch(cohort, /UPDATE public\.vehicle_receipts SET created_by/);
 });

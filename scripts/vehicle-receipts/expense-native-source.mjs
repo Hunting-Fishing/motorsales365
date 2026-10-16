@@ -136,7 +136,7 @@ export const metadata = Object.freeze({
   fixturePath: "scripts/vehicle-receipts/expense-posting-fixture.mjs",
   fixtureSha256: "98db65cfe826651d234367e9fae9c3222a294010d99bbd8a6876fc880fc6d2d1",
   candidatePath: "scripts/vehicle-receipts/expense-operation-candidate.sql",
-  candidateSha256: "ddea3f2c59cc8ec385c6273d700ea4a8ee2a010eeac14c3f6475cd3f7b3c1368",
+  candidateSha256: "eec735a6274708f21b87a05883f43ec420b20e9dd37b4487cf6977ecb6cce570",
   wholeSourceCount: 7,
   spanCount: 22,
   seedStatementCount: 7,

@@ -215,7 +215,7 @@ quiet_native 7s "$expense_bin/pg_isready" -h "$expense_root/socket" -p 55436 -U 
 
 report_phase_output() {
   local captured=$1 phase_status=$2 body line index=0 failed=0 completed=0
-  local failure_pattern='^FAIL nativePG17 expense: stage=(admission|server-identity|fresh-cluster|fixture-setup|locked-acl|same-request|different-operation|changed-binding|outer-transaction|late-ledger-fk|customer-wait|vehicle-wait|financial-wait|draft-line-setup|draft-line-acl|draft-line-outer|draft-line-cas|draft-line-parent|draft-line-customer|draft-line-vehicle|draft-line-item|draft-line-late|complete), sqlState=([0-9A-Z]{5}|unavailable); no live acceptance\.$'
+  local failure_pattern='^FAIL nativePG17 expense: stage=(admission|server-identity|fresh-cluster|fixture-setup|locked-acl|same-request|different-operation|changed-binding|outer-transaction|late-ledger-fk|customer-wait|vehicle-wait|financial-wait|draft-line-setup|draft-line-acl|draft-line-outer|draft-line-cas|draft-line-parent|draft-line-customer|draft-line-vehicle|draft-line-item|draft-line-late|auth-user-command-first|auth-user-delete-rollback|auth-user-delete-commit|complete), sqlState=([0-9A-Z]{5}|unavailable); no live acceptance\.$'
   local passes=(
     'locked ordinary-role denial; owner/GUC positives only, not authority'
     'same request waits then exact replay without timestamp/repost writes'
@@ -234,6 +234,9 @@ report_phase_output() {
     'draft line vehicle customer drift after observed wait denied'
     'draft line install drift after observed item wait denied'
     'draft line native CHECK and late rewrite roll back all selected rows'
+    'auth user command-first observed wait retains FK denial and outer ROLLBACK'
+    'auth user delete-first observed wait precedes receipt lock; ROLLBACK permits command'
+    'auth user delete-first COMMIT denies missing actor without financial changes'
     'complete; synthetic owner/GUC only, NOT authority policy global-writer phantom API Auth Storage restore or release acceptance'
   )
   [[ "$phase_status" == 0 || "$phase_status" == 1 ]] || return 1

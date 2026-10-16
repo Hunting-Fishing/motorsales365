@@ -4,6 +4,24 @@
 integrated candidate/[draft PR68](https://github.com/Hunting-Fishing/motorsales365/pull/68),
 not an active bridge or completed online ordering/delivery feature.
 
+Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified on canonical branch/
+same draft PR68/base/title/exact prior64,364-character body/main preserved;
+[evidence comment6222580829](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6222580829).
+Own run38951117451 build117142431562/OCR/type/lint/native pass, unit117142431397
+still running, no inherited pass/cancellation. Actual native117142431134 log is
+untruncated PG17.11/Parts247/all18 ordered selected proofs/cleanup, bounded
+57/59/157ms not full/RTO,47 replay failures retained. Preview117142433032 actually
+configuration-skips/no upload; production/migration/Supabase Preview skip.
+Workers0eb20ff8/check117142467128 fails, fresh cause unverified/hosting stop
+unchanged. Existing follow-up source checkpoint updated/read back in place,
+identity/settings/thread/creation preserved. Notes join next source without
+docs-only cancellation; next completed own-head unit, no unchanged24 rerun.
+Actual build log is truncated but final214 tracked assets/Worker motorsales365/
+sole365/15OCR/202PDF/server-boundary/dry-run markers are present. Fetched COMPLETE
+CI merge14a1878c3ecd0f7d01569a476b1668f3172d30bb equals candidate whole tree
+8c0a4920731258ced1f9dae39e102214a3b70f2d;2,586 current objects/zero missing,
+not complete historical recovery. Native/preview logs were not reread unchanged.
+
 ## Implemented, intentionally unwired
 
 `src/lib/buddy-delivery-contract.ts` defines a proposed365-side v1 delivery-request

@@ -1,5 +1,11 @@
 # Docker-free native receipt-expense rehearsal
 
+17 October additive successor: [Auth-user lock ordering](AUTH_USER_EXPENSE_LOCK_ORDER.md)
+records private candidateSHAeec735a6… and three additional mandatory native markers
+(21 total), preserving the previous18. Its new concurrent deletion cohorts need
+fresh Linux execution; older ten/eighteen-marker results below are historical,
+not evidence for the new ordering or real session/native authority.
+
 Nonregression at publishedb2c0328c/same draft PR68: actual job117028294367/
 run38917399787 has untruncated PGDG17.11/server170011/private identity/ten ordered
 expense PASS/final-completion/EXIT+always-cleanup evidence. Parts247/six quote

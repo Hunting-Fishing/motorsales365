@@ -6,7 +6,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
-import { DRAFT_LINE_STAGES, rehearseDraftLine } from "./native-draft-line-postgres.mjs";
+import {
+  DRAFT_LINE_STAGES,
+  DRAFT_SNAPSHOT_SQL,
+  rehearseDraftLine,
+} from "./native-draft-line-postgres.mjs";
 import { buildExpenseNativeSource } from "../vehicle-receipts/expense-native-source.mjs";
 import {
   bindExpenseOperationRequest,
@@ -37,6 +41,9 @@ const stages = new Set([
   "vehicle-wait",
   "financial-wait",
   ...DRAFT_LINE_STAGES,
+  "auth-user-command-first",
+  "auth-user-delete-rollback",
+  "auth-user-delete-commit",
   "complete",
 ]);
 export function safeFailure(value, error) {
@@ -457,6 +464,19 @@ async function snapshot(observer) {
   assert.match(hash, /^[a-f0-9]{64}$/);
   return hash;
 }
+// Preserve the original financial/native snapshot above. This additional
+// same-cluster witness also covers every synthetic Auth-user row; it is not
+// managed Auth lineage, session/ban/refresh authority or a recoverable backup.
+export const AUTH_USER_SNAPSHOT_SQL = `SELECT encode(sha256(convert_to(jsonb_build_object(
+ 'selectedGraph',(${SNAPSHOT_SQL.slice(0, -1)}),
+ 'draftGraph',(${DRAFT_SNAPSHOT_SQL.slice(0, -1)}),
+ 'authUsers',(SELECT coalesce(jsonb_agg(to_jsonb(t) ORDER BY t.id),'[]'::jsonb) FROM auth.users t)
+ )::text,'UTF8')),'hex');`;
+async function authUserSnapshot(observer) {
+  const hash = single(await observer.command(AUTH_USER_SNAPSHOT_SQL));
+  assert.match(hash, /^[a-f0-9]{64}$/);
+  return hash;
+}
 async function visible(observer, value, count) {
   assert.deepEqual(
     JSON.parse(
@@ -844,6 +864,190 @@ async function rehearse(context) {
         pass,
       });
     });
+
+    stage = "auth-user-command-first";
+    // Dedicated noncreator actors are explicit synthetic support. Keep the
+    // retained receipt.created_by NO ACTION FK and all old fixture seeds: the
+    // actor may be deleted before any outcome exists without rewriting a
+    // receipt creator or inventing managed Auth cascades/profile constraints.
+    // KEY SHARE is not a non-key-update, session/ban/refresh or native-authority
+    // fence; compatibility with every writer/global lock order remains unknown.
+    assert.deepEqual(
+      JSON.parse(
+        single(
+          await observer.command(`SELECT json_build_object(
+            'receiptCreator',(SELECT count(*)::text FROM pg_constraint c WHERE c.conrelid='public.vehicle_receipts'::regclass
+              AND c.confrelid='auth.users'::regclass AND c.contype='f' AND c.convalidated AND c.confdeltype='a'
+              AND c.conkey=ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid=c.conrelid AND attname='created_by')]),
+            'outcomeAccount',(SELECT count(*)::text FROM pg_constraint c WHERE c.conrelid='receipt_expense_candidate.outcomes'::regclass
+              AND c.confrelid='auth.users'::regclass AND c.contype='f' AND c.convalidated AND c.confdeltype='a'
+              AND c.conkey=ARRAY[(SELECT attnum FROM pg_attribute WHERE attrelid=c.conrelid AND attname='account_id')]));`),
+        ),
+      ),
+      { receiptCreator: "1", outcomeAccount: "1" },
+    );
+    async function assertAuthUserState(value, accountId, present) {
+      assert.deepEqual(
+        JSON.parse(
+          single(
+            await value.command(`SELECT json_build_object(
+              'userPresent',EXISTS(SELECT 1 FROM auth.users WHERE id=${literal(accountId)}::uuid),
+              'profile',(SELECT json_build_object('id',p.id,'userId',p.user_id,'shopId',p.shop_id)
+                FROM shop_manager.profiles p WHERE p.id=${literal(accountId)}::uuid));`),
+          ),
+        ),
+        {
+          userPresent: present,
+          profile: { id: accountId, userId: accountId, shopId: ids.shop },
+        },
+      );
+    }
+    async function authUserRequest(number) {
+      const accountId = uuid(number);
+      assert.notEqual(accountId, ids.manager);
+      await observer.command(`INSERT INTO auth.users(id) VALUES(${literal(accountId)}::uuid);
+        INSERT INTO shop_manager.profiles(id,user_id,shop_id)
+          VALUES(${literal(accountId)}::uuid,${literal(accountId)}::uuid,${literal(ids.shop)}::uuid);`);
+      const value = await request({ expectedAccountId: accountId });
+      assert.equal(
+        single(
+          await observer.command(
+            `SELECT created_by::text FROM public.vehicle_receipts WHERE id=${literal(value.receiptId)}::uuid;`,
+          ),
+        ),
+        ids.manager,
+      );
+      await assertAuthUserState(observer, accountId, true);
+      await visible(observer, value, 0);
+      return { accountId, value };
+    }
+    async function receiptRemainsUnlocked(probe, value) {
+      assert.deepEqual(
+        await probe.command(`BEGIN; SELECT id::text FROM public.vehicle_receipts
+          WHERE id=${literal(value.receiptId)}::uuid FOR UPDATE NOWAIT;`),
+        [value.receiptId],
+      );
+      await probe.command("ROLLBACK;");
+    }
+
+    {
+      const { accountId, value } = await authUserRequest(91001);
+      await withSessions(context, [accountId, null], async (owner, deleter) => {
+        const before = await authUserSnapshot(observer);
+        await owner.command("BEGIN;");
+        const ack = await result(owner, value);
+        const committedGraph = await authUserSnapshot(owner);
+        assert.notEqual(committedGraph, before);
+        await visible(observer, value, 0);
+        assert.equal(await authUserSnapshot(observer), before);
+        const pendingDelete = expectedError(
+          deleter.command(
+            `DELETE FROM auth.users WHERE id=${literal(accountId)}::uuid RETURNING id;`,
+          ),
+          "23503",
+        );
+        await observedBlock(observer, deleter, owner);
+        await owner.command("COMMIT;");
+        await pendingDelete;
+        await assertAuthUserState(observer, accountId, true);
+        await visible(observer, value, 1);
+        assert.equal(await authUserSnapshot(observer), committedGraph);
+        assert.deepEqual(await result(owner, value), ack);
+        assert.equal(await authUserSnapshot(observer), committedGraph);
+        await visible(observer, value, 1);
+      });
+    }
+    {
+      const { accountId, value } = await authUserRequest(91002);
+      await withSessions(context, [accountId, null], async (owner, deleter) => {
+        const before = await authUserSnapshot(observer);
+        const beforeFinancial = await snapshot(observer);
+        await owner.command("BEGIN;");
+        await result(owner, value);
+        await visible(owner, value, 1);
+        await visible(observer, value, 0);
+        const pendingDelete = deleter.command(
+          `BEGIN; DELETE FROM auth.users WHERE id=${literal(accountId)}::uuid RETURNING id;`,
+        );
+        pendingDelete.catch(() => {});
+        await observedBlock(observer, deleter, owner);
+        await owner.command("ROLLBACK;");
+        assert.deepEqual(await pendingDelete, [accountId]);
+        await assertAuthUserState(deleter, accountId, false);
+        const deletedGraph = await authUserSnapshot(deleter);
+        assert.notEqual(deletedGraph, before);
+        assert.equal(await snapshot(deleter), beforeFinancial);
+        assert.equal(await authUserSnapshot(observer), before);
+        await deleter.command("COMMIT;");
+        await assertAuthUserState(observer, accountId, false);
+        assert.equal(await authUserSnapshot(observer), deletedGraph);
+        assert.equal(await snapshot(observer), beforeFinancial);
+        await visible(observer, value, 0);
+      });
+    }
+    pass("auth user command-first observed wait retains FK denial and outer ROLLBACK");
+
+    stage = "auth-user-delete-rollback";
+    {
+      const { accountId, value } = await authUserRequest(91003);
+      await withSessions(context, [null, accountId, null], async (deleter, owner, probe) => {
+        const before = await authUserSnapshot(observer);
+        const beforeFinancial = await snapshot(observer);
+        assert.deepEqual(
+          await deleter.command(
+            `BEGIN; DELETE FROM auth.users WHERE id=${literal(accountId)}::uuid RETURNING id;`,
+          ),
+          [accountId],
+        );
+        await assertAuthUserState(deleter, accountId, false);
+        assert.equal(await snapshot(deleter), beforeFinancial);
+        const pending = result(owner, value);
+        pending.catch(() => {});
+        await observedBlock(observer, owner, deleter);
+        await receiptRemainsUnlocked(probe, value);
+        await observedBlock(observer, owner, deleter);
+        assert.equal(await authUserSnapshot(observer), before);
+        await deleter.command("ROLLBACK;");
+        const ack = await pending;
+        await assertAuthUserState(observer, accountId, true);
+        await visible(observer, value, 1);
+        const committedGraph = await authUserSnapshot(observer);
+        assert.deepEqual(await result(owner, value), ack);
+        assert.equal(await authUserSnapshot(observer), committedGraph);
+        await visible(observer, value, 1);
+      });
+    }
+    pass("auth user delete-first observed wait precedes receipt lock; ROLLBACK permits command");
+
+    stage = "auth-user-delete-commit";
+    {
+      const { accountId, value } = await authUserRequest(91004);
+      await withSessions(context, [null, accountId, null], async (deleter, owner, probe) => {
+        const before = await authUserSnapshot(observer);
+        const beforeFinancial = await snapshot(observer);
+        assert.deepEqual(
+          await deleter.command(
+            `BEGIN; DELETE FROM auth.users WHERE id=${literal(accountId)}::uuid RETURNING id;`,
+          ),
+          [accountId],
+        );
+        await assertAuthUserState(deleter, accountId, false);
+        const deletedGraph = await authUserSnapshot(deleter);
+        assert.equal(await snapshot(deleter), beforeFinancial);
+        const pending = expectedError(owner.command(invokeSQL(value)), "42501");
+        await observedBlock(observer, owner, deleter);
+        await receiptRemainsUnlocked(probe, value);
+        await observedBlock(observer, owner, deleter);
+        assert.equal(await authUserSnapshot(observer), before);
+        await deleter.command("COMMIT;");
+        await pending;
+        await assertAuthUserState(observer, accountId, false);
+        assert.equal(await authUserSnapshot(observer), deletedGraph);
+        assert.equal(await snapshot(observer), beforeFinancial);
+        await visible(observer, value, 0);
+      });
+    }
+    pass("auth user delete-first COMMIT denies missing actor without financial changes");
     stage = "complete";
     pass(
       "complete; synthetic owner/GUC only, NOT authority policy global-writer phantom API Auth Storage restore or release acceptance",

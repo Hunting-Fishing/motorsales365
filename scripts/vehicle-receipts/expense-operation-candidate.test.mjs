@@ -14,7 +14,7 @@ import {
 const sql = fs
   .readFileSync(new URL("./expense-operation-candidate.sql", import.meta.url), "utf8")
   .replace(/\r\n/g, "\n");
-const sqlSha = "ddea3f2c59cc8ec385c6273d700ea4a8ee2a010eeac14c3f6475cd3f7b3c1368";
+const sqlSha = "eec735a6274708f21b87a05883f43ec420b20e9dd37b4487cf6977ecb6cce570";
 assert.equal(createHash("sha256").update(sql).digest("hex"), sqlSha, "candidate SQL exact LF pin");
 const operationId = "60000000-0000-4000-8000-000000000001";
 const otherOperation = "60000000-0000-4000-8000-000000000002";
@@ -48,6 +48,9 @@ const count = (db) =>
   );
 const state = async (db) => ({
   base: await snapshot(db),
+  // This fixture's Auth table is synthetic and id-only. Comparing its complete
+  // rows guards deletion mechanics, not managed Auth/source/session acceptance.
+  authUsers: (await db.query("SELECT id FROM auth.users ORDER BY id")).rows,
   outcomes: (
     await db.query(
       "SELECT to_jsonb(o) AS row FROM receipt_expense_candidate.outcomes o ORDER BY account_id,operation_id",
@@ -144,6 +147,35 @@ test("pinned private atomic publication is INVOKER, fully qualified, no client g
     /ORDER BY a\.id FOR UPDATE;\s*v_intent := receipt_expense_candidate\.validate_intent/,
   );
   assert.match(sql, /do not prevent phantom account-code\/line inserts/);
+});
+
+test("exact Auth-user KEY SHARE precedes every outcome lookup and receipt/native/financial lock", () => {
+  const start = sql.indexOf("CREATE FUNCTION receipt_expense_candidate.create_operation(");
+  assert.ok(start >= 0);
+  const end = sql.indexOf("\nREVOKE ALL ON ALL FUNCTIONS", start);
+  assert.ok(end > start);
+  const body = sql.slice(start, end);
+  const lock =
+    "PERFORM u.id FROM auth.users u WHERE u.id=(v_intent->>'expectedAccountId')::uuid FOR KEY SHARE;";
+  const lockAt = body.indexOf(lock);
+  assert.ok(lockAt >= 0);
+  assert.equal(body.indexOf(lock, lockAt + lock.length), -1);
+  assert.match(
+    body,
+    /v_intent := receipt_expense_candidate\.validate_intent\(p_intent,p_binding\);\s*(?:--[^\n]*\n\s*)*PERFORM u\.id FROM auth\.users u WHERE u\.id=\(v_intent->>'expectedAccountId'\)::uuid FOR KEY SHARE;\s*IF NOT FOUND THEN\s*RAISE EXCEPTION USING ERRCODE='42501', MESSAGE='Expense operation failed\.';\s*END IF;/,
+  );
+  for (const following of [
+    "SELECT o.* INTO v_before FROM receipt_expense_candidate.outcomes o",
+    "SELECT r.* INTO v_receipt FROM public.vehicle_receipts r",
+    "SELECT c.id,c.shop_id INTO v_locked_customer,v_locked_shop FROM shop_manager.customers c",
+    "SELECT v.customer_id INTO v_vehicle_customer FROM shop_manager.vehicles v",
+    "receipt_expense_candidate.verify_outcome(v_intent,p_binding,v_saved.expense_id",
+    "INSERT INTO shop_manager.expenses(",
+  ]) {
+    assert.ok(body.indexOf(following) > lockAt, `${following}: must follow Auth-user lock`);
+  }
+  assert.match(sql, /KEY SHARE is deletion\/FK ordering only/);
+  assert.match(sql, /does not block\s*-- non-key user changes/);
 });
 
 test("actual candidate ACL denies ordinary anon/auth/service functions and ledger DML; owner-only is not human authority", async () => {
@@ -393,6 +425,50 @@ test("actor and captured shop/vehicle mismatches fail with no business/ledger ef
       await assert.rejects(create(db, intent(overrides)), failure("42501"));
       assert.deepEqual(await state(db), before);
     }
+  });
+});
+
+test("missing exact Auth user fails early42501 despite otherwise-valid synthetic native scope, preserving the whole graph", async () => {
+  await fixture(async (db) => {
+    // Intentional orphan of the fixture's synthetic native profile table. The
+    // retained receipt's real created_by FK still points to the existing manager.
+    // Without the new gate this actor passes legacy synthetic scope and reaches
+    // the late outcomes.account_id FK23503, so a generic scope denial is not enough.
+    await db.query("INSERT INTO shop_manager.profiles(id,user_id,shop_id) VALUES($1,$1,$2)", [
+      ids.absent,
+      ids.shop,
+    ]);
+    await db.exec("BEGIN");
+    try {
+      await db.query("SELECT set_config('test.user',$1,true)", [ids.absent]);
+      assert.deepEqual(
+        await one(
+          db,
+          "SELECT auth.uid() AS subject,vehicle_receipts_private.shop_access($1,true) AS shop_access,shop_manager.is_shop_operations_manager($2,$3) AS manager",
+          [ids.vehicle, ids.absent, ids.shop],
+        ),
+        { subject: ids.absent, shop_access: true, manager: true },
+      );
+    } finally {
+      await db.exec("ROLLBACK");
+    }
+    assert.deepEqual(
+      await one(db, "SELECT id FROM auth.users WHERE id=$1", [ids.absent]),
+      undefined,
+    );
+    const before = await state(db);
+    await assert.rejects(
+      create(db, intent({ expectedAccountId: ids.absent }), ids.absent),
+      failure("42501"),
+    );
+    assert.deepEqual(await state(db), before);
+    assert.deepEqual(await count(db), {
+      expenses: 0,
+      entries: 0,
+      lines: 0,
+      accounts: 0,
+      outcomes: 0,
+    });
   });
 });
 

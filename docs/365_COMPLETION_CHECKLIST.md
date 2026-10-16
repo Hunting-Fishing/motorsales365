@@ -42,6 +42,38 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Private receipt-expense Auth-user ordering source is implemented: exact expected
+user KEY SHARE before outcome/business locks, missing42501 before posting. SQL
+eec735a6… stays private/unapplied, no Auth grant/definer/fallback/app activation.
+Four new synthetic native deletion scenarios preserve existing FKs; strict CI
+transcript requires all18 old plus three new markers and unchanged cleanup/limits.
+Root75/75 in35.5518278s plus retained draft36/36 in11.6102602s pass; lint/syntax/
+format/diff/independent review clear. Actual new native21-marker execution and
+own-head required checks pending. Parentcaa unit must finish before source push;
+no docs-only restart. Same PR68/commit subject `Order private receipt expense
+Auth-user lock before business writes`; exact commit in publication comment.
+Next fresh native result, then strict original-human/session/native authority,
+compatible all writers and durable reconciliation. Not non-key changes/session/
+role/tenant/API/private-original/recovery or production acceptance. No live/
+grant/main/Buddy/366 change; all scope,47/12/5/2, stops and deadline risk retained.
+[Exact deletion/FK prerequisite](evidence/AUTH_USER_EXPENSE_LOCK_ORDER.md).
+
+### Proposed Buddy contract checkpoint
+
+Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified same canonical branch/
+draft PR68/comment6222580829, exact prior body/title/base/main preserved. Own
+38951117451 build117142431562/OCR/type/lint/native pass; unit117142431397 running,
+not inherited/accepted/cancelled. Actual native117142431134 untruncated PG17.11/
+Parts247/all18 ordered selected proofs/cleanup pass,47 failures retained,
+bounded57/59/157ms not full/RTO. Preview config skip/no upload, production/
+migration/Supabase Preview skip; Workers0eb20ff8 fails cause unknown, stop unchanged.
+Existing follow-up exact source checkpoint updated/readback, identity/settings/
+thread/creation preserved. Notes join next integrated slice, not docs-only unit
+cancellation. Actual build final214/Worker/backend/OCR/PDF/server/dry-run guards
+present (truncated log); COMPLETE CI merge14a1878c… equals candidate tree8c0a4920…,
+current2,586 objects/zero missing, not history recovery. Next completed own-head
+unit results, no unchanged24/1231/121 or native/preview log reread.
+
 Independent N3 proposed365-side request/offer codec is implemented: strict v1/
 namespaced refs/calendar/sequence, required independent expected store/order/leg,
 immutable whole-payload comparison and privacy-minimized offer. UNWIRED: no

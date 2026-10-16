@@ -290,9 +290,20 @@ const draftLineFailureStages = [
   "draft-line-item",
   "draft-line-late",
 ];
+const authUserPassMessages = [
+  "auth user command-first observed wait retains FK denial and outer ROLLBACK",
+  "auth user delete-first observed wait precedes receipt lock; ROLLBACK permits command",
+  "auth user delete-first COMMIT denies missing actor without financial changes",
+];
+const authUserFailureStages = [
+  "auth-user-command-first",
+  "auth-user-delete-rollback",
+  "auth-user-delete-commit",
+];
 const passMessages = [
   ...originalPassMessages.slice(0, -1),
   ...draftLinePassMessages,
+  ...authUserPassMessages,
   originalPassMessages.at(-1),
 ];
 const passMarkers = passMessages.map((message) => `PASS nativePG17 expense: ${message}.\n`);
@@ -300,7 +311,7 @@ const completion =
   "Native expense PostgreSQL17 rehearsal complete: synthetic owner sessions only.\n";
 const successTranscript = serverMarker + passMarkers.join("") + completion;
 
-test("draft-line transcript extends exactly the existing ten markers before the original completion proof", () => {
+test("Auth-user transcript preserves all eighteen prior proofs before requiring three new proofs", () => {
   const parser = source.slice(at("report_phase_output() {"), at("run_phase() {"));
   const declaredPasses = parser.match(/  local passes=\(\n([\s\S]*?)\n  \)/);
   assert.ok(declaredPasses, "one fixed ordered pass list");
@@ -312,10 +323,12 @@ test("draft-line transcript extends exactly the existing ten markers before the 
   });
   assert.equal(originalPassMessages.length, 10);
   assert.equal(draftLinePassMessages.length, 8);
-  assert.equal(new Set(actual).size, 18);
+  assert.equal(authUserPassMessages.length, 3);
+  assert.equal(new Set(actual).size, 21);
   assert.deepEqual(actual, passMessages);
   assert.deepEqual(actual.slice(0, 9), originalPassMessages.slice(0, -1));
-  assert.deepEqual(actual.slice(9, -1), draftLinePassMessages);
+  assert.deepEqual(actual.slice(9, 17), draftLinePassMessages);
+  assert.deepEqual(actual.slice(17, -1), authUserPassMessages);
   assert.equal(actual.at(-1), originalPassMessages.at(-1));
   const stages = parser.match(/stage=\(([^)]+)\), sqlState=/);
   assert.ok(stages, "one fixed failure-stage allowlist");
@@ -334,6 +347,7 @@ test("draft-line transcript extends exactly the existing ten markers before the 
     "vehicle-wait",
     "financial-wait",
     ...draftLineFailureStages,
+    ...authUserFailureStages,
     "complete",
   ]);
 });
@@ -392,6 +406,7 @@ test(
       "vehicle-wait",
       "financial-wait",
       ...draftLineFailureStages,
+      ...authUserFailureStages,
       "complete",
     ]) {
       for (const state of ["23503", "unavailable"]) {
@@ -442,7 +457,7 @@ test(
 );
 
 test(
-  "actual isolated Bash parser requires every original and draft-line proof once in exact full-transcript order",
+  "actual isolated Bash parser requires every original, draft-line and Auth-user proof once in exact order",
   { skip: !bash },
   () => {
     const transcripts = [
@@ -450,6 +465,15 @@ test(
         originalPassMessages.map((message) => `PASS nativePG17 expense: ${message}.\n`).join("") +
         completion,
       serverMarker + passMarkers.slice(0, 9).join("") + completion,
+      serverMarker +
+        [
+          ...originalPassMessages.slice(0, -1),
+          ...draftLinePassMessages,
+          originalPassMessages.at(-1),
+        ]
+          .map((message) => `PASS nativePG17 expense: ${message}.\n`)
+          .join("") +
+        completion,
       serverMarker + passMarkers.join("") + passMarkers[9] + completion,
       successTranscript + passMarkers[9],
     ];
