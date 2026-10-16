@@ -156,7 +156,7 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     ],
     [
       "Receipt read DTO and caller contracts (never quarantined)",
-      "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts --maxWorkers=1",
+      "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts --maxWorkers=1",
     ],
     [
       "Independent Workers build source freeze (offline, never quarantined)",

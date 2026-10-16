@@ -28,6 +28,10 @@ import {
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
 import { withReceiptAbort } from "@/lib/receipt-abort";
+import {
+  parseReceiptExpenseAcknowledgment,
+  RECEIPT_EXPENSE_FAILURE,
+} from "@/lib/vehicle-receipt-expense-contract";
 
 // The import itself must be client-only, not just the exported scanner body.
 // Start's SSR import protection rejects any server-visible .client module edge.
@@ -172,6 +176,14 @@ function AuthenticatedVehicleReceiptPanel({
   const [busy, setBusy] = useState<string | null>(null);
   const [openingReceiptId, setOpeningReceiptId] = useState<string | null>(null);
   const privateRead = useRef({ active: false, lifetime: 0, attempt: null as symbol | null });
+  const expenseScope = useRef({
+    active: false,
+    lifetime: 0,
+    attempt: null as { controller: AbortController } | null,
+    held: false,
+  });
+  const [expensePending, setExpensePending] = useState(false);
+  const [expenseUnknown, setExpenseUnknown] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState("");
   function changePage(next: number) {
     if (!Number.isSafeInteger(next) || next < 0 || next > 1_000_000) return;
@@ -211,6 +223,78 @@ function AuthenticatedVehicleReceiptPanel({
       if (current()) {
         scope.attempt = null;
         setOpeningReceiptId(null);
+      }
+    }
+  }
+  useLayoutEffect(() => {
+    const scope = expenseScope.current;
+    scope.active = true;
+    scope.lifetime += 1;
+    setExpensePending(false);
+    setExpenseUnknown(scope.held);
+    return () => {
+      scope.active = false;
+      scope.lifetime += 1;
+      const pending = scope.attempt;
+      if (pending) {
+        // StrictMode setup must not revive an uncertain dispatched write.
+        // Aborting its transport does not establish database rollback.
+        scope.held = true;
+        pending.controller.abort();
+      }
+      scope.attempt = null;
+    };
+  }, []);
+  async function requestReceiptExpense(receipt: VehicleReceipt) {
+    const scope = expenseScope.current;
+    if (
+      !scope.active ||
+      scope.attempt !== null ||
+      scope.held ||
+      !canUseReceiptRead() ||
+      data?.canRecordExpense !== true ||
+      !shopVehicleId ||
+      receipt.shop_vehicle_id?.toLowerCase() !== shopVehicleId.toLowerCase() ||
+      receipt.status !== "confirmed"
+    )
+      return;
+    const request = Object.freeze({
+      id: receipt.id,
+      expectedAccountId: userId,
+      expectedShopVehicleId: shopVehicleId,
+    });
+    const lifetime = scope.lifetime;
+    const attempt = { controller: new AbortController() };
+    scope.attempt = attempt;
+    setExpensePending(true);
+    const current = () =>
+      scope.active &&
+      scope.lifetime === lifetime &&
+      scope.attempt === attempt &&
+      !attempt.controller.signal.aborted;
+    try {
+      const raw = await expenseFn({ data: request, signal: attempt.controller.signal });
+      if (!current()) return;
+      parseReceiptExpenseAcknowledgment(raw, request.id, request.expectedShopVehicleId);
+      if (!current()) return;
+      toast.message("Expense request acknowledged. Check shop expenses to confirm.");
+      if (!current()) return;
+      // The current expenses route still uses this legacy key. This does not
+      // confer account scoping on that separate reader.
+      void qc.invalidateQueries({ queryKey: ["shop-manager", "expenses"] });
+      if (!current()) return;
+      void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });
+      if (!current()) return;
+      void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
+    } catch {
+      if (current()) {
+        scope.held = true;
+        setExpenseUnknown(true);
+      }
+    } finally {
+      if (current()) {
+        scope.attempt = null;
+        setExpensePending(false);
       }
     }
   }
@@ -264,6 +348,16 @@ function AuthenticatedVehicleReceiptPanel({
         receiptReady={Boolean(data)}
         canUseReceiptRead={canUseReceiptRead}
       />
+      {expenseUnknown && (
+        <p role="alert" className="text-sm text-destructive">
+          {RECEIPT_EXPENSE_FAILURE}
+        </p>
+      )}
+      {expensePending && (
+        <p role="status" className="text-sm">
+          Checking expense request…
+        </p>
+      )}
       {(receipts.isPending || receipts.fetchStatus !== "idle") && (
         <p role="status" className="text-sm">
           Loading receipts…
@@ -379,20 +473,14 @@ function AuthenticatedVehicleReceiptPanel({
                   </Button>
                 )}
                 {shopVehicleId &&
-                  data?.canRecordExpense &&
-                  r.shop_vehicle_id &&
+                  data?.canRecordExpense === true &&
+                  r.shop_vehicle_id?.toLowerCase() === shopVehicleId.toLowerCase() &&
                   r.status === "confirmed" && (
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={busy === r.id}
-                      onClick={() =>
-                        action(r.id, async () => {
-                          await expenseFn({ data: { id: r.id } });
-                          toast.success("Recorded in shop expenses");
-                          void qc.invalidateQueries({ queryKey: ["shop-manager", "expenses"] });
-                        })
-                      }
+                      disabled={busy === r.id || expensePending || expenseUnknown}
+                      onClick={() => void requestReceiptExpense(r)}
                     >
                       Record shop expense
                     </Button>

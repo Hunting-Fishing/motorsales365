@@ -5,8 +5,10 @@ import {
   getVehicleReceipts,
   listVehicleShopLinks,
   getPrivateReceiptUrl,
+  recordVehicleReceiptExpense,
 } from "./vehicle-receipts.functions";
 import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
+import { RECEIPT_EXPENSE_FAILURE } from "./vehicle-receipt-expense-contract";
 const mocks = vi.hoisted(() => ({
   request: vi.fn(),
   privileged: vi.fn(),
@@ -51,6 +53,13 @@ const privatePath = `${uid(99)}/${receiptId}/original.pdf`;
 const signedReceiptUrl = (path = privatePath) =>
   `https://wjxaajgvddtrxxtocxen.supabase.co/storage/v1/object/sign/vehicle-receipts/${path}?token=fixture.storage.token`;
 const privateRequest = () => ({ expectedAccountId: account, id: receiptId });
+const expenseId = uid(90);
+const expenseRequest = () => ({
+  expectedAccountId: account,
+  id: receiptId,
+  expectedShopVehicleId: shopVehicle,
+});
+const expenseAcknowledgment = () => ({ receiptId, shopVehicleId: shopVehicle, expenseId });
 const receiptProjection =
   "id,vehicle_id,shop_vehicle_id,created_by,file_path,file_name,media_type,vendor,purchased_on,currency,total,status,share_with_shop,created_at";
 const itemProjection =
@@ -100,7 +109,16 @@ const link = (id = shopVehicle) => ({
   active: true,
 });
 type Response = { data: unknown; error: unknown; count?: unknown };
-type Stage = "access" | "activeLink" | "headers" | "items" | "attachments" | "links" | "private";
+type Stage =
+  | "access"
+  | "activeLink"
+  | "headers"
+  | "items"
+  | "attachments"
+  | "links"
+  | "private"
+  | "expense"
+  | "expenseTarget";
 type Read = {
   stage: Stage;
   table?: string;
@@ -162,7 +180,11 @@ function client(
                 ? Object.fromEntries((read.args?._ids as string[]).map((id) => [id, false]))
                 : read.stage === "private"
                   ? { id: receiptId, file_path: privatePath }
-                  : [link()],
+                  : read.stage === "expenseTarget"
+                    ? { id: receiptId, shop_vehicle_id: shopVehicle }
+                    : read.stage === "expense"
+                      ? expenseId
+                      : [link()],
     error: null,
     ...(["headers", "items", "links"].includes(read.stage) ? { count: 1 } : {}),
   });
@@ -177,6 +199,7 @@ function client(
         read.options = queryOptions;
         if (projection === activeProjection) read.stage = "activeLink";
         if (projection === "id,file_path") read.stage = "private";
+        if (projection === "id,shop_vehicle_id") read.stage = "expenseTarget";
         return op("select");
       },
       eq: (column: string, value: unknown) => {
@@ -265,7 +288,12 @@ function client(
     ),
     rpc: vi.fn((name: string, args: Record<string, unknown>) =>
       builder({
-        stage: name === "vehicle_receipt_workspace_access" ? "access" : "attachments",
+        stage:
+          name === "vehicle_receipt_workspace_access"
+            ? "access"
+            : name === "record_vehicle_receipt_expense"
+              ? "expense"
+              : "attachments",
         args,
         filters: {},
         orders: [],
@@ -302,6 +330,14 @@ async function links(data: unknown, ctx: unknown) {
 async function privateUrl(data: unknown, ctx: unknown) {
   return (
     getPrivateReceiptUrl as unknown as (args: {
+      data: unknown;
+      context: unknown;
+    }) => Promise<unknown>
+  )({ data, context: ctx });
+}
+async function receiptExpense(data: unknown, ctx: unknown) {
+  return (
+    recordVehicleReceiptExpense as unknown as (args: {
       data: unknown;
       context: unknown;
     }) => Promise<unknown>
@@ -1361,6 +1397,434 @@ describe("private receipt URL server boundary", () => {
       expect(result).not.toHaveProperty("cause");
       expect(String(result)).not.toContain("PRIVATE");
       expect(String(result)).not.toContain(privatePath);
+    },
+  );
+});
+
+describe("receipt expense caller and transport boundary", () => {
+  // Synthetic middleware/SDK only. The existing native RPC remains unchanged;
+  // its UUID cannot prove persisted financial fields or native-shop authority.
+  afterEach(() => {
+    expect(mocks.writes).not.toHaveBeenCalled();
+    expect(mocks.privileged).not.toHaveBeenCalled();
+  });
+
+  it("preflights the exact receipt/shop intent then makes one signal-bound no-retry RPC and returns only a bound acknowledgment", async () => {
+    const caller = client();
+    await expect(receiptExpense(expenseRequest(), context(caller))).resolves.toEqual(
+      expenseAcknowledgment(),
+    );
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.from).toHaveBeenCalledExactlyOnceWith("vehicle_receipts");
+    expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("record_vehicle_receipt_expense", {
+      _id: receiptId,
+    });
+    expect(caller.reads).toEqual([
+      expect.objectContaining({
+        stage: "expenseTarget",
+        projection: "id,shop_vehicle_id",
+        filters: { id: receiptId },
+        signal: controller.signal,
+        retry: false,
+        single: true,
+      }),
+      expect.objectContaining({
+        stage: "expense",
+        args: { _id: receiptId },
+        signal: controller.signal,
+        retry: false,
+      }),
+    ]);
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+
+  it("accepts SDK metadata and a valid null-prototype RPC envelope without exposing metadata", async () => {
+    const response = Object.assign(Object.create(null), {
+      data: expenseId,
+      error: null,
+      status: 200,
+      count: null,
+    });
+    const caller = client({ responses: { expense: response } });
+    const result = await receiptExpense(expenseRequest(), context(caller));
+    expect(result).toEqual(expenseAcknowledgment());
+    expect(Object.isFrozen(result)).toBe(true);
+  });
+
+  it.each([
+    null,
+    {},
+    { id: receiptId },
+    { expectedAccountId: account, id: receiptId },
+    { ...expenseRequest(), expectedAccountId: "PRIVATE" },
+    { ...expenseRequest(), id: "PRIVATE" },
+    { ...expenseRequest(), expectedShopVehicleId: "PRIVATE" },
+    { ...expenseRequest(), extra: "PRIVATE" },
+  ])("rejects malformed expense input before request/Auth/dispatch: %j", async (input) => {
+    const caller = client();
+    await expect(receiptExpense(input, context(caller))).rejects.toThrow(
+      "Invalid receipt expense request.",
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it.each(["expectedAccountId", "id", "expectedShopVehicleId"] as const)(
+    "does not invoke expense input %s accessors",
+    async (key) => {
+      const input = expenseRequest(),
+        get = vi.fn(() => input[key]),
+        caller = client();
+      Object.defineProperty(input, key, { enumerable: true, get });
+      await expect(receiptExpense(input, context(caller))).rejects.toThrow(
+        "Invalid receipt expense request.",
+      );
+      expect(get).not.toHaveBeenCalled();
+      expect(mocks.request).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it("preserves early account-changed denial before request access", async () => {
+    const caller = client();
+    await expect(
+      receiptExpense({ ...expenseRequest(), expectedAccountId: uid(7) }, context(caller)),
+    ).rejects.toThrow("Account changed. Refresh before recording a receipt expense.");
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it("captures all three primitive intent fields before getRequest hooks can mutate validated input", async () => {
+    const caller = client();
+    mocks.request.mockImplementationOnce(() => {
+      Object.assign(mocks.validated as object, {
+        expectedAccountId: uid(7),
+        id: uid(8),
+        expectedShopVehicleId: uid(9),
+      });
+      return currentRequest();
+    });
+    await expect(receiptExpense(expenseRequest(), context(caller))).resolves.toEqual(
+      expenseAcknowledgment(),
+    );
+    expect(caller.reads[0].filters).toEqual({ id: receiptId });
+    expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("record_vehicle_receipt_expense", {
+      _id: receiptId,
+    });
+  });
+
+  it.each([null, "Basic PRIVATE", "Bearer opaque", "Bearer fixture.access.token,second"])(
+    "refuses malformed expense Bearer before native calls: %j",
+    async (authorization) => {
+      const caller = client();
+      mocks.request.mockReturnValue({
+        signal: controller.signal,
+        headers: { get: () => authorization },
+      });
+      await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+        RECEIPT_EXPENSE_FAILURE,
+      );
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    null,
+    { sub: account, role: "service_role" },
+    { sub: uid(9), role: "authenticated" },
+    { sub: account, role: "authenticated", is_anonymous: true },
+  ])("refuses incompatible expense middleware claims before request access: %j", async (claims) => {
+    const caller = client();
+    await expect(receiptExpense(expenseRequest(), { ...context(caller), claims })).rejects.toThrow(
+      RECEIPT_EXPENSE_FAILURE,
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { data: { user: null }, error: null },
+    { data: { user: { id: uid(9) } }, error: null },
+    { data: { user: { id: account, is_anonymous: true } }, error: null },
+    { data: { user: { id: account } }, error: { message: "PRIVATE Auth" } },
+  ])("refuses unconfirmed expense current Auth: %j", async (response) => {
+    const caller = client();
+    caller.auth.getUser.mockResolvedValue(response);
+    await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+      RECEIPT_EXPENSE_FAILURE,
+    );
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  const losses = ["account", "client", "claims", "auth-method", "header", "abort"] as const;
+  function loseCaller(
+    ctx: ReturnType<typeof context>,
+    loss: (typeof losses)[number],
+    request: ReturnType<typeof currentRequest>,
+  ) {
+    if (loss === "account") ctx.userId = uid(9);
+    if (loss === "client") ctx.supabase = client();
+    if (loss === "claims") ctx.claims.role = "service_role";
+    if (loss === "auth-method")
+      ctx.supabase.auth.getUser = vi.fn(() =>
+        Promise.resolve({ data: { user: { id: account } }, error: null }),
+      );
+    if (loss === "header") request.headers.set("authorization", "Bearer changed.access.token");
+    if (loss === "abort") controller.abort(new Error("PRIVATE aborted"));
+  }
+
+  it.each(["account", "client", "claims", "auth-method"] as const)(
+    "captures expense caller before request hooks can replace %s",
+    async (loss) => {
+      const caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockImplementationOnce(() => {
+        loseCaller(ctx, loss, request);
+        return request;
+      });
+      await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(losses)(
+    "refuses %s change during pending expense Auth before target/RPC dispatch",
+    async (loss) => {
+      const pending = deferred<unknown>(),
+        caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockReturnValue(request);
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const result = receiptExpense(expenseRequest(), ctx);
+      loseCaller(ctx, loss, request);
+      pending.resolve({ data: { user: { id: account } }, error: null });
+      await expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+
+  for (const point of ["target-build", "target-result", "rpc-build", "rpc-result"] as const) {
+    it.each(losses)(
+      `refuses %s change at expense ${point} without returning an acknowledgment`,
+      async (loss) => {
+        const request = currentRequest();
+        const caller = client({
+            onBuild: (read, method) => {
+              if (point === "target-build" && read.stage === "expenseTarget" && method === "single")
+                loseCaller(ctx, loss, request);
+              if (point === "rpc-build" && read.stage === "expense" && method === "retry")
+                loseCaller(ctx, loss, request);
+            },
+            onResult: (read) => {
+              if (point === "target-result" && read.stage === "expenseTarget")
+                loseCaller(ctx, loss, request);
+              if (point === "rpc-result" && read.stage === "expense")
+                loseCaller(ctx, loss, request);
+            },
+          }),
+          ctx = context(caller);
+        mocks.request.mockReturnValue(request);
+        await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(
+          RECEIPT_EXPENSE_FAILURE,
+        );
+        if (point === "target-build") expect(caller.reads).toEqual([]);
+        if (point.startsWith("target")) expect(caller.rpc).not.toHaveBeenCalled();
+        if (point !== "rpc-result")
+          expect(caller.reads.map((read) => read.stage)).not.toContain("expense");
+        else expect(caller.reads.map((read) => read.stage)).toEqual(["expenseTarget", "expense"]);
+      },
+    );
+  }
+
+  it.each([
+    null,
+    {},
+    { id: receiptId, shop_vehicle_id: null },
+    { id: uid(8), shop_vehicle_id: shopVehicle },
+    { id: receiptId, shop_vehicle_id: uid(8) },
+    { id: receiptId, shop_vehicle_id: shopVehicle, extra: true },
+  ])("denies missing/wrong selected shop target before accounting RPC: %j", async (data) => {
+    const caller = client({ responses: { expenseTarget: { data, error: null } } });
+    await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+      RECEIPT_EXPENSE_FAILURE,
+    );
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  for (const phase of ["expenseTarget", "expense"] as const) {
+    it.each([undefined, false, "", { message: "PRIVATE provider cause" }])(
+      `requires explicit expense ${phase} error:null with otherwise-valid data: %j`,
+      async (error) => {
+        const control = client();
+        await expect(receiptExpense(expenseRequest(), context(control))).resolves.toEqual(
+          expenseAcknowledgment(),
+        );
+        const data =
+          phase === "expenseTarget" ? { id: receiptId, shop_vehicle_id: shopVehicle } : expenseId;
+        const caller = client({ responses: { [phase]: { data, error } } });
+        const result = await receiptExpense(expenseRequest(), context(caller)).catch(
+          (value: unknown) => value,
+        );
+        expect((result as Error).message).toBe(RECEIPT_EXPENSE_FAILURE);
+        expect(result).not.toHaveProperty("cause");
+        expect(String(result)).not.toContain("PRIVATE");
+        if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
+      },
+    );
+  }
+
+  it.each([null, undefined, true, 1, [], {}, { id: expenseId }, "PRIVATE invalid UUID"])(
+    "never accepts invalid expense RPC UUID data: %j",
+    async (data) => {
+      const caller = client({ responses: { expense: { data, error: null } } });
+      await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+        RECEIPT_EXPENSE_FAILURE,
+      );
+      expect(caller.reads.map((read) => read.stage)).toEqual(["expenseTarget", "expense"]);
+    },
+  );
+
+  it.each([
+    "target-data",
+    "target-error",
+    "target-id",
+    "target-shop",
+    "rpc-data",
+    "rpc-error",
+  ] as const)("does not invoke expense %s accessor evidence", async (field) => {
+    const row = { id: receiptId, shop_vehicle_id: shopVehicle };
+    const target: Response = { data: row, error: null },
+      rpc: Response = { data: expenseId, error: null };
+    const object =
+      field === "target-id" || field === "target-shop"
+        ? row
+        : field.startsWith("target")
+          ? target
+          : rpc;
+    const key = field.endsWith("data")
+      ? "data"
+      : field.endsWith("error")
+        ? "error"
+        : field === "target-id"
+          ? "id"
+          : "shop_vehicle_id";
+    const get = vi.fn(() => "PRIVATE");
+    Object.defineProperty(object, key, { enumerable: true, get });
+    const caller = client({ responses: { expenseTarget: target, expense: rpc } });
+    await expect(receiptExpense(expenseRequest(), context(caller))).rejects.toThrow(
+      RECEIPT_EXPENSE_FAILURE,
+    );
+    expect(get).not.toHaveBeenCalled();
+    if (field.startsWith("target")) expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it("checks caller after target parsing traps before starting the accounting RPC", async () => {
+    const trap = vi.fn();
+    const data = new Proxy(
+      { id: receiptId, shop_vehicle_id: shopVehicle },
+      {
+        ownKeys: (target) => {
+          trap();
+          ctx.claims.role = "service_role";
+          return Reflect.ownKeys(target);
+        },
+      },
+    );
+    const caller = client({ responses: { expenseTarget: { data, error: null } } }),
+      ctx = context(caller);
+    await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+    expect(trap).toHaveBeenCalledExactlyOnceWith();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+
+  it("checks caller after RPC parsing traps before returning expense identity", async () => {
+    const trap = vi.fn();
+    const response = new Proxy(
+      { data: expenseId, error: null },
+      {
+        getOwnPropertyDescriptor: (target, key) => {
+          if (key === "data") {
+            trap();
+            ctx.claims.role = "service_role";
+          }
+          return Reflect.getOwnPropertyDescriptor(target, key);
+        },
+      },
+    );
+    const caller = client({ responses: { expense: response } }),
+      ctx = context(caller);
+    await expect(receiptExpense(expenseRequest(), ctx)).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+    expect(trap).toHaveBeenCalledExactlyOnceWith();
+    expect(caller.reads).toHaveLength(2);
+  });
+
+  it.each(["resolve", "reject"] as const)(
+    "observes late expense Auth %s after the ten-second wait without accounting dispatch",
+    async (settlement) => {
+      vi.useFakeTimers();
+      const pending = deferred<unknown>(),
+        caller = client();
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const result = receiptExpense(expenseRequest(), context(caller));
+      const assertion = expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      await vi.advanceTimersByTimeAsync(10_000);
+      await assertion;
+      if (settlement === "resolve")
+        pending.resolve({ data: { user: { id: account } }, error: null });
+      else pending.reject(new Error("PRIVATE late Auth"));
+      await Promise.resolve();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+
+  it.each(["expenseTarget", "expense"] as const)(
+    "denies an ignored late %s result after request abort without claiming rollback",
+    async (phase) => {
+      const pending = deferred<Response>(),
+        caller = client({ responses: { [phase]: pending.promise } });
+      const result = receiptExpense(expenseRequest(), context(caller));
+      await vi.waitFor(() => expect(caller.reads.map((read) => read.stage)).toContain(phase));
+      controller.abort();
+      pending.resolve({
+        data:
+          phase === "expenseTarget" ? { id: receiptId, shop_vehicle_id: shopVehicle } : expenseId,
+        error: null,
+      });
+      await expect(result).rejects.toThrow(RECEIPT_EXPENSE_FAILURE);
+      if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
+      else expect(caller.rpc).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it.each(["expenseTarget", "expense"] as const)(
+    "redacts %s provider rejection without another dispatch",
+    async (phase) => {
+      const caller = client({
+        responses: { [phase]: () => Promise.reject(new Error("PRIVATE provider cause")) },
+      });
+      const result = await receiptExpense(expenseRequest(), context(caller)).catch(
+        (value: unknown) => value,
+      );
+      expect((result as Error).message).toBe(RECEIPT_EXPENSE_FAILURE);
+      expect(result).not.toHaveProperty("cause");
+      expect(String(result)).not.toContain("PRIVATE");
+      if (phase === "expenseTarget") expect(caller.rpc).not.toHaveBeenCalled();
+      else expect(caller.rpc).toHaveBeenCalledTimes(1);
     },
   );
 });

@@ -2215,3 +2215,466 @@ describe("temporary mixed receipt public-sharing interlock", () => {
     },
   );
 });
+
+// Actual panel + QueryClient, synthetic transport acknowledgments only. These
+// cases do not execute the expense RPC or prove posting, rollback or dedupe.
+describe("receipt expense request acknowledgment and committed lifetime", () => {
+  const shopVehicle = "31000000-aaaa-4000-8000-000000000001";
+  const otherShopVehicle = "31000000-bbbb-4000-8000-000000000002";
+  const receiptId = "32000000-0000-4000-8000-000000000001";
+  const otherReceiptId = "32000000-0000-4000-8000-000000000002";
+  const expenseId = "33000000-0000-4000-8000-000000000001";
+  const control = "Record shop expense";
+  const neutral = "Expense request acknowledged. Check shop expenses to confirm.";
+  const failure =
+    "Expense change could not be confirmed. Check shop expenses before repeating this request.";
+  type ExpenseAck = Awaited<ReturnType<typeof api.recordVehicleReceiptExpense>>;
+  type FixtureReceiptReadOptions = {
+    data: { expectedAccountId: string; shopVehicleId?: string; page?: number };
+  };
+  const acknowledgment = (id = receiptId, target = shopVehicle): ExpenseAck => ({
+    receiptId: id,
+    shopVehicleId: target,
+    expenseId,
+  });
+  const expenseRow = (id = receiptId, target = shopVehicle): VehicleReceipt => ({
+    ...receipt("Expense source supplier"),
+    id,
+    vehicle_id: null,
+    shop_vehicle_id: target,
+    status: "confirmed",
+  });
+  function page(target = shopVehicle, currentPage = 0, totalCount = 2): ReceiptRead {
+    return receiptPage(
+      {
+        receipts:
+          currentPage === 0
+            ? [expenseRow(receiptId, target), expenseRow(otherReceiptId, target)]
+            : [expenseRow(otherReceiptId, target)],
+        linkedVehicleId: null,
+        canWrite: false,
+        canRecordExpense: true,
+      },
+      currentPage,
+      totalCount,
+    );
+  }
+  function request(index = 0) {
+    return vi.mocked(api.recordVehicleReceiptExpense).mock.calls[index][0] as unknown as {
+      data: { id: string; expectedAccountId: string; expectedShopVehicleId: string };
+      signal: AbortSignal;
+    };
+  }
+  function captureSourceClick(button: HTMLElement) {
+    // Deliberately retain the actual source handler, bypassing native/React
+    // disabled admission. This is an adversarial component harness, not a
+    // keyboard/browser accessibility or authorization proof.
+    const key = Object.getOwnPropertyNames(button).find((name) => name.startsWith("__reactProps$"));
+    expect(key).toBeDefined();
+    const props = Reflect.get(button, key!) as { onClick: () => void };
+    expect(props.onClick).toBeTypeOf("function");
+    return props.onClick;
+  }
+  async function showExpense() {
+    const view = show(undefined, { shopVehicleId: shopVehicle });
+    await screen.findAllByRole("button", { name: control });
+    return view;
+  }
+  beforeEach(() => {
+    vi.mocked(api.recordVehicleReceiptExpense).mockReset().mockResolvedValue(acknowledgment());
+    vi.mocked(api.getVehicleReceipts).mockImplementation((options) => {
+      const input = (options as unknown as FixtureReceiptReadOptions).data;
+      return Promise.resolve(page(input.shopVehicleId ?? shopVehicle, input.page));
+    });
+    vi.spyOn(toast, "message").mockImplementation(() => 0);
+    vi.spyOn(toast, "success").mockImplementation(() => 0);
+    vi.spyOn(toast, "error").mockImplementation(() => 0);
+  });
+  afterEach(() => {
+    onlineManager.setOnline(true);
+    vi.restoreAllMocks();
+  });
+
+  it("admits one synchronous request across receipt controls and acknowledges only exact bound IDs", async () => {
+    const pending = deferred<ExpenseAck>();
+    vi.mocked(api.recordVehicleReceiptExpense).mockReturnValueOnce(pending.promise);
+    const { client } = await showExpense();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    const buttons = screen.getAllByRole("button", { name: control });
+    const rawFirst = captureSourceClick(buttons[0]);
+    const rawSecond = captureSourceClick(buttons[1]);
+    act(() => {
+      rawFirst();
+      rawFirst();
+      rawSecond();
+    });
+    expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(1);
+    expect(request().data).toEqual({
+      id: receiptId,
+      expectedAccountId: "owner-a",
+      expectedShopVehicleId: shopVehicle,
+    });
+    expect(Object.isFrozen(request().data)).toBe(true);
+    expect(request().signal).toBeInstanceOf(AbortSignal);
+    expect(request().signal.aborted).toBe(false);
+    expect(screen.getByText("Checking expense request…")).toBeInTheDocument();
+    for (const button of buttons) expect(button).toBeDisabled();
+    expect(toast.message).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+    await act(async () => pending.resolve(acknowledgment()));
+    expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral);
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(invalidate.mock.calls.map(([filters]) => filters?.queryKey)).toEqual([
+      ["shop-manager", "expenses"],
+      ["vehicle-receipts", "owner-a"],
+      ["vehicle-history"],
+    ]);
+    expect(screen.queryByText(failure)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Recorded in shop expenses/)).not.toBeInTheDocument();
+  });
+
+  it("matches direct shop UUIDs case-insensitively while capturing the selected target spelling", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+      receiptPage({
+        receipts: [expenseRow(receiptId, shopVehicle.toUpperCase())],
+        linkedVehicleId: null,
+        canWrite: false,
+        canRecordExpense: true,
+      }),
+    );
+    vi.mocked(api.recordVehicleReceiptExpense).mockResolvedValueOnce(
+      acknowledgment(receiptId, shopVehicle.toUpperCase()),
+    );
+    await showExpense();
+    fireEvent.click(screen.getByRole("button", { name: control }));
+    await waitFor(() => expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral));
+    expect(request().data.expectedShopVehicleId).toBe(shopVehicle);
+    expect(toast.success).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["null", null],
+    ["undefined", undefined],
+    ["void success", { ok: true }],
+    ["missing expense", { receiptId, shopVehicleId: shopVehicle }],
+    ["wrong receipt", { receiptId: otherReceiptId, shopVehicleId: shopVehicle, expenseId }],
+    ["wrong shop", { receiptId, shopVehicleId: otherShopVehicle, expenseId }],
+    ["malformed expense", { receiptId, shopVehicleId: shopVehicle, expenseId: "not-an-id" }],
+    ["extra field", { receiptId, shopVehicleId: shopVehicle, expenseId, posted: true }],
+  ] as const)(
+    "holds redispatch after a %s acknowledgment without optimistic financial success",
+    async (_label, value) => {
+      vi.mocked(api.recordVehicleReceiptExpense).mockResolvedValueOnce(value as ExpenseAck);
+      const { client } = await showExpense();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      const raw = captureSourceClick(screen.getAllByRole("button", { name: control })[0]);
+      act(raw);
+      await screen.findByText(failure);
+      act(raw);
+      for (const button of screen.getAllByRole("button", { name: control }))
+        expect(button).toBeDisabled();
+      expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(1);
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+      expect(screen.queryByText(/not-an-id|posted/)).not.toBeInTheDocument();
+    },
+  );
+
+  it("holds a rejected unknown outcome through read failure, retry and page changes", async () => {
+    vi.mocked(api.getVehicleReceipts).mockImplementation((options) =>
+      Promise.resolve(
+        page(
+          (options as unknown as FixtureReceiptReadOptions).data.shopVehicleId ?? shopVehicle,
+          (options as unknown as FixtureReceiptReadOptions).data.page,
+          26,
+        ),
+      ),
+    );
+    vi.mocked(api.recordVehicleReceiptExpense).mockRejectedValueOnce(
+      new Error("PRIVATE expense SQL detail"),
+    );
+    const { client } = await showExpense();
+    const raw = captureSourceClick(screen.getAllByRole("button", { name: control })[0]);
+    act(raw);
+    await screen.findByText(failure);
+    vi.mocked(api.getVehicleReceipts).mockRejectedValueOnce(new Error("PRIVATE refresh detail"));
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts", "owner-a"] });
+    });
+    await screen.findByText("Could not load receipts. Please try again.");
+    expect(screen.getByText(failure)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Retry receipts" }));
+    await screen.findAllByRole("button", { name: control });
+    fireEvent.click(screen.getByRole("button", { name: "Next receipts" }));
+    await screen.findByText(/Receipt page 2/);
+    const second = await screen.findByRole("button", { name: control });
+    expect(second).toBeDisabled();
+    act(raw);
+    act(captureSourceClick(second));
+    expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(failure)).toBeInTheDocument();
+    expect(screen.queryByText(/PRIVATE/)).not.toBeInTheDocument();
+    expect(toast.message).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it.each(["missing capability", "draft", "owner receipt", "other shop"] as const)(
+    "does not offer expense admission for %s in the selected workspace",
+    async (kind) => {
+      const row = expenseRow();
+      vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(
+        receiptPage({
+          receipts: [
+            {
+              ...row,
+              ...(kind === "draft" ? { status: "draft" as const } : {}),
+              ...(kind === "owner receipt" ? { shop_vehicle_id: null, vehicle_id: vehicle } : {}),
+              ...(kind === "other shop" ? { shop_vehicle_id: otherShopVehicle } : {}),
+            },
+          ],
+          linkedVehicleId: vehicle,
+          canWrite: true,
+          canRecordExpense: kind !== "missing capability",
+        }),
+      );
+      show(undefined, { shopVehicleId: shopVehicle });
+      await screen.findByText("Expense source supplier");
+      expect(screen.queryByRole("button", { name: control })).not.toBeInTheDocument();
+      expect(api.recordVehicleReceiptExpense).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["invalidated", "paused", "error", "replaced capability", "page intent"] as const)(
+    "rejects a retained raw expense handler after synchronous %s read loss",
+    async (kind) => {
+      const { client } = await showExpense();
+      const raw = captureSourceClick(screen.getAllByRole("button", { name: control })[0]);
+      const cached = client.getQueryCache().find({ queryKey: ["vehicle-receipts"], exact: false })!;
+      const pending = deferred<ReceiptRead>();
+      vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(pending.promise);
+      act(() => {
+        if (kind === "invalidated")
+          void client.invalidateQueries({ queryKey: ["vehicle-receipts"] });
+        if (kind === "paused") {
+          onlineManager.setOnline(false);
+          void client.refetchQueries({ queryKey: ["vehicle-receipts"] });
+        }
+        if (kind === "error") cached.setState({ status: "error", error: new Error("PRIVATE") });
+        if (kind === "replaced capability")
+          client.setQueryData(cached.queryKey, { ...page(), canRecordExpense: false });
+        if (kind === "page intent") {
+          client.setQueryData(cached.queryKey, page(shopVehicle, 0, 26));
+        }
+        raw();
+      });
+      if (kind === "page intent") {
+        await waitFor(() =>
+          expect(screen.getByRole("button", { name: "Next receipts" })).toBeEnabled(),
+        );
+        const latest = captureSourceClick(screen.getAllByRole("button", { name: control })[0]);
+        act(() => {
+          screen.getByRole("button", { name: "Next receipts" }).click();
+          latest();
+        });
+        expect(screen.getByText(/Receipt page 2/)).toBeInTheDocument();
+      }
+      expect(api.recordVehicleReceiptExpense).not.toHaveBeenCalled();
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      await act(async () => pending.resolve(page(shopVehicle, 1, 26)));
+    },
+  );
+
+  it("does not treat an ordinary receipt refresh as transport cancellation or an expense outcome", async () => {
+    const pending = deferred<ExpenseAck>();
+    const read = deferred<ReceiptRead>();
+    vi.mocked(api.recordVehicleReceiptExpense).mockReturnValueOnce(pending.promise);
+    const { client } = await showExpense();
+    fireEvent.click(screen.getAllByRole("button", { name: control })[0]);
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(read.promise);
+    act(() => {
+      void client.refetchQueries({ queryKey: ["vehicle-receipts"] });
+    });
+    expect(request().signal.aborted).toBe(false);
+    expect(screen.getByText("Checking expense request…")).toBeInTheDocument();
+    await act(async () => pending.resolve(acknowledgment()));
+    expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral);
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(screen.queryByText(failure)).not.toBeInTheDocument();
+    await act(async () => read.resolve(page()));
+  });
+
+  for (const settlement of ["resolve", "reject"] as const) {
+    it.each([
+      "account",
+      "shop target",
+      "logout",
+      "Auth loading",
+      "account ABA",
+      "target ABA",
+    ] as const)(
+      `silences old ${settlement} after committed %s and cannot release a new expense lock`,
+      async (kind) => {
+        const old = deferred<ExpenseAck>(),
+          current = deferred<ExpenseAck>();
+        vi.mocked(api.recordVehicleReceiptExpense)
+          .mockReturnValueOnce(old.promise)
+          .mockReturnValueOnce(current.promise);
+        const { client, container, rerender, view } = await showExpense();
+        const invalidate = vi.spyOn(client, "invalidateQueries");
+        fireEvent.click(screen.getAllByRole("button", { name: control })[0]);
+        const original = request();
+        let selectedShop = shopVehicle;
+        if (kind === "account" || kind === "account ABA") {
+          auth.userId = "owner-b";
+          rerender(view());
+        }
+        if (kind === "account ABA") {
+          auth.userId = "owner-a";
+          rerender(view());
+        }
+        if (kind === "shop target" || kind === "target ABA") {
+          selectedShop = otherShopVehicle;
+          rerender(view({ shopVehicleId: selectedShop }));
+        }
+        if (kind === "target ABA") {
+          selectedShop = shopVehicle;
+          rerender(view({ shopVehicleId: selectedShop }));
+        }
+        if (kind === "logout") {
+          auth.userId = null;
+          rerender(view());
+          expect(container).toBeEmptyDOMElement();
+          auth.userId = "owner-a";
+          rerender(view());
+        }
+        if (kind === "Auth loading") {
+          auth.loading = true;
+          rerender(view());
+          expect(container).toBeEmptyDOMElement();
+          auth.loading = false;
+          rerender(view());
+        }
+        expect(original.signal.aborted).toBe(true);
+        const button = (await screen.findAllByRole("button", { name: control }))[0];
+        fireEvent.click(button);
+        expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(2);
+        expect(request(1).data).toEqual({
+          id: receiptId,
+          expectedAccountId: auth.userId,
+          expectedShopVehicleId: selectedShop,
+        });
+        expect(original.data).toEqual({
+          id: receiptId,
+          expectedAccountId: "owner-a",
+          expectedShopVehicleId: shopVehicle,
+        });
+        await act(async () =>
+          settlement === "resolve"
+            ? old.resolve(acknowledgment())
+            : old.reject(new Error("PRIVATE old outcome")),
+        );
+        expect(button).toBeDisabled();
+        expect(toast.message).not.toHaveBeenCalled();
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(toast.error).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalled();
+        expect(screen.queryByText(failure)).not.toBeInTheDocument();
+        await act(async () => current.resolve(acknowledgment(receiptId, selectedShop)));
+        expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral);
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(invalidate).toHaveBeenCalledWith({ queryKey: ["vehicle-receipts", auth.userId] });
+      },
+    );
+
+    it(`silences ${settlement} after unmount and aborts only the expense transport`, async () => {
+      const old = deferred<ExpenseAck>();
+      vi.mocked(api.recordVehicleReceiptExpense).mockReturnValueOnce(old.promise);
+      const { client, unmount } = await showExpense();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(screen.getAllByRole("button", { name: control })[0]);
+      unmount();
+      expect(request().signal.aborted).toBe(true);
+      await act(async () =>
+        settlement === "resolve"
+          ? old.resolve(acknowledgment())
+          : old.reject(new Error("PRIVATE unmounted outcome")),
+      );
+      expect(invalidate).not.toHaveBeenCalled();
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+    });
+
+    it(`retains an uncertain in-flight StrictMode hold despite late ${settlement}`, async () => {
+      const old = deferred<ExpenseAck>();
+      vi.mocked(api.recordVehicleReceiptExpense).mockReturnValueOnce(old.promise);
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+      });
+      let seeded = 0,
+        cleanups = 0;
+      const unsubscribe = client.getQueryCache().subscribe((event) => {
+        if (event.type !== "added" || event.query.queryKey[0] !== "vehicle-receipts") return;
+        expect(event.query.queryKey.slice(0, 4)).toEqual([
+          "vehicle-receipts",
+          "owner-a",
+          undefined,
+          shopVehicle,
+        ]);
+        expect(event.query.queryKey).toHaveLength(6);
+        seeded += 1;
+        event.query.setData(page(), { updatedAt: Date.now() + 60_000, manual: true });
+      });
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      function StartDuringFirstCommit() {
+        const started = useRef(false);
+        useLayoutEffect(() => {
+          if (!started.current) {
+            started.current = true;
+            screen.getAllByRole("button", { name: control })[0].click();
+          }
+          return () => {
+            cleanups += 1;
+          };
+        }, []);
+        return null;
+      }
+      render(
+        <StrictMode>
+          <QueryClientProvider client={client}>
+            <VehicleReceiptPanel shopVehicleId={shopVehicle} />
+            <StartDuringFirstCommit />
+          </QueryClientProvider>
+        </StrictMode>,
+      );
+      unsubscribe();
+      expect(seeded).toBeGreaterThan(0);
+      expect(cleanups).toBe(1);
+      expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(1);
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(request().signal.aborted).toBe(true);
+      expect(screen.getByText(failure)).toBeInTheDocument();
+      const button = screen.getAllByRole("button", { name: control })[0];
+      expect(button).toBeDisabled();
+      act(captureSourceClick(button));
+      await act(async () =>
+        settlement === "resolve"
+          ? old.resolve(acknowledgment())
+          : old.reject(new Error("PRIVATE replay outcome")),
+      );
+      expect(screen.getByText(failure)).toBeInTheDocument();
+      expect(button).toBeDisabled();
+      expect(api.recordVehicleReceiptExpense).toHaveBeenCalledTimes(1);
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    });
+  }
+});

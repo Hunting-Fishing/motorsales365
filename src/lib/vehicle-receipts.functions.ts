@@ -4,6 +4,12 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
+  receiptExpenseRequestSchema,
+  RECEIPT_EXPENSE_FAILURE,
+  parseReceiptExpenseTargetResponse,
+  parseReceiptExpenseResponse,
+} from "./vehicle-receipt-expense-contract";
+import {
   privateReceiptUrlRequestSchema,
   PRIVATE_RECEIPT_URL_FAILURE,
   PRIVATE_RECEIPT_SIGN_TTL_SECONDS,
@@ -517,7 +523,55 @@ export const revokeShopVehicleLink = createServerFn({ method: "POST" })
   );
 export const recordVehicleReceiptExpense = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: uuid }).parse(d))
-  .handler(async ({ data, context }) =>
-    rpc(context.supabase, "record_vehicle_receipt_expense", { _id: data.id }),
-  );
+  .inputValidator((input: unknown) => {
+    const parsed = receiptExpenseRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid receipt expense request.");
+    return parsed.data;
+  })
+  .handler(async ({ data, context }) => {
+    const intent = Object.freeze({
+      expectedAccountId: data.expectedAccountId,
+      id: data.id,
+      expectedShopVehicleId: data.expectedShopVehicleId,
+    });
+    if (context?.userId !== intent.expectedAccountId)
+      throw new Error("Account changed. Refresh before recording a receipt expense.");
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCurrent = await caller.verify(request);
+      assertCurrent();
+      const db = context.supabase as unknown as {
+        from(table: "vehicle_receipts"): ReceiptReadBuilder;
+        rpc(name: "record_vehicle_receipt_expense", args: { _id: string }): ReceiptReadBuilder;
+      };
+      const target = db
+        .from("vehicle_receipts")
+        .select("id,shop_vehicle_id")
+        .eq("id", intent.id)
+        .abortSignal(request.signal)
+        .retry(false)
+        .single();
+      assertCurrent();
+      const targetResponse = await target;
+      assertCurrent();
+      parseReceiptExpenseTargetResponse(targetResponse, intent.id, intent.expectedShopVehicleId);
+      assertCurrent();
+      const query = db
+        .rpc("record_vehicle_receipt_expense", { _id: intent.id })
+        .abortSignal(request.signal)
+        .retry(false);
+      assertCurrent();
+      const response = await query;
+      assertCurrent();
+      const acknowledgment = parseReceiptExpenseResponse(
+        response,
+        intent.id,
+        intent.expectedShopVehicleId,
+      );
+      assertCurrent();
+      return acknowledgment;
+    } catch {
+      throw new Error(RECEIPT_EXPENSE_FAILURE);
+    }
+  });
