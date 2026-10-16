@@ -16,19 +16,23 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
-R3 recovery source `c25f79f3` is committed/reviewed: two fresh private native PG17
-clusters on the established ephemeral Linux host, externally pinned synthetic
-roles/archive artifacts, source-offline restore and actual ordinary database
-role/data/catalog/sequence checks. No Docker, application SQL or live operation.
-Final combined offline guards 91/91 (793.18ms), syntax/format/diff and changed-line
-lint zero findings pass; read-only 214 public/Worker boundaries verify with
-unchanged application build inputs. Same-PR publication/new exact-head Linux execution are still required; this is
-not full API/Auth/private-original recovery or production RTO acceptance.
-Contract/evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. After selected
-rehearsal verification, continue real-stack/private-byte recovery prerequisites
-and independent C1.08 full-line viewing/atomic writers. The fresh read-only QA
-check still finds an unsubmitted signup; credentials/Terms/native pilot/session
-are not bypassed. Keep 47 replay failures and other exact release gaps open for
+R3 initial source `c25f79f3`/published `c08c25c8` is on the same draft PR #68.
+Actual Linux job `116896620628` fails during synthetic recovery prepare; Parts247
+and all six quote groups/stops pass and recovery cleanup completes. No restore
+or recovery-time success is claimed. The hidden first/sole internal cause is not
+proven; independent source review finds a definite wrong role-settings catalog.
+Repair source `3393d29a` uses the correct global settings catalog and fixed bounded
+failure codes without raw diagnostics or relaxed conditions. Final offline96/96
+(1,791.91ms), syntax/format/diff, independent review and changed-line lint zero
+findings pass; repaired exact-head Linux execution is still required.
+Contract/checks/deployment status: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+No Docker, application migration or live operation; full API/Auth/private-original
+recovery and production RTO remain open. Next: verify repaired native recovery,
+then real-stack/private-byte recovery prerequisites and a separate read-only
+account/receipt/target-bound C1.08 line-window viewer, preserving incomplete-row
+editor/sharing flags and the existing100-line replacement-write cap. The fresh
+read-only QA check still finds unsubmitted signup; no credential/Terms/native
+pilot/session bypass. Keep 47 replay failures and exact release gaps open for
 the 17 October feasibility review.
 
 Publication `0b836b15` is verified on canonical remote/same attached draft PR #68;

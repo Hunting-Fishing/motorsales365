@@ -1,16 +1,16 @@
 # Native Customer 360: first delivery slice
 
-16 October R3 shared dependency: a bounded synthetic second-private-cluster
-PG17 recovery source `c25f79f3` is committed/reviewed and targets the existing
-ephemeral Linux host. It keeps role/ACL/data/sequence and source-offline checks without Docker,
-live SQL or an application migration. Final combined offline guards 91/91,
-syntax/format/diff and changed-line lint zero findings pass; retained artifact
-checks verify unchanged application inputs. Exact-head native execution is still
-required; it is not real API/Auth/private-original or production recovery proof.
-See `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. Continue real-stack/private-byte
-recovery prerequisites and independent C1.08 full-line viewing/atomic writers
-after this selected rehearsal. QA signup/native pilot/session and 47 retained
-application replay failures remain open, not removed from the seven-day scope.
+16 October R3 shared dependency: first actual Linux synthetic recovery attempt
+at published `c08c25c8` fails prepare, with retained Parts247/quote six groups and
+cleanup passing. No restore success. Repair source `3393d29a` corrects a definite
+role-settings catalog error and adds fixed bounded failure codes; final offline
+96/96, syntax/format/diff/review and changed-line lint zero findings pass. New
+exact-head native execution remains required, not real API/Auth/private-original
+or production recovery proof. See `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+Next: repaired native verification, then real-stack/private-byte recovery and a
+separate read-only C1.08 line-window viewer without unlocking partial-row edit/
+share or changing the100-line replacement writer. No Docker, app migration or
+live operation. QA/native pilot/session and 47 replay failures remain open.
 
 C1.06 source `ee9af3a8` captures installation account/receipt/item/selected vehicle/
 date/odometer intent, checks child/parent preflights and legacy void transport

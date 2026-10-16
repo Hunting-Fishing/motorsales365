@@ -1,6 +1,7 @@
 # Docker-free synthetic PostgreSQL17 recovery rehearsal
 
-Updated 16 October 2026. Source `c25f79f3217565901d0359835b5246a543ebd7cd`;
+Updated 16 October 2026. Initial source `c25f79f3217565901d0359835b5246a543ebd7cd`;
+repair source `3393d29adb0d313d8d009fecbb628ee4eedd32d1`;
 same integrated candidate and draft PR #68; no hosted
 project, application migration, live operation or deployment is part of this
 slice. Source/publication and execution results are recorded below when verified.
@@ -48,11 +49,13 @@ JWT, Supabase Auth, original-human or trusted native-shop authority acceptance.
   control remains. This is a synthetic database rollback witness, not recovery
   from a production incident or failure of separately restored cluster roles.
 
-The wrapper suppresses native/Node stderr and exposes static phase failures
-only. Prepare's detailed generic stage/SQLSTATE/timing stderr is not visible in
-CI. The final passing restore marker includes dump/restore/verification timings;
-failure diagnosis has this explicit observability limitation. No raw SQL, data,
-credential or path diagnostics are published.
+Native/Node stderr remains suppressed. The diagnostic follow-up adds a short
+stdout failure marker containing only a fixed allowlisted stage and SQLSTATE;
+the prepare wrapper admits that complete bounded record only after child/group
+cleanup, still fails and never converts it to a manifest pin. Successful prepare
+still requires exactly 64 lowercase hex bytes plus one newline. Prepare timing
+stderr is not visible in CI; final passing restore output includes timings.
+No raw SQL, data, credential, path or driver diagnostics are published.
 
 PostgreSQL documents that [cluster roles need a separate dump](https://www.postgresql.org/docs/17/backup-dump.html).
 The [roles dump's password omission](https://www.postgresql.org/docs/17/app-pg-dumpall.html)
@@ -98,11 +101,57 @@ build or TypeScript run is claimed for this CI-only slice. Read-only checks at
 Worker `motorsales365`/`index.mjs`, canonical backend, 15 OCR/202 PDF assets and
 browser-engine/server separation. They do not prove new-head CI or deployment.
 
-Source is committed and awaits same-PR publication. Offline tests
-and shell syntax are not native runtime evidence. The new exact-head Linux job must prove
+Initial source/evidence is published as `c08c25c8d29ac793aceb905d0c3539e202942f7a`
+on the same draft PR #68; canonical remote/title/base/draft/history/main are
+verified, with a clean checkout and final 214 public/Worker boundaries. No upload
+or deployment. Offline tests and shell syntax are not native runtime evidence.
+The new exact-head Linux job must prove
 actual package/server identity, both fresh clusters, source shutdown, artifact
 verification, restore/comparison/ordinary-role checks, timings and cleanup before
 this selected synthetic rehearsal can be called passing.
+
+### First Linux attempt and bounded repair
+
+Actual `c08c25c8` native job `116896620628` in run `38877697404` fails during
+prepare; the untruncated log has only the static prepare-failed message, so its
+first/sole internal cause is not proven. Both retained Parts247 and six quote
+groups pass, including native17.11/server170011 identity and scoped stops. The
+recovery EXIT cleanup and subsequent always-cleanup complete; no restore/PASS
+or recovery-time result is present. Existing 47 migration replay failures remain.
+
+Independent source diagnosis finds a definite catalog error: `pg_authid` has no
+`rolconfig` field. [PostgreSQL17 catalogs](https://www.postgresql.org/docs/17/catalog-pg-authid.html)
+and the [`pg_roles` view](https://www.postgresql.org/docs/17/view-pg-roles.html)
+distinguish role properties/passwords from role settings. The repair retains real
+password-null checking and obtains global role settings through the correlated
+`pg_db_role_setting` row (`setrole=pg_authid.oid`, `setdatabase=0`). This would fix
+an undefined-column error when the old snapshot is reached; it is not proof that
+no earlier failure existed. The fixed bounded failure marker makes the next
+attempt diagnosable without enabling raw stderr.
+
+Final repair offline checks pass **96/96**, zero failures/skips, 1,791.91ms:
+68 Node recovery tests, 17 shell guards (including real isolated Bash marker
+parser allow/deny cases) and 11 retained quote/wiring guards. The shell test first
+found Windows newline argument transport in its new parser harness; input moved
+to stdin without changing the production parser or any assertion. Syntax/format/
+diff pass. Actual native restore and the repaired exact head remain unverified
+until publication/execution; no test timeout, quarantine or recovery condition is
+relaxed.
+
+Repair source is committed at `3393d29a`; changed-line lint against `c08c25c8`
+has zero errors/warnings/retained findings across three JS files. Independent
+frozen delta review is clear. Final repair hashes:
+
+- Node: `c5fdc66420c22af8139ae78abc31439e103499fd2e28f25ae401ae12b948c17c`.
+- Node test: `36c006d1bec82c09264975ed391e1bd3533efb24b4624acc16cf832e9830ed3f`.
+- Shell: `553731239a6e983a8bc5a962636318d0dde90c2749571fc7b46c06425fd2222e`.
+- Shell test: `d6dc437c902f0d5ca67908574b0447c3d1e3905b8937f1634e965380eee9c5af`.
+
+At the last `c08c25c8` check, build/typecheck/lint/browser OCR pass and unit
+`116896620703` is still running. Wrapper preview `116896619501` is a confirmed
+configuration skip without application upload; migrations/production/Supabase
+Preview skip. Independent Workers build `cadc5a53-e04a-416f-9f88-9f7dca03009a`
+fails with ID/link only; no fresh cause is inferred from older build logs.
 
 ## Open release gates and next dependency
 

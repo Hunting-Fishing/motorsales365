@@ -41,18 +41,19 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-R3 bounded recovery source `c25f79f3` is committed/reviewed, not yet native accepted:
-two private fresh PG17 clusters, synthetic role/archive recovery with externally
-held manifest pin, source-offline restore, ordinary database role checks and
-data/catalog/ACL/RLS/sequence comparison. Final combined offline 91/91 (793.18ms),
-syntax/format/diff, changed-line lint zero findings and retained 214 public/Worker
-boundaries pass; application build inputs unchanged. Evidence and exclusions:
-`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. No Docker, application migration,
-live operation or deployment. Exact-head Linux execution remains required;
-whole baseline/API/Auth/private originals/configuration/production RTO and
-owner/live acceptance remain open. The QA form is still unsubmitted at the
-fresh read-only check. Next: selected rehearsal verification, then real-stack/
-private-byte recovery and independent C1.08/atomic workflow dependencies.
+R3 initial source `c25f79f3`/published `c08c25c8` fails actual Linux synthetic
+prepare in job `116896620628`; Parts247/six quote groups/stops and recovery
+cleanup pass, not restore. Definite role-settings catalog defect is independently
+found; first/sole runtime cause is not proven from the coarse log. Repair source
+`3393d29a` corrects that lookup and adds strict bounded stage/SQLSTATE diagnostics,
+without raw data or relaxed conditions. Final offline96/96 (1,791.91ms), syntax/
+format/diff/review and changed-line lint zero findings pass. New exact-head native
+execution is required. Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+No Docker, application migration, live operation or deployment. Whole baseline/
+API/Auth/private originals/configuration/production RTO/owner/live gates remain
+open. QA form is still unsubmitted at the fresh read-only check. Next: repaired
+native verification, then real-stack/private-byte recovery and separate C1.08
+read-only line-window viewing that does not unlock partial-row edit/share/write.
 
 Published `0b836b15` is verified on canonical remote/same attached draft PR #68/
 base/title/draft/history/main; final 214 assets/Worker boundaries pass. Run

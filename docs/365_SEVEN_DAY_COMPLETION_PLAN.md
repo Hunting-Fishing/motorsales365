@@ -1,12 +1,13 @@
 # 365 Seven Day Completion Plan
 
-16 October recovery dependency update: bounded synthetic native PG17
-dump/source-shutdown/second-private-cluster source `c25f79f3` is committed/reviewed,
-using the existing ephemeral Linux host and no Docker or live operation.
-Role/ACL/data/catalog/sequence and ordinary database connection checks are
-required; final offline guards 91/91, syntax/format/diff/lint and retained artifact
-checks pass but are not actual native execution. Contract and current
-checks: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. Whole application baseline,
+16 October recovery update: initial Linux synthetic prepare at published
+`c08c25c8` fails, while retained Parts247/six quote groups and cleanup pass.
+Repair source `3393d29a` corrects the role-settings catalog and adds bounded fixed
+failure codes; final offline96/96, syntax/format/diff/review/lint pass. Repaired
+exact-head native execution is required; no restore acceptance, Docker, live
+operation or relaxed gate. Checks: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+Continue repaired verification, real-stack/private-byte prerequisites and separate
+read-only C1.08 viewing without unlocking partial-row writes. Whole application baseline,
 real API/Auth/private originals/configuration/production RTO and owner/live
 acceptance remain open. Continue those and independent receipt workflow work;
 this is not a scope cut or a completed R3 gate. The 17 October feasibility review
