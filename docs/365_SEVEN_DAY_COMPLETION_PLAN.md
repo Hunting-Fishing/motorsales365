@@ -1,5 +1,31 @@
 # 365 Seven Day Completion Plan
 
+Sourcef53c8ea8 closes bounded full staff/claim/native roster source composition,
+not native authority. Final68/68 five suites81.967s, reviews/syntax/format/lint/
+diff/214 assets/existing-output Worker guards pass.36 tables/53 functions/41
+attachments/full parent+provider+sequence guards; retained no-op role-row churn,
+early chatFK versus later missing-role rollback explicit. Parentb2 all six Actions
+pass,4,863/93 files100.48s, zero unexpected/quarantined failures; new-head actual
+composition/unit/runtime-budget result still required, normal25min unchanged.
+No app/migration/grant/live/deploy or parent fixture rewrite. Original-token/
+strict session/native team-role-tenant/current-catalog/all-writer/financial/full
+recovery/API/private originals/pilot/owner/live andsafe101+ draft edits remain.
+22 October target remains at risk;17 October feasibility review/no scope cuts
+retained. `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md` records exact limits.
+
+Publishedb2c0328c/same draft PR68 passes all six Actions gates38917399787;
+unit117028294149 reports4,863/93 files
+100.48s, zero unexpected/quarantined failures; truncated/final summaries. Fresh CI build final214 media/Worker/backend/
+OCR/PDF markers are present in a truncated log; merge checkoutbffced3b… has the
+complete identical tree to published head. Actual PG17.11 expense/native cleanup,
+Parts247/quote/bounded recovery pass;47 replay failures remain and tiny48/67/148ms
+not RTO. Preview config skip/no upload, newest Workersaf30218f… fails, fresh cause
+unverified. The f53c8ea8 checkpoint above supersedes the earlier pending unit/
+bounded-composition steps; ingress/session/native authority/financial/recovery/
+owner gates remain.
+22 October risk/17 October feasibility review remain; no scope cuts/live/deploy.
+Follow-up notes join next source slice without restarting unchanged CI.
+
 Source `d4538923` connects bounded command-strict session-claim custody to receipt
 expense recording only. Final978/9784 suites12.65s, full TypeScript, review/
 format/diff/changed-line lint and214 assets/existing-output Worker guards pass;

@@ -1,5 +1,17 @@
 # Docker-free native receipt-expense rehearsal
 
+Nonregression at publishedb2c0328c/same draft PR68: actual job117028294367/
+run38917399787 has untruncated PGDG17.11/server170011/private identity/ten ordered
+expense PASS/final-completion/EXIT+always-cleanup evidence. Parts247/six quote
+groups/bounded synthetic recovery pass; tiny48/67/148ms is not RTO,47 replay
+failures remain. Source/candidate/harness unchanged by the connected command
+custody slice; owner/GUC still not human/session/native authority. All six Actions
+gates pass; unit117028294149 reports4,863/93 files100.48s, zero unexpected/
+quarantined failures, returned log truncated/final summaries. Fresh build final guards present in a
+truncated log and synthetic PR-merge complete tree equals published head.
+Preview config skip/no upload, Workers newestaf30218f… failure fresh cause
+unverified; no hosted/migration/grant/deploy. Notes join next source slice.
+
 16 October 2026. Source `7d866ce01a6300f305a01cff939ba753ab6217d0`, same integrated
 branch/draft PR #68. Publication `0eae86921ecae9d819e6a7eae79ab3149271c16b` is
 verified on the canonical remote/same draft PR, with unchanged title/base/main.
@@ -114,13 +126,13 @@ build/TypeScript run is claimed. New-head Actions must independently check them.
 
 Final LF SHA256:
 
-| File | SHA256 |
-| --- | --- |
-| expense-native-source.mjs | 410c50ca675abae897d4e73cb3c055bf67f02025672ad1ff92e6c077c724ebfd |
-| expense-native-source.test.mjs | 31b4a4ec89248705cd64051012fe3520df3adfa00415f00b13869c48333bc64c |
-| native-expense-postgres.mjs | a095a7759479318045fd41ab6dd0d51af736c7057c45b8ebadb15655ba5364e9 |
-| native-expense-postgres.test.mjs | cb8c0c77d7558f3b7eaeb670b7e6f11e28bdc9b635934e8d7008f425c7791804 |
-| run-native-expense-postgres.sh | b2f0b49d9ad563e2796a86b5efdb64cf5b1c768b1ea7455dd0b0bbb7a48ba424 |
+| File                                 | SHA256                                                           |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| expense-native-source.mjs            | 410c50ca675abae897d4e73cb3c055bf67f02025672ad1ff92e6c077c724ebfd |
+| expense-native-source.test.mjs       | 31b4a4ec89248705cd64051012fe3520df3adfa00415f00b13869c48333bc64c |
+| native-expense-postgres.mjs          | a095a7759479318045fd41ab6dd0d51af736c7057c45b8ebadb15655ba5364e9 |
+| native-expense-postgres.test.mjs     | cb8c0c77d7558f3b7eaeb670b7e6f11e28bdc9b635934e8d7008f425c7791804 |
+| run-native-expense-postgres.sh       | b2f0b49d9ad563e2796a86b5efdb64cf5b1c768b1ea7455dd0b0bbb7a48ba424 |
 | run-native-expense-postgres.test.mjs | 14ce113cea1f4cf02d6910c303d0a0fa937e530d378847dfd16c1cc05f3cdce9 |
 
 ## Parent verification and exact next action

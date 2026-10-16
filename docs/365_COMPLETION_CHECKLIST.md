@@ -16,6 +16,41 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest source `f53c8ea8` closes the named bounded full platform staff/claim to
+native roster source composition, not authority. Unchanged full parent plus
+retained native selections now guard36 tables/53 functions/41 attachments/two
+added enums/no client policies, original provider uid/parent rows/settings and
+member sequence with no reset. Final serial68/68 across5 files81.967s includes
+10 new cases, legacy profile/roster-ID preservation with native role-row churn,
+early real chat FK23503 and later retained missing-role P0001 rollback, and21
+drift refusals. Syntax/format/full lint/root+independent review/diff/changed-line
+lint and214 assets/existing-output Worker guards pass. Parentb2c0328c now passes
+all six Actions,4,863/93 files100.48s, zero unexpected/quarantined failures,
+truncated unit log/final summaries. New-head CI is separate; normal25min retained.
+See `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`. No source/migration/
+permission/activation/live change to the app or existing fixtures. Next actual
+new-head composition/unit/runtime-budget result, then owned ingress/strict
+session/native-team/role/tenant authority and compatible catalog/all-writer/
+financial/full recovery closure; safe101+ draft editing stays independent.
+R2/C1.04/C3/R3, QA/pilot/owner/live and22 October risk remain open. No Docker.
+
+Published `b2c0328c` is verified on the canonical remote/same draft PR68 with
+unchanged base/title/main and49,044-character prior PR history preserved.
+All six exact-head38917399787 gates pass; unit117028294149 reports4,863/93 files
+100.48s, zero unexpected/quarantined failures (truncated/final summaries).
+Build log is truncated with final214 media/
+Worker/backend/15 OCR/202 PDF/server-boundary markers. CI's PR-merge checkout
+bffced3b71c514af599e8629c20b095cde849c4d has the COMPLETE same treefb87b2aa… as
+b2c0328c (parents576fb17d…/b2c0328c), verified by read-only fetch/diff.
+Native117028294367 untruncated PGDG17.11/server170011/ten expense markers/cleanup,
+Parts247/quote/bounded recovery pass; tiny48/67/148ms not RTO,47 replay failures
+remain. Preview117028284731/38917397437 log confirms config skip/no upload;
+production/migration/Supabase Preview skip. Workers117028447628/buildaf30218f…
+fails with fresh cause unverified. Earlier next-unit/composition steps are
+superseded by the checkpoint above; preserve the
+remaining ingress/strict session/native authority/financial/recovery gates.
+Follow-up notes join the next meaningful source slice. No live/SQL/grant/deploy.
+
 Latest source `d4538923` (initial source50cf029c plus checked-callable typing fix)
 connects command-strict session-claim custody ONLY to receipt expense recording.
 Same-client exact-observed-bearer claims/current-user checks, immutable security

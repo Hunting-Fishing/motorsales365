@@ -1,5 +1,30 @@
 # Native Customer 360: first delivery slice
 
+Sourcef53c8ea8 composes selected full staff/claim/native roster foundation, not
+authority:36 tables/53 functions/41 attachments/no client policies, unchanged
+provider/parent/sequence guards. Final68/68 five suites81.967s, syntax/format/
+lint/review/diff/214 assets/existing-output Worker guards pass. Legacy roster/
+profile IDs preserved, native role-row UUID churn explicit; early chatFK and
+late missing-role rollback scoped separately. Parentb2 all six Actions pass,
+4,863/93 files100.48s, zero unexpected/quarantined failures; new-head composition/
+unit/runtime budget still required. `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`.
+Next owned ingress/strict session/native-team/role/tenant authority and compatible
+catalog/all-writer/financial/recovery before activation; safe101+ draft edit remains.
+No app/migration/grant/live/deploy/fixture rewrite; owner/GUC remains synthetic.
+
+Publishedb2c0328c is verified on the same draft PR68/main unchanged. All six Actions
+gates pass (38917399787), unit117028294149 reports
+4,863/93 files100.48s, zero unexpected/quarantined failures; truncated/final
+summaries present. Fresh CI build's final
+214 media/Worker/backend/OCR/PDF markers are present in a truncated log; its
+PR-merge bffced3b… COMPLETEtree equals b2c0328c. Actual native117028294367/
+PG17.11 expense markers/cleanup, Parts247/quote/bounded recovery pass;47 replay
+failures remain, tiny48/67/148ms not RTO. Preview log config skip/no upload;
+latest Workersaf30218f… fresh failure cause unverified; no deployment. The f53c8ea8
+checkpoint above supersedes earlier pending unit/bounded-composition steps;
+original-token/session/native-authority/financial/recovery gates remain. Notes join
+next meaningful source slice without docs-only restart.
+
 Source `d4538923` connects strict command session-claim custody to receipt expense
 recording only: same-client observed-token claims/current-user tuple, expiry and
 shared monotonic10s Auth wait; legacy RPC/private transaction/generated middleware

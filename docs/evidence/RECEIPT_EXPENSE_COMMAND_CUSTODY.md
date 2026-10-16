@@ -7,6 +7,22 @@ before local verification. This slice connects
 an additional denial boundary to `recordVehicleReceiptExpense`; it does not
 activate the private expense transaction candidate or establish native authority.
 
+Publication `b2c0328ce470a3eac558e009c61629bdade9a96b` is verified on canonical
+remote/same draft PR68 with unchanged title/base/main and49,044-character prior
+PR history preserved. All six exact-head Actions gates pass in38917399787; unit
+117028294149 reports4,863/4,863 across93 files100.48s, zero unexpected/quarantined
+failures; returned log truncated with final summaries. Fresh build117028294568 has a truncated log with
+final214 media/Worker/backend/15 OCR/202 PDF/server-engine markers. Its checkout
+bffced3b71c514af599e8629c20b095cde849c4d is GitHub's synthetic PR merge with
+parents576fb17d1fdea96d73b4ae68ea6b725eef62efdf andb2c0328c; read-only fetch
+confirms both COMPLETEtrees equalfb87b2aa5fe4f5047be8c9b9a17c74451364af5a.
+Native117028294367 has untruncated PGDG17.11/server170011/ten expense PASS markers/
+cleanup, Parts247/quote/bounded synthetic recovery (48/67/148ms, not RTO),47 replay
+failures retained. Preview117028284731/run38917397437 confirms config skip/no
+upload; migration/production/Supabase Preview skip. Separate Workers117028447628/
+buildaf30218f-3e1f-491d-899c-036176113e12 fails; fresh cause unverified. Follow-up
+notes join the next meaningful source slice, not a docs-only restart.
+
 ## Connected boundary
 
 `captureNativeCommandCaller` is a separate mode of the existing request helper.
