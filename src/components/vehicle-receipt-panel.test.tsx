@@ -21,6 +21,7 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 vi.mock("@/lib/vehicle-receipts.functions", () => ({
   getVehicleReceipts: vi.fn(),
+  getVehicleReceiptItemPage: vi.fn(),
   startVehicleReceipt: vi.fn(),
   saveVehicleReceipt: vi.fn(),
   extractVehicleReceipt: vi.fn(),
@@ -3375,4 +3376,246 @@ describe("receipt installation intent, acknowledgment and committed session", ()
     expect(toast.success).not.toHaveBeenCalled();
     expect(invalidate).not.toHaveBeenCalled();
   });
+});
+
+describe("read-only complete-line viewer integration", () => {
+  const accountA = "61000000-0000-4000-8000-000000000001";
+  const accountB = "61000000-0000-4000-8000-000000000002";
+  const parentId = "62000000-0000-4000-8000-000000000001";
+  const otherVehicle = "10000000-0000-4000-8000-000000000002";
+  type LinePage = Awaited<ReturnType<typeof api.getVehicleReceiptItemPage>>;
+  function line(index: number): LinePage["items"][number] {
+    return {
+      id: `63000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      receipt_id: parentId,
+      description: `Viewer-only line ${index + 1}`,
+      category: "brakes",
+      brand: null,
+      part_number: null,
+      quantity: 1,
+      total: null,
+      confidence: 1,
+      reviewed: true,
+      installed_on: null,
+      odometer_km: null,
+      public_summary_allowed: false,
+      sort_order: index,
+    };
+  }
+  function window(page = 0): LinePage {
+    return {
+      receiptId: parentId,
+      vehicleId: vehicle,
+      shopVehicleId: null,
+      page,
+      totalCount: 101,
+      hasNext: page === 0,
+      items: page === 0 ? Array.from({ length: 100 }, (_, i) => line(i)) : [line(100)],
+    };
+  }
+  function source(complete = false): ReceiptRead {
+    return receiptPage({
+      receipts: [
+        {
+          ...receipt("Viewer supplier"),
+          id: parentId,
+          status: "confirmed",
+          items: [line(0)],
+          items_complete: complete,
+          item_count: complete ? 1 : 101,
+          edit_eligible: false,
+          can_write: false,
+        },
+      ],
+      linkedVehicleId: null,
+      canWrite: false,
+    });
+  }
+  function raw(button: HTMLElement) {
+    const key = Object.getOwnPropertyNames(button).find((name) => name.startsWith("__reactProps$"));
+    if (!key) throw new Error("Missing source handler.");
+    const props: unknown = Reflect.get(button, key);
+    if (
+      !props ||
+      typeof props !== "object" ||
+      !("onClick" in props) ||
+      typeof props.onClick !== "function"
+    )
+      throw new Error("Missing source handler.");
+    const handler = props.onClick;
+    return () => handler();
+  }
+  beforeEach(() => {
+    auth.userId = accountA;
+    vi.mocked(api.getVehicleReceipts).mockResolvedValue(source());
+    vi.mocked(api.getVehicleReceiptItemPage).mockReset().mockResolvedValue(window());
+  });
+  afterEach(() => onlineManager.setOnline(true));
+
+  it("offers all retained line pages on a read-only partial receipt without unlocking existing controls", async () => {
+    show();
+    fireEvent.click(await screen.findByRole("button", { name: "View all lines" }));
+    await within(screen.getByRole("dialog")).findByText("Viewer-only line 100");
+    expect(vi.mocked(api.getVehicleReceiptItemPage).mock.calls[0][0]).toMatchObject({
+      data: { expectedAccountId: accountA, receiptId: parentId, vehicleId: vehicle, page: 0 },
+      signal: expect.any(AbortSignal),
+    });
+    expect(
+      screen.queryByRole("button", { name: /Review|Save|Record installation/ }),
+    ).not.toBeInTheDocument();
+    expect(within(screen.getByRole("dialog")).queryByRole("checkbox")).not.toBeInTheDocument();
+    vi.mocked(api.getVehicleReceiptItemPage).mockResolvedValueOnce(window(1));
+    fireEvent.click(screen.getByRole("button", { name: "Next lines" }));
+    await screen.findByText("Viewer-only line 101");
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.getByRole("checkbox", { name: "Share with linked shops" })).toBeDisabled();
+    expect(
+      screen.getByRole("checkbox", { name: "Show parts summary on public ride/passport" }),
+    ).toBeDisabled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.setReceiptSharing).not.toHaveBeenCalled();
+    expect(api.installReceiptItem).not.toHaveBeenCalled();
+  });
+
+  it("does not add a second reader to a complete receipt", async () => {
+    vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(source(true));
+    show();
+    await screen.findByText("Viewer supplier");
+    expect(screen.queryByRole("button", { name: "View all lines" })).not.toBeInTheDocument();
+    expect(api.getVehicleReceiptItemPage).not.toHaveBeenCalled();
+  });
+
+  it.each(["invalidated", "fetching", "paused", "error", "same-object success"] as const)(
+    "destroys the display selection on committed parent %s and never reopens it after recovery",
+    async (kind) => {
+      const { client } = show();
+      fireEvent.click(await screen.findByRole("button", { name: "View all lines" }));
+      await within(screen.getByRole("dialog")).findByText("Viewer-only line 100");
+      const oldNext = raw(screen.getByRole("button", { name: "Next lines" }));
+      const parent = client.getQueryCache().find({ queryKey: ["vehicle-receipts"], exact: false })!;
+      const snapshot = parent.state.data;
+      act(() => {
+        if (kind === "invalidated")
+          void client.invalidateQueries({ queryKey: parent.queryKey, refetchType: "none" });
+        if (kind === "fetching" || kind === "paused") parent.setState({ fetchStatus: kind });
+        if (kind === "error") parent.setState({ status: "error", error: new Error("PRIVATE") });
+        if (kind === "same-object success") client.setQueryData(parent.queryKey, snapshot);
+        oldNext();
+      });
+      await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+      expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(1);
+      act(() => {
+        parent.setState({
+          fetchStatus: "idle",
+          status: "success",
+          error: null,
+          isInvalidated: false,
+        });
+      });
+      await screen.findByRole("button", { name: "View all lines" });
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      act(oldNext);
+      expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("blocks a same-tick old launch after invalidation without dispatching a line read", async () => {
+    const { client } = show();
+    const launch = raw(await screen.findByRole("button", { name: "View all lines" }));
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts"], refetchType: "none" });
+      launch();
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(api.getVehicleReceiptItemPage).not.toHaveBeenCalled();
+  });
+
+  it("close synchronously fences captured pagination before React removes the dialog", async () => {
+    show();
+    fireEvent.click(await screen.findByRole("button", { name: "View all lines" }));
+    await within(screen.getByRole("dialog")).findByText("Viewer-only line 100");
+    const next = raw(screen.getByRole("button", { name: "Next lines" }));
+    const close = screen.getByRole("button", { name: "Close" });
+    act(() => {
+      close.click();
+      next();
+    });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(1);
+  });
+
+  it("aborts a pending line read when the parent refreshes and requires a new explicit viewer", async () => {
+    const oldLines = deferred<LinePage>();
+    const parentRefresh = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceiptItemPage).mockReturnValueOnce(oldLines.promise);
+    const context = show();
+    fireEvent.click(await screen.findByRole("button", { name: "View all lines" }));
+    await waitFor(() => expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(1));
+    const issued = vi.mocked(api.getVehicleReceiptItemPage).mock.calls[0][0];
+    if (!issued?.signal) throw new Error("Missing synthetic signal.");
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(parentRefresh.promise);
+    act(() => {
+      void context.client.refetchQueries({ queryKey: ["vehicle-receipts"] });
+    });
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(issued.signal.aborted).toBe(true);
+    await act(async () => {
+      parentRefresh.resolve(source());
+      oldLines.resolve(window());
+    });
+    await screen.findByRole("button", { name: "View all lines" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "View all lines" }));
+    await within(screen.getByRole("dialog")).findByText("Viewer-only line 100");
+    expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(2);
+  });
+
+  for (const outcome of ["resolve", "reject"] as const) {
+    it.each(["account ABA", "target ABA", "logout", "Auth loading", "unmount"] as const)(
+      `aborts the old line read on %s and ignores its late ${outcome}`,
+      async (kind) => {
+        const pending = deferred<LinePage>();
+        vi.mocked(api.getVehicleReceiptItemPage).mockReturnValueOnce(pending.promise);
+        const context = show();
+        fireEvent.click(await screen.findByRole("button", { name: "View all lines" }));
+        await waitFor(() => expect(api.getVehicleReceiptItemPage).toHaveBeenCalledTimes(1));
+        const options = vi.mocked(api.getVehicleReceiptItemPage).mock.calls[0][0];
+        if (!options?.signal) throw new Error("Missing synthetic signal.");
+        if (kind === "account ABA") {
+          auth.userId = accountB;
+          context.rerender(context.view());
+          auth.userId = accountA;
+          context.rerender(context.view());
+        }
+        if (kind === "target ABA") {
+          context.rerender(context.view({ vehicleId: otherVehicle }));
+          context.rerender(context.view());
+        }
+        if (kind === "logout") {
+          auth.userId = null;
+          context.rerender(context.view());
+        }
+        if (kind === "Auth loading") {
+          auth.loading = true;
+          context.rerender(context.view());
+        }
+        if (kind === "unmount") context.unmount();
+        expect(options.signal.aborted).toBe(true);
+        expect(options.data).toEqual({
+          expectedAccountId: accountA,
+          receiptId: parentId,
+          vehicleId: vehicle,
+          page: 0,
+        });
+        await act(async () =>
+          outcome === "resolve"
+            ? pending.resolve(window())
+            : pending.reject(new Error("PRIVATE old failure")),
+        );
+        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        expect(screen.queryByText("Viewer-only line 100")).not.toBeInTheDocument();
+        expect(screen.queryByText(/PRIVATE old failure/)).not.toBeInTheDocument();
+      },
+    );
+  }
 });

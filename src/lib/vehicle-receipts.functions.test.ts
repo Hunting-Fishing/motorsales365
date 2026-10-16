@@ -8,11 +8,17 @@ import {
   recordVehicleReceiptExpense,
   discardReceiptDraft,
   installReceiptItem,
+  getVehicleReceiptItemPage,
 } from "./vehicle-receipts.functions";
 import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
 import { RECEIPT_EXPENSE_FAILURE } from "./vehicle-receipt-expense-contract";
 import { RECEIPT_DISCARD_UNAVAILABLE } from "./vehicle-receipts";
 import { RECEIPT_INSTALLATION_FAILURE } from "./vehicle-receipt-installation-contract";
+import {
+  RECEIPT_LINES_FAILURE,
+  RECEIPT_LINES_PARENT_PROJECTION,
+  parseReceiptLinesPage,
+} from "./vehicle-receipt-lines-contract";
 const mocks = vi.hoisted(() => ({
   request: vi.fn(),
   privileged: vi.fn(),
@@ -134,7 +140,9 @@ type Stage =
   | "expenseTarget"
   | "installationItem"
   | "installationTarget"
-  | "installation";
+  | "installation"
+  | "lineParent"
+  | "lineItems";
 type Read = {
   stage: Stage;
   table?: string;
@@ -179,36 +187,40 @@ function client(
   const reads: Read[] = [];
   const defaults = (read: Read): Response => ({
     data:
-      read.stage === "access"
-        ? { can_write: true, can_record_expense: false }
-        : read.stage === "activeLink"
-          ? { shop_vehicle_id: shopVehicle, vehicle_id: vehicle, active: true }
-          : read.stage === "headers"
-            ? [header()]
-            : read.stage === "items"
-              ? [
-                  item(
-                    String(read.filters.receipt_id),
-                    uid(100 + Number(String(read.filters.receipt_id).slice(-3))),
-                  ),
-                ]
-              : read.stage === "attachments"
-                ? Object.fromEntries((read.args?._ids as string[]).map((id) => [id, false]))
-                : read.stage === "private"
-                  ? { id: receiptId, file_path: privatePath }
-                  : read.stage === "expenseTarget"
-                    ? { id: receiptId, shop_vehicle_id: shopVehicle }
-                    : read.stage === "expense"
-                      ? expenseId
-                      : read.stage === "installationItem"
-                        ? { id: itemId, receipt_id: receiptId }
-                        : read.stage === "installationTarget"
-                          ? { id: receiptId, vehicle_id: vehicle, shop_vehicle_id: shopVehicle }
-                          : read.stage === "installation"
-                            ? null
-                            : [link()],
+      read.stage === "lineParent"
+        ? { id: receiptId, vehicle_id: vehicle, shop_vehicle_id: null, share_with_shop: true }
+        : read.stage === "lineItems"
+          ? [item()]
+          : read.stage === "access"
+            ? { can_write: true, can_record_expense: false }
+            : read.stage === "activeLink"
+              ? { shop_vehicle_id: shopVehicle, vehicle_id: vehicle, active: true }
+              : read.stage === "headers"
+                ? [header()]
+                : read.stage === "items"
+                  ? [
+                      item(
+                        String(read.filters.receipt_id),
+                        uid(100 + Number(String(read.filters.receipt_id).slice(-3))),
+                      ),
+                    ]
+                  : read.stage === "attachments"
+                    ? Object.fromEntries((read.args?._ids as string[]).map((id) => [id, false]))
+                    : read.stage === "private"
+                      ? { id: receiptId, file_path: privatePath }
+                      : read.stage === "expenseTarget"
+                        ? { id: receiptId, shop_vehicle_id: shopVehicle }
+                        : read.stage === "expense"
+                          ? expenseId
+                          : read.stage === "installationItem"
+                            ? { id: itemId, receipt_id: receiptId }
+                            : read.stage === "installationTarget"
+                              ? { id: receiptId, vehicle_id: vehicle, shop_vehicle_id: shopVehicle }
+                              : read.stage === "installation"
+                                ? null
+                                : [link()],
     error: null,
-    ...(["headers", "items", "links"].includes(read.stage) ? { count: 1 } : {}),
+    ...(["headers", "items", "links", "lineItems"].includes(read.stage) ? { count: 1 } : {}),
   });
   function builder(read: Read) {
     function op(method: string) {
@@ -224,6 +236,7 @@ function client(
         if (projection === "id,shop_vehicle_id") read.stage = "expenseTarget";
         if (projection === "id,receipt_id") read.stage = "installationItem";
         if (projection === "id,vehicle_id,shop_vehicle_id") read.stage = "installationTarget";
+        if (projection === RECEIPT_LINES_PARENT_PROJECTION) read.stage = "lineParent";
         return op("select");
       },
       eq: (column: string, value: unknown) => {
@@ -240,6 +253,7 @@ function client(
       },
       range: (from: number, to: number) => {
         read.range = [from, to];
+        if (read.stage === "items") read.stage = "lineItems";
         return op("range");
       },
       limit: (limit: number) => {
@@ -380,6 +394,14 @@ async function discardDraft(data: unknown, ctx: unknown) {
 async function recordInstallation(data: unknown, ctx: unknown) {
   return (
     installReceiptItem as unknown as (args: { data: unknown; context: unknown }) => Promise<unknown>
+  )({ data, context: ctx });
+}
+async function receiptLines(data: unknown, ctx: unknown) {
+  return (
+    getVehicleReceiptItemPage as unknown as (args: {
+      data: unknown;
+      context: unknown;
+    }) => Promise<unknown>
   )({ data, context: ctx });
 }
 beforeEach(() => {
@@ -2334,6 +2356,410 @@ describe("installation caller, selected target and void transport boundary", () 
       else pending.reject(new Error("PRIVATE late Auth"));
       await Promise.resolve();
       expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+    },
+  );
+});
+
+describe("display-only receipt line page caller and scope boundaries", () => {
+  const input = (page = 0, shop = false) => ({
+    expectedAccountId: account,
+    receiptId,
+    ...(shop ? { shopVehicleId: shopVehicle } : { vehicleId: vehicle }),
+    page,
+  });
+  const visibleParent = (changes: Record<string, unknown> = {}) => ({
+    id: receiptId,
+    vehicle_id: vehicle,
+    shop_vehicle_id: null,
+    share_with_shop: true,
+    ...changes,
+  });
+  const stages = ["access", "activeLink", "lineParent", "lineItems"] as const;
+  const losses = ["account", "client", "claims", "auth-method", "header", "abort"] as const;
+  function lose(
+    ctx: ReturnType<typeof context>,
+    loss: (typeof losses)[number],
+    request: ReturnType<typeof currentRequest>,
+  ) {
+    if (loss === "account") ctx.userId = uid(99);
+    if (loss === "client") ctx.supabase = client();
+    if (loss === "claims") ctx.claims.role = "service_role";
+    if (loss === "auth-method") {
+      const original = ctx.supabase.auth.getUser;
+      ctx.supabase.auth.getUser = vi.fn((value: string) => original(value));
+    }
+    if (loss === "header") request.headers.set("authorization", "Bearer changed.access.token");
+    if (loss === "abort") controller.abort(new Error("PRIVATE abort"));
+  }
+  afterEach(() => {
+    expect(mocks.writes).not.toHaveBeenCalled();
+    expect(mocks.privileged).not.toHaveBeenCalled();
+  });
+  it("uses one same-client Auth lookup, exact fixed projections/windows and pre/post visible parent checks", async () => {
+    const caller = client(),
+      request = input();
+    const result = await receiptLines(request, context(caller));
+    expect(parseReceiptLinesPage(result, request)).toMatchObject({
+      receiptId,
+      page: 0,
+      totalCount: 1,
+      hasNext: false,
+      vehicleId: vehicle,
+      shopVehicleId: null,
+    });
+    expect(result).not.toHaveProperty("items_complete");
+    expect(result).not.toHaveProperty("edit_eligible");
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.reads.map((read) => read.stage)).toEqual([
+      "access",
+      "lineParent",
+      "lineItems",
+      "access",
+      "lineParent",
+    ]);
+    for (const read of caller.reads)
+      expect(read).toMatchObject({ signal: controller.signal, retry: false });
+    for (const read of caller.reads.filter((read) => read.stage === "lineParent"))
+      expect(read).toMatchObject({
+        projection: RECEIPT_LINES_PARENT_PROJECTION,
+        filters: { id: receiptId },
+        single: true,
+      });
+    expect(caller.reads.find((read) => read.stage === "lineItems")).toMatchObject({
+      projection: itemProjection,
+      options: { count: "exact" },
+      filters: { receipt_id: receiptId },
+      range: [0, 99],
+      orders: [
+        ["sort_order", { ascending: true }],
+        ["id", { ascending: true }],
+      ],
+    });
+    expect(caller.storage.from).not.toHaveBeenCalled();
+  });
+  it("reaches line101 without changing parent writer flags or fetching unbounded children", async () => {
+    const caller = client({
+      responses: { lineItems: { data: [{ ...item(), sort_order: 100 }], count: 101, error: null } },
+    });
+    await expect(receiptLines(input(1), context(caller))).resolves.toMatchObject({
+      page: 1,
+      totalCount: 101,
+      hasNext: false,
+      items: [{ sort_order: 100 }],
+    });
+    expect(caller.reads.find((read) => read.stage === "lineItems")?.range).toEqual([100, 199]);
+  });
+  it.each(["direct", "linked", "dual"] as const)(
+    "preserves selected shop %s read semantics without granting writes",
+    async (kind) => {
+      const caller = client({
+        responses: {
+          lineParent: {
+            data: visibleParent({
+              shop_vehicle_id: kind === "linked" ? uid(99) : shopVehicle,
+              vehicle_id: kind === "direct" ? null : vehicle,
+              share_with_shop: kind === "linked",
+            }),
+            error: null,
+          },
+        },
+      });
+      await expect(receiptLines(input(0, true), context(caller))).resolves.toMatchObject({
+        shopVehicleId: shopVehicle,
+        vehicleId: null,
+      });
+      expect(caller.reads.filter((read) => read.stage === "activeLink")).toHaveLength(2);
+      expect(caller.reads.filter((read) => read.stage === "lineItems")).toHaveLength(1);
+    },
+  );
+  it("denies an unshared linked receipt before item dispatch", async () => {
+    const caller = client({
+      responses: { lineParent: { data: visibleParent({ share_with_shop: false }), error: null } },
+    });
+    await expect(receiptLines(input(0, true), context(caller))).rejects.toThrow(
+      RECEIPT_LINES_FAILURE,
+    );
+    expect(caller.reads.map((read) => read.stage)).toEqual(["access", "activeLink", "lineParent"]);
+  });
+  it.each([
+    null,
+    {},
+    { ...input(), vehicleId: undefined },
+    { ...input(), shopVehicleId: shopVehicle },
+    { ...input(), limit: 1000 },
+    { ...input(), expectedAccountId: "bad" },
+    { ...input(), receiptId: "bad" },
+    { ...input(), page: 0.5 },
+  ])("rejects invalid request before request/client access %j", async (raw) => {
+    const caller = client();
+    await expect(receiptLines(raw, context(caller))).rejects.toThrow(
+      "Invalid receipt line request.",
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it("preserves early account denial and captures all validated primitive intent before request hooks", async () => {
+    const denied = client();
+    await expect(receiptLines(input(), { ...context(denied), userId: uid(99) })).rejects.toThrow(
+      "Account changed.",
+    );
+    expect(mocks.request).not.toHaveBeenCalled();
+    const caller = client();
+    mocks.request.mockImplementationOnce(() => {
+      Object.assign(mocks.validated as object, {
+        expectedAccountId: uid(90),
+        receiptId: uid(91),
+        vehicleId: uid(92),
+        shopVehicleId: shopVehicle,
+        page: 1,
+      });
+      return currentRequest();
+    });
+    await expect(receiptLines(input(), context(caller))).resolves.toMatchObject({
+      receiptId,
+      page: 0,
+      vehicleId: vehicle,
+    });
+    expect(caller.reads.find((read) => read.stage === "lineItems")).toMatchObject({
+      filters: { receipt_id: receiptId },
+      range: [0, 99],
+    });
+  });
+  it.each([
+    undefined,
+    "",
+    "Bearer invalid",
+    "bearer fixture.access.token",
+    "Bearer fixture.access.token ",
+  ])("denies malformed bearer %j before native capability", async (header) => {
+    const caller = client();
+    mocks.request.mockReturnValue({
+      signal: controller.signal,
+      // Real Headers normalizes surrounding whitespace. Present the intended
+      // malformed raw getter value instead of accidentally testing a valid token.
+      headers: { get: (name: string) => (name === "authorization" ? (header ?? null) : null) },
+    });
+    await expect(receiptLines(input(), context(caller))).rejects.toThrow(RECEIPT_LINES_FAILURE);
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it.each([
+    { sub: account, role: "service_role" },
+    { sub: account, role: "authenticated", is_anonymous: true },
+    { sub: uid(99), role: "authenticated" },
+  ])("denies unsupported claims %j", async (claims) => {
+    const caller = client();
+    await expect(receiptLines(input(), { ...context(caller), claims })).rejects.toThrow(
+      RECEIPT_LINES_FAILURE,
+    );
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it.each([
+    null,
+    { data: { user: null }, error: null },
+    { data: { user: { id: uid(99) } }, error: null },
+    { data: { user: { id: account, is_anonymous: true } }, error: null },
+    { data: { user: { id: account } }, error: false },
+    { data: { user: { id: account } }, error: { message: "PRIVATE Auth" } },
+  ])("denies unavailable/noncurrent Auth %j", async (value) => {
+    const caller = client();
+    caller.auth.getUser.mockResolvedValue(value);
+    await expect(receiptLines(input(), context(caller))).rejects.toThrow(RECEIPT_LINES_FAILURE);
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it.each(losses)(
+    "denies unsupported caller or first-observed header at getRequest: %s",
+    async (loss) => {
+      const caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockImplementationOnce(() => {
+        lose(ctx, loss, request);
+        // The header is captured only after getRequest returns. A different valid
+        // first-observed token is not an observed header replacement.
+        if (loss === "header") request.headers.set("authorization", "Bearer malformed");
+        return request;
+      });
+      await expect(receiptLines(input(), ctx)).rejects.toThrow(RECEIPT_LINES_FAILURE);
+      expect(caller.rpc).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+    },
+  );
+  it("verifies the valid first-observed token returned by getRequest, not a token captured beforehand", async () => {
+    const caller = client();
+    mocks.request.mockImplementationOnce(() => ({
+      signal: controller.signal,
+      headers: new Headers({ authorization: "Bearer changed.access.token" }),
+    }));
+    await expect(receiptLines(input(), context(caller))).resolves.toMatchObject({ receiptId });
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith("changed.access.token");
+    expect(caller.reads.filter((read) => read.stage === "lineItems")).toHaveLength(1);
+  });
+  it.each(losses)("denies %s loss during pending Auth", async (loss) => {
+    const pending = deferred<unknown>(),
+      caller = client(),
+      ctx = context(caller),
+      request = currentRequest();
+    mocks.request.mockReturnValue(request);
+    caller.auth.getUser.mockReturnValue(pending.promise);
+    const result = receiptLines(input(), ctx);
+    lose(ctx, loss, request);
+    pending.resolve({ data: { user: { id: account } }, error: null });
+    await expect(result).rejects.toThrow(RECEIPT_LINES_FAILURE);
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  for (const stage of stages)
+    it.each(losses)(`fences %s loss after awaited ${stage}`, async (loss) => {
+      const request = currentRequest();
+      const caller = client({
+          onResult: (read) => {
+            if (read.stage === stage) lose(ctx, loss, request);
+          },
+        }),
+        ctx = context(caller);
+      mocks.request.mockReturnValue(request);
+      await expect(receiptLines(input(0, true), ctx)).rejects.toThrow(RECEIPT_LINES_FAILURE);
+      expect(caller.reads.at(-1)?.stage).toBe(stage);
+    });
+  for (const stage of stages)
+    it.each(losses)(
+      `fences %s loss during ${stage} query construction before dispatch`,
+      async (loss) => {
+        const request = currentRequest();
+        const last =
+          stage === "lineParent" ? "single" : stage === "activeLink" ? "maybeSingle" : "retry";
+        const caller = client({
+            onBuild: (read, method) => {
+              if (read.stage === stage && method === last) lose(ctx, loss, request);
+            },
+          }),
+          ctx = context(caller);
+        mocks.request.mockReturnValue(request);
+        await expect(receiptLines(input(0, true), ctx)).rejects.toThrow(RECEIPT_LINES_FAILURE);
+        expect(caller.reads.map((read) => read.stage)).not.toContain(stage);
+      },
+    );
+  for (const stage of stages)
+    it.each([undefined, false, "", { message: "PRIVATE read" }])(
+      `requires explicit error:null at ${stage} with otherwise valid data`,
+      async (error) => {
+        const good =
+          stage === "access"
+            ? { data: { can_write: false, can_record_expense: false }, error: null }
+            : stage === "activeLink"
+              ? {
+                  data: { shop_vehicle_id: shopVehicle, vehicle_id: vehicle, active: true },
+                  error: null,
+                }
+              : stage === "lineParent"
+                ? { data: visibleParent(), error: null }
+                : { data: [item()], count: 1, error: null };
+        const control = client({ responses: { [stage]: good } });
+        await expect(receiptLines(input(0, true), context(control))).resolves.toMatchObject({
+          receiptId,
+        });
+        const caller = client({ responses: { [stage]: { ...good, error } } });
+        await expect(receiptLines(input(0, true), context(caller))).rejects.toThrow(
+          RECEIPT_LINES_FAILURE,
+        );
+        expect(caller.reads.at(-1)?.stage).toBe(stage);
+      },
+    );
+  it.each([null, undefined, "1", -1, 0.5, 0, 2, 101])(
+    "denies unknown/contradictory item count %j",
+    async (count) => {
+      const caller = client({ responses: { lineItems: { data: [item()], count, error: null } } });
+      await expect(receiptLines(input(), context(caller))).rejects.toThrow(RECEIPT_LINES_FAILURE);
+      expect(caller.reads.at(-1)?.stage).toBe("lineItems");
+    },
+  );
+  it.each([
+    "revoked-link",
+    "rebound-link",
+    "unshared",
+    "retargeted",
+    "lost-parent",
+    "denied-workspace",
+  ] as const)("denies observed post-page %s before return", async (kind) => {
+    let accesses = 0,
+      links = 0,
+      parents = 0;
+    const caller = client({
+      responses: {
+        access: () => ({
+          data: { can_write: true, can_record_expense: false },
+          error: ++accesses === 2 && kind === "denied-workspace" ? { message: "PRIVATE" } : null,
+        }),
+        activeLink: () => ({
+          data:
+            ++links === 2 && kind === "revoked-link"
+              ? null
+              : {
+                  shop_vehicle_id: shopVehicle,
+                  vehicle_id: links === 2 && kind === "rebound-link" ? uid(99) : vehicle,
+                  active: true,
+                },
+          error: null,
+        }),
+        lineParent: () => ({
+          data:
+            ++parents === 2 && kind === "lost-parent"
+              ? null
+              : visibleParent({
+                  share_with_shop: !(parents === 2 && kind === "unshared"),
+                  vehicle_id: parents === 2 && kind === "retargeted" ? uid(99) : vehicle,
+                }),
+          error: null,
+        }),
+      },
+    });
+    await expect(receiptLines(input(0, true), context(caller))).rejects.toThrow(
+      RECEIPT_LINES_FAILURE,
+    );
+    expect(caller.reads.filter((read) => read.stage === "lineItems")).toHaveLength(1);
+  });
+  it.each(["lineParent", "lineItems"] as const)(
+    "checks caller again after %s parser traps",
+    async (stage) => {
+      let parsed = 0;
+      const row = stage === "lineParent" ? visibleParent() : item();
+      const trapped = new Proxy(row, {
+        ownKeys(target) {
+          parsed++;
+          ctx.claims.role = "service_role";
+          return Reflect.ownKeys(target);
+        },
+      });
+      const caller = client({
+          responses: {
+            [stage]: { data: stage === "lineItems" ? [trapped] : trapped, count: 1, error: null },
+          },
+        }),
+        ctx = context(caller);
+      await expect(receiptLines(input(), ctx)).rejects.toThrow(RECEIPT_LINES_FAILURE);
+      expect(parsed).toBeGreaterThan(0);
+      expect(caller.reads.at(-1)?.stage).toBe(stage);
+    },
+  );
+  it.each(["resolve", "reject"] as const)(
+    "observes late Auth %s after the10s wait without native dispatch",
+    async (settlement) => {
+      vi.useFakeTimers();
+      const pending = deferred<unknown>(),
+        caller = client();
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const assertion = expect(receiptLines(input(), context(caller))).rejects.toThrow(
+        RECEIPT_LINES_FAILURE,
+      );
+      await vi.advanceTimersByTimeAsync(10_000);
+      await assertion;
+      if (settlement === "resolve")
+        pending.resolve({ data: { user: { id: account } }, error: null });
+      else pending.reject(new Error("PRIVATE late Auth"));
+      await Promise.resolve();
       expect(caller.rpc).not.toHaveBeenCalled();
       expect(vi.getTimerCount()).toBe(0);
     },

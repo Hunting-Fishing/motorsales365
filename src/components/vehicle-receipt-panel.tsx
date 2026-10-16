@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { VehicleReceiptLinesDialog } from "@/components/vehicle-receipt-lines-dialog";
 import {
   Dialog,
   DialogContent,
@@ -166,6 +167,15 @@ function AuthenticatedVehicleReceiptPanel({
     placeholderData: undefined,
   });
   const receiptInvalidated = useReadInvalidation(qc, receiptKey);
+  const receiptHash = hashKey(receiptKey);
+  const receiptVersion = useSyncExternalStore(
+    (notify) =>
+      qc.getQueryCache().subscribe((event) => {
+        if (event.query.queryHash === receiptHash) notify();
+      }),
+    () => qc.getQueryCache().get(receiptHash)?.state.dataUpdateCount ?? 0,
+    () => 0,
+  );
   const data =
     receipts.isSuccess &&
     receipts.fetchStatus === "idle" &&
@@ -183,6 +193,73 @@ function AuthenticatedVehicleReceiptPanel({
       !current.isInvalidated &&
       current.data === data,
     );
+  }
+  type LineReadRow = NonNullable<typeof data>["receipts"][number];
+  type LineSelection = {
+    receipt: LineReadRow;
+    snapshot: NonNullable<typeof data>;
+    version: number;
+    session: number;
+  };
+  const [lineSelection, setLineSelection] = useState<LineSelection | null>(null);
+  const lineScope = useRef({ active: false, sequence: 0, selection: null as LineSelection | null });
+  useLayoutEffect(() => {
+    const scope = lineScope.current;
+    scope.active = true;
+    setLineSelection(null);
+    return () => {
+      scope.active = false;
+      scope.selection = null;
+    };
+  }, []);
+  const linesVisible =
+    lineSelection &&
+    data === lineSelection.snapshot &&
+    receiptVersion === lineSelection.version &&
+    data.page === pageIntent.current;
+  useLayoutEffect(() => {
+    if (lineSelection && !linesVisible && lineScope.current.selection === lineSelection) {
+      lineScope.current.selection = null;
+      setLineSelection(null);
+    }
+  }, [lineSelection, linesVisible]);
+  function linesCurrent(selection: LineSelection) {
+    const state = qc.getQueryState(receiptKey);
+    return (
+      lineScope.current.active &&
+      lineScope.current.selection === selection &&
+      selection.snapshot.page === pageIntent.current &&
+      state?.status === "success" &&
+      state.fetchStatus === "idle" &&
+      !state.isInvalidated &&
+      state.data === selection.snapshot &&
+      state.dataUpdateCount === selection.version
+    );
+  }
+  function openLines(receipt: LineReadRow) {
+    const scope = lineScope.current;
+    if (
+      !scope.active ||
+      scope.selection ||
+      !canUseReceiptRead() ||
+      !data ||
+      receipt.items_complete ||
+      !data.receipts.includes(receipt)
+    )
+      return;
+    const selection = {
+      receipt,
+      snapshot: data,
+      version: receiptVersion,
+      session: ++scope.sequence,
+    };
+    scope.selection = selection;
+    setLineSelection(selection);
+  }
+  function closeLines(selection: LineSelection) {
+    if (lineScope.current.selection !== selection) return;
+    lineScope.current.selection = null;
+    setLineSelection(null);
   }
   const [edit, setEdit] = useState<VehicleReceipt | "new" | null>(null);
   const [install, setInstall] = useState<InstallationSelection | null>(null);
@@ -216,6 +293,8 @@ function AuthenticatedVehicleReceiptPanel({
   function changePage(next: number) {
     if (!Number.isSafeInteger(next) || next < 0 || next > 1_000_000) return;
     // Fence old DOM controls in the same tick, before the new query commits.
+    lineScope.current.selection = null;
+    setLineSelection(null);
     pageIntent.current = next;
     setCategoryFilter("");
     setPage(next);
@@ -723,10 +802,15 @@ function AuthenticatedVehicleReceiptPanel({
               </p>
             )}
             {!r.items_complete && (
-              <p role="status" className="text-sm text-muted-foreground">
-                Showing {r.items.length} of {r.item_count} lines. This partial receipt cannot be
-                reviewed or change summary sharing.
-              </p>
+              <div className="space-y-2">
+                <p role="status" className="text-sm text-muted-foreground">
+                  Showing {r.items.length} of {r.item_count} lines. This partial receipt cannot be
+                  reviewed or change summary sharing.
+                </p>
+                <Button type="button" size="sm" variant="outline" onClick={() => openLines(r)}>
+                  View all lines
+                </Button>
+              </div>
             )}
             {r.status === "draft" && r.items_complete && !r.edit_eligible && (
               <p role="status" className="text-sm text-muted-foreground">
@@ -829,6 +913,16 @@ function AuthenticatedVehicleReceiptPanel({
             )}
           </div>
         ))}
+      {linesVisible && lineSelection && (
+        <VehicleReceiptLinesDialog
+          key={lineSelection.session}
+          intent={{ expectedAccountId: userId, receiptId: lineSelection.receipt.id, ...target }}
+          currency={lineSelection.receipt.currency}
+          parentQueryKey={receiptKey}
+          isParentCurrent={() => linesCurrent(lineSelection)}
+          onClose={() => closeLines(lineSelection)}
+        />
+      )}
       {edit && (
         <ReceiptEditor
           key={edit === "new" ? "new" : edit.id}

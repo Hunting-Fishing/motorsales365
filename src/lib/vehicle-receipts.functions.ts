@@ -4,6 +4,16 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
+  receiptLinesRequestSchema,
+  RECEIPT_LINES_FAILURE,
+  RECEIPT_LINES_PAGE_SIZE,
+  RECEIPT_LINES_PARENT_PROJECTION,
+  RECEIPT_LINES_ITEM_PROJECTION,
+  parseReceiptLinesParentResponse,
+  parseReceiptLinesPageResponse,
+  parseReceiptLinesReadResponse,
+} from "./vehicle-receipt-lines-contract";
+import {
   receiptInstallationRequestSchema,
   RECEIPT_INSTALLATION_FAILURE,
   parseReceiptInstallationItemResponse,
@@ -88,6 +98,117 @@ async function rpc(client: any, name: string, args: Record<string, unknown>) {
   if (error) throw new Error(error.message);
   return data;
 }
+// Display-only windows are never merged into the parent's replace-all editor.
+export const getVehicleReceiptItemPage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => {
+    const parsed = receiptLinesRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid receipt line request.");
+    return parsed.data;
+  })
+  .handler(async ({ data, context }) => {
+    const intent = Object.freeze({
+      expectedAccountId: data.expectedAccountId,
+      receiptId: data.receiptId,
+      vehicleId: Object.hasOwn(data, "vehicleId") ? data.vehicleId : undefined,
+      shopVehicleId: Object.hasOwn(data, "shopVehicleId") ? data.shopVehicleId : undefined,
+      page: data.page,
+    });
+    if (context?.userId !== intent.expectedAccountId)
+      throw new Error("Account changed. Refresh before loading receipt lines.");
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCurrent = await caller.verify(request);
+      const db = context.supabase as unknown as ReceiptReadClient;
+      async function read(query: ReceiptReadBuilder, counted = false) {
+        assertCurrent();
+        const response = await query;
+        assertCurrent();
+        const result = parseReceiptLinesReadResponse(response, counted);
+        assertCurrent();
+        if (result.error !== null) throw new Error(RECEIPT_LINES_FAILURE);
+        return result;
+      }
+      async function visibleParent() {
+        assertCurrent();
+        const access = await read(
+          db
+            .rpc("vehicle_receipt_workspace_access", {
+              _vehicle_id: intent.vehicleId ?? null,
+              _shop_vehicle_id: intent.shopVehicleId ?? null,
+            })
+            .abortSignal(request.signal)
+            .retry(false),
+        );
+        parseReceiptWorkspaceAccess(access.data);
+        assertCurrent();
+        let linkedVehicleId: string | null = null;
+        if (intent.shopVehicleId) {
+          const link = await read(
+            db
+              .from("vehicle_shop_links")
+              .select(receiptReadProjections.activeLink)
+              .eq("shop_vehicle_id", intent.shopVehicleId)
+              .eq("active", true)
+              .abortSignal(request.signal)
+              .retry(false)
+              .maybeSingle(),
+          );
+          linkedVehicleId = parseActiveReceiptLink(link.data, intent.shopVehicleId);
+          assertCurrent();
+        }
+        assertCurrent();
+        const response = await read(
+          db
+            .from("vehicle_receipts")
+            .select(RECEIPT_LINES_PARENT_PROJECTION)
+            .eq("id", intent.receiptId)
+            .abortSignal(request.signal)
+            .retry(false)
+            .single(),
+        );
+        const parent = parseReceiptLinesParentResponse(response, intent, linkedVehicleId);
+        assertCurrent();
+        return { parent, linkedVehicleId };
+      }
+      const before = await visibleParent();
+      assertCurrent();
+      const response = await read(
+        db
+          .from("vehicle_receipt_items")
+          .select(RECEIPT_LINES_ITEM_PROJECTION, { count: "exact" })
+          .eq("receipt_id", intent.receiptId)
+          .order("sort_order", { ascending: true })
+          .order("id", { ascending: true })
+          .range(
+            intent.page * RECEIPT_LINES_PAGE_SIZE,
+            intent.page * RECEIPT_LINES_PAGE_SIZE + RECEIPT_LINES_PAGE_SIZE - 1,
+          )
+          .abortSignal(request.signal)
+          .retry(false),
+        true,
+      );
+      const result = parseReceiptLinesPageResponse(response, intent);
+      assertCurrent();
+      // Observed access/target changes deny the result. These separate reads
+      // do not provide an atomic multi-page snapshot or strict revocation proof.
+      const after = await visibleParent();
+      const binding = (value: typeof before) =>
+        JSON.stringify([
+          value.linkedVehicleId?.toLowerCase() ?? null,
+          value.parent.id.toLowerCase(),
+          value.parent.vehicle_id?.toLowerCase() ?? null,
+          value.parent.shop_vehicle_id?.toLowerCase() ?? null,
+          value.parent.share_with_shop,
+        ]);
+      if (binding(before) !== binding(after)) throw new Error(RECEIPT_LINES_FAILURE);
+      assertCurrent();
+      return result;
+    } catch {
+      throw new Error(RECEIPT_LINES_FAILURE);
+    }
+  });
 export const getVehicleReceipts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => {
