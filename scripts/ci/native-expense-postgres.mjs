@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { DRAFT_LINE_STAGES, rehearseDraftLine } from "./native-draft-line-postgres.mjs";
 import { buildExpenseNativeSource } from "../vehicle-receipts/expense-native-source.mjs";
 import {
   bindExpenseOperationRequest,
@@ -35,6 +36,7 @@ const stages = new Set([
   "customer-wait",
   "vehicle-wait",
   "financial-wait",
+  ...DRAFT_LINE_STAGES,
   "complete",
 ]);
 export function safeFailure(value, error) {
@@ -826,6 +828,22 @@ async function rehearse(context) {
     pass(
       "expense journal line account drift after observed waits is rechecked without replay writes",
     );
+    // Fresh scoped observer, same privately admitted ephemeral cluster. No
+    // optional skip, parent fixture reset, new transport or client grant.
+    await withSessions(context, [null], async (draftObserver) => {
+      await rehearseDraftLine({
+        observer: draftObserver,
+        withSessions: (subjects, run) => withSessions(context, subjects, run),
+        observedBlock,
+        expectedError,
+        financialSnapshotSQL: SNAPSHOT_SQL,
+        setStage: (value) => {
+          assert.ok(stages.has(value));
+          stage = value;
+        },
+        pass,
+      });
+    });
     stage = "complete";
     pass(
       "complete; synthetic owner/GUC only, NOT authority policy global-writer phantom API Auth Storage restore or release acceptance",

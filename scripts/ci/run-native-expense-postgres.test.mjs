@@ -257,7 +257,7 @@ test("only a complete bounded allowlisted transcript can acknowledge success or 
 
 const serverMarker =
   "NativeExpensePG17 server_version_num=170011; private cluster identity verified.\n";
-const passMarkers = [
+const originalPassMessages = [
   "locked ordinary-role denial; owner/GUC positives only, not authority",
   "same request waits then exact replay without timestamp/repost writes",
   "different operation same receipt refused after observed wait",
@@ -268,10 +268,75 @@ const passMarkers = [
   "vehicle customer drift after observed wait refuses stale join binding",
   "expense journal line account drift after observed waits is rechecked without replay writes",
   "complete; synthetic owner/GUC only, NOT authority policy global-writer phantom API Auth Storage restore or release acceptance",
-].map((message) => `PASS nativePG17 expense: ${message}.\n`);
+];
+const draftLinePassMessages = [
+  "draft line locked ordinary roles; synthetic owner only",
+  "draft line outer COMMIT visibility and ROLLBACK preserve selected graph",
+  "draft line observed wait rejects stale full item CAS",
+  "draft line parent status drift after observed wait denied",
+  "draft line customer shop drift after observed wait denied",
+  "draft line vehicle customer drift after observed wait denied",
+  "draft line install drift after observed item wait denied",
+  "draft line native CHECK and late rewrite roll back all selected rows",
+];
+const draftLineFailureStages = [
+  "draft-line-setup",
+  "draft-line-acl",
+  "draft-line-outer",
+  "draft-line-cas",
+  "draft-line-parent",
+  "draft-line-customer",
+  "draft-line-vehicle",
+  "draft-line-item",
+  "draft-line-late",
+];
+const passMessages = [
+  ...originalPassMessages.slice(0, -1),
+  ...draftLinePassMessages,
+  originalPassMessages.at(-1),
+];
+const passMarkers = passMessages.map((message) => `PASS nativePG17 expense: ${message}.\n`);
 const completion =
   "Native expense PostgreSQL17 rehearsal complete: synthetic owner sessions only.\n";
 const successTranscript = serverMarker + passMarkers.join("") + completion;
+
+test("draft-line transcript extends exactly the existing ten markers before the original completion proof", () => {
+  const parser = source.slice(at("report_phase_output() {"), at("run_phase() {"));
+  const declaredPasses = parser.match(/  local passes=\(\n([\s\S]*?)\n  \)/);
+  assert.ok(declaredPasses, "one fixed ordered pass list");
+  const lines = declaredPasses[1].split("\n");
+  const actual = lines.map((line) => {
+    const match = line.match(/^    '([^']+)'$/);
+    assert.ok(match, "only exact literal proof messages are accepted");
+    return match[1];
+  });
+  assert.equal(originalPassMessages.length, 10);
+  assert.equal(draftLinePassMessages.length, 8);
+  assert.equal(new Set(actual).size, 18);
+  assert.deepEqual(actual, passMessages);
+  assert.deepEqual(actual.slice(0, 9), originalPassMessages.slice(0, -1));
+  assert.deepEqual(actual.slice(9, -1), draftLinePassMessages);
+  assert.equal(actual.at(-1), originalPassMessages.at(-1));
+  const stages = parser.match(/stage=\(([^)]+)\), sqlState=/);
+  assert.ok(stages, "one fixed failure-stage allowlist");
+  assert.deepEqual(stages[1].split("|"), [
+    "admission",
+    "server-identity",
+    "fresh-cluster",
+    "fixture-setup",
+    "locked-acl",
+    "same-request",
+    "different-operation",
+    "changed-binding",
+    "outer-transaction",
+    "late-ledger-fk",
+    "customer-wait",
+    "vehicle-wait",
+    "financial-wait",
+    ...draftLineFailureStages,
+    "complete",
+  ]);
+});
 function runOutputParser(transcript, status) {
   // Execute only this extracted pure builtin parser, never the CI wrapper,
   // cleanup, PostgreSQL programs or Node rehearsal.
@@ -326,6 +391,7 @@ test(
       "customer-wait",
       "vehicle-wait",
       "financial-wait",
+      ...draftLineFailureStages,
       "complete",
     ]) {
       for (const state of ["23503", "unavailable"]) {
@@ -346,6 +412,67 @@ test(
     assert.equal(partialResult.status, 0);
     assert.equal(partialResult.stdout, partial);
     assert.equal(partialResult.stderr, "");
+  },
+);
+
+test(
+  "actual isolated Bash parser admits bounded partial draft-line failures but never upgrades them to success",
+  { skip: !bash },
+  () => {
+    const previous = passMarkers.slice(0, originalPassMessages.length - 1).join("");
+    for (const [index, stage] of draftLineFailureStages.entries()) {
+      const draftProgress = passMarkers.slice(9, 9 + Math.min(index, draftLinePassMessages.length));
+      const transcript =
+        serverMarker +
+        previous +
+        draftProgress.join("") +
+        `FAIL nativePG17 expense: stage=${stage}, sqlState=23514; no live acceptance.\n`;
+      const admitted = runOutputParser(transcript, "1");
+      assert.equal(admitted.error, undefined);
+      assert.equal(admitted.status, 0);
+      assert.equal(admitted.stdout, transcript);
+      assert.equal(admitted.stderr, "");
+      const refused = runOutputParser(transcript, "0");
+      assert.equal(refused.error, undefined);
+      assert.equal(refused.status, 1);
+      assert.equal(refused.stdout, "");
+      assert.equal(refused.stderr, "");
+    }
+  },
+);
+
+test(
+  "actual isolated Bash parser requires every original and draft-line proof once in exact full-transcript order",
+  { skip: !bash },
+  () => {
+    const transcripts = [
+      serverMarker +
+        originalPassMessages.map((message) => `PASS nativePG17 expense: ${message}.\n`).join("") +
+        completion,
+      serverMarker + passMarkers.slice(0, 9).join("") + completion,
+      serverMarker + passMarkers.join("") + passMarkers[9] + completion,
+      successTranscript + passMarkers[9],
+    ];
+    for (let index = 0; index < passMarkers.length; index++) {
+      transcripts.push(
+        serverMarker + passMarkers.filter((_, at) => at !== index).join("") + completion,
+      );
+      const repeated = [...passMarkers];
+      repeated.splice(index, 0, passMarkers[index]);
+      transcripts.push(serverMarker + repeated.join("") + completion);
+      if (index + 1 < passMarkers.length) {
+        const swapped = [...passMarkers];
+        [swapped[index], swapped[index + 1]] = [swapped[index + 1], swapped[index]];
+        transcripts.push(serverMarker + swapped.join("") + completion);
+      }
+    }
+    for (const transcript of transcripts) {
+      const result = runOutputParser(transcript, "0");
+      assert.equal(result.error, undefined);
+      assert.equal(result.status, 1);
+      assert.equal(result.stdout, "");
+      assert.equal(result.stderr, "");
+    }
   },
 );
 

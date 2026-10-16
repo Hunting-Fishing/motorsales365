@@ -92,6 +92,9 @@ jobs:
       - name: Native expense source parity and runner safety (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs
 
+      - name: Native draft-line source parity and cohort guards (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-native-source.test.mjs scripts/ci/native-draft-line-postgres.test.mjs
+
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 

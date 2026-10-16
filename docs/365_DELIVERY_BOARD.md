@@ -12,6 +12,24 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+Next dependency source prepared: additive Docker-free native PG17 draft-line
+phase preserves original expense transport/cleanup/ten markers and requires
+eight new ordered cohorts before success. Final local121/121 nine suites54.782s,
+review/format/lint/diff/214 assets/existing Worker guards pass; actual new-head
+native Linux acceptance is pending, not real authority or enabled101+ editing.
+No app/migration/grant/hosted/Buddy change/deploy. Preserve running parent unit
+before publication in same PR68. Next read actual new native cohorts/cleanup,
+then authority/catalog/all-writer/durable/API/recovery gates before connection.
+Evidence: [native draft-line rehearsal](evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md).
+Parent40fd9aee five Actions pass; unit remains running at latest readback.
+Hosting and QA stops remain unchanged; do not retry them or re-ask nominations.
+Parent unit log117078254223 retrieval returned HTTP502 twice (initial + one
+allowed retry); that log-read action is STOPPED until changed provider/job
+evidence. Non-log status still reports in_progress. Commit the verified source
+locally, but hold push so it cannot cancel the running parent. Resume by checking
+completion status, then publish this existing slice; do not recreate it or repeat
+121 tests unchanged. No CLI/dashboard log fallback or invented parent unit count.
+
 - Integrated source: `34a9093045543526b6e3d6ee1450353f0eda3373`; published
   candidate: `1014b72e5deaa63aca0904ff3c90c4cb12a9e055`, branch
   `completion/365-seven-day-integration`, same [draft PR #68](https://github.com/Hunting-Fishing/motorsales365/pull/68).
@@ -76,11 +94,12 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
    transaction coverage and normal timeouts/quarantine. No Docker, paid resources,
    customer outreach, destructive repair or unreviewed production experiments.
 
-| Stopped/dependent action             | Observed result / alternate budget                                                                                                                | Resume condition                                                                                                                                                                                                 |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authenticated CRM browser acceptance | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff. | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                                               |
-| Cloudflare build remediation         | Current-head failure confirmed; fresh cause unknown. No remediation/alternative attempted in this consolidation.                                  | Read permitted exact-head diagnostics once, select one authorized safe alternative if justified, then stop/notify if it fails. Do not redispatch unchanged builds or inspect CI through CLI/dashboard fallbacks. |
-| Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                 | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                                                    |
+| Stopped/dependent action             | Observed result / alternate budget                                                                                                                                                                                   | Resume condition                                                                                                                                                                          |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authenticated CRM browser acceptance | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                    | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
+| Cloudflare build remediation         | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried. | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
+| Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                    | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
+| Parent40fd9aee unit log retrieval    | Job117078254223 returned HTTP502 on initial read and one allowed retry. STOPPED; no alternative budget remains for unchanged log reads. Status-only reports still show in_progress.                                  | Changed provider/job evidence, not another identical log request or CLI/dashboard fallback. Hold source push until completion status avoids cancelling parent.                            |
 
 ## One scope and dependency board
 
@@ -277,3 +296,14 @@ board and one-alternative rule, unchanged ID/name/kind/active status/30-minute
 schedule/thread/creation time; no duplicate. Next implementation remains native
 PG17 draft-line independent-session proof, with authority/provenance/hosting lanes
 in parallel under recorded stop conditions. No migration impact or deployment.
+
+Post-publication readback: consolidation40fd9aeed5053ea65bcf8a78f4919a99115b9e54
+is canonical remote/same draft PR68/base/title; prior62,030-character PR body
+preserved verbatim. Main70ab892a unchanged. New run38932061829 currently has
+OCR/lint/native success and build/type/unit running; no inherited parent pass.
+Workers7461bcd9/check117078480110 fails; exact-head Code Review summary/detail
+returns no failure log/annotations. No safe evidence-based fix/alternate is
+available, so hosting remediation STOPPED; owner notified for redacted build
+error output/new permitted diagnostics. No unchanged redispatch/fallback/guess.
+These post-publication notes join the next implementation slice, not another
+documentation-only CI restart. QA acceptance remains separately stopped at login.

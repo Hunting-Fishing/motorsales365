@@ -177,6 +177,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs",
     ],
     [
+      "Native draft-line source parity and cohort guards (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-native-source.test.mjs scripts/ci/native-draft-line-postgres.test.mjs",
+    ],
+    [
       "Full staff claim and native roster bridge composition (memory-only, never quarantined)",
       "node --test --test-concurrency=1 scripts/ci/full-native-staff-bridge-composition.test.mjs",
     ],

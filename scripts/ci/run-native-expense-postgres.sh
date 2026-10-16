@@ -215,7 +215,7 @@ quiet_native 7s "$expense_bin/pg_isready" -h "$expense_root/socket" -p 55436 -U 
 
 report_phase_output() {
   local captured=$1 phase_status=$2 body line index=0 failed=0 completed=0
-  local failure_pattern='^FAIL nativePG17 expense: stage=(admission|server-identity|fresh-cluster|fixture-setup|locked-acl|same-request|different-operation|changed-binding|outer-transaction|late-ledger-fk|customer-wait|vehicle-wait|financial-wait|complete), sqlState=([0-9A-Z]{5}|unavailable); no live acceptance\.$'
+  local failure_pattern='^FAIL nativePG17 expense: stage=(admission|server-identity|fresh-cluster|fixture-setup|locked-acl|same-request|different-operation|changed-binding|outer-transaction|late-ledger-fk|customer-wait|vehicle-wait|financial-wait|draft-line-setup|draft-line-acl|draft-line-outer|draft-line-cas|draft-line-parent|draft-line-customer|draft-line-vehicle|draft-line-item|draft-line-late|complete), sqlState=([0-9A-Z]{5}|unavailable); no live acceptance\.$'
   local passes=(
     'locked ordinary-role denial; owner/GUC positives only, not authority'
     'same request waits then exact replay without timestamp/repost writes'
@@ -226,6 +226,14 @@ report_phase_output() {
     'customer shop drift after observed wait refuses prior shop intent'
     'vehicle customer drift after observed wait refuses stale join binding'
     'expense journal line account drift after observed waits is rechecked without replay writes'
+    'draft line locked ordinary roles; synthetic owner only'
+    'draft line outer COMMIT visibility and ROLLBACK preserve selected graph'
+    'draft line observed wait rejects stale full item CAS'
+    'draft line parent status drift after observed wait denied'
+    'draft line customer shop drift after observed wait denied'
+    'draft line vehicle customer drift after observed wait denied'
+    'draft line install drift after observed item wait denied'
+    'draft line native CHECK and late rewrite roll back all selected rows'
     'complete; synthetic owner/GUC only, NOT authority policy global-writer phantom API Auth Storage restore or release acceptance'
   )
   [[ "$phase_status" == 0 || "$phase_status" == 1 ]] || return 1

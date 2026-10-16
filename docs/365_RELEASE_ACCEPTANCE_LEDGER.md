@@ -10,6 +10,32 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Prepared native draft-line phase:121/121 nine suites54.782s, review/format/lint/
+diff/214 assets/existing Worker guards pass. Pure source child adds only seven
+retained spans/private candidate after original native expense cohorts; eight
+new mandatory proof markers/strict stages precede old completion. All18 markers,
+admission/transport/cleanup/budgets retained. Actual new-head PG17 wait/CAS/
+outer transaction/scope/CHECK/late rewrite/cleanup and six Actions still required;
+source/PGlite is not native acceptance. No app/SQL/migration/grant/live/deploy.
+C1.07/C1.08/R2/R3 unaccepted; authority/all-writer/catalog/durable/API/private
+original/full recovery/owner/device gates remain before activation. Preserve
+parent unit before push and existing QA/hosting stops. Exact evidence:
+`evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md`.47 replay/22 October risk unchanged.
+Parent40fd9aee unit117078254223 still in_progress; exact log endpoint returned
+HTTP502 twice (initial + one retry). Log retrieval STOPPED until changed provider/
+job evidence; no fallback/repeated read or invented counts. Hold source push to
+preserve running parent. Local commit subject "Prepare native PG17 draft line
+independent session rehearsal"; next completion status then publish existing slice.
+
+Current documentation publication40fd9aeed5053ea65bcf8a78f4919a99115b9e54 is on
+the canonical remote/same draft PR68; title/base/prior62,030-character body and
+main preserved. New38932061829 OCR/lint/native pass; build/type/unit running at
+readback, not accepted. Workers7461bcd9/check117078480110 fails; permitted
+exact-head summary/detail provides no error log/annotations. No safe evidenced
+alternate: hosting remediation STOPPED, owner notified for redacted build error
+output/new permitted diagnostic access. No unchanged redispatch or forbidden
+fallback. Follow-up notes join next implementation, not a new docs-only restart.
+
 Publication1014b72e/source34a90930 verified same canonical branch/draft PR68/base/
 title/main/original history. All six Actions38926258007 pass; actual unit
 117058446033 reports4,863/4,863 across93 files102.07s, zero unexpected/quarantined

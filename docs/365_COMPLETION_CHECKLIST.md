@@ -4,6 +4,14 @@ Updated: 2026-10-17 (Asia/Manila)
 
 ## Consolidated current delivery authority
 
+Published consolidation40fd9aeed5053ea65bcf8a78f4919a99115b9e54, same draft PR68;
+base/title/prior full body and main unchanged. New38932061829 OCR/lint/native
+pass, build/type/unit running at readback; parent CI not inherited. Current
+Workers7461bcd9 fails. Exact-head permitted summary/detail has no error log;
+no safe evidence-based alternate, so hosting remediation STOPPED and owner
+notified for redacted error output/new permitted diagnostics. No unchanged retry.
+Follow-up notes join next implementation slice, not a docs-only restart.
+
 Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequence,
 Day 2 feasibility, fail-fast stops, CRM/device acceptance, multi-store ordering /
 Barangay Buddy boundaries and conditional main promotion. All 18 existing
@@ -34,6 +42,23 @@ Historical foundation branch: `completion/365-foundation`.
 Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
+
+Native draft-line PG17 source prerequisite is prepared in same PR68: pure pinned
+seven-span child builder and eight mandatory observed-wait/outer transaction/CAS/
+scope/native CHECK/late rewrite cohorts, with all original expense proofs and
+admission/cleanup/budgets intact. Final121/121 nine suites54.782s, review/format/
+lint/diff/214 assets/existing-output Worker guards pass. Actual new-head Linux
+cohorts and six Actions are separate/pending; do not inherit parent native results
+or cancel its running unit job. No app/migration/grant/live/deploy; C1.07/C1.08/
+R2/R3 remain unaccepted. Next actual PG17 proof, then trusted authority/current
+catalog/all-writer/durable/API/private-original/full recovery before connection.
+`evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md` records exact source/tests/limits.
+Unchanged QA/hosting stops and47 replay/provenance/22 October risk retained.
+Publication hold: parent40fd9aee unit117078254223 remains in_progress. Log reads
+failed HTTP502 initial + one allowed retry, so STOP that unchanged read; no CLI/
+dashboard fallback. Source commit subject "Prepare native PG17 draft line
+independent session rehearsal" is local until parent completes; next status-only
+completion check then push this existing slice, not repeated implementation/tests.
 
 Published1014b72e/source34a90930 verified canonical remote/same draft PR68/base/
 title/draft/main/original history. All six Actions gates38926258007 pass; unit
