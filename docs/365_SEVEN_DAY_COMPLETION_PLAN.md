@@ -76,10 +76,21 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
-Latest backend source `ad776aa8` adds required expected-shop intent, same-name
+Latest connected source `9a4059bd` adds customer detail caller/current-user denial
+and private receipt opening lifetime/duplicate-read fences. Critical suites
+192/192, full TypeScript, changed-line lint/review and mandatory CI guards pass.
+Fresh complete packaging/214 public copies/Worker boundaries pass with existing
+warnings; new-head publication/CI is separately recorded after verification. This
+is not trusted native authority, strict session revocation or real API/Storage/
+restore/owner acceptance. See `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`.
+
+Prior backend source `ad776aa8` adds required expected-shop intent, same-name
 publication containment and a separate private native-PG17 independent-session
-CI path. PGlite 94/94 and offline guards/wiring 11/11 pass; actual new Linux
-server/race/cleanup results remain pending. The candidate stays revoked/unapplied,
+CI path. Publication `2cbf20a4` passes all six Actions gates: actual native
+PG17.11 six quote scenario groups/cleanup, Parts247/247 with 47 retained replay
+failures, locked quote94/94 and application2,595/2,595 (79files,78.12s). This closes
+the selected SQL rehearsal, not whole baseline or real API/Auth/Storage/restore.
+The candidate stays revoked/unapplied,
 with trusted authority/durable retry/API/restore/owner gates open. Parent
 `bb1f193f` now passes all six Actions gates, including application 2,595/2,595
 (79 files,56.84s); that is not acceptance of this newer source or a release.

@@ -184,3 +184,33 @@ All 214 tracked public Git/source/output copies and existing Worker/backend/
 build inputs remain unchanged from the complete parent artifact; no fresh local
 application build, upload or deployment is claimed. No new migration/history,
 live ACL/Auth/business write, provider activation, resource/cost or Docker use.
+
+### Published native execution result
+
+Evidence/publication `2cbf20a45ecfec9affbec110b8e808af87af2571` is verified on the
+canonical remote and same attached draft PR #68, unchanged base/main. Run
+`38843686721`, job `116789263074`, completed successfully with an untruncated log.
+Signed PGDG packages are `17.11-1.pgdg24.04+2`; actual postgres/psql 17.11 ran the
+unchanged Parts 247/247 assertions with 47 retained migration replay failures.
+After Parts stop/cleanup, the independent quote cluster logged actual
+`server_version_num=170011` and verified private identity. All six named native
+scenario groups passed, followed by server stop and the successful always-cleanup
+step. The log explicitly retains synthetic authority and no JWT/API/R2/restore/
+release/durable-idempotency acceptance. That selected native SQL/concurrency gate
+is now verified; previous pending wording above describes prepublication status,
+not a need to repeat completed tests.
+
+All 214 tracked public copies and existing Worker/backend/OCR/PDF/server boundaries
+verify again at publication. All six Actions gates pass. Completed unit log
+confirms locked quote 94/94 and application 2,595/2,595 across 79 files (78.12s),
+zero unexpected/quarantined failures. It is truncated overall but contains both
+summaries and the final checker. Two earlier in-progress log reads returned
+provider HTTP 502; completed read succeeded without CLI/API fallback. Wrapper
+`38843686801` migrations/production and Supabase
+Preview skipped; preview's skip path is not an upload. Workers build
+`5f3fb782-58e0-49d7-9177-6625fea20b1b` failed (ID/link only, fresh cause unverified).
+These exact-head follow-up notes remain local for the next integrated source
+slice, avoiding a documentation-only CI restart. No live SQL/permission/business/
+Auth change, upload or deployment. Next: final Actions checks, then trusted fresh/
+original-human authority, durable replay/numbering and all-writer protocol, not
+another copy of this selected SQL rehearsal.

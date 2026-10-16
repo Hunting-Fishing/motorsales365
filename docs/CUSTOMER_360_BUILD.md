@@ -1529,7 +1529,28 @@ authority, private-storage/transaction/restore and designated owner acceptance.
 Source `ad776aa8`, same draft PR #68, adds an unapplied/unconnected quote
 transaction with prior expected-shop intent. PGlite 94/94 and offline CI/safety
 guards 11/11 pass. A separate private native-PG17 concurrency path is implemented
-but awaits actual Linux execution/cleanup. No UI hookup or production change;
+and passed actual Linux execution/cleanup on publication `2cbf20a4`: native
+PG17.11, six independent-session quote scenario groups and Parts247/247, with
+47 retained replay failures. All six Actions gates pass, including locked quote
+94/94 and application2,595/2,595. No UI hookup or production change;
 trusted authority, durable retry, all-writer scope and real API/storage/recovery/
 owner acceptance remain open. Exact evidence/resumption:
 `evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`.
+
+## Connected caller checks and private receipt opening (2026-10-16)
+
+Source `9a4059bd`, same draft PR #68, adds captured caller/current Auth record
+denial to the existing customer detail reader without changing generated
+middleware or permissions. Private receipt opening now fences late responses
+across account/target/logout/unmount and actual StrictMode cleanup; repeat reads
+are synchronously held, with no mutation refresh or raw error exposure. Critical
+tests192/192, full TypeScript, changed-line lint, mandatory CI guards and independent
+review pass. Fresh complete build/214 public copies/Worker boundaries pass with
+existing warnings. New-head publication/CI is separately
+recorded in `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`.
+
+This is not strict session revocation, original-human/native-shop authorization,
+private-storage or mutation/retry acceptance. Existing receipt list/editor/mutation
+and current-role/session, tenant/team/offboarding, durable financial/stock writers,
+restore and designated pilot/owner gates remain open. No deployment, live SQL/
+Auth/business write, new hosted resource/cost, Docker or provider activation.

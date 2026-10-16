@@ -54,7 +54,33 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest backend slice: `ad776aa8a18ed181293bbc6fd01a65518ca62949`, same draft PR #68.
+Latest connected slice: `9a4059bde546ed81eaa886124cc3e5b59529b5bc`, same draft PR #68.
+Customer 360's existing reader now adds same-caller explicit-token Auth record
+checks, strict credential/verified-subject binding, a bounded wait and observed
+context-loss denial before/after private reads. Receipt file opening has a
+synchronous duplicate-read latch and committed lifetime fences across account/
+target/logout/unmount/StrictMode, without mutation-cache refresh or raw errors.
+Combined critical suites pass 192/192 (final 5.77s: helper92, handler67, receipt33),
+full TypeScript and seven-file changed-line lint pass; nine older lint findings
+remain outside changed lines. Independent source/test/CI review and two mandatory
+CI guards pass. A test-only unsupported ByRole option was corrected to an exact
+anchored matcher; no source/timeout/assertion weakening. Fresh complete build and
+214 tracked Git/source/output public copies, Worker/canonical backend/15 OCR/
+202 PDF/server boundary verify at `9a4059bd`; existing warnings remain. New-head
+publication/CI is recorded after verification. This is connected
+caller denial/read lifetime safety, not strict session revocation, original-human/
+native-shop authority, storage/transaction/recovery or owner acceptance. Evidence:
+`evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`. Generated middleware, permissions,
+SQL, package/configuration/media and other hosted projects remain unchanged.
+Next safe application dependency: compose this additional caller-denial guard
+with existing commercial/communications readers, retaining their native primary/
+link/projection tests; continue receipt list/editor/mutation lifetime and unknown
+outcome handling separately. Do not treat read locks as purchase dedupe or new
+positive native authority. Shared original-human/fresh session/role/tenant,
+native-team/claim/offboarding, durable financial/stock writers and real private-
+object/restore/pilot acceptance remain release-blocking.
+
+Prior backend slice: `ad776aa8a18ed181293bbc6fd01a65518ca62949`, same draft PR #68.
 Locked/unapplied quote SQL now requires prior expected-shop intent and refuses
 any existing same-name overload/procedure without replacement. All prior 88 cases
 plus six additions pass 94/94 on PGlite/PostgreSQL 18.6 (69.636s total; actual main
@@ -69,6 +95,28 @@ input changed or fresh local build/deployment claimed. See
 trusted native authority. Next: verify new exact-head native17 marker/barriers/
 cleanup, then compose original-human/fresh authority, durable retry/numbering and
 all-writer scope; real API/private-storage/restore/owner gates remain open.
+
+Publication `2cbf20a45ecfec9affbec110b8e808af87af2571` is verified on the canonical
+remote and same attached draft PR #68/base; main is unchanged. Exact-head Actions
+run `38843686721`, job `116789263074`, has an untruncated log confirming signed
+PGDG 17.11 packages, all 247 Parts assertions and 47 retained replay failures,
+followed by the separate quote cluster's actual `server_version_num=170011`, all
+six independent-session scenario groups, server stop and successful always-cleanup.
+This closes that selected Docker-free native SQL rehearsal, not R2 authority,
+whole-baseline/API/Auth/private-storage/restore or financial acceptance. All 214
+tracked public copies/Worker boundaries verify again at publication. All six Actions
+gates pass. Completed unit log confirms locked quote 94/94 and application
+2,595/2,595 across 79 files (78.12s), zero unexpected/quarantined failures. Log is
+truncated overall but contains both summaries/checker. Two earlier in-progress
+unit-log reads returned provider HTTP 502; the completed read succeeded without
+CLI/API diagnostic fallback.
+Wrapper `38843686801` migrations/production and Supabase Preview skipped;
+preview's configured skip path is not an upload. Independent Workers build
+`5f3fb782-58e0-49d7-9177-6625fea20b1b` failed (ID/link only; fresh cause unverified).
+These follow-up notes remain local for the next integrated slice, avoiding a
+documentation-only CI restart. No live mutation/deployment occurred. Next: final
+new-head Actions results, then trusted original-human/fresh native authority and
+durable retry/numbering/all-writer composition; do not repeat the completed races.
 
 Prior backend slice: `c2f7f3153d13a2453db863877bf9ae880628b1e1`, locked/unapplied
 atomic quote candidate outside migrations, same draft PR #68. Actual header/items
