@@ -118,7 +118,7 @@ export const SNAPSHOT_SQL = `SELECT jsonb_build_object(
    FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='recovery_fixture' AND c.relkind IN ('r','S')),
  'columns',(SELECT jsonb_agg(jsonb_build_object('relation',c.relname,'name',a.attname,'type',format_type(a.atttypid,a.atttypmod),
    'notnull',a.attnotnull,'identity',a.attidentity,'default',pg_get_expr(d.adbin,d.adrelid),
-   'acl',${acl("coalesce(a.attacl,'{}'::aclitem[])")}) ORDER BY c.relname,a.attnum)
+   'acl',${acl("a.attacl")}) ORDER BY c.relname,a.attnum)
    FROM pg_attribute a JOIN pg_class c ON c.oid=a.attrelid JOIN pg_namespace n ON n.oid=c.relnamespace
    LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum
    WHERE n.nspname='recovery_fixture' AND c.relkind='r' AND a.attnum>0 AND NOT a.attisdropped),

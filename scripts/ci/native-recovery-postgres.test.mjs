@@ -893,6 +893,18 @@ test("fixture and comparison pin genuine constraints/ACL/FORCE RLS and lossless 
   assert.equal(FIXTURE_FINGERPRINT, hash(FIXTURE_SQL + SNAPSHOT_SQL));
 });
 
+test("column ACL snapshot preserves explicit grants and treats a NULL ACL as no column grants", () => {
+  const columns = SNAPSHOT_SQL.slice(
+    SNAPSHOT_SQL.indexOf("'columns'"),
+    SNAPSHOT_SQL.indexOf("'constraints'"),
+  );
+  assert.match(columns, /FROM aclexplode\(a\.attacl\) a/);
+  assert.match(columns, /'grantor',pg_get_userbyid\(a\.grantor\)/);
+  assert.match(columns, /'privilege',a\.privilege_type,'grantable',a\.is_grantable/);
+  assert.match(columns, /'\[\]'::jsonb/);
+  assert.doesNotMatch(columns, /coalesce\(a\.attacl|acldefault|'\{\}'::aclitem\[\]/);
+});
+
 test("role snapshot reads real password-null and role settings from their distinct PostgreSQL17 catalogs", () => {
   assert.match(SNAPSHOT_SQL, /'passwordIsNull',rolpassword IS NULL/);
   assert.match(SNAPSHOT_SQL, /FROM pg_authid WHERE rolname/);
