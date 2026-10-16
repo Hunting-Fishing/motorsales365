@@ -147,8 +147,8 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test scripts/ci/native-quote-postgres.test.mjs",
     ],
     [
-      "Native customer caller and private receipt lifetimes (never quarantined)",
-      "npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/components/vehicle-receipt-panel.test.tsx --maxWorkers=1",
+      "Native customer callers and receipt entry lifetimes (never quarantined)",
+      "npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/lib/customer-commercial.functions.test.ts src/lib/customer-communications.functions.test.ts src/components/vehicle-receipt-panel.test.tsx src/lib/vehicle-receipts.test.ts --maxWorkers=1",
     ],
     [
       "Independent Workers build source freeze (offline, never quarantined)",

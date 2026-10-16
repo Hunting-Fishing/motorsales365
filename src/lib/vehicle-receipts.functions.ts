@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   receiptDate,
-  receiptLineSchema,
+  receiptSaveSchema,
   parseReceiptExtraction,
   categoryKeys,
   validateReceiptFile,
@@ -105,30 +105,7 @@ export const startVehicleReceipt = createServerFn({ method: "POST" })
   );
 export const saveVehicleReceipt = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z
-      .object({
-        id: uuid,
-        vendor: z.string().trim().max(200).nullable(),
-        purchasedOn: receiptDate.nullable(),
-        currency: z.string().regex(/^[A-Z]{3}$/),
-        total: z.number().nonnegative().max(99999999).nullable(),
-        items: z.array(receiptLineSchema).min(1).max(100),
-        confirm: z.boolean(),
-      })
-      .superRefine((d, ctx) => {
-        if (
-          d.confirm &&
-          (!d.purchasedOn || d.items.some((i) => !i.reviewed || !i.category || i.quantity === null))
-        )
-          ctx.addIssue({
-            code: "custom",
-            message:
-              "Set the purchase date and review the name, category and quantity of every item.",
-          });
-      })
-      .parse(d),
-  )
+  .inputValidator((d: unknown) => receiptSaveSchema.parse(d))
   .handler(async ({ data, context }) =>
     rpc(context.supabase, "save_vehicle_receipt", {
       _id: data.id,

@@ -1,8 +1,9 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { Receipt, Plus, ScanLine, Loader2, Lock, Wrench, Trash2, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,13 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { PART_CATEGORIES, localReceiptDate, validateReceiptFile } from "@/lib/vehicle-receipts";
+import {
+  PART_CATEGORIES,
+  localReceiptDate,
+  validateReceiptFile,
+  receiptEntrySchema,
+  receiptSaveSchema,
+} from "@/lib/vehicle-receipts";
 import type { ReceiptLine, ReceiptTarget, VehicleReceipt } from "@/lib/vehicle-receipts";
 import type { ReceiptOcrProgress } from "@/lib/receipt-ocr.client";
 import { withReceiptAbort } from "@/lib/receipt-abort";
@@ -349,6 +356,8 @@ function AuthenticatedVehicleReceiptPanel({
         ))}
       {edit && (
         <ReceiptEditor
+          key={edit === "new" ? "new" : edit.id}
+          userId={userId}
           target={target}
           receipt={edit === "new" ? null : edit}
           onClose={() => {
@@ -371,10 +380,12 @@ function AuthenticatedVehicleReceiptPanel({
 }
 
 function ReceiptEditor({
+  userId,
   target,
   receipt,
   onClose,
 }: {
+  userId: string;
   target: ReceiptTarget;
   receipt: VehicleReceipt | null;
   onClose: () => void;
@@ -397,147 +408,255 @@ function ReceiptEditor({
   const [consent, setConsent] = useState(false),
     [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [uploadPath, setUploadPath] = useState<string | null>(receipt?.file_path ?? null);
+  const [unknown, setUnknown] = useState(false);
   const localScan = useRef<AbortController | null>(null);
-  const mounted = useRef(true);
   const [localProgress, setLocalProgress] = useState<ReceiptOcrProgress | null>(null);
-  useEffect(() => {
-    mounted.current = true;
+  type Attempt = {
+    lifetime: number;
+    lost: boolean;
+    pending: "start" | "upload" | "save" | null;
+  };
+  const editor = useRef({
+    active: false,
+    lifetime: 0,
+    held: false,
+    attempt: null as Attempt | null,
+    id: receipt?.id ?? null,
+    path: receipt?.file_path ?? null,
+    attached: Boolean(receipt?.attachment_uploaded ?? receipt?.file_path),
+  });
+  const uncertain =
+    "Receipt change could not be confirmed. Your entries are kept while this editor is open. Close and check existing receipts before trying again; do not create a duplicate.";
+  const frozen = busy || unknown;
+  useLayoutEffect(() => {
+    const scope = editor.current;
+    scope.active = true;
+    scope.lifetime += 1;
+    scope.attempt = null;
+    setBusy(false);
+    setUnknown(scope.held);
+    if (scope.held) setError(uncertain);
     return () => {
-      mounted.current = false;
+      scope.active = false;
+      scope.lifetime += 1;
+      if (scope.attempt) {
+        scope.attempt.lost = true;
+        if (scope.attempt.pending) scope.held = true;
+      }
       localScan.current?.abort();
     };
   }, []);
-  async function ensureReceipt() {
-    let current = id,
-      path = uploadPath;
-    if (!current) {
+  function current(attempt: Attempt) {
+    const scope = editor.current;
+    return (
+      scope.active &&
+      scope.lifetime === attempt.lifetime &&
+      scope.attempt === attempt &&
+      !attempt.lost
+    );
+  }
+  function assertCurrent(attempt: Attempt) {
+    if (!current(attempt)) {
+      attempt.lost = true;
+      throw new Error(uncertain);
+    }
+  }
+  function checkFile(selected: File | null) {
+    if (!selected) return;
+    validateReceiptFile(selected);
+    z.string().trim().max(200).parse(selected.name);
+    if (receipt?.media_type && receipt.media_type !== selected.type)
+      throw new Error("Use the original file type for this draft.");
+  }
+  async function ensureReceipt(attempt: Attempt, selected: File | null) {
+    assertCurrent(attempt);
+    const scope = editor.current;
+    let currentId = scope.id;
+    if (!currentId) {
+      attempt.pending = "start";
       const row = await start({
         data: {
           ...target,
-          ...(file
-            ? { fileName: file.name, mediaType: file.type as any, fileSize: file.size }
+          ...(selected
+            ? {
+                fileName: selected.name,
+                mediaType: selected.type as
+                  | "image/jpeg"
+                  | "image/png"
+                  | "image/webp"
+                  | "application/pdf",
+                fileSize: selected.size,
+              }
             : {}),
         },
       });
-      current = row.id;
-      path = row.file_path;
-      setId(current);
-      setUploadPath(path);
+      assertCurrent(attempt);
+      const ack = z
+        .object({ id: z.string().uuid(), file_path: z.string().nullable() })
+        .strict()
+        .parse(row);
+      const ext = selected
+        ? (
+            {
+              "image/jpeg": "jpg",
+              "image/png": "png",
+              "image/webp": "webp",
+              "application/pdf": "pdf",
+            } as Record<string, string>
+          )[selected.type]
+        : null;
+      const expectedPath = selected ? `${userId}/${ack.id}/original.${ext}` : null;
+      if (ack.file_path !== expectedPath) throw new Error(uncertain);
+      currentId = ack.id;
+      scope.id = currentId;
+      scope.path = ack.file_path;
+      attempt.pending = null;
+      setId(currentId);
     }
-    if (file && path && !attached) {
-      if (receipt?.media_type && receipt.media_type !== file.type)
-        throw new Error(
-          "Use the original file type for this draft, or discard it and create a new receipt.",
-        );
+    if (selected && !scope.attached) {
+      assertCurrent(attempt);
+      if (!scope.path) throw new Error(uncertain);
+      attempt.pending = "upload";
       const uploaded = await supabase.storage
         .from("vehicle-receipts")
-        .upload(path, file, { upsert: false, contentType: file.type });
-      if (uploaded.error && uploaded.error.message !== "The resource already exists")
-        throw new Error(uploaded.error.message);
+        .upload(scope.path, selected, { upsert: false, contentType: selected.type });
+      assertCurrent(attempt);
+      if (
+        uploaded.error !== null ||
+        uploaded.data?.path !== scope.path ||
+        uploaded.data?.fullPath !== `vehicle-receipts/${scope.path}`
+      )
+        throw new Error(uncertain);
+      scope.attached = true;
+      attempt.pending = null;
       setAttached(true);
     }
-    return current;
+    return currentId;
   }
-  async function run(fn: () => Promise<void>) {
+  async function run(fn: (attempt: Attempt) => Promise<void>, message: string) {
+    const scope = editor.current;
+    if (!scope.active || scope.held || scope.attempt) return;
+    const attempt: Attempt = { lifetime: scope.lifetime, lost: false, pending: null };
+    scope.attempt = attempt;
     setBusy(true);
     setError("");
     try {
-      await fn();
-    } catch (e: any) {
-      setError(e.message || "Could not process receipt");
+      await fn(attempt);
+    } catch {
+      if (current(attempt)) {
+        if (attempt.pending) {
+          scope.held = true;
+          setUnknown(true);
+          setError(uncertain);
+        } else setError(message);
+      }
     } finally {
-      setBusy(false);
+      if (current(attempt)) {
+        scope.attempt = null;
+        setBusy(false);
+        setLocalProgress(null);
+      }
     }
   }
   function change(i: number, patch: Partial<ReceiptLine>) {
     setItems(items.map((x, j) => (j === i ? { ...x, ...patch, reviewed: false } : x)));
   }
   async function extract() {
-    await run(async () => {
-      if (!file && !attached) throw new Error("Upload a receipt first.");
-      const current = await ensureReceipt();
-      const result = await scan({ data: { id: current, consent: true } });
+    const selected = file;
+    const allowed = consent;
+    await run(async (attempt) => {
+      if (!allowed || (!selected && !editor.current.attached))
+        throw new Error("Receipt consent required.");
+      checkFile(selected);
+      const currentId = await ensureReceipt(attempt, selected);
+      assertCurrent(attempt);
+      const result = await scan({ data: { id: currentId, consent: true } });
+      assertCurrent(attempt);
       setVendor(result.vendor || "");
       setDate(result.purchased_on || "");
       setCurrency(result.currency || "PHP");
       setTotal(result.total?.toString() || "");
       setItems(result.items.length ? result.items : [blankLine()]);
       toast.message("Scan complete. Check every item and fill any missing fields.");
-    });
+    }, "Could not scan with AI. You can enter the receipt manually.");
   }
   async function extractLocal() {
-    if (!file || busy) return;
-    const controller = new AbortController();
-    localScan.current = controller;
-    setBusy(true);
-    setError("");
-    setLocalProgress({ stage: "Preparing scanner", progress: 0 });
-    try {
-      if (controller.signal.aborted) return;
-      const result = await scanReceiptOnDevice(file, {
-        signal: controller.signal,
-        onProgress: (progress) => {
-          if (mounted.current && !controller.signal.aborted) setLocalProgress(progress);
-        },
-      });
-      if (!mounted.current || controller.signal.aborted) return;
-      if (
-        !result.vendor &&
-        !result.purchased_on &&
-        !result.currency &&
-        result.total === null &&
-        !result.items.length
-      ) {
-        throw new Error(
-          "No readable receipt details found. Your entries were kept; try a clearer photo or enter the receipt manually.",
-        );
+    const selected = file;
+    if (!selected) return;
+    await run(async (attempt) => {
+      const controller = new AbortController();
+      localScan.current = controller;
+      setLocalProgress({ stage: "Preparing scanner", progress: 0 });
+      try {
+        if (controller.signal.aborted) return;
+        const result = await scanReceiptOnDevice(selected, {
+          signal: controller.signal,
+          onProgress: (progress) => {
+            if (current(attempt) && !controller.signal.aborted) setLocalProgress(progress);
+          },
+        });
+        if (!current(attempt) || controller.signal.aborted) return;
+        if (
+          !result.vendor &&
+          !result.purchased_on &&
+          !result.currency &&
+          result.total === null &&
+          !result.items.length
+        ) {
+          throw new Error(
+            "No readable receipt details found. Your entries were kept; try a clearer photo or enter the receipt manually.",
+          );
+        }
+        if (result.vendor) setVendor(result.vendor);
+        if (result.purchased_on) setDate(result.purchased_on);
+        if (result.currency) setCurrency(result.currency);
+        if (result.total !== null) setTotal(result.total.toString());
+        if (result.items.length) setItems(result.items);
+        toast.message("On-device scan complete. Review every suggestion before saving.");
+      } catch (err) {
+        if (current(attempt) && !controller.signal.aborted) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Could not scan this photo. You can enter the receipt manually.",
+          );
+        }
+      } finally {
+        if (localScan.current === controller) localScan.current = null;
       }
-      if (result.vendor) setVendor(result.vendor);
-      if (result.purchased_on) setDate(result.purchased_on);
-      if (result.currency) setCurrency(result.currency);
-      if (result.total !== null) setTotal(result.total.toString());
-      if (result.items.length) setItems(result.items);
-      toast.message("On-device scan complete. Review every suggestion before saving.");
-    } catch (err) {
-      if (mounted.current && !controller.signal.aborted) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Could not scan this photo. You can enter the receipt manually.",
-        );
-      }
-    } finally {
-      if (localScan.current === controller) localScan.current = null;
-      if (mounted.current) {
-        setBusy(false);
-        setLocalProgress(null);
-      }
-    }
+    }, "Could not scan this photo. You can enter the receipt manually.");
   }
   async function persist(confirm: boolean) {
-    await run(async () => {
-      const current = await ensureReceipt();
-      await save({
-        data: {
-          id: current,
-          vendor: vendor || null,
-          purchasedOn: date || null,
-          currency,
-          total: num(total),
-          items,
-          confirm,
-        },
-      });
+    const selected = file;
+    const fields = {
+      vendor: vendor || null,
+      purchasedOn: date || null,
+      currency,
+      total: num(total),
+      items,
+      confirm,
+    };
+    await run(async (attempt) => {
+      const entry = receiptEntrySchema.parse(fields);
+      checkFile(selected);
+      if (editor.current.id) receiptSaveSchema.parse({ ...entry, id: editor.current.id });
+      const currentId = await ensureReceipt(attempt, selected);
+      assertCurrent(attempt);
+      const payload = receiptSaveSchema.parse({ ...entry, id: currentId });
+      attempt.pending = "save";
+      const ack = await save({ data: payload });
+      assertCurrent(attempt);
+      if (ack !== null) throw new Error(uncertain);
+      attempt.pending = null;
       toast.success(confirm ? "Purchase history saved" : "Draft saved");
       onClose();
-    });
+    }, "Check the receipt details and review every required item before saving.");
   }
   return (
     <Dialog
       open
       onOpenChange={(o) => {
-        if (!o && !busy) onClose();
+        if (!o && !editor.current.attempt && !editor.current.held) onClose();
       }}
     >
       <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
@@ -555,7 +674,7 @@ function ReceiptEditor({
                 id="receipt-file"
                 type="file"
                 accept="image/jpeg,image/png,image/webp,application/pdf"
-                disabled={busy || Boolean(id && attached)}
+                disabled={frozen || Boolean(id && attached)}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
@@ -575,7 +694,12 @@ function ReceiptEditor({
             </div>
           )}
           <div className="rounded-lg border p-3 space-y-2">
-            <Button type="button" variant="outline" disabled={busy || !file} onClick={extractLocal}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={frozen || !file}
+              onClick={extractLocal}
+            >
               <ScanLine className="mr-1 h-4 w-4" /> Scan on this device
             </Button>
             {localProgress && (
@@ -601,6 +725,7 @@ function ReceiptEditor({
               <input
                 type="checkbox"
                 checked={consent}
+                disabled={frozen}
                 onChange={(e) => setConsent(e.target.checked)}
                 className="mt-1"
               />{" "}
@@ -609,7 +734,7 @@ function ReceiptEditor({
             <Button
               type="button"
               variant="outline"
-              disabled={busy || !consent || (!file && !attached)}
+              disabled={frozen || !consent || (!file && !attached)}
               onClick={extract}
             >
               {busy ? (
@@ -623,7 +748,7 @@ function ReceiptEditor({
               AI suggests details. You confirm them. You can enter everything manually.
             </p>
           </div>
-          <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-4">
+          <fieldset disabled={frozen} className="grid gap-3 sm:grid-cols-4">
             <div className="sm:col-span-2">
               <Label htmlFor="receipt-vendor">Supplier / shop</Label>
               <Input
@@ -663,7 +788,7 @@ function ReceiptEditor({
               />
             </div>
           </fieldset>
-          <fieldset disabled={busy} className="space-y-3">
+          <fieldset disabled={frozen} className="space-y-3">
             {items.map((item, i) => (
               <div key={i} className="space-y-2 rounded-lg border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -677,7 +802,7 @@ function ReceiptEditor({
                   <Button
                     size="sm"
                     variant="ghost"
-                    disabled={busy || items.length === 1}
+                    disabled={frozen || items.length === 1}
                     onClick={() => setItems(items.filter((_, j) => j !== i))}
                   >
                     Remove item
@@ -754,7 +879,9 @@ function ReceiptEditor({
                   <input
                     type="checkbox"
                     checked={item.reviewed}
-                    disabled={!item.description.trim() || !item.category || !item.quantity}
+                    disabled={
+                      frozen || !item.description.trim() || !item.category || !item.quantity
+                    }
                     onChange={(e) =>
                       setItems(
                         items.map((x, j) => (j === i ? { ...x, reviewed: e.target.checked } : x)),
@@ -770,7 +897,7 @@ function ReceiptEditor({
             type="button"
             variant="outline"
             size="sm"
-            disabled={busy || items.length >= 100}
+            disabled={frozen || items.length >= 100}
             onClick={() => setItems([...items, blankLine()])}
           >
             <Plus className="mr-1 h-3 w-3" /> Add item
@@ -782,14 +909,20 @@ function ReceiptEditor({
           )}
         </div>
         <DialogFooter>
-          <Button variant="ghost" disabled={busy} onClick={onClose}>
-            Close
+          <Button
+            variant="ghost"
+            disabled={busy}
+            onClick={() => {
+              if (!editor.current.attempt) onClose();
+            }}
+          >
+            {unknown ? "Close and check receipts" : "Close"}
           </Button>
-          <Button variant="outline" disabled={busy} onClick={() => persist(false)}>
+          <Button variant="outline" disabled={frozen} onClick={() => persist(false)}>
             Save draft
           </Button>
           <Button
-            disabled={busy || !date || items.some((i) => !i.reviewed)}
+            disabled={frozen || !date || items.some((i) => !i.reviewed)}
             onClick={() => persist(true)}
           >
             Confirm purchases

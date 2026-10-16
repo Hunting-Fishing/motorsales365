@@ -35,6 +35,7 @@ vi.mock("@/lib/vehicle-receipts.functions", () => ({
   recordVehicleReceiptExpense: vi.fn(),
 }));
 const vehicle = "10000000-0000-4000-8000-000000000001";
+const draftId = "20000000-0000-4000-8000-000000000001";
 function receipt(vendor: string): VehicleReceipt {
   return {
     id: "receipt-1",
@@ -66,7 +67,12 @@ function show(
 }
 beforeEach(() => {
   vi.clearAllMocks();
-  localOcr.upload.mockResolvedValue({ error: null });
+  localOcr.upload.mockReset().mockImplementation((path: string) =>
+    Promise.resolve({
+      data: { path, fullPath: `vehicle-receipts/${path}` },
+      error: null,
+    }),
+  );
   localOcr.scan.mockResolvedValue({
     vendor: "Local supplier",
     purchased_on: "2026-10-15",
@@ -88,8 +94,17 @@ beforeEach(() => {
   auth.userId = "owner-a";
   vi.mocked(api.getVehicleReceipts).mockResolvedValue({ receipts: [], linkedVehicleId: null });
   vi.mocked(api.listVehicleShopLinks).mockResolvedValue([]);
-  vi.mocked(api.startVehicleReceipt).mockResolvedValue({ id: "receipt-1", file_path: null });
-  vi.mocked(api.saveVehicleReceipt).mockResolvedValue(null);
+  vi.mocked(api.startVehicleReceipt)
+    .mockReset()
+    .mockImplementation(async (options) => {
+      const { data } = options as unknown as { data: { fileName?: string } };
+      return {
+        id: draftId,
+        file_path: data.fileName ? `owner-a/${draftId}/original.png` : null,
+      };
+    });
+  vi.mocked(api.saveVehicleReceipt).mockReset().mockResolvedValue(null);
+  vi.mocked(api.extractVehicleReceipt).mockReset();
 });
 
 function deferred<T>() {
@@ -410,6 +425,315 @@ describe("private receipt opening lifetime", () => {
     expect(button).toBeEnabled();
     expect(toast.error).not.toHaveBeenCalled();
     expect(invalidate).not.toHaveBeenCalled();
+  });
+});
+
+describe("receipt editor dispatch and committed lifetime", () => {
+  beforeEach(() => {
+    vi.spyOn(toast, "success").mockImplementation(() => 0);
+    vi.spyOn(toast, "message").mockImplementation(() => 0);
+  });
+  afterEach(() => vi.restoreAllMocks());
+  async function openEntry(withFile = false) {
+    const context = show();
+    const add = await screen.findByRole("button", { name: "Add receipt" });
+    await waitFor(() => expect(add).toBeEnabled());
+    fireEvent.click(add);
+    const dialog = within(screen.getByRole("dialog"));
+    fireEvent.change(dialog.getByLabelText("Supplier / shop"), {
+      target: { value: "Manual supplier" },
+    });
+    fireEvent.change(dialog.getByLabelText("Item description"), {
+      target: { value: "Manual brake part" },
+    });
+    if (withFile)
+      fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+        target: { files: [new File(["synthetic"], "receipt.png", { type: "image/png" })] },
+      });
+    return { ...context, dialog };
+  }
+  function expectHeld(dialog: ReturnType<typeof within>) {
+    expect(dialog.getByRole("alert")).toHaveTextContent("Receipt change could not be confirmed");
+    expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Manual supplier");
+    expect(dialog.getByLabelText("Item description")).toHaveValue("Manual brake part");
+    expect(dialog.getByRole("button", { name: "Save draft" })).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Confirm purchases" })).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Scan with AI" })).toBeDisabled();
+    expect(dialog.getByRole("button", { name: "Close and check receipts" })).toBeEnabled();
+    expect(toast.success).not.toHaveBeenCalled();
+  }
+  it("preflights invalid manual data before creating any receipt and allows correction", async () => {
+    const { dialog } = await openEntry();
+    fireEvent.change(dialog.getByLabelText("Item description"), { target: { value: " " } });
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await dialog.findByText(/Check the receipt details/);
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(dialog.getByLabelText("Item description")).toBeEnabled();
+    fireEvent.change(dialog.getByLabelText("Item description"), {
+      target: { value: "Corrected item" },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1));
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+  });
+  it("admits only one same-tick remote action and refuses same-tick Close", async () => {
+    const pending = deferred<{ id: string; file_path: string | null }>();
+    vi.mocked(api.startVehicleReceipt).mockReturnValueOnce(pending.promise);
+    const { dialog } = await openEntry(true);
+    fireEvent.click(dialog.getByRole("checkbox", { name: /Allow this receipt/ }));
+    fireEvent.change(dialog.getByLabelText("Purchase date"), { target: { value: "2026-10-01" } });
+    fireEvent.change(dialog.getByLabelText("Category"), { target: { value: "brakes" } });
+    fireEvent.click(dialog.getByRole("checkbox", { name: /I checked this item/ }));
+    const save = dialog.getByRole("button", { name: "Save draft" });
+    const confirm = dialog.getByRole("button", { name: "Confirm purchases" });
+    expect(confirm).toBeEnabled();
+    const ai = dialog.getByRole("button", { name: "Scan with AI" });
+    const local = dialog.getByRole("button", { name: "Scan on this device" });
+    const closes = dialog.getAllByRole("button", { name: /^Close$/ });
+    act(() => {
+      save.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      save.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      confirm.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      ai.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      local.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      closes.forEach((close) => close.dispatchEvent(new MouseEvent("click", { bubbles: true })));
+    });
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+    expect(api.extractVehicleReceipt).not.toHaveBeenCalled();
+    expect(localOcr.scan).not.toHaveBeenCalled();
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    await act(async () =>
+      pending.resolve({ id: draftId, file_path: `owner-a/${draftId}/original.png` }),
+    );
+    await waitFor(() => expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1));
+    expect(localOcr.upload).toHaveBeenCalledTimes(1);
+  });
+  for (const step of ["start", "upload", "save"] as const) {
+    it(`${step}: a late rejection after account loss remains silent`, async () => {
+      const pending = deferred<unknown>();
+      if (step === "start")
+        vi.mocked(api.startVehicleReceipt).mockReturnValueOnce(
+          pending.promise as ReturnType<typeof api.startVehicleReceipt>,
+        );
+      if (step === "upload") localOcr.upload.mockReturnValueOnce(pending.promise);
+      if (step === "save") vi.mocked(api.saveVehicleReceipt).mockReturnValueOnce(pending.promise);
+      const { dialog, client, rerender, view } = await openEntry(true);
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+      if (step !== "start") await waitFor(() => expect(localOcr.upload).toHaveBeenCalledTimes(1));
+      if (step === "save")
+        await waitFor(() => expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1));
+      auth.userId = "owner-b";
+      rerender(view());
+      await act(async () => pending.reject(new Error("PRIVATE old operation cause")));
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+      expect(localOcr.upload).toHaveBeenCalledTimes(step === "start" ? 0 : 1);
+      expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(step === "save" ? 1 : 0);
+    });
+    it.each(["account", "sign-out", "vehicle", "shop", "unmount", "account ABA"] as const)(
+      `${step}: a late reply after committed %s cannot dispatch another step or private UI effects`,
+      async (transition) => {
+        const pending = deferred<unknown>();
+        if (step === "start")
+          vi.mocked(api.startVehicleReceipt).mockReturnValueOnce(
+            pending.promise as ReturnType<typeof api.startVehicleReceipt>,
+          );
+        if (step === "upload") localOcr.upload.mockReturnValueOnce(pending.promise);
+        if (step === "save") vi.mocked(api.saveVehicleReceipt).mockReturnValueOnce(pending.promise);
+        const { dialog, client, rerender, view, unmount } = await openEntry(true);
+        const invalidate = vi.spyOn(client, "invalidateQueries");
+        fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+        if (step !== "start") await waitFor(() => expect(localOcr.upload).toHaveBeenCalledTimes(1));
+        if (step === "save")
+          await waitFor(() => expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1));
+        if (transition === "account" || transition === "account ABA") {
+          auth.userId = "owner-b";
+          rerender(view());
+          if (transition === "account ABA") {
+            auth.userId = "owner-a";
+            rerender(view());
+          }
+        } else if (transition === "sign-out") {
+          auth.userId = null;
+          rerender(view());
+        } else if (transition === "vehicle")
+          rerender(view({ vehicleId: "10000000-0000-4000-8000-000000000002" }));
+        else if (transition === "shop")
+          rerender(view({ shopVehicleId: "10000000-0000-4000-8000-000000000003" }));
+        else unmount();
+        const path = `owner-a/${draftId}/original.png`;
+        await act(async () =>
+          pending.resolve(
+            step === "start"
+              ? { id: draftId, file_path: path }
+              : step === "upload"
+                ? { error: null, data: { path, fullPath: `vehicle-receipts/${path}` } }
+                : null,
+          ),
+        );
+        expect(localOcr.upload).toHaveBeenCalledTimes(step === "start" ? 0 : 1);
+        expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(step === "save" ? 1 : 0);
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(toast.message).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalled();
+        expect(api.discardReceiptDraft).not.toHaveBeenCalled();
+      },
+    );
+    it.each(["throw", "reject", "malformed"] as const)(
+      `${step}: %s leaves entries held without blind retry`,
+      async (mode) => {
+        const broken = () => {
+          throw new Error("PRIVATE backend detail");
+        };
+        const result =
+          mode === "reject"
+            ? () => Promise.reject(new Error("PRIVATE token cause"))
+            : mode === "throw"
+              ? broken
+              : () => Promise.resolve({});
+        if (step === "start")
+          vi.mocked(api.startVehicleReceipt).mockImplementationOnce(result as never);
+        if (step === "upload") localOcr.upload.mockImplementationOnce(result);
+        if (step === "save") vi.mocked(api.saveVehicleReceipt).mockImplementationOnce(result);
+        const { dialog, client } = await openEntry(step !== "save");
+        const invalidate = vi.spyOn(client, "invalidateQueries");
+        fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+        await waitFor(() => expectHeld(dialog));
+        expect(dialog.getByRole("alert")).not.toHaveTextContent("PRIVATE");
+        fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+        fireEvent.click(dialog.getByRole("button", { name: "Scan with AI" }));
+        expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+        expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(step === "save" ? 1 : 0);
+        expect(api.extractVehicleReceipt).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalled();
+        expect(api.discardReceiptDraft).not.toHaveBeenCalled();
+      },
+    );
+  }
+  it.each([
+    null,
+    { id: "opaque", file_path: null },
+    { id: draftId, file_path: "another-owner/path" },
+    { id: draftId, file_path: null },
+    { id: draftId, file_path: `owner-a/${draftId}/original.pdf` },
+  ])("rejects an unbound file-start acknowledgment %j without upload or save", async (ack) => {
+    vi.mocked(api.startVehicleReceipt).mockResolvedValueOnce(ack as never);
+    const { dialog } = await openEntry(true);
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expectHeld(dialog));
+    expect(localOcr.upload).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+  });
+  it("does not accept the old already-exists error as an uploaded-file acknowledgment", async () => {
+    localOcr.upload.mockResolvedValueOnce({
+      data: null,
+      error: { message: "The resource already exists" },
+    });
+    const { dialog } = await openEntry(true);
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expectHeld(dialog));
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+  });
+  it.each([
+    { path: "wrong/path", fullPath: `vehicle-receipts/owner-a/${draftId}/original.png` },
+    { path: `owner-a/${draftId}/original.png`, fullPath: "another-bucket/wrong/path" },
+  ])("rejects an upload acknowledgment bound to the wrong path/bucket %j", async (data) => {
+    localOcr.upload.mockResolvedValueOnce({ data, error: null });
+    const { dialog } = await openEntry(true);
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expectHeld(dialog));
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+  });
+  it.each([undefined, true, "", []])(
+    "never calls a non-null save acknowledgment a confirmed save: %j",
+    async (ack) => {
+      vi.mocked(api.saveVehicleReceipt).mockResolvedValueOnce(ack);
+      const { dialog } = await openEntry();
+      fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+      await waitFor(() => expectHeld(dialog));
+      expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1);
+    },
+  );
+  it("closes an explicitly held editor only to reconcile, never deleting or recreating its unknown draft", async () => {
+    vi.mocked(api.startVehicleReceipt).mockRejectedValueOnce(new Error("PRIVATE lost reply"));
+    const { dialog, client } = await openEntry();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expectHeld(dialog));
+    fireEvent.click(dialog.getByRole("button", { name: "Close and check receipts" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+    expect(api.discardReceiptDraft).not.toHaveBeenCalled();
+    expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ["vehicle-receipts", "owner-a"] });
+  });
+  it("preflights an overlong attachment name before draft creation", async () => {
+    const { dialog } = await openEntry();
+    fireEvent.change(dialog.getByLabelText("Receipt image or PDF (optional for manual entry)"), {
+      target: { files: [new File(["synthetic"], "x".repeat(201), { type: "image/png" })] },
+    });
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await dialog.findByText(/Check the receipt details/);
+    expect(api.startVehicleReceipt).not.toHaveBeenCalled();
+    expect(localOcr.upload).not.toHaveBeenCalled();
+  });
+  it.each(["resolve", "reject"] as const)(
+    "ignores a late AI %s after acknowledged upload and account loss",
+    async (mode) => {
+      const pending = deferred<Awaited<ReturnType<typeof api.extractVehicleReceipt>>>();
+      vi.mocked(api.extractVehicleReceipt).mockReturnValueOnce(pending.promise);
+      const { dialog, client, rerender, view } = await openEntry(true);
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(dialog.getByRole("checkbox", { name: /Allow this receipt/ }));
+      fireEvent.click(dialog.getByRole("button", { name: "Scan with AI" }));
+      await waitFor(() => expect(api.extractVehicleReceipt).toHaveBeenCalledTimes(1));
+      expect(localOcr.upload).toHaveBeenCalledTimes(1);
+      auth.userId = "owner-b";
+      rerender(view());
+      const add = await screen.findByRole("button", { name: "Add receipt" });
+      await waitFor(() => expect(add).toBeEnabled());
+      fireEvent.click(add);
+      fireEvent.change(screen.getByLabelText("Supplier / shop"), {
+        target: { value: "Account B details" },
+      });
+      await act(async () => {
+        if (mode === "resolve")
+          pending.resolve({
+            vendor: "PRIVATE old AI supplier",
+            purchased_on: null,
+            currency: null,
+            total: null,
+            items: [],
+          });
+        else pending.reject(new Error("PRIVATE old AI provider cause"));
+      });
+      expect(screen.getByLabelText("Supplier / shop")).toHaveValue("Account B details");
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(api.saveVehicleReceipt).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    },
+  );
+  it("retains an acknowledged draft/upload for manual save after AI fails, without another create or upload", async () => {
+    vi.mocked(api.extractVehicleReceipt).mockRejectedValueOnce(
+      new Error("PRIVATE provider failure"),
+    );
+    const { dialog } = await openEntry(true);
+    fireEvent.click(dialog.getByRole("checkbox", { name: /Allow this receipt/ }));
+    fireEvent.click(dialog.getByRole("button", { name: "Scan with AI" }));
+    await dialog.findByText(/You can enter the receipt manually/);
+    expect(dialog.getByRole("button", { name: "Save draft" })).toBeEnabled();
+    expect(dialog.getByLabelText("Supplier / shop")).toHaveValue("Manual supplier");
+    fireEvent.click(dialog.getByRole("button", { name: "Save draft" }));
+    await waitFor(() => expect(api.saveVehicleReceipt).toHaveBeenCalledTimes(1));
+    expect(api.startVehicleReceipt).toHaveBeenCalledTimes(1);
+    expect(localOcr.upload).toHaveBeenCalledTimes(1);
+    expect(api.saveVehicleReceipt).toHaveBeenCalledWith({
+      data: expect.objectContaining({ id: draftId, vendor: "Manual supplier", confirm: false }),
+    });
   });
 });
 
