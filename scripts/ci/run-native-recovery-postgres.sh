@@ -214,6 +214,11 @@ for recovery_cluster in source restored; do
   quiet_native 7s "$recovery_bin/pg_isready" -h "$recovery_root/$recovery_cluster/socket" -p "$recovery_port" -U "$recovery_bootstrap" -d postgres -t 5 || fail 'cluster readiness failed'
 done
 
+report_failure_marker() {
+  local marker=$1 pattern=$'^FAIL:(admission|server-identity|fixture|source-access|dump|manifest|offline-source|roles-restore|database-restore|compare|restored-access|rollback):([0-9A-Z]{5}|unavailable)\n\\.$'
+  [[ "$marker" =~ $pattern ]] || return 1
+  printf 'Native recovery phase failed: stage=%s sqlState=%s\n' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" >&2
+}
 run_phase() {
   local phase=$1 pin=${2:-} output_fd input_fd result=0 captured
   local args=("$recovery_timeout" --signal=TERM --kill-after=5s 120s /usr/bin/env -i
@@ -231,8 +236,12 @@ run_phase() {
   if [[ "$phase" == --prepare ]]; then
     # Sentinel preserves the required single newline, rejecting extra output.
     captured=$(head -c 66 <&"$output_fd"; printf '.')
-    [[ ${#captured} == 66 && "${captured:64}" == $'\n.' && "${captured:0:64}" =~ ^[a-f0-9]{64}$ ]] || result=1
-    recovery_manifest_sha=${captured:0:64}
+    recovery_manifest_sha=
+    if [[ ${#captured} == 66 && "${captured:64}" == $'\n.' && "${captured:0:64}" =~ ^[a-f0-9]{64}$ ]]; then
+      recovery_manifest_sha=${captured:0:64}
+    else
+      result=1
+    fi
   else
     head -c 65536 <&"$output_fd" || result=1
   fi
@@ -241,6 +250,10 @@ run_phase() {
   # Node must close/reap its tools before exiting. A dead timeout leader alone
   # does not prove group absence, and fallback must retain that uncertainty.
   clear_phase_marker || result=1
+  if [[ "$phase" == --prepare && $result != 0 ]]; then
+    # Only the complete bounded allowlisted marker is published, never raw stdout.
+    report_failure_marker "$captured" || true
+  fi
   [[ $result == 0 ]]
 }
 run_phase --prepare || fail 'prepare phase failed'

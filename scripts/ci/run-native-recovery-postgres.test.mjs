@@ -268,3 +268,118 @@ test(
     }
   },
 );
+
+test("prepare diagnostics publish only a complete allowlisted marker after child/group cleanup, never a failed pin", () => {
+  const phase = source.slice(at("run_phase() {"));
+  assert.match(source, /report_failure_marker\(\) \{/);
+  assert.match(
+    source,
+    /admission\|server-identity\|fixture\|source-access\|dump\|manifest\|offline-source\|roles-restore\|database-restore\|compare\|restored-access\|rollback/,
+  );
+  assert.match(source, /\[0-9A-Z\]\{5\}\|unavailable/);
+  assert.match(
+    source,
+    /printf 'Native recovery phase failed: stage=%s sqlState=%s\\n' "\$\{BASH_REMATCH\[1\]\}" "\$\{BASH_REMATCH\[2\]\}"/,
+  );
+  assert.match(
+    phase,
+    /recovery_manifest_sha=\s+if \[\[.*captured:0:64.*\[a-f0-9\]\{64\}.*\]\]; then\s+recovery_manifest_sha=\$\{captured:0:64\}\s+else\s+result=1/,
+  );
+  assert.ok(
+    phase.indexOf('wait "$recovery_phase_pid"') <
+      phase.indexOf('report_failure_marker "$captured"'),
+  );
+  assert.ok(
+    phase.indexOf("clear_phase_marker || result=1") <
+      phase.indexOf('report_failure_marker "$captured"'),
+  );
+  assert.match(phase, /"\$phase" == --prepare && \$result != 0/);
+  assert.doesNotMatch(phase, /printf[^\n]*"\$captured"|echo[^\n]*"\$captured"/);
+});
+
+function runFailureMarker(marker) {
+  // Execute ONLY the extracted pure parser/printf function, never the wrapper,
+  // CI admission, any PostgreSQL program, cleanup or the recovery Node runner.
+  const definition = source.slice(at("report_failure_marker() {"), at("run_phase() {"));
+  return spawnSync(
+    bash,
+    [
+      "--noprofile",
+      "--norc",
+      "-c",
+      `${definition}\nIFS= read -r -d '' marker || true\nreport_failure_marker "$marker"`,
+    ],
+    {
+      env: refusalEnvironment,
+      input: marker,
+      encoding: "utf8",
+      timeout: 5000,
+      maxBuffer: 8192,
+    },
+  );
+}
+
+test(
+  "the actual isolated Bash marker function emits bounded stage/state only for every approved stage",
+  { skip: !bash },
+  () => {
+    for (const stage of [
+      "admission",
+      "server-identity",
+      "fixture",
+      "source-access",
+      "dump",
+      "manifest",
+      "offline-source",
+      "roles-restore",
+      "database-restore",
+      "compare",
+      "restored-access",
+      "rollback",
+    ]) {
+      for (const state of ["42501", "unavailable"]) {
+        const result = runFailureMarker(`FAIL:${stage}:${state}\n.`);
+        assert.equal(result.error, undefined);
+        assert.equal(result.status, 0);
+        assert.equal(result.stdout, "");
+        assert.equal(
+          result.stderr,
+          `Native recovery phase failed: stage=${stage} sqlState=${state}\n`,
+        );
+        assert.ok(result.stderr.length <= 100);
+      }
+    }
+  },
+);
+
+test(
+  "the actual marker function refuses raw data, extra output, wrong terminators, injected fields and success hashes",
+  { skip: !bash },
+  () => {
+    for (const marker of [
+      "",
+      "PRIVATE SQL detail",
+      "FAIL:PRIVATE-STAGE:42501\n.",
+      "FAIL:fixture:p0001\n.",
+      "FAIL:fixture:4250\n.",
+      "FAIL:fixture:425010\n.",
+      "FAIL:fixture:Unavailable\n.",
+      "FAIL:fixture:42501.",
+      "FAIL:fixture:42501\n",
+      "FAIL:fixture:42501\r\n.",
+      "FAIL:fixture:42501\n\n.",
+      "FAIL:fixture:42501\n..",
+      "FAIL:fixture:42501\n.EXTRA",
+      "FAIL:fixture:42501:PRIVATE\n.",
+      "FAIL:fixture:42501\nPRIVATE\n.",
+      "FAIL:$(echo PRIVATE):42501\n.",
+      `${"a".repeat(64)}\n.`,
+    ]) {
+      const result = runFailureMarker(marker);
+      assert.equal(result.error, undefined);
+      assert.equal(result.status, 1);
+      assert.equal(result.stdout, "");
+      assert.equal(result.stderr, "");
+    }
+  },
+);

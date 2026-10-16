@@ -26,6 +26,7 @@ import {
   clientOptions,
   artifactCommand,
   safeFailure,
+  failureMarker,
   parseManifest,
   verifyArtifacts,
   readPrivateFile,
@@ -290,7 +291,7 @@ test("CLI refuses bad phase/extra args/non-CI before native child admission, wit
     });
     assert.equal(result.error, undefined);
     assert.equal(result.status, 1);
-    assert.equal(result.stdout, "");
+    assert.equal(result.stdout, "FAIL:admission:unavailable\n");
     assert.match(result.stderr, /Synthetic PostgreSQL17 recovery failed \(stage=admission/);
     assert.doesNotMatch(
       result.stderr,
@@ -660,6 +661,45 @@ test("failure output is static generic stage and allowlisted SQLSTATE, never mes
   );
 });
 
+test("short failure marker is bounded fixed vocabulary and cannot carry driver details or masquerade as a digest", () => {
+  for (const stage of [
+    "admission",
+    "server-identity",
+    "fixture",
+    "source-access",
+    "dump",
+    "manifest",
+    "offline-source",
+    "roles-restore",
+    "database-restore",
+    "compare",
+    "restored-access",
+    "rollback",
+  ]) {
+    const marker = failureMarker(stage, {
+      sqlState: "42501",
+      message: "PRIVATE SQL",
+      stack: "PRIVATE",
+    });
+    assert.equal(marker, `FAIL:${stage}:42501\n`);
+    assert.ok(Buffer.byteLength(marker) < 66);
+    assert.doesNotMatch(marker, /PRIVATE|^[a-f0-9]{64}\n$/);
+  }
+  for (const sqlState of [
+    undefined,
+    "",
+    "PRIVATE",
+    "42501\nPRIVATE",
+    "42501 PRIVATE",
+    "aaaaa",
+    42501,
+  ]) {
+    assert.equal(failureMarker("PRIVATE", { sqlState }), "FAIL:admission:unavailable\n");
+  }
+  assert.match(source, /process\.stdout\.write\(failureMarker\(stage, error\)\)/);
+  assert.match(source, /process\.exitCode = 1/);
+});
+
 test("fixture and comparison pin genuine constraints/ACL/FORCE RLS and lossless decimal/sequence catalog evidence", () => {
   assert.match(FIXTURE_SQL, /GENERATED ALWAYS AS IDENTITY/);
   assert.match(FIXTURE_SQL, /REFERENCES recovery_fixture\.tenants/);
@@ -685,6 +725,16 @@ test("fixture and comparison pin genuine constraints/ACL/FORCE RLS and lossless 
   ])
     assert.ok(SNAPSHOT_SQL.includes(term));
   assert.equal(FIXTURE_FINGERPRINT, hash(FIXTURE_SQL + SNAPSHOT_SQL));
+});
+
+test("role snapshot reads real password-null and role settings from their distinct PostgreSQL17 catalogs", () => {
+  assert.match(SNAPSHOT_SQL, /'passwordIsNull',rolpassword IS NULL/);
+  assert.match(SNAPSHOT_SQL, /FROM pg_authid WHERE rolname/);
+  assert.match(
+    SNAPSHOT_SQL,
+    /SELECT setconfig FROM pg_db_role_setting WHERE setrole=pg_authid\.oid AND setdatabase=0/,
+  );
+  assert.doesNotMatch(SNAPSHOT_SQL, /\brolconfig\b/);
 });
 
 test("source orders admission, external-pin/artifact verification, offline identity, restore and actual role probes", () => {

@@ -113,7 +113,8 @@ export const SNAPSHOT_SQL = `SELECT jsonb_build_object(
    FROM pg_policy p JOIN pg_class c ON c.oid=p.polrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='recovery_fixture'),
  'roles',(SELECT jsonb_agg(jsonb_build_object('name',rolname,'super',rolsuper,'inherit',rolinherit,'createRole',rolcreaterole,
    'createDb',rolcreatedb,'login',rolcanlogin,'replication',rolreplication,'bypass',rolbypassrls,'limit',rolconnlimit,
-   'validUntil',rolvaliduntil::text,'config',rolconfig,'passwordIsNull',rolpassword IS NULL) ORDER BY rolname)
+   'validUntil',rolvaliduntil::text,'config',(SELECT setconfig FROM pg_db_role_setting WHERE setrole=pg_authid.oid AND setdatabase=0),
+   'passwordIsNull',rolpassword IS NULL) ORDER BY rolname)
    FROM pg_authid WHERE rolname IN ('postgres','${OWNER}','${READERS[0]}','${READERS[1]}')),
  'memberships',(SELECT coalesce(jsonb_agg(jsonb_build_object('role',pg_get_userbyid(roleid),'member',pg_get_userbyid(member),
    'grantor',pg_get_userbyid(grantor),'admin',admin_option,'inherit',inherit_option,'set',set_option)
@@ -127,8 +128,22 @@ export const FIXTURE_FINGERPRINT = sha(FIXTURE_SQL + SNAPSHOT_SQL);
 
 export function safeFailure(value, error) {
   const name = stages.has(value) ? value : "admission";
-  const sqlState = /^[0-9A-Z]{5}$/.test(error?.sqlState ?? "") ? error.sqlState : "unavailable";
+  const sqlState =
+    typeof error?.sqlState === "string" && /^[0-9A-Z]{5}$/.test(error.sqlState)
+      ? error.sqlState
+      : "unavailable";
   return `Synthetic PostgreSQL17 recovery failed (stage=${name}, sqlState=${sqlState}); no release or production recovery is inferred.\n`;
+}
+
+// A short fixed-vocabulary failure record fits the shell's strict 66-byte
+// prepare capture. It never contains driver messages, SQL, paths or artifacts.
+export function failureMarker(value, error) {
+  const name = stages.has(value) ? value : "admission";
+  const sqlState =
+    typeof error?.sqlState === "string" && /^[0-9A-Z]{5}$/.test(error.sqlState)
+      ? error.sqlState
+      : "unavailable";
+  return `FAIL:${name}:${sqlState}\n`;
 }
 
 export function validateContext(env, platform) {
@@ -901,6 +916,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         `PASS synthetic PG17 recovery: data/catalog/ACL/RLS/sequence and late restore rollback; dumpMs=${result.dumpMs}, restoreMs=${result.restoreMs}, verifyMs=${result.verifyMs}. NOT whole baseline, Auth/API/private Storage/credential recovery or production RTO.\n`,
       );
   } catch (error) {
+    process.stdout.write(failureMarker(stage, error));
     process.stderr.write(safeFailure(stage, error));
     process.exitCode = 1;
   } finally {
