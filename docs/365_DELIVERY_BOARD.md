@@ -24,9 +24,12 @@ mandatory; timeouts, cleanup, role denials and Parts coverage are unchanged.
 Root serial75/75 in35.5518278s plus retained draft36/36 in11.6102602s pass, zero
 fail/skip/cancel; lint/syntax/format/diff/independent review pass. Actual new native
 21-marker execution and own-head required checks remain pending, not inherited.
-Publication waits for parentcaa1e4c4 unit completion, no docs-only cancellation.
-Same draft PR68, commit subject `Order private receipt expense Auth-user lock
-before business writes`; exact commit recorded in its publication comment.
+Source78e5fdfe62ffbc3c877351b1a6523a0a7c8836c0 is committed after local validation.
+Parentcaa1e4c4 completed all six Actions before publication; actual unit117142431397
+reports5,032/96 files101.60s, zero unexpected/quarantined failures (returned log
+truncated/final summaries). No cancellation/inherited new-head pass. Same draft
+PR68, commit subject `Order private receipt expense Auth-user lock before
+business writes`; exact publication recorded in its evidence comment.
 No app activation/live change/main promotion/deployment.
 [Exact implementation and limits](evidence/AUTH_USER_EXPENSE_LOCK_ORDER.md).
 
@@ -44,7 +47,8 @@ alternative succeeded, no build/native action failure or new stopped action.
 Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified canonical branch/same
 draft PR68/comment6222580829, exact prior64,364-character body/title/base/draft/
 main70ab892a… preserved. Own38951117451 build117142431562/OCR/type/lint/native pass;
-unit117142431397 is running, not inherited/accepted/cancelled. Actual native
+unit117142431397 now passes:5,032/96 files101.60s, zero unexpected/quarantined
+failures (truncated log/final summaries), all six Actions complete. Actual native
 117142431134 log is untruncated PG17.11/Parts247/all18 ordered selected expense/
 draft proofs/terminators/EXIT+always cleanup;47 failures retained, bounded
 57/59/157ms recovery not full/RTO. Preview117142433032 actually config-skips/no
@@ -53,7 +57,7 @@ fails, fresh cause unverified; hosting stop unchanged, no diagnostics/redispatch
 Existing automation updated/read back same identity/active30min/thread/creation,
 exact new source/limits/next dependency, no duplicate. These follow-up notes join
 next integrated source without cancelling this unit via a docs-only push. Next
-read actual completed current-head unit; no unchanged24/1231/121 reruns. Actual
+unit publication hold cleared without cancellation; no unchanged24/1231/121 reruns. Actual
 build log is truncated but final214 tracked assets/Worker motorsales365/canonical
 365/15OCR/202PDF/server-boundary/dry-run markers exist. Fetched COMPLETE CI merge
 14a1878c3ecd0f7d01569a476b1668f3172d30bb equals candidate whole current tree

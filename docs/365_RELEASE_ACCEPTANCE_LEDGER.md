@@ -18,8 +18,10 @@ replay and graph/Auth equality with existing FKs. All18 prior markers plus three
 new markers remain mandatory; cleanup/timeouts/adversarial coverage preserved.
 Root75/75 in35.5518278s and retained draft36/36 in11.6102602s pass, zero fail/skip/
 cancel; lint/syntax/format/diff/independent review clear. New native21-marker/
-required own-head CI pending, not inherited. Parentcaa unit completion required
-before source push; same PR68/commit subject `Order private receipt expense
+required own-head CI pending, not inherited. Source78e5fdfe62ffbc3c877351b1a6523a0a7c8836c0
+committed; parentcaa all six Actions finish before publication, actual unit5,032/
+96 files101.60s, zero unexpected/quarantined failures (truncated/final summaries).
+No cancellation; same PR68/commit subject `Order private receipt expense
 Auth-user lock before business writes`, exact commit in publication comment.
 No native-human/session/non-key update/role/tenant/global-writer/API/private-object/
 full recovery acceptance. Next fresh native result then strict transaction
@@ -31,8 +33,9 @@ owner/device/main/live gates and22 October risk remain.
 
 Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified same draft PR68/
 comment6222580829; prior full body/title/base/main preserved. Own38951117451
-Build117142431562/OCR/type/lint/native pass, unit117142431397 running separately,
-not accepted/inherited/cancelled. Actual native117142431134 untruncated PG17.11/
+All six Actions pass, actual unit117142431397:5,032/96 files101.60s, zero unexpected/
+quarantined failures (truncated/final summaries), not inherited/cancelled.
+Actual native117142431134 untruncated PG17.11/
 Parts247/all18 ordered selected proofs/cleanup,47 failures retained; bounded
 57/59/157ms not full/RTO. Preview actually config-skips/no upload; production/
 migration/Supabase Preview skip. Workers0eb20ff8 fails fresh cause unknown,
@@ -40,8 +43,8 @@ hosting stop unchanged. Existing automation source checkpoint updated/readback,
 same ID/settings/thread/creation. Notes join next implementation without docs-only
 restart; actual build final214/Worker/backend/OCR/PDF/server/dry-run guards exist
 (truncated); COMPLETE merge14a1878c… equals current candidate tree8c0a4920…,
-2,586 current objects/zero missing, not history recovery. Next completed own-head
-unit result, no unchanged24/1231/121 rerun or native/preview log reread.
+2,586 current objects/zero missing, not history recovery. Publication hold cleared;
+no unchanged24/1231/121 rerun or native/preview log reread.
 
 Independent N3 proposed365-side request/offer contract is implemented only:
 fixed v1, distinct references, required expected store/order/leg consistency,

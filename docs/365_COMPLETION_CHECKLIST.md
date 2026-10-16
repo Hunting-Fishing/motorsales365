@@ -49,8 +49,10 @@ Four new synthetic native deletion scenarios preserve existing FKs; strict CI
 transcript requires all18 old plus three new markers and unchanged cleanup/limits.
 Root75/75 in35.5518278s plus retained draft36/36 in11.6102602s pass; lint/syntax/
 format/diff/independent review clear. Actual new native21-marker execution and
-own-head required checks pending. Parentcaa unit must finish before source push;
-no docs-only restart. Same PR68/commit subject `Order private receipt expense
+own-head required checks pending. Source78e5fdfe62ffbc3c877351b1a6523a0a7c8836c0
+committed; parentcaa all six Actions finish before publication, actual unit5,032/
+96 files101.60s, zero unexpected/quarantined failures (truncated/final summaries).
+No cancellation/docs-only restart. Same PR68/commit subject `Order private receipt expense
 Auth-user lock before business writes`; exact commit in publication comment.
 Next fresh native result, then strict original-human/session/native authority,
 compatible all writers and durable reconciliation. Not non-key changes/session/
@@ -62,8 +64,9 @@ grant/main/Buddy/366 change; all scope,47/12/5/2, stops and deadline risk retain
 
 Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified same canonical branch/
 draft PR68/comment6222580829, exact prior body/title/base/main preserved. Own
-38951117451 build117142431562/OCR/type/lint/native pass; unit117142431397 running,
-not inherited/accepted/cancelled. Actual native117142431134 untruncated PG17.11/
+38951117451 all six Actions pass; actual unit117142431397 reports5,032/96 files
+101.60s, zero unexpected/quarantined failures (truncated/final summaries), not
+inherited/cancelled. Actual native117142431134 untruncated PG17.11/
 Parts247/all18 ordered selected proofs/cleanup pass,47 failures retained,
 bounded57/59/157ms not full/RTO. Preview config skip/no upload, production/
 migration/Supabase Preview skip; Workers0eb20ff8 fails cause unknown, stop unchanged.
@@ -71,8 +74,8 @@ Existing follow-up exact source checkpoint updated/readback, identity/settings/
 thread/creation preserved. Notes join next integrated slice, not docs-only unit
 cancellation. Actual build final214/Worker/backend/OCR/PDF/server/dry-run guards
 present (truncated log); COMPLETE CI merge14a1878c… equals candidate tree8c0a4920…,
-current2,586 objects/zero missing, not history recovery. Next completed own-head
-unit results, no unchanged24/1231/121 or native/preview log reread.
+current2,586 objects/zero missing, not history recovery. Publication hold cleared;
+no unchanged24/1231/121 or native/preview log reread.
 
 Independent N3 proposed365-side request/offer codec is implemented: strict v1/
 namespaced refs/calendar/sequence, required independent expected store/order/leg,

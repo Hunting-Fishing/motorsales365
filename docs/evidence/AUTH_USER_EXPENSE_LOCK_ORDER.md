@@ -6,6 +6,10 @@ Private/unapplied deletion and foreign-key ordering only, not session, native-sh
 authority, connected CRM behavior or release acceptance. Commit subject:
 `Order private receipt expense Auth-user lock before business writes`; its
 publication comment records the exact commit and fresh-head checks.
+Source commit:78e5fdfe62ffbc3c877351b1a6523a0a7c8836c0. Parentcaa1e4c4 completed
+all six Actions before publication: actual unit117142431397 reports5,032/96 files
+101.60s, zero unexpected/quarantined failures (truncated log/final summaries).
+No running unit cancellation or inherited new-head/native21 result.
 
 ## Implemented boundary
 
