@@ -1,5 +1,29 @@
 # Native Customer 360: first delivery slice
 
+Latest checkpoint,16 October, source `7804bd98`: retained receipt-expense/journal composition
+is implemented as a source-pinned memory-only fixture, same candidate/draft
+PR #68. Local12/12 plus CI-wiring14/14 (8.842s), syntax/format/full changed-file
+ESLint and independent review pass. Selected native constraints/attachments and
+genuine late-FK rollback are retained, not a rewritten financial/native authority
+model. No app writer/migration/grant/live change/deployment. Exact source,
+publication/new-head CI and limitations: `evidence/EXPENSE_POSTING_SOURCE_REHEARSAL.md`.
+
+Expense-read publication `ef1cb798` passes all six Actions gates. Completed Linux
+unit116945850260/run38892723856 confirms4,696/4,696 across92 files (61.59s), zero
+unexpected/quarantined failures (overall log truncated, final summaries present).
+Native Parts247/quote/bounded restore/ACL/RLS/sequence/late-failure rollback/
+cleanup pass;47 replay failures remain. Preview confirms config skip/no upload;
+migrations/production/Supabase Preview skip; newest independent Workers failure
+cause unverified. No current API/native-role/private-original/owner/live acceptance.
+
+Next: unconnected locked atomic exact-money expense/journal command and durable
+payload-bound operation receipt, with legacy conflicts, zero/Cash/AP/tax/reversal,
+current-catalog/native authority and retry/recovery closure before connection.
+Continue other independent scope while real-stack/QA/pilot gates remain open;
+do not repeat completed readers or infer posting from transport acknowledgment.
+Earlier pending-publication/next-read entries below retain history and are
+superseded by this checkpoint.
+
 Expense page read support is implemented at `1953f580`, same candidate/draft PR
 #68. Bound100-row windows, strict native DTOs, exact-query freshness, independent
 errors/retries and amount/tax presentation replace global queries, false empty

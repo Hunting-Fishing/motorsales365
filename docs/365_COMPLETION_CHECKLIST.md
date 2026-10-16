@@ -16,6 +16,39 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest checkpoint, source `7804bd98`: retained expense-to-journal composition is implemented
+as a pinned, memory-only fixture on the same integrated candidate/draft PR #68.
+Seven whole LF source pins/22 unchanged selections preserve the actual selected
+constraints, posting and binding attachments. Local12/12 (12.218s), then14/14
+including CI-wiring guards (8.842s), syntax/format/full changed-file ESLint and
+independent review pass. The new explicit single-worker CI step is never
+quarantined; all six jobs/native PG17/Parts/quote/recovery/timeouts are retained.
+No application writer, SQL migration, grant, live data or deployment changes.
+This characterizes rounding/conflict/zero/NaN/Cash/AP and actual late-FK rollback,
+not a corrected financial command, current catalog or native authority proof.
+Exact source/publication and new-head CI are recorded in
+`evidence/EXPENSE_POSTING_SOURCE_REHEARSAL.md`.
+
+Expense-read publication `ef1cb798` is verified on the canonical remote/same PR.
+All six Actions gates pass; completed unit116945850260/run38892723856 confirms
+application4,696/4,696 across92 files (61.59s), zero unexpected/quarantined
+failures (overall log truncated, final summaries present). Native116945850239
+passes Parts247/six quote groups and bounded synthetic restore/ACL/RLS/sequence/
+late-failure rollback/cleanup; tiny67/86/206ms is not production RTO. The47
+replay failures remain. Preview116945850534 confirms config skip/no upload;
+migrations/production/Supabase Preview skip. Workers7522b11b-0909-430e-bc7f-50cbb5b32c36
+fails with fresh cause unverified. This is not new fixture-head CI proof.
+
+Next: an unconnected locked expense/journal command with payload-bound durable
+operation receipts, exact-money/conflict/late-failure/retry/recovery tests and
+explicit native-authority/current-catalog/financial-policy gates before connection.
+Do not repeat completed read/fixture/recovery work, invent an expense URL guard
+or shop-fill attachment, overwrite a legacy conflict, or equate a UUID with
+posting. Whole baseline/47 replay failures, safe101+ review/edit, private originals,
+pilot/owner/live release acceptance remain open. Target22 October and17 October
+feasibility review unchanged. Earlier checkpoint entries below retain history;
+their pending-publication/next-read statements are superseded by this checkpoint.
+
 Expense read support is implemented at `1953f580`, same integrated branch/draft
 PR #68. Account/observed-shop-bound100-row expense/category/vehicle windows,
 strict native DATE/amount/DTO checks, independent retries and exact-query UI

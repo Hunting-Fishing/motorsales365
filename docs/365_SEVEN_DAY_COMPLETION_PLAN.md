@@ -1,5 +1,29 @@
 # 365 Seven Day Completion Plan
 
+Latest checkpoint,16 October, source `7804bd98`: the retained expense/journal graph is composed in
+a memory-only source-pinned fixture, same integrated candidate/draft PR #68.
+Local12/12 and CI-wiring14/14 (8.842s), syntax/format/full changed-file ESLint and
+independent review pass; actual selected constraints/trigger failures remain,
+with synthetic authority/current-policy limitations explicit. All six jobs and
+native PG17/Parts/quote/recovery coverage/timeouts are retained. No application
+writer, migration, live change or deployment. Source/publication/new-head CI:
+`evidence/EXPENSE_POSTING_SOURCE_REHEARSAL.md`. This is not an accepted writer.
+
+Expense-read publication `ef1cb798` now passes all six Actions gates, including
+actual Linux application4,696/4,696 across92 files (61.59s), zero unexpected/
+quarantined failures; overall log truncated, final summaries present. Bounded
+native restore/rollback/cleanup passes,47 replay failures remain. Preview config
+skip/no upload; migrations/production/Supabase Preview skip; newest independent
+Workers failure cause unverified. No release/owner/live acceptance transfers.
+
+Next critical dependency: unconnected locked atomic expense/journal posting with
+payload-bound durable outcomes; exact-money/conflict/retry/recovery tests and
+current catalog/native authority/financial-policy closure before connection.
+Whole baseline/private originals/API/Auth, safe101+ review/edit and pilot/owner/
+release gaps still threaten22 October; retain the17 October feasibility review,
+no deadline guarantee or silent scope cut. Older checkpoint pending/next-read
+statements below are historical, superseded by this checkpoint.
+
 Expense read source `1953f580` continues the integrated candidate/PR #68:
 account/shop-bound windows and private lifetimes, explicit unknown-binding/error
 states, received amount/tax presentation and no false capped MTD total. Related

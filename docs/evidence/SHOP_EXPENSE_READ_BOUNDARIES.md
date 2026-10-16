@@ -5,6 +5,27 @@ integrated candidate and draft PR #68. Publication/exact new-head CI remain
 pending below; the prior published
 `4af1d906` result does not transfer to new source.
 
+Latest publication checkpoint: expense-read evidence head
+`ef1cb798151106ae963c3f251d04f95550774dad` is verified on canonical remote/same
+draft PR68. All six Actions gates pass at this head. Completed unit116945850260,
+run38892723856, confirms4,696/4,696 across92 files (61.59s), zero unexpected/
+quarantined failures; overall log truncated with final summaries/checker output
+present. Native116945850239 passes Parts247/six quote groups and bounded
+synthetic restore/ACL/RLS/sequence/late-failure rollback/cleanup, tiny67/86/206ms
+not production RTO;47 replay failures remain. Preview116945850534 confirms
+config skip/no upload; migrations/production/Supabase Preview skip. Workers
+7522b11b-0909-430e-bc7f-50cbb5b32c36 fails, fresh cause unverified. No deployment.
+The pending-publication statements below retain their historical source-capture
+context and are superseded by this checkpoint.
+
+Next source dependency is now implemented at7804bd98: the retained expense/
+journal graph is composed without rewriting native constraints/attachments,
+local12/12 plus CI guards14/14. This is memory-only characterization, not a
+fixed/current/authoritative writer. New-head CI remains required. See
+`EXPENSE_POSTING_SOURCE_REHEARSAL.md` for exact provenance/limitations; continue
+the unconnected atomic command/durable outcome dependency, not repeat this
+fixture or the completed read integration.
+
 ## Connected reader and native compatibility
 
 The existing expense route had account-independent query keys, unbounded
