@@ -1,5 +1,12 @@
 # 365 Seven Day Completion Plan
 
+Latest R3 diagnostic source `176732c6`: second actual Linux run still fails
+identity admission before fixture/dump/restore, with Parts247/quote/cleanup pass.
+All conditions are retained; finer fixed checkpoints plus offline98/98/review/
+syntax/format/diff/lint pass. Next is actual checkpoint execution, not a bypass
+or completed recovery gate. Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+The target and 17 October feasibility review are unchanged.
+
 16 October recovery update: initial Linux synthetic prepare at published
 `c08c25c8` fails, while retained Parts247/six quote groups and cleanup pass.
 Repair source `3393d29a` corrects the role-settings catalog and adds bounded fixed

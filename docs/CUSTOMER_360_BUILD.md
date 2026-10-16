@@ -1,5 +1,12 @@
 # Native Customer 360: first delivery slice
 
+Latest R3 diagnostic source `176732c6` retains every identity/pristine condition
+after `e4b316b0` still refuses before fixture/dump/restore. Final offline98/98,
+review/syntax/format/diff/lint pass; new actual Linux checkpoint execution is
+required, not recovery acceptance. Parts247/six quote groups/cleanup still pass.
+Continue real-stack/private-byte prerequisites and separate C1.08 viewing after
+this gate; no partial-row writer is unlocked. Evidence below remains current.
+
 16 October R3 shared dependency: first actual Linux synthetic recovery attempt
 at published `c08c25c8` fails prepare, with retained Parts247/quote six groups and
 cleanup passing. No restore success. Repair source `3393d29a` corrects a definite

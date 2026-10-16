@@ -41,6 +41,14 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+Latest R3 diagnostic source `176732c6` adds fixed identity-field/pristine-inventory
+checkpoints without relaxing any condition. Actual `e4b316b0` run fails before
+fixture/dump/restore at `server-identity/unavailable`; Parts247/quote six groups/
+cleanup pass, not recovery. Final offline98/98 (2,796.64ms), syntax/format/diff/
+independent review and changed-line lint zero findings pass. Next exact-head
+native run must locate the refusal; R3 stays blocked, no release or live change.
+Details: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 R3 initial source `c25f79f3`/published `c08c25c8` fails actual Linux synthetic
 prepare in job `116896620628`; Parts247/six quote groups/stops and recovery
 cleanup pass, not restore. Definite role-settings catalog defect is independently

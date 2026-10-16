@@ -16,6 +16,15 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest R3 diagnostic source `176732c6` preserves all admission conditions and
+adds fixed identity-field/pristine-inventory checkpoints. The second Linux run
+at `e4b316b0` still refuses `server-identity/unavailable` before any fixture/dump/
+restore; Parts247/six quote groups/stops and cleanup pass, not recovery. Final
+offline98/98 (2,796.64ms), syntax/format/diff/review and changed-line lint zero
+findings pass. New exact-head native execution must locate the remaining refusal;
+do not bypass identity or infer that the catalog fix solved the first failure.
+Evidence/next dependencies: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
 R3 initial source `c25f79f3`/published `c08c25c8` is on the same draft PR #68.
 Actual Linux job `116896620628` fails during synthetic recovery prepare; Parts247
 and all six quote groups/stops pass and recovery cleanup completes. No restore

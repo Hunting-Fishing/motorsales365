@@ -2,6 +2,7 @@
 
 Updated 16 October 2026. Initial source `c25f79f3217565901d0359835b5246a543ebd7cd`;
 repair source `3393d29adb0d313d8d009fecbb628ee4eedd32d1`;
+diagnostic checkpoint source `176732c691ff7630ccc4cdaa2aa5b8494c868892`;
 same integrated candidate and draft PR #68; no hosted
 project, application migration, live operation or deployment is part of this
 slice. Source/publication and execution results are recorded below when verified.
@@ -152,6 +153,40 @@ At the last `c08c25c8` check, build/typecheck/lint/browser OCR pass and unit
 configuration skip without application upload; migrations/production/Supabase
 Preview skip. Independent Workers build `cadc5a53-e04a-416f-9f88-9f7dca03009a`
 fails with ID/link only; no fresh cause is inferred from older build logs.
+
+### Second Linux attempt: identity admission still refuses
+
+Published `e4b316b05bc5799022beafb5afd892ce34b766c9` is verified on canonical
+remote and the same draft PR #68, preserving title/base/draft/prior body/main.
+Read-only 214 public copies/Worker/backend/OCR/PDF/server checks pass. Actual
+native job `116900472237` in run `38878828660` fails with the admitted fixed
+marker `stage=server-identity sqlState=unavailable`. This is before fixture
+creation, role snapshot, dump or restore, so the valid catalog correction was
+not the first observed failure. Parts247/six quote groups and scoped stops pass;
+recovery EXIT/always-cleanup complete. No recovery acceptance or timing result.
+
+The next source adds finer fixed identity-read/JSON/field and pristine-inventory
+checkpoints. Every original query and identity condition remains; the extracted
+identity validator tests each wrong/missing field, and pristine validation still
+rejects extra keys with its full exact comparison. The shell extends only the
+fixed stage allowlist; successful pin length/grammar, source-offline, restore,
+timeouts and all cleanup guards stay unchanged. No actual values are logged.
+Final combined offline **98/98**, zero failures/skips, 2,796.64ms; syntax/format/
+diff pass. This improves diagnosis only and does not claim the failing admission
+is repaired. New exact-head native execution must identify the remaining issue.
+
+Checkpoint source `176732c6` is committed; changed-line lint against `e4b316b0`
+has zero errors/warnings/retained findings across three JS files. Independent
+frozen delta review is clear. Hashes: Node
+`0aecc7460f06182d76c61de096b08f80a2249750fa69ab3f5ba6e0ef2c833b5f`, test
+`a0941f1313e7f2a0bf8eb18f1073fcbd95b87d646f05759d7594e8dbe20b2170`, shell
+`57a5e3f8c20080990d2d836aee108c2924d8135e400cc8855a39e4415b0a1d24`, shell test
+`1c3abe69f251faea10f0cb3e37e67dfe0d091f568736c3fb1c3057b8b0fe0217`.
+At the final `e4b316b0` check, build/typecheck/lint/browser OCR pass and unit
+`116900472468` is still running. Migrations/production/Supabase Preview skip;
+preview is reported success but its new log is not yet inspected. Workers build
+`7368be80-be35-4f33-87ed-4cbbc92e1ff9` fails with fresh cause unverified. No app
+build input, migration, hosting setting or live state changed in this follow-up.
 
 ## Open release gates and next dependency
 
