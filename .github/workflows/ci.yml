@@ -77,6 +77,9 @@ jobs:
           npm run test:vehicle-receipts:db
           npm run test:installed-components:db
 
+      - name: Retained expense and journal composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-posting-fixture.test.mjs
+
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 

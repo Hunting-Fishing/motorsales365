@@ -138,6 +138,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
   const steps = workflow.jobs.test.steps;
   const expected = [
     [
+      "Retained expense and journal composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-posting-fixture.test.mjs",
+    ],
+    [
       "Native invoice read lifetimes and financial acknowledgments (never quarantined)",
       "npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1",
     ],
