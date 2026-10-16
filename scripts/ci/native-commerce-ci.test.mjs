@@ -142,6 +142,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-posting-fixture.test.mjs",
     ],
     [
+      "Expense operation request and reported-posting contract (offline, never quarantined)",
+      "node --test scripts/vehicle-receipts/expense-operation-contract.test.mjs",
+    ],
+    [
       "Native invoice read lifetimes and financial acknowledgments (never quarantined)",
       "npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1",
     ],
