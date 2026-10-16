@@ -68,6 +68,29 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+16 October connected source `1a49acc5` adds an interim mixed per-item consent
+interlock without replacing editor/install/expense or existing lifetimes. All
+1,180 focused cases pass across 11 suites (24.98s), including 15 new consent
+cases and all retained panel coverage. Independent review, full TypeScript,
+changed-line lint zero new findings and fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server boundaries pass, with retained warnings. Exact
+evidence/publication: `evidence/RECEIPT_READ_CONTRACTS.md`.
+This protects observed mixed UI snapshots,
+not independent atomic sharing or direct/concurrent callers. C1.04/C1.05
+row-action safety and exact-money/durable recovery are the next dependency.
+
+16 October private receipt signing source `39a1ab1e` closes the selected reader's
+captured-account/receipt/key/URL and late-result contract. Focused 1,165/1,165,
+full TypeScript, changed-line lint/format/diff/review/CI guards pass. Parent
+`7f2fcd4c` now passes all six Actions gates, Linux application 3,431/3,431; that is
+not new-source or live acceptance. Fresh packaging/publication are recorded in
+`evidence/RECEIPT_READ_CONTRACTS.md`. Next is a bounded mixed-consent privacy
+interlock (now implemented at `1a49acc5`), then row-writer caller/acknowledgment/unknown handling. Atomic
+independent sharing, exact receipt-expense amounts/conflict reconciliation and
+durable Storage/DB recovery remain substantive gaps. These join the existing
+authority/baseline/hosting/pilot gaps in the Day 2 review on 17 October. The
+22 October target is unchanged, not guaranteed by focused test counts.
+
 16 October connected receipt source `f50aaa0d` now includes account-bound server readers,
 fixed counted pages and item completeness/edit compatibility. It preserves open
 editors and mounted uncertain-write holds while preventing replacement from a

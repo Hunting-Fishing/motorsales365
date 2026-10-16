@@ -16,7 +16,34 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
-Current connected receipt source `f50aaa0d` adds account-bound server readers, fixed DTOs,
+Mixed-consent source `1a49acc5` now refuses both receipt-level sharing operations
+when complete items have different public preferences. Disabled controls plus
+event predicates inspect the full unfiltered set; the visible notice preserves
+the temporary restriction as unfinished independent-sharing work. All 109 prior
+panel tests are unchanged and 15 regressions are appended. Final combined
+1,180/1,180 across 11 suites (24.98s), independent review and format/diff pass.
+Final full TypeScript, seven-file changed-line lint (zero new findings), fresh
+complete build/214 public copies/Worker/backend/OCR/PDF/server checks pass with
+retained warnings. Exact evidence/publication status:
+`evidence/RECEIPT_READ_CONTRACTS.md`. Direct/concurrent SQL sharing, row mutation
+caller/lifetime/acknowledgment/unknown guards, exact-money and durable recovery
+remain open. Next: C1.04/C1.05 row actions, preserving editor/install holds.
+
+Private attachment signing is implemented at `39a1ab1e` in the same integrated
+candidate/draft PR #68. It binds captured account/receipt intent, selected DB key,
+canonical URL and own successful SDK evidence, with generic errors and a bounded
+late-result wait. Signing integration 1,165/1,165 across 11 suites (34.84s), full
+TypeScript, changed-line lint (zero new findings), format/diff and independent
+review pass. Packaging/publication are recorded after completion in
+`evidence/RECEIPT_READ_CONTRACTS.md`. No migration, live write or deployment.
+Mixed per-item summary consent is now guarded above, rather than letting a
+shop-sharing toggle publish every item. Next: row-action caller/lifetime/
+acknowledgment/unknown holds and atomic exact-money/durable recovery dependencies.
+The expense RPC can coerce unscaled receipt totals into NUMERIC(14,2), and its
+existing-conflict UUID does not bind amount/shop/vehicle. This remains an explicit
+financial gap, not solved by browser rounding or accepting the UUID.
+
+Prior connected receipt source `f50aaa0d` adds account-bound server readers, fixed DTOs,
 exact visible counts, receipt/link pages of 25/100 and four-worker item reads with a
 100-line display cap. Missing attachment-access evidence fails closed. New review
 requires complete, entry-compatible draft fields and no installation/public-summary
@@ -31,6 +58,20 @@ remaining gates are in `evidence/RECEIPT_READ_CONTRACTS.md`; this is not an atom
 snapshot or trusted native authority. Next: typed writer outcomes/durable retry,
 complete-line viewing, private URL caller binding, then the shared release and
 retail/recruitment dependencies. No SQL, live write or deployment is included.
+
+Publication `7f2fcd4c` is verified on canonical remote/same attached draft PR #68/
+base/main. Final-head 214 public copies/Worker boundaries verify. Run `38859267928`
+has all six Actions gates passing. Completed unit `116837596293` confirms
+application 3,431/3,431 across 84 files (93.55s), zero unexpected/quarantined
+failures; overall log truncated, final summaries/checker present.
+Actual untruncated native `116837596063` log confirms PGDG17.11/170011, Parts247/247,
+six quote groups, both server stops/scoped cleanup and 47 retained replay failures,
+not full baseline/API/restore proof. Wrapper `38859263186` preview is a confirmed
+configuration skip without upload; migrations/production/Supabase Preview skip.
+Workers build `b72864b7-42c9-44af-81f1-a9c50563c853` fails, fresh cause unverified.
+Follow-up notes join the next source slice; no docs-only CI restart. The private
+URL contract is now implemented above. New source needs exact-head checks;
+no release gate, approval or scope reduction follows from parent green.
 
 Owner directive, 2026-10-16: **no Docker**. Do not install/start/use Docker, pull
 images or ask the owner to open Docker Desktop. Continue Docker-free work and

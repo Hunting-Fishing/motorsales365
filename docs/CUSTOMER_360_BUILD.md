@@ -1,5 +1,26 @@
 # Native Customer 360: first delivery slice
 
+Mixed-consent source `1a49acc5` (16 October) adds a temporary receipt-level sharing
+interlock while preserving individual public choices. Both disabled and event
+guards use the full returned items, including category-filtered-out lines. Final
+combined 1,180/1,180 across 11 suites (24.98s), with 15 new cases and all 109 prior
+panel tests unchanged; independent review/format/diff pass. Full TypeScript,
+changed-line lint zero new findings and fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server boundaries pass, with retained warnings. Exact
+evidence/publication: `evidence/RECEIPT_READ_CONTRACTS.md`. Independent atomic sharing and
+direct/concurrent caller safety remain open, not removed from scope. Next:
+expense/discard row-action safety, exact-money and durable recovery.
+
+Private receipt signing follow-up `39a1ab1e` (16 October): captured account/receipt
+intent, fixed DB-key/canonical URL evidence, generic errors and bounded late-result
+discard are integrated without SQL or live changes. Focused 1,165/1,165 across 11
+suites, full TypeScript and changed-line lint/review/format/CI guards pass;
+packaging/publication are recorded in `evidence/RECEIPT_READ_CONTRACTS.md`.
+Signed URL expiry/revocation and real private-object acceptance remain unverified.
+Next is preservation of mixed per-item consent, then row-action caller/lifetime/
+acknowledgment and atomic exact-money/durable recovery. A success-looking expense
+UUID is not financial reconciliation, and the two existing numeric scales differ.
+
 Latest connected receipt source `f50aaa0d` (16 October): expected-account-bound
 server reads, fixed counted receipt/link pages, complete-item evidence and safe
 new-editor eligibility are integrated with the existing panel. Open editor,

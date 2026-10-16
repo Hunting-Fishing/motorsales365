@@ -41,11 +41,40 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
-Current source: receipt server DTO/caller/pages `f50aaa0d`, final focused 966/966,
+Integrated source `1a49acc5` adds a temporary mixed-consent sharing interlock on
+top of `39a1ab1e`. Final combined 1,180/1,180 across 11 suites (24.98s), including
+all 109 retained panel tests plus 15 new cases; independent review/format/diff
+pass. Final full TypeScript, changed-line lint zero new findings and fresh complete
+build/214 public copies/Worker/backend/OCR/PDF/server boundaries pass with retained
+warnings. Exact evidence/publication: `evidence/RECEIPT_READ_CONTRACTS.md`.
+C1.03 independent atomic sharing remains
+unfinished; C1.04/C1.05 caller/acknowledgment/unknown and exact-money/durable
+recovery are next. No new isolated/owner/live acceptance, SQL or live change.
+Signing source `39a1ab1e`: captured-account private receipt URL reader and opener,
+fixed DB-key/canonical URL validation, generic failure and bounded late-result
+discard. Focused integration 1,165/1,165 (11 suites, 34.84s), full TypeScript,
+changed-line lint zero new findings, format/diff/review and CI wiring guards pass.
+Packaging/publication: `evidence/RECEIPT_READ_CONTRACTS.md`. No SQL/live/release
+change, no new isolated/owner/live acceptance. Next connected privacy dependency
+is mixed per-item sharing consent; row-action acknowledgment/lifetime/unknown
+holds and durable exact-money/Storage recovery remain separate.
+Prior read source: receipt server DTO/caller/pages `f50aaa0d`, final focused 966/966,
 full TypeScript, changed-line lint/review/CI guards and fresh complete build/214
 public copies/Worker/backend/OCR/PDF/server boundaries pass with existing warnings.
 Publication and
 limitations are in `evidence/RECEIPT_READ_CONTRACTS.md`; no SQL/live/release change.
+Publication `7f2fcd4c` is verified on canonical remote/same attached draft PR #68/
+base/main; final 214 assets/Worker checks pass. Run `38859267928` build/typecheck/lint/
+OCR/native Parts pass; completed unit `116837596293` confirms 3,431/3,431 across
+84 files (93.55s), zero unexpected/quarantined failures. Overall unit log is
+truncated, final summaries/checker present. Completed
+untruncated native `116837596063` confirms PG17.11/170011, Parts247/247, six quote
+groups/stops/scoped cleanup and 47 retained replay failures, not whole baseline/
+API/private-storage/restore proof. Wrapper `38859263186` preview confirmed skip is
+not upload; migrations/production/Supabase Preview skip. Workers build
+`b72864b7-42c9-44af-81f1-a9c50563c853` fails with ID/link only, fresh cause unverified. These
+follow-up notes stay local for next source integration, no docs-only CI restart.
+Parent six-gate acceptance does not accept new source; no live acceptance.
 Previous published slices: receipt reads `eb90d15c` and retail assignment `bd5e4b04`.
 Receipt panel101/101; lead handler106/route45; final combined703/703 across eight
 suites (35.65s), seven-file changed-line lint zero new errors/warnings (23 older
@@ -230,6 +259,14 @@ route is not evidence that the changed candidate has passed those gates.
 
 ## Workflow ledger
 
+C1 signing source `39a1ab1e` adds captured caller/receipt/path/URL binding
+and bounded late-result privacy; 1,165 focused tests pass. It requests a 300-second
+TTL, not verified expiry or immediate revocation. The next mixed-consent interlock
+is interim source safety, not independent atomic sharing. Expense UUID transport
+acknowledgment does not prove posting: unscaled receipt totals can coerce into
+NUMERIC(14,2), and existing-conflict results do not check amount/shop/vehicle.
+Keep exact-money/conflict, durable retry and Storage/DB discard recovery open.
+
 Current C1 source `f50aaa0d` adds expected-account denial, exact visible
 counted pages, parent/target DTO checks and strict per-receipt attachment evidence.
 Partial item sets and editor-incompatible metadata cannot open the replacement
@@ -286,6 +323,30 @@ bounded agents were available for this reconciliation run with non-overlapping
 ownership and no branch changes; capacity must be checked again when needed.
 Do not promise parallel throughput or continuous execution
 between scheduled turns.
+
+## Receipt action inventory
+
+Bounded C1 source audit on 16 October. These rows add detail to C1, not new scope
+or a complete application inventory. All remain isolated-role/API/private-object
+unverified, owner pending and live unverified. Source tests use synthetic SDK
+responses and a real QueryClient, not real Auth/storage/financial transactions.
+
+| ID    | Existing action                                | Current source evidence and exact remaining closure                                                                                                                                                                                                                                 |
+| ----- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1.01 | Phone image/PDF/manual review                  | Existing OCR and manual editor with preflight and mounted holds. Actual phone/PDF corrections, controlled provider/local OCR recovery, totals/date/currency and original-byte custody remain required.                                                                              |
+| C1.02 | Receipt/shop-link pages and private attachment | `f50aaa0d` counted DTOs; `39a1ab1e` caller/key/URL binding and late-result discard. Actual roles/objects/expiry, retained key compatibility and byte/HTTP bounds remain unverified.                                                                                                 |
+| C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                    |
+| C1.04 | Record shop expense                            | UUID payload currently ignored by UI. Require current-caller/lifetime and typed acknowledgment/unknown holds, then exact NUMERIC precision, existing amount/shop/vehicle conflict validation, durable posting/reconciliation and real-role transactions. No JS rounding substitute. |
+| C1.05 | Discard draft and attachment                   | Existing separate Storage removal then DB discard can partially complete. Require caller/acknowledgment/unknown handling and durable recoverable object/row coordination; operation reordering alone is not rollback.                                                               |
+| C1.06 | Record installation                            | Purchase never implies installation. Installation dialog still needs caller/lifetime/acknowledgment/unknown guards, exact receipt/item/vehicle binding, correction/removal/history consent and real-role acceptance.                                                                |
+| C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                               |
+| C1.08 | View/review receipts over 100 lines            | Current partial display is explicit and cannot replace the full item set. Complete-line viewing and a safe edit contract remain unfinished; the display cap does not remove these receipts from scope.                                                                              |
+
+The C1.03 mixed-consent UI interlock is implemented at `1a49acc5`; it cannot solve
+direct/concurrent SQL sharing. Next bounded source action is C1.04/C1.05 row-action
+safety. The independent atomic/financial/recovery dependencies above
+remain release gates; no grant, migration, production mutation or scope cut follows
+from this inventory.
 
 ## Retail and recruitment action inventory
 
