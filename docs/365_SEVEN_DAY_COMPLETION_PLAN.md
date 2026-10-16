@@ -68,6 +68,24 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+16 October C1.06 source `ee9af3a8` adds installation account/receipt/item/selected target/
+date/odometer intent, same-client child/parent preflights, checked void transport
+acknowledgment and parent-held session/lifetime/uncertainty fences. Actual content
+cleanup was corrected after diagnosed new-test failures, with assertions/timeouts/
+quarantine preserved. Final focused 1,705/1,705 across 13 suites (32.14s), 247 new
+cases, all prior 179 panel cases retained; review/format/diff/full TypeScript/
+offline guards pass; changed-line lint zero new findings. Fresh complete build/
+214 public copies/Worker/backend/OCR/PDF/server checks pass with retained warnings;
+same PR publication joins C1.05, with new exact-head CI separately required.
+Evidence/publication: `evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`.
+No SQL/live change or native atomic/persisted-history/durable acceptance. Next
+shared dependency is synthetic second-cluster PG17 dump/restore on the existing
+ephemeral Linux host; this remains partial DB recovery. A complete Docker-free
+real API/Auth/private-file/restore path, whole baseline (47 replay failures),
+QA credentials/Terms/native roles and owner acceptance remain deadline-threatening
+gaps for 17 October review. C1.08 full-line viewing and other atomic workflows stay
+in scope; 22 October 21:00 remains a target, not a verified forecast.
+
 16 October C1.05 source `5ede72c6` interlocks all draft removal before
 handler-level business/client/Storage/RPC access; accessible disabled UI has no
 dispatch listener and keeps eligible review. Focused synthetic 1,458/1,458 across

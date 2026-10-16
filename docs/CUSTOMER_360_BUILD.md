@@ -1,5 +1,20 @@
 # Native Customer 360: first delivery slice
 
+C1.06 source `ee9af3a8` captures installation account/receipt/item/selected vehicle/
+date/odometer intent, checks child/parent preflights and legacy void transport
+acknowledgment, and uses parent-held admission/session/unknown fences with actual
+portal-content cleanup and neutral feedback. Final focused 1,705/1,705 across
+13 suites (32.14s), 247 new cases and all prior 179 panel cases retained; final
+review/format/diff/full TypeScript/offline guards pass; changed-line lint zero
+new findings. Fresh complete build/214 public copies/Worker/backend/OCR/PDF/server
+checks pass with retained warnings; same PR publication joins C1.05, with new
+exact-head CI separately required. Exact checks/publication and diagnosed
+test/lifecycle repairs: `evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`.
+No SQL/live change. Native atomic authority, persisted history and durable recovery
+remain unaccepted. Next shared gate is partial synthetic PG17 dump/restore on
+the existing ephemeral Linux host, not full API/Auth/private-file acceptance;
+independent C1.08 full-line viewing and other atomic receipt workflows stay open.
+
 C1.05 source `5ede72c6` (16 October) interlocks all draft removal before
 handler-level business/client/Storage/RPC access. The panel retains a disabled
 accessible control/preservation notice, removes its dispatch path and preserves

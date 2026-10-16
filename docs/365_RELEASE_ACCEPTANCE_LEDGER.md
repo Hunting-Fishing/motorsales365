@@ -41,6 +41,26 @@ and develop a reviewed production-safe acceptance path; do not waive validation,
 recovery or release gates or treat a live database as disposable staging.
 
 Integration branch: `completion/365-seven-day-integration`.
+C1.06 source `ee9af3a8` has seven-field installation intent, same-client child/parent
+preflights, checked void transport acknowledgment and parent-held session/lifetime/
+uncertainty fences, with actual portal-content cleanup and neutral feedback.
+Final focused synthetic 1,705/1,705 across 13 suites (32.14s), 247 new cases and
+all 179 prior panel cases retained. Review/format/diff/full TypeScript and explicit
+offline guards pass; changed-line lint zero new findings. Fresh complete build/
+214 public copies/Worker/backend/OCR/PDF/server checks pass with retained warnings.
+Same draft PR #68 publication joins C1.05; new exact-head CI remains separately
+unverified until after push. Diagnosed initial test
+failures and repaired content boundary are recorded
+in `evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`. Native atomic target/authority,
+persisted history and durable retry/recovery are not accepted. No SQL/live change.
+Next shared dependency: synthetic dump/second-private-PG17-cluster restore on the
+existing ephemeral Linux host, including actual roles/ACLs/sequences and recovery
+time. That remains partial DB recovery, not full API/Auth/private-object restore.
+No complete Docker-free real-stack runner is present; 47 retained replay failures
+and QA/native pilot/session gates remain. Carry exact gaps into 17 October review,
+without another hosted-project/Docker question or silent scope cut. C1.08 full-line
+viewing and independent atomic sharing/discard/financial recovery remain open.
+
 C1.05 source `5ede72c6` interlocks all draft removal, before handler-level
 business/client/Storage/RPC access. Disabled accessible UI has no destructive
 binding/listener and preserves eligible review. Focused synthetic 1,458/1,458
@@ -48,7 +68,7 @@ across 12 suites (29.30s), 43 new cases and all 161 prior panel cases retained;
 independent review/format/diff/full TypeScript/offline guards pass. Changed-line
 lint zero new findings; fresh complete build/214 public copies/Worker/backend/
 OCR/PDF/server checks pass with retained warnings. Parent `15743f05` now has all
-six Actions gates passing; unit `116864182583` application 3,880/3,880 across86
+six Actions gates passing; unit `116864182583` application 3,880/3,880 across 86
 files (90.09s), zero unexpected/quarantined failures, truncated overall log with
 final summaries present. New source publishes with connected installation work
 on the same PR. Evidence: `evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`.
@@ -396,7 +416,7 @@ responses and a real QueryClient, not real Auth/storage/financial transactions.
 | C1.03 | Shop sharing/public summary                    | Mixed per-item consent cannot be safely reduced with `.some()` before the existing all-item SQL update. Interim UI refusal is not an independent atomic sharing writer; direct/concurrent callers and returned-state acknowledgment remain open.                                                                                                                                          |
 | C1.04 | Record shop expense                            | `5bd1a715` adds captured account/selected-shop intent, non-atomic target preflight, checked UUID transport acknowledgment and neutral current-only feedback/mounted holds. Exact NUMERIC precision, persisted amount/shop/vehicle conflict validation, native authority, durable posting/reconciliation and real-role transactions remain. No JS rounding substitute.                     |
 | C1.05 | Discard draft and attachment                   | `5ede72c6` temporarily interlocks all draft removal; disabled accessible UI has no dispatch listener, eligible review retained. Safe discard remains unfinished: durable account/tenant/receipt/key operation identity, all-writer fences, object/row coordination and verified original-byte recovery. Native direct capabilities unchanged; operation reordering alone is not rollback. |
-| C1.06 | Record installation                            | Purchase never implies installation. Installation dialog still needs caller/lifetime/acknowledgment/unknown guards, exact receipt/item/vehicle binding, correction/removal/history consent and real-role acceptance.                                                                                                                                                                      |
+| C1.06 | Record installation                            | `ee9af3a8` captured seven-field intent, same-client child/parent preflights and void transport acknowledgment; parent-held session/lifetime/unknown fences and actual content cleanup. Purchase never implies installation. Native atomic binding/authority, persisted history, durable retry, correction/removal/consent and real-role/recovery acceptance remain.                       |
 | C1.07 | Start/save/confirm/retry                       | Existing editor holds uncertain outcomes only while mounted; the void acknowledgment is not persisted-state proof. Require durable operation identity, reopen reconciliation, authorized conflict handling and exact retained values.                                                                                                                                                     |
 | C1.08 | View/review receipts over 100 lines            | Current partial display is explicit and cannot replace the full item set. Complete-line viewing and a safe edit contract remain unfinished; the display cap does not remove these receipts from scope.                                                                                                                                                                                    |
 

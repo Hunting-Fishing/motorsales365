@@ -16,6 +16,28 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+C1.06 source `ee9af3a8` captures installation account/receipt/item/selected
+vehicle/date/odometer intent, checks same-client child/parent preflights and the
+legacy void transport acknowledgment, and fences dialog-content/session/write
+lifetimes with mounted uncertainty holds and neutral feedback. Final focused
+1,705/1,705 across 13 suites (32.14s), 247 new cases, all prior 179 panel cases
+retained; final review/format/diff/full TypeScript and explicit offline CI guards
+pass; changed-line lint zero new findings. Fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings; publication
+joins C1.05 on the same draft PR #68, not a duplicate. New exact-head CI remains
+separate from this local verification. The actual
+Radix content cleanup boundary was corrected after two diagnosed new-test runs,
+without weakening assertions/timeouts/quarantine. Exact checks/publication and
+non-atomic/native-authority/durable-history limitations:
+`evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`. No SQL/live write or deployment.
+Next shared release dependency: synthetic dump/second-private-PG17-cluster restore
+rehearsal on the established ephemeral Linux host, including roles/ACLs/sequences
+and measured recovery; selected SQL or that partial restore cannot satisfy real
+API/Auth/private-object recovery. No complete Docker-free stack runner is present,
+47 retained replay failures remain, and QA/native pilot acceptance is unverified.
+Keep those exact gaps for the 17 October feasibility review. Independent C1.08
+complete-line viewing and atomic sharing/discard/financial recovery remain open.
+
 C1.05 source `5ede72c6` temporarily refuses every draft removal before any
 handler-level business/client/Storage/RPC access. The panel keeps an accessible
 disabled control and preservation notice, without a destructive binding/listener;
