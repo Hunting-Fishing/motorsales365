@@ -19,8 +19,10 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  # npm is the package manager of record: package-lock.json is what the
-  # Cloudflare Worker build uses. --legacy-peer-deps is required because
+  # npm is the Actions/local package manager of record (package-lock.json).
+  # Independent Workers Builds currently auto-detects Bun before its build command;
+  # it is separately frozen, not repaired or approved by an Actions pass.
+  # --legacy-peer-deps is required because
   # @tanstack/zod-adapter declares a Zod 3 peer while the app runs Zod 4.
   NPM_CI: npm ci --legacy-peer-deps --no-audit --no-fund
   CI: "true"
@@ -189,6 +191,12 @@ jobs:
       - name: Native quote and work-order list read lifetimes (never quarantined)
         run: npx vitest run src/components/shop-manager/quote-list.test.tsx src/components/shop-manager/work-order-list.test.tsx src/components/shop-manager/work-order-detail.test.tsx --maxWorkers=1
 
+      - name: Native quote detail private lifetimes and conversion interlock (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-detail.test.tsx --maxWorkers=1
+
+      - name: Independent Workers build source freeze (offline, never quarantined)
+        run: node --test scripts/ci/independent-workers-build.test.mjs
+
       - name: Native commerce test and pinned CI runner guards (offline, never quarantined)
         run: node --test scripts/ci/native-commerce-ci.test.mjs
 
@@ -305,41 +313,108 @@ jobs:
     name: Parts adversarial RLS suite (throwaway Postgres)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-    env:
-      # --local mode only accepts a local server; the service container is
-      # disposable and destroyed with the job. No remote database is touched.
-      PGHOST: localhost
-      PGPORT: "5432"
-      PGUSER: postgres
-      PGPASSWORD: postgres
     steps:
       - uses: actions/checkout@v4
-      - name: Install psql client
-        run: |
-          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
-          psql --version
-      - name: Run suite (--local replay of supabase/migrations)
+      - name: Install native PostgreSQL 17 (ephemeral runner only)
+        timeout-minutes: 5
+        shell: bash
         run: |
           set -euo pipefail
+          # Ubuntu 24.04's built-in PG16 is not the required PG17 server.
+          # Official signed PGDG repository; major is explicit, minor packages float.
+          # https://www.postgresql.org/download/linux/ubuntu/
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          # Do not create/start a package-managed main cluster. Only our private
+          # initdb cluster below is used, never a preinstalled runner cluster.
+          printf '\ncreate_main_cluster = false\n' \
+            | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            postgresql-17 postgresql-client-17
+          /usr/lib/postgresql/17/bin/postgres --version
+          /usr/lib/postgresql/17/bin/psql --version
+      - name: Run suite (--local replay of supabase/migrations)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="/usr/lib/postgresql/17/bin:$PATH"
+          unset DATABASE_URL PGSERVICE PGSERVICEFILE PGHOSTADDR PGPASSWORD PGOPTIONS
+          export PGUSER=postgres PGDATABASE=postgres PGPORT=55432 PGCONNECT_TIMEOUT=5
+          parts_temp_base="$(realpath -e "$RUNNER_TEMP")"
+          parts_pg_root="$(mktemp -d "$parts_temp_base/parts-rls.XXXXXX")"
+          case "$parts_pg_root" in "$parts_temp_base"/parts-rls.*) ;; *) exit 1 ;; esac
+          test "$(dirname "$parts_pg_root")" = "$parts_temp_base"
+          [[ "$(basename "$parts_pg_root")" =~ ^parts-rls\.[A-Za-z0-9]{6}$ ]]
+          test ! -L "$parts_pg_root"
+          printf 'PARTS_PG_ROOT=%s\n' "$parts_pg_root" >> "$GITHUB_ENV"
+          # A private socket and no TCP listener prevent use of any other local
+          # or hosted database. initdb/pg_ctl run as the unprivileged runner owner.
+          export PGHOST="$parts_pg_root/socket"
+          mkdir -m 700 "$PGHOST"
+          cleanup_parts_cluster() {
+            parts_status=$?
+            trap - EXIT
+            if [ -f "$parts_pg_root/data/postmaster.pid" ]; then
+              if ! pg_ctl -D "$parts_pg_root/data" -m fast -w -t 15 stop; then
+                if ! pg_ctl -D "$parts_pg_root/data" -m immediate -w -t 15 stop; then
+                  echo '::error::Could not stop the private Parts PostgreSQL cluster.'
+                  parts_status=1
+                fi
+              fi
+            fi
+            exit "$parts_status"
+          }
+          trap cleanup_parts_cluster EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          initdb -D "$parts_pg_root/data" --username=postgres --encoding=UTF8 \
+            --locale=C.UTF-8 --auth-local=trust --auth-host=reject \
+            --set=listen_addresses= --set="unix_socket_directories=$PGHOST" \
+            --set=unix_socket_permissions=0700 --set="port=$PGPORT" --no-instructions
+          pg_ctl -D "$parts_pg_root/data" -l "$parts_pg_root/server.log" -w -t 30 start
+          pg_isready -d postgres -t 5
+          parts_server_version="$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW server_version_num')"
+          if [[ ! "$parts_server_version" =~ ^17[0-9]{4}$ ]]; then
+            echo '::error::The adversarial suite requires an actual PostgreSQL 17 server.'
+            exit 1
+          fi
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW data_directory')" = "$parts_pg_root/data"
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW unix_socket_directories')" = "$PGHOST"
+          test -z "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW listen_addresses')"
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SELECT rolsuper FROM pg_roles WHERE rolname = current_user')" = t
           if [ ! -f scripts/test-parts-rls-adversarial.sh ] || [ ! -f supabase/tests/parts_network_adversarial_rls.sql ]; then
-            echo "::notice::Parts adversarial RLS suite not on this branch yet (lands with PR #5); skipping."
-            exit 0
+            echo '::error::The existing Parts adversarial runner and SQL suite are required.'
+            exit 1
           fi
           bash scripts/test-parts-rls-adversarial.sh --local 2>&1 | tee parts-rls.log
           # The script exits 0 on a privilege SKIP; in CI we own a superuser, so a SKIP is a failure.
           if grep -q "SKIP.*parts adversarial RLS suite" parts-rls.log; then echo "::error::Suite skipped unexpectedly"; exit 1; fi
           grep -m1 "assertions passed" parts-rls.log >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Clean private PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${PARTS_PG_ROOT:-}" ] || [ ! -d "$PARTS_PG_ROOT" ]; then exit 0; fi
+          parts_temp_base="$(realpath -e "$RUNNER_TEMP")"
+          parts_pg_root="$(realpath -e "$PARTS_PG_ROOT")"
+          case "$parts_pg_root" in "$parts_temp_base"/parts-rls.*) ;; *) echo '::error::Unsafe cleanup target.'; exit 1 ;; esac
+          test "$(dirname "$parts_pg_root")" = "$parts_temp_base"
+          [[ "$(basename "$parts_pg_root")" =~ ^parts-rls\.[A-Za-z0-9]{6}$ ]]
+          test ! -L "$PARTS_PG_ROOT"
+          if [ -f "$parts_pg_root/data/postmaster.pid" ]; then
+            if ! /usr/lib/postgresql/17/bin/pg_ctl -D "$parts_pg_root/data" -m fast -w -t 15 stop; then
+              /usr/lib/postgresql/17/bin/pg_ctl -D "$parts_pg_root/data" -m immediate -w -t 15 stop
+            fi
+          fi
+          if [ -f "$parts_pg_root/server.log" ]; then cp "$parts_pg_root/server.log" parts-rls-server.log; fi
+          # This is only the validated, unique directory allocated by mktemp.
+          rm -rf -- "$parts_pg_root"
