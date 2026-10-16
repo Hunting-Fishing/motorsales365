@@ -42,6 +42,38 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Independent N3 proposed365-side request/offer codec is implemented: strict v1/
+namespaced refs/calendar/sequence, required independent expected store/order/leg,
+immutable whole-payload comparison and privacy-minimized offer. UNWIRED: no
+transport/signature/durable writer/Auth/provider/Buddy/live order or dispatch.
+Final24/24 in1.44s, CI wiring2/2 in87.2558ms, full normal TypeScript/changed-file
+ESLint/format/diff/review pass; narrow own-value/null-prototype correction adds two
+regressions. Mandatory offline CI gate retains limits/coverage. Parent19fd2a7e
+all-six Actions pass; actual5,008/95 files101.25s, zero unexpected/quarantined
+failures (truncated/final summaries). New-head CI separate, no parent cancellation
+or unchanged1231/121. Same PR68, commit subject:
+`Define private-by-design Buddy delivery request contract`.
+[Exact proposed request codec](evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md).
+Next current-head checks, strict native transaction authority/all-writer/durable/
+recovery and N1/N2 authoritative stock/order/outbox before signed N3 handoff.
+No migration/grant/production/main change; existing stops/risk/scope retained.
+
+### Verified Auth catalog checkpoint
+
+Published19fd2a7ed8d0e7df27168f91035b87457f076ed0 verified same canonical branch/
+draft PR68/comment6222081796 with exact prior64,364-character body/title/base/main
+preserved. All six38947359743 Actions pass; actual unit117129750943 reports
+5,008/95 files101.25s, zero unexpected/quarantined failures (truncated/final
+summaries), not inherited/cancelled. Actual native117129750990 untruncated PG17.11/
+Parts247/all18 ordered expense+draft/cleanup pass;47 failures remain, bounded
+67/82/215ms recovery not full/RTO. Actual build117129750739 final214/Worker/backend/
+OCR/PDF/server/dry-run markers visible (truncated). COMPLETE merge09f63857… equals
+candidate whole treea4f1b0b0… . Preview config skip/no upload; production/migration/
+Supabase Preview skip; Workers eca54607 fails fresh cause unknown, existing stop
+unchanged. Check-statusHTTP500 resolved by ONE permitted retry, not fallback.
+Existing follow-up updated/readback same identity/settings/thread/creation, no
+duplicate. These notes join next implementation without docs-only unit cancellation.
+
 Selected Auth catalog/dependency integration now captures actual sole365 metadata
 without Auth rows/IDs/values/helper execution. ONE initial64-trigger bound reports
 incomplete; ONE reviewed same-scope256-bound alternative passes with218 selected

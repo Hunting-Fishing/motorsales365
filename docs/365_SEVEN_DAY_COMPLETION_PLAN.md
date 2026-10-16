@@ -2,6 +2,14 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Parent19fd2a7e now passes all six Actions, actual5,008/95 files101.25s, zero
+unexpected/quarantined failures (truncated/final summaries). Independent N3
+proposed365 request/offer codec passes24/24/full TypeScript/CI wiring/review;
+no transport/signature/durable writer/Auth/Buddy/ordering or dispatch activation.
+`evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md` records scope/limits. New-head
+CI and shared strict authority/transaction/all-writer/durable recovery remain
+next; no consumer scope completion, date guarantee or scope reduction.
+
 [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) now owns current execution order,
 Day 2 feasibility/rebased dates, all18 existing workflow IDs plus N1–N3, role/device
 acceptance and main/release conditions. This plan retains historical schedule and

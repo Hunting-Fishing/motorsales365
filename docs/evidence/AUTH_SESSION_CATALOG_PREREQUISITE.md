@@ -2,6 +2,25 @@
 
 17 October 2026, Asia/Manila. Same integrated candidate and
 [draft PR68](https://github.com/Hunting-Fishing/motorsales365/pull/68).
+Published19fd2a7ed8d0e7df27168f91035b87457f076ed0 is verified on canonical remote,
+same draft/base/title/exact prior body/main preserved; evidence
+[comment6222081796](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6222081796).
+Own run38947359743 now passes all six Actions; actual unit117129750943 reports
+5,008/95 files101.25s, zero unexpected/quarantined failures (truncated/final
+summaries). Actual native117129750990 is untruncated PG17.11/Parts247/all18
+ordered proofs/cleanup, bounded67/82/215ms not full/RTO,47 failures retained.
+Build117129750739 is truncated with final artifact guards present; COMPLETE
+merge09f63857… equals candidate whole current treea4f1b0b0… . Current artifact
+closure2,583 objects/zero missing verified by ONE current-commit/tree alternative
+after an overbroad history audit found41 missing ancestor objects. Full historical
+object recovery is not proved or attempted; no unrelated history fetch/retry.
+Preview configuration skip/no
+upload and production/migration/Supabase Preview skips verified; Workers eca54607
+fails, fresh cause unverified/existing hosting stop unchanged. Check readHTTP500
+resolved by ONE same-tool retry. Existing automation exact checkpoint readback
+preserves identity/settings/thread/creation, no duplicate. These follow-up notes
+join next integrated source after the unit completed, without cancellation.
+
 Parent publication `fb881504bbd35821fd8e8d0b4497c76176ab72b4` now passes all six
 required Actions gates. Actual unit job117112437695/run38942225928 reports
 5,008/5,008 across95 files72.81s, zero unexpected/quarantined failures; returned

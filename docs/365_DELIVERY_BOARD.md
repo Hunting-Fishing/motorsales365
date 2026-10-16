@@ -12,7 +12,57 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current slice: proposed365-side Buddy request/offer contract.**
+Independent N3 source implements fixed v1 data, required independent expected
+store/order/leg consistency, frozen detached full-payload canonical comparison
+and minimized offers without contact/internal order references. It is UNWIRED:
+no signature/transport/durable writer/Auth/provider/route/UI/Buddy or live dispatch.
+Final24/24 in1.44s, CI wiring2/2 in87.2558ms, full normal TypeScript, changed-file
+ESLint/format/diff/review pass. One bounded own-value/null-prototype correction
+adds two cleanup-protected regressions. Mandatory single-worker non-quarantined
+CI gate added; no timeout/quarantine/native-coverage weakening or unchanged1231/121.
+Parent19fd2a7e all-six Actions completed before publication; actual unit117129750943
+5,008/95 files101.25s, zero unexpected/quarantined failures (truncated/final
+summaries). No running unit cancellation/inherited new-head pass. Same PR68;
+commit subject `Define private-by-design Buddy delivery request contract`.
+[Exact proposed contract and limits](evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md).
+
+Next current-head mandatory CI, then strict original-human/session/native authority
+inside the eventual expense transaction, compatible all-writer/lock ordering/
+financial/stock/durable recovery. N3 next needs an authoritative365 store-split
+stock/order transaction and durable outbox before separately scoped signed Buddy
+inbox/callback work. This codec is not checkout, sender authority, clock/expiry/
+coarse-area/eligibility enforcement or dedupe. All18+N1–N3,47 failures/12/5/2,
+QA/hosting stops, owner/policy/device/main/live gates and22 October risk remain.
+No migration/grant/settings/account/production/Buddy/366/main/deployment change.
+
+### Verified Auth catalog/dependency checkpoint
+
 **Current slice: selected Auth catalog/dependency integration.**
+Published19fd2a7ed8d0e7df27168f91035b87457f076ed0 is verified on the canonical
+branch/same draft PR68, evidence comment6222081796; title/base/draft/exact64,364-
+character body/main70ab892a… preserved. All six run38947359743 Actions pass;
+actual unit117129750943 reports5,008/95 files101.25s, zero unexpected/quarantined
+failures (truncated/final summaries), no cancellation or inherited parent pass.
+First check-status readHTTP500 resolved by ONE same-tool retry.
+Actual native117129750990 log is untruncated: PG17.11/Parts247/all18 ordered
+expense/draft markers/terminators/EXIT+always cleanup pass;47 replay failures
+remain, bounded67/82/215ms recovery not full/RTO. Actual build117129750739 returned
+log is truncated but final214 assets/Worker motorsales365/canonical365/15OCR/
+202PDF/server-boundary/dry-run markers are present. Fetched complete CI merge
+09f638578b3f9efe89680eeee9edfa3be165168d has identical whole current tree
+a4f1b0b0949bc9d2fbeaeeb14a3bfb1c51ad964b to the candidate. Current artifact
+closure has2,583 objects/zero missing. An initial overbroad ancestor-history audit
+found41 missing historical objects; ONE current-commit/tree audit resolved the
+artifact question, not complete repository-history recovery. Do not retry/fetch
+unrelated history or call it recovered from this result.
+Preview117129756786 actually skips configuration/no upload; production/migrations/
+Supabase Preview skip. Workers build eca54607/check117129822308 fails, fresh cause
+unverified; existing hosting stop unchanged, no new diagnostics/redispatch.
+Existing automation updated/read back in place, same ID/name/kind/active30min/
+thread/creation and exact new checkpoint; no duplicate. These post-publication
+notes join the next integrated implementation slice, not a docs-only CI restart.
+
 The actual sole365 read-only catalog observation at2026-10-16T18:18:36.401211UTC
 is complete for its explicitly selected metadata, not Auth/native authority.
 Server170006;18 columns/4 constraints/5 indexes/0 session policies/218 trigger
@@ -221,7 +271,7 @@ has full owner or live acceptance.
 | R4 Pilot/release/support           | Not accepted or deployed                                                                                                                                    | Owner/staff acceptance of the complete candidate, monitored recovery/support and conditional main/deployment checklist below.                                                                                                                                                                                             |
 | N1 Multi-store live inventory      | Existing location/B2B foundations; cross-business consumer authority not accepted                                                                           | Verified business/store enrollment, catalog/fitment and opt-in visibility; location-specific availability freshness/reservation/conflict/expiry, private-cost isolation and manager permissions.                                                                                                                          |
 | N2 Consumer online ordering        | No active consumer cart/retail fulfillment loop established by bounded source audit                                                                         | Store-split cart/checkout contract, atomic stock reservation/order identity, approved payment/fees/delivery eligibility, cancellation/return/reconciliation and buyer/store status UI; no oversell/duplicate order on concurrent or unknown outcomes.                                                                     |
-| N3 Barangay Buddy delivery         | Separate rider/job foundations verified in source; no 365 bridge or live dispatch acceptance                                                                | Versioned signed outbox/inbox bridge, operator signup/approval/eligibility, live offers, atomic one-operator acceptance, status callbacks, privacy/cancellation/reassignment and recovery tests described below.                                                                                                          |
+| N3 Barangay Buddy delivery         | Separate rider/job foundations and proposed365-side request/offer codec; no active bridge/live dispatch acceptance                                          | Authoritative store-split stock/order plus durable365 outbox, then signed versioned inbox/callback bridge, operator eligibility/live offers/atomic one-winner/privacy/cancellation/reassignment/recovery. Codec parsing is not authority, expiry, dedupe or durable acceptance.                                           |
 
 ## CRM and professional web/device acceptance
 

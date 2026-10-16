@@ -2,6 +2,13 @@
 
 ## Current delivery authority (17 October 2026)
 
+Parent19fd2a7e Auth catalog prerequisite now passes all six Actions; actual unit
+5,008/95 files101.25s (truncated/final summaries), zero unexpected/quarantined
+failures. Independent N3 proposed365 request/offer codec passes24/24/full normal
+TypeScript/CI wiring/review and is unwired, not CRM authority or live ordering/
+dispatch. `evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md`; current new-head checks
+and strict native transaction/all-writer/durable recovery remain next.
+
 Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequencing and
 CRM/Shop Manager desktop/phone/tablet acceptance. This file retains historical
 source evidence; old "next" statements are not repeated work instructions.

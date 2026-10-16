@@ -10,6 +10,41 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Independent N3 proposed365-side request/offer contract is implemented only:
+fixed v1, distinct references, required expected store/order/leg consistency,
+immutable whole comparison and contact-minimized offers. Final24/24 in1.44s,
+CI wiring2/2 in87.2558ms, full normal TypeScript/changed-file ESLint/format/diff/
+review pass; own-value/null-prototype correction includes two regressions.
+Mandatory offline CI gate adds no timeout/quarantine/coverage weakening.
+No signature/transport/durable writer/replay/native authority/current expiry/
+area precision/eligibility/ordering/dispatch acceptance. Parent19fd2a7e all-six
+completion and actual5,008/95 files101.25s recorded, no running cancellation or
+inherited new-head pass. Same PR68, commit subject:
+`Define private-by-design Buddy delivery request contract`;
+[exact evidence](evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md).
+Next current-head CI, strict transaction authority/all-writer/durable/recovery,
+N1/N2 authoritative stock/order/outbox before separately scoped signed N3 handoff.
+All18+N1–N3 remain open for owner/real-role/device/main/live release acceptance;
+no DB/grant/production/Buddy/account/provider change. Known stops47 failures/
+12/5/2 and22 October risk retained.
+
+### Verified Auth catalog checkpoint
+
+Published19fd2a7ed8d0e7df27168f91035b87457f076ed0 is verified in same draft PR68,
+comment6222081796; prior exact body/title/base/draft/main preserved. New38947359743
+all six Actions pass; actual unit117129750943 reports5,008/95 files101.25s, zero
+unexpected/quarantined failures (truncated/final summaries), not inherited or
+cancelled. Actual native117129750990 untruncated PG17.11/Parts247/all18 ordered
+expense+draft/cleanup pass,47 failures retained, bounded67/82/215ms not full/RTO.
+Actual build117129750739 final214/Worker/backend/OCR/PDF/server/dry-run markers
+present (truncated), COMPLETE merge09f63857… equals candidate treea4f1b0b0… .
+Preview config skip/no upload; production/migration/Supabase Preview skip;
+Workers eca54607 fails cause unverified, existing hosting stop unchanged. Initial
+check-statusHTTP500 resolved by ONE permitted retry. Existing automation updated/
+readback same ID/settings/thread/creation. Notes join next source, no docs-only
+restart/cancel, main or live change. Own-head unit completion is now verified;
+reviewed strict transaction admission/all-writer/durable/recovery remains open.
+
 Selected Auth catalog prerequisite is integrated, not a positive authority gate.
 Actual sole365170006 observation2026-10-16T18:18:36.401211UTC captures18 selected
 columns/4 constraints/5 indexes/0 session policies/218 attachments/9 functions;

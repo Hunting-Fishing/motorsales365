@@ -75,6 +75,9 @@ jobs:
       - name: Native Auth session catalog privacy and dependencies (offline, never quarantined)
         run: node --test scripts/ci/auth-session-catalog-review.test.mjs
 
+      - name: Buddy delivery handoff contract (offline, never quarantined)
+        run: npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db
