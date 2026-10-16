@@ -68,6 +68,21 @@ schedule alone. Existing approved production restrictions must be preserved.
 
 ## Delivery schedule
 
+16 October C1.05 source `5ede72c6` interlocks all draft removal before
+handler-level business/client/Storage/RPC access; accessible disabled UI has no
+dispatch listener and keeps eligible review. Focused synthetic 1,458/1,458 across
+12 suites (29.30s), 43 new cases with prior 161 panel cases retained; independent
+review/format/diff/full TypeScript/offline guards pass. Changed-line lint zero new
+findings; fresh complete build/214 public copies/Worker/backend/OCR/PDF/server
+checks pass with retained warnings. Same PR publication joins installation work.
+Verification/publication: `evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`.
+This contains one app-source risk, not completed discard, live ACL containment or
+original-byte recovery. The native coordinator/all-writer/recovery and shared
+release gates still threaten the target. Next independent work is sharing,
+installation and complete-line viewing; QA credentials/Terms/session and trusted
+native pilot roles remain unverified. Day 2 review on 17 October and 22 October
+21:00 target stay unchanged; no Docker, new resource, scope cut or verified forecast.
+
 16 October C1.04 source `5bd1a715` adds expense account/selected-shop caller and
 typed acknowledgment safety, with synchronous admission and mounted uncertainty/
 current-only neutral callbacks. Focused 1,415/1,415 across 12 suites (28.51s), all

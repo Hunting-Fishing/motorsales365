@@ -1,5 +1,32 @@
 # Receipt expense caller and acknowledgment safety
 
+## Publication
+
+Canonical remote and the same attached draft PR #68 confirm head
+`15743f05bf27ef25a24b05c6ace89c05e3c94eea`, with title/base/draft and main
+`70ab892a` unchanged. The updated PR body retains all previous evidence. Final-head
+214 public Git/source/output copies and Worker/canonical-backend/OCR/PDF/server
+checks pass.
+
+Run `38867685088` now has all six Actions gates passing. Completed unit
+`116864182583` confirms application 3,880/3,880 across 86 files (90.09s), zero
+unexpected/quarantined failures; overall log truncated, final summary/checker
+present. Completed native `116864182433`
+has an untruncated actual log: official PGDG17.11 packages, server marker170011,
+Parts247/247, all six independent-session quote groups, both server stops/scoped
+cleanup and 47 retained migration replay failures. This remains selected synthetic
+SQL rehearsal, not whole baseline/API/Auth/private-storage/restore acceptance.
+Wrapper `38867685186` preview `116864182898` is a confirmed DEPLOY_VIA_ACTIONS
+configuration skip, not application upload. Migrations/production/Supabase Preview
+skip. Independent Workers build `896c3483-5607-4d08-8f88-cc6cabafa831` fails with
+ID/link only; fresh cause/source-freeze execution is unverified. No CLI/API CI-log
+fallback was used.
+
+These publication notes join the C1.05 interlock evidence commit, not a
+docs-only CI restart. C1.05 source `5ede72c6` temporarily refuses draft deletion;
+connected installation command work follows on the same PR. No deployment, live mutation,
+new acceptance gate, approval or scope reduction follows from this evidence.
+
 Source: `5bd1a7155b3711174791bb475999973c45bbcff0`, same integrated branch and
 draft PR #68. Publication/exact-head checks are recorded separately.
 

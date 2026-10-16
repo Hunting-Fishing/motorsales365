@@ -1,5 +1,19 @@
 # Native Customer 360: first delivery slice
 
+C1.05 source `5ede72c6` (16 October) interlocks all draft removal before
+handler-level business/client/Storage/RPC access. The panel retains a disabled
+accessible control/preservation notice, removes its dispatch path and preserves
+eligible review and every other receipt workflow. Focused synthetic 1,458/1,458
+across 12 suites (29.30s), 43 new cases, all prior 161 panel cases retained;
+independent review/format/diff/full TypeScript/offline guards pass. Changed-line
+lint zero new findings; fresh complete build/214 public copies/Worker/backend/
+OCR/PDF/server checks pass with retained warnings. Same PR publication will join
+connected installation work. Exact verification/publication and remaining gate:
+`evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`. No SQL/live ACL/deployment change.
+Safe discard, durable object/row coordination, original-byte restore and real-role
+acceptance remain unfinished; native direct capabilities are unchanged. Continue
+independent sharing/installation/complete-line viewing, not a silent scope cut.
+
 C1.04 source `5bd1a715` (16 October) adds captured account/receipt/selected-shop
 expense intent, same-client preflight, checked transport acknowledgment and
 neutral current-only feedback. A synchronous per-mount fence/unknown hold

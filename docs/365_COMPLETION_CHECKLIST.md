@@ -16,6 +16,40 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+C1.05 source `5ede72c6` temporarily refuses every draft removal before any
+handler-level business/client/Storage/RPC access. The panel keeps an accessible
+disabled control and preservation notice, without a destructive binding/listener;
+eligible review and all other receipt workflows stay unchanged. Focused synthetic
+1,458/1,458 across 12 suites (29.30s), 43 new cases, all prior 161 panel cases
+retained; independent review/format/diff/full TypeScript/offline CI guards pass.
+Changed-line lint zero new findings; fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Parent
+`15743f05` now has all six Actions gates passing: application 3,880/3,880 across
+86 files (90.09s), zero unexpected/quarantined failures, final summaries present
+in a truncated overall log. Source will publish with connected installation work
+on the same PR. Exact checks/publication and remaining
+coordinator/restore gate: `evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`.
+This is not completed discard, live ACL containment or recoverable deletion;
+direct native capabilities remain unchanged. No SQL/live mutation or scope cut.
+Continue independent sharing/installation/complete-line viewing while durable
+original-byte/row recovery, native authority and real-role acceptance stay open.
+QA signup remains unsubmitted at the fresh read-only check; no credential/Terms
+handoff or privilege was bypassed.
+
+Expense publication `15743f05` is verified on canonical remote/same attached
+draft PR #68; title/base/draft/history/main `70ab892a` are preserved. Final-head
+214 public assets and Worker/backend/OCR/PDF/server checks pass. Run `38867685088`
+has build/typecheck/lint/OCR/native Parts passing; unit `116864182583` still runs
+at capture. Completed untruncated native `116864182433` confirms PGDG17.11/170011,
+Parts247/247, six quote groups, both stops/scoped cleanup and 47 retained replay
+failures, not full baseline/API/restore acceptance. Wrapper preview
+`116864182898` is a confirmed configuration skip without application upload;
+migrations/production/Supabase Preview skip. Workers build
+`896c3483-5607-4d08-8f88-cc6cabafa831` fails with fresh cause unverified. These
+follow-up notes join the next source slice, no docs-only CI restart. Verify the
+remaining unit result, then C1.05 discard and remaining sharing/install command
+boundaries; do not repeat completed expense/read/approval recovery. No deployment.
+
 C1.04 source `5bd1a715` adds captured account/receipt/selected-shop intent,
 same-client target preflight, checked UUID transport acknowledgment, synchronous
 expense admission and current-only neutral feedback/mounted unknown holds.
