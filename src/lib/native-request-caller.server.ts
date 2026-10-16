@@ -191,6 +191,8 @@ function captureCaller(context: unknown, expectedAccountId: string, strictComman
     ) {
       throw new Error(NATIVE_REQUEST_CALLER_FAILURE);
     }
+    // Preserve the checked callable type across the nested sequential wait.
+    const readCurrentUser = getUser;
 
     let lost = false;
     function fail(): never {
@@ -313,7 +315,7 @@ function captureCaller(context: unknown, expectedAccountId: string, strictComman
               function verifyUser() {
                 assertAuthWait();
                 assertCurrent();
-                const pending: unknown = getUser.call(auth, token);
+                const pending: unknown = readCurrentUser.call(auth, token);
                 // Always observe both settlements, including a rejection after
                 // abort/timeout. The SDK has no per-call signal: this wait bound
                 // does not cancel its network operation or revoke a session.
