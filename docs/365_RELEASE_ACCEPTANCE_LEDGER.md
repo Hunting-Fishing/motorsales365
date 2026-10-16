@@ -6,6 +6,21 @@ target, not a verified forecast. Scope and daily gates are in
 
 ## Candidate and status rules
 
+Latest source `7d866ce0`: Docker-free native PG17 expense session harness, exact
+frozen-source parity and bounded private-cluster cleanup/markers. Root104/104,
+39.882s, no skips/failures; reviews/format/lint/214 assets/Worker guards pass.
+Actual new native result is PENDING; C1.04/C3 stay unaccepted, candidate remains
+private/unapplied/no grants. Owner/GUC positives are synthetic; data digests are
+not complete native catalog/settings/restore/API/Auth/private-object proof.
+Parent92d05890 all six Actions pass, application4,696/92 files93.50s, zero
+unexpected/quarantined failures (truncated log/final summaries); bounded native
+Parts/quote/recovery passes,47 replay failures remain; Preview config skip/no
+upload, latest Workers fresh cause unverified. Next exact-head actual server/
+cohort/EXIT+always-cleanup result, then authority/current-catalog/all-writer/
+account-phantom/financial/full recovery closure before connection. See
+`evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md`. QA/pilot/owner/live and target-risk
+gates remain; earlier next-harness entries are superseded.
+
 Latest source `f7632817`: unapplied private receipt CREATE transaction and full
 request-bound outcome ledger; single retained posting, legacy conflict refusal,
 ordered post-wait financial row locks/rechecks and unchanged replay acknowledgments.

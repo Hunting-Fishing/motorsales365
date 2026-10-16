@@ -16,6 +16,21 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-16)
 
+Latest source `7d866ce0`: Docker-free native PG17 expense session harness and
+frozen-source builder, same candidate/PR #68. Final root104/104 (39.882s), no
+skips/failures, independent frozen reviews/syntax/format/six-file lint/diff and214
+assets/Worker guards pass. Actual new native execution remains PENDING; owner/GUC
+positives are synthetic, ordinary roles deny only, no grant/activation/live change.
+Verify exact new-head native server/cohorts/EXIT+always-cleanup before acceptance.
+Parent92d05890 all six Actions pass, application4,696/92 files93.50s, zero
+unexpected/quarantined failures (truncated log/final summaries). Bounded native
+Parts/quote/recovery pass,47 replay failures remain; Preview config skip/no upload,
+Workers newest failure cause unverified. Full authority/catalog/all-writer/account
+phantom/financial/API/Auth/private-original/recovery and QA/pilot/owner/live gates
+remain. `evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md` has pins/tests/next action.
+Previous next-native-harness statements below are superseded;22 October risk and
+17 October feasibility review unchanged. No Docker, new hosted backend or deploy.
+
 Latest source `f7632817`: private, unapplied receipt CREATE transaction and full
 payload-bound outcome ledger; one retained posting, no legacy adoption/repost,
 post-wait financial row locks/rechecks and exact retry/drift refusal. Root20/20

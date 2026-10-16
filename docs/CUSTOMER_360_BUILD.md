@@ -1,5 +1,17 @@
 # Native Customer 360: first delivery slice
 
+Latest source `7d866ce0` prepares Docker-free native PG17 expense independent
+sessions with exact frozen-source parity and conservative cleanup/reporting.
+Root104/104 (39.882s), no skips/failures, frozen reviews/format/lint/214 assets/
+Worker guards pass. Actual new native result is pending, not human/Auth/private
+storage/financial/restore acceptance; candidate remains private/unapplied. Parent
+92d05890 all six Actions pass,4,696/92 files93.50s, zero unexpected/quarantined
+failures; bounded Parts/quote/recovery pass,47 replay failures remain; Preview
+config skip/no upload, newest Workers cause unverified. Next exact-head native
+server/cohort/cleanup result, then authority/current-catalog/all-writer/account
+phantom/financial/full recovery closure. `evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md`.
+Older next-harness text is superseded; no app/hosted/migration/live change.
+
 Latest source `f7632817`: unapplied private receipt CREATE transaction plus
 full-binding outcome ledger, single retained posting/no legacy adoption,
 post-wait financial row locks/rechecks and exact retry/drift refusal. Local20/20

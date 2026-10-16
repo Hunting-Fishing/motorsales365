@@ -1,5 +1,19 @@
 # 365 Seven Day Completion Plan
 
+Latest source `7d866ce0` prepares the Docker-free native PG17 expense session
+harness, frozen-source builder and safe cleanup/diagnostics. Root104/104 (39.882s),
+no skips/failures, reviews/format/lint/214 assets/Worker guards pass; actual Linux
+cohorts remain pending, not real Auth/native authority/recovery acceptance. Parent
+92d05890 all six Actions pass, application4,696/92 files93.50s, zero unexpected/
+quarantined failures; bounded native Parts/quote/recovery passes,47 replay failures
+remain; Preview config skip/no upload, newest Workers fresh cause unverified.
+Next verify exact-head native package/server/cohorts/cleanup, then unresolved
+catalog/human-session/shop/all-writer/account-phantom/financial/full recovery gates.
+QA/pilot/owner/live, private originals/API/Auth and safe101+ edits still threaten
+22 October;17 October feasibility review stays required, no silent scope cuts or
+guarantee. No Docker/hosted change/deploy. `evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md`.
+Earlier next-harness statements are superseded, not repeated implementation.
+
 Latest source `f7632817` adds an unapplied private receipt CREATE transaction and
 full-binding outcome ledger. Local20/20 plus combined56/56 (32.361s), frozen
 reviews/format/lint/214 assets/Worker guards pass; no client execute/ledger grant,

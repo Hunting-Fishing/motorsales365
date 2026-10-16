@@ -5,6 +5,14 @@ branch/draft PR #68. This is an **unapplied laboratory candidate**, not a connec
 application writer, migration, approved accounting policy or production release.
 Publication and exact-head CI must be verified separately.
 
+Publication92d05890 is now verified on the canonical remote/same draft PR; all six
+Actions pass, application4,696/92 files93.50s, zero unexpected/quarantined failures
+(truncated unit log/final summaries). Bounded native Parts/quote/recovery and
+cleanup pass,47 replay failures remain; Preview config skip/no upload, Workers
+failure fresh cause unverified. Next harness source7d866ce0 is implemented with
+root104/104 offline/model cases, not yet actual native execution; details and
+exact next action: `NATIVE_EXPENSE_PG17_REHEARSAL.md`. No connection or live change.
+
 ## Implemented boundary
 
 `scripts/vehicle-receipts/expense-operation-candidate.sql` creates a new private
