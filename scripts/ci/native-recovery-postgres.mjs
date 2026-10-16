@@ -186,6 +186,8 @@ export function validateContext(env, platform) {
     archive: `${root}/recovery-probe.dump`,
     roles: `${root}/recovery-roles.sql`,
     manifest: `${root}/manifest.json`,
+    passfile: `${root}/empty.pgpass`,
+    servicefile: `${root}/empty.pg_service.conf`,
   });
 }
 
@@ -194,8 +196,8 @@ function childEnv(context) {
     PATH: `${BIN}:/usr/bin:/bin`,
     LANG: "C.UTF-8",
     LC_ALL: "C.UTF-8",
-    PGPASSFILE: "/dev/null",
-    PGSERVICEFILE: "/dev/null",
+    PGPASSFILE: context.passfile,
+    PGSERVICEFILE: context.servicefile,
     PGSYSCONFDIR: context.root,
     PGCONNECT_TIMEOUT: "5",
     PGSSLMODE: "disable",
@@ -357,11 +359,17 @@ function directory(value, uid) {
   assert.equal(fs.realpathSync(value), value);
 }
 
-export function readPrivateFile(value, maxBytes, uid) {
+export function readPrivateFile(value, maxBytes, uid, allowEmpty = false) {
+  assert.equal(typeof allowEmpty, "boolean");
   const fd = fs.openSync(value, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
   try {
     const before = fs.fstatSync(fd);
-    assert.ok(before.isFile() && before.nlink === 1 && before.size > 0 && before.size <= maxBytes);
+    assert.ok(
+      before.isFile() &&
+        before.nlink === 1 &&
+        before.size >= (allowEmpty ? 0 : 1) &&
+        before.size <= maxBytes,
+    );
     assert.equal(before.uid, uid);
     assert.equal(before.mode & 0o777, 0o600);
     const bytes = Buffer.alloc(before.size);
@@ -381,6 +389,14 @@ export function readPrivateFile(value, maxBytes, uid) {
     return bytes;
   } finally {
     fs.closeSync(fd);
+  }
+}
+
+// libpq warns about /dev/null because a password file must be regular. Keep
+// strict stderr rejection and use verified EMPTY private controls instead.
+export function validateEmptyClientFiles(context, uid) {
+  for (const value of [context.passfile, context.servicefile]) {
+    assert.equal(readPrivateFile(value, 1, uid, true).length, 0);
   }
 }
 
@@ -465,7 +481,13 @@ function validateFiles(context, phase) {
     ])
       assert.ok(!fs.existsSync(value));
   } else
-    for (const value of [context.archive, context.roles, context.manifest])
+    for (const value of [
+      context.archive,
+      context.roles,
+      context.manifest,
+      context.passfile,
+      context.servicefile,
+    ])
       assert.ok(!fs.existsSync(value));
   return uid;
 }
@@ -820,6 +842,11 @@ export async function runRecoveryPhase(phase, pin, env = process.env, platform =
   );
   const context = validateContext(env, platform),
     uid = validateFiles(context, phase);
+  if (phase === "--prepare") {
+    privateWrite(context.passfile, Buffer.alloc(0));
+    privateWrite(context.servicefile, Buffer.alloc(0));
+  }
+  validateEmptyClientFiles(context, uid);
   stage = "server-identity";
   const restoredId = await serverIdentity(context, "restored");
   await fresh(context, "restored");

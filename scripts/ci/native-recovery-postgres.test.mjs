@@ -34,6 +34,7 @@ import {
   runRecoveryPhase,
   assertServerIdentity,
   assertFreshCluster,
+  validateEmptyClientFiles,
 } from "./native-recovery-postgres.mjs";
 
 const moduleUrl = new URL("./native-recovery-postgres.mjs", import.meta.url);
@@ -106,6 +107,8 @@ test("context admits only the fixed CI Linux private source/restored artifact la
     archive: `${context.root}/recovery-probe.dump`,
     roles: `${context.root}/recovery-roles.sql`,
     manifest: `${context.root}/manifest.json`,
+    passfile: `${context.root}/empty.pgpass`,
+    servicefile: `${context.root}/empty.pg_service.conf`,
   });
   assert.ok(
     Object.isFrozen(context) &&
@@ -243,8 +246,8 @@ test("source/restored psql requests always use exact sockets/ports/user/database
       );
       assert.equal(options.timeout, COMMAND_MS);
       assert.equal(options.maxOutput, MAX_OUTPUT);
-      assert.equal(options.env.PGPASSFILE, "/dev/null");
-      assert.equal(options.env.PGSERVICEFILE, "/dev/null");
+      assert.equal(options.env.PGPASSFILE, context.passfile);
+      assert.equal(options.env.PGSERVICEFILE, context.servicefile);
       assert.equal(options.env.PGSYSCONFDIR, context.root);
       assert.equal(options.env.PGCONNECT_TIMEOUT, "5");
       assert.equal(options.env.PGSSLMODE, "disable");
@@ -639,6 +642,92 @@ test("private file consumption is bounded, no-follow, owner/mode/inode checked a
   } finally {
     for (const patch of patches) patch.mock.restore();
   }
+});
+
+test("client controls must be empty regular private files while backup artifacts still refuse empty bytes", () => {
+  const good = {
+    isFile: () => true,
+    isSymbolicLink: () => false,
+    nlink: 1,
+    size: 0,
+    uid: 123,
+    mode: 0o100600,
+    dev: 1,
+    ino: 2,
+    mtimeMs: 3,
+    ctimeMs: 4,
+  };
+  let metadata = good,
+    named = good,
+    closed = 0;
+  const opened = [];
+  const patches = [
+    mock.method(fs, "openSync", (value, flags) => {
+      assert.ok([context.passfile, context.servicefile].includes(value));
+      if (fs.constants.O_NOFOLLOW !== undefined)
+        assert.equal(flags & fs.constants.O_NOFOLLOW, fs.constants.O_NOFOLLOW);
+      opened.push(value);
+      return 99;
+    }),
+    mock.method(fs, "fstatSync", () => metadata),
+    mock.method(fs, "lstatSync", () => named),
+    mock.method(fs, "readSync", (_fd, buffer) => {
+      buffer.fill(0x78);
+      return buffer.length;
+    }),
+    mock.method(fs, "closeSync", () => {
+      closed++;
+    }),
+  ];
+  try {
+    assert.doesNotThrow(() => validateEmptyClientFiles(context, 123));
+    assert.deepEqual(opened, [context.passfile, context.servicefile]);
+    assert.equal(closed, 2);
+    assert.throws(() => readPrivateFile(context.passfile, 100, 123));
+    for (const patch of [
+      { size: 1 },
+      { size: 2 },
+      { uid: 999 },
+      { mode: 0o100644 },
+      { nlink: 2 },
+      { isFile: () => false },
+    ]) {
+      metadata = { ...good, ...patch };
+      named = metadata;
+      assert.throws(() => validateEmptyClientFiles(context, 123));
+    }
+    metadata = good;
+    named = { ...good, isSymbolicLink: () => true };
+    assert.throws(() => validateEmptyClientFiles(context, 123));
+    named = { ...good, ino: 3 };
+    assert.throws(() => validateEmptyClientFiles(context, 123));
+    assert.equal(closed, opened.length);
+    assert.throws(() => readPrivateFile(context.passfile, 100, 123, "true"));
+  } finally {
+    for (const patch of patches) patch.mock.restore();
+  }
+});
+
+test("empty client controls are created exclusively before the first query, validated on both phases, never a credentials fallback", () => {
+  assert.match(source, /passfile: `\$\{root\}\/empty\.pgpass`/);
+  assert.match(source, /servicefile: `\$\{root\}\/empty\.pg_service\.conf`/);
+  assert.match(source, /PGPASSFILE: context\.passfile/);
+  assert.match(source, /PGSERVICEFILE: context\.servicefile/);
+  assert.doesNotMatch(source, /PGPASSFILE: "\/dev\/null"|PGSERVICEFILE: "\/dev\/null"/);
+  const phase = source.slice(source.indexOf("export async function runRecoveryPhase"));
+  const creation = phase.indexOf("privateWrite(context.passfile, Buffer.alloc(0))");
+  const validation = phase.indexOf("validateEmptyClientFiles(context, uid)");
+  const firstQuery = phase.indexOf('await serverIdentity(context, "restored")');
+  assert.ok(creation >= 0 && creation < validation && validation < firstQuery);
+  assert.match(
+    phase,
+    /if \(phase === "--prepare"\) \{\s+privateWrite\(context\.passfile, Buffer\.alloc\(0\)\);\s+privateWrite\(context\.servicefile, Buffer\.alloc\(0\)\);\s+\}\s+validateEmptyClientFiles\(context, uid\)/,
+  );
+  assert.match(source, /O_EXCL \| fs\.constants\.O_NOFOLLOW/);
+  assert.match(
+    source,
+    /else if \(errBytes\.length\)\s+reject\(new Error\("Recovery command emitted unexpected diagnostics\."\)\)/,
+  );
 });
 
 test("bounded runner uses no shell/inherited env, binary buffers, one owned child and consumes generic failures", async () => {
