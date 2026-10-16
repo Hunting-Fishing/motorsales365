@@ -42,6 +42,18 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Current ONE recovery alternative source490089329470d771b382f5c111544b45cbc1a538
+is verified unchanged at reviewed hashes,23/23 local validation not rerun.
+Parent20dd unit117153435216 now passes actual5,032/96 files90.94s, zero unexpected/
+quarantined failures (truncated/final summaries); build/type/OCR/lint also pass.
+Native remains failed, not all-six acceptance. Hold cleared without cancellation;
+publish reviewed alternative once in same PR68 and inspect fresh recovery+
+expense21/terminators/cleanup. New-head required gates are separate. If alternative
+fails STOP/notify once; no second guessed repair or old-job rerun. No app/live/
+permissions/main/Buddy/366 change, no unchanged tests, all release gates retained.
+
+### Auth-user ordering / initial recovery failure checkpoint
+
 Publication20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
 draft PR68/comment6223011064, exact body/title/base/draft/main preserved. Own build/
 type/OCR/lint pass; unit117153435216 running, no follow-up push cancellation.

@@ -3,6 +3,22 @@
 17 October 2026, Asia/Manila. Same integrated candidate/draft PR68. This is the
 ONE selected safe alternative for the20dd5a3e native recovery failure, not a
 confirmed root-cause fix or accepted restore. No new native trial has run yet.
+Current publication hold is cleared: parent20dd unit117153435216 completes with
+actual5,032/96 files90.94s, zero unexpected/quarantined failures (returned log
+truncated/final summaries). Build/type/OCR/lint pass; native remains failed, not
+all-six acceptance. Source490089329470d771b382f5c111544b45cbc1a538 is reverified at
+frozen hashes with independent read-only review; no unchanged23/111/app test rerun.
+Publish the already-reviewed source ONCE to the same PR68 and observe fresh native
+recovery/expense21/terminators/cleanup; exact publication goes in its evidence
+comment. If that single alternative fails STOP/notify, no second guessed repair.
+
+### Historical preparation hold
+
+Locally committed490089329470d771b382f5c111544b45cbc1a538, deliberately UNPUBLISHED
+until20dd unit117153435216 completes. Verify exact source/preserved user edits
+before the one later push. These publication notes join the corrective slice;
+no docs-only CI restart or old-job diagnostic/rerun. Existing follow-up updated
+in place with pending source/quota/next action; identity/schedule/thread retained.
 
 ## Actual failure and bounded diagnosis
 
@@ -21,6 +37,11 @@ the cause: when the PID file is gone it skips that exact prior PID check, and a
 process with an unreadable executable link is skipped by the final scan.
 
 ## Selected source alternative / exact quota
+
+PostgreSQL17 [pg_ctl waiting documentation](https://www.postgresql.org/docs/17/app-pg-ctl.html)
+states shutdown completion is detected by removal of the server PID file. This
+supports retaining a separately bounded actual process-directory absence proof;
+it does not prove which subcheck caused the original sanitized refusal.
 
 `stop_cluster` keeps the exact original `/proc/$verified_pid` directory-absence
 predicate but polls it immediately and after at most20 cadences of0.1s. It admits

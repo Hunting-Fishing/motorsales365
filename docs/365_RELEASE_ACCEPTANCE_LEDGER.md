@@ -10,6 +10,18 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Current ONE recovery alternative source490089329470d771b382f5c111544b45cbc1a538
+is verified at frozen shell/test hashes;23/23 offline validation unchanged.
+Parent20dd unit117153435216 now completes, actual5,032/96 files90.94s, zero
+unexpected/quarantined failures (truncated/final summaries). Build/type/OCR/lint
+pass; native remains failed, not all-six acceptance. Hold cleared without unit
+cancellation. Publish reviewed alternative once to same PR68, observe new-head
+recovery/expense21/terminators/cleanup and required CI; no inherited acceptance.
+If alternative fails STOP/notify once, no second guessed repair/old-job rerun.
+All scope,47/12/5/2, QA/hosting/authority/device/owner/main/live gates retained.
+
+### Auth-user ordering / initial recovery failure checkpoint
+
 Published20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
 draft PR68/comment6223011064 with exact prior body/title/base/draft/main preserved.
 Build/type/OCR/lint pass, unit117153435216 running; no cancelling follow-up push.
