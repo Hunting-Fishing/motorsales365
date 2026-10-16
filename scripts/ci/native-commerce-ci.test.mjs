@@ -153,6 +153,7 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
 });
 
 test("native commerce route suites stay explicit, single-worker and never quarantined", () => {
+  assert.equal(workflow.jobs.test["timeout-minutes"], 25);
   const steps = workflow.jobs.test.steps;
   const expected = [
     [
@@ -170,6 +171,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     [
       "Native expense source parity and runner safety (offline, never quarantined)",
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs",
+    ],
+    [
+      "Full staff claim and native roster bridge composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/full-native-staff-bridge-composition.test.mjs",
     ],
     [
       "Native invoice read lifetimes and financial acknowledgments (never quarantined)",
@@ -213,7 +218,7 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     ],
     [
       "Receipt read DTO and caller contracts (never quarantined)",
-      "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts --maxWorkers=1",
+      "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts src/lib/native-command-caller.server.test.ts --maxWorkers=1",
     ],
     [
       "Independent Workers build source freeze (offline, never quarantined)",

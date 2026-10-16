@@ -182,6 +182,9 @@ jobs:
       - name: Full claim evidence ownership writer composition (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/claim-evidence-catalog-review.test.mjs scripts/ci/full-claim-evidence-composition.test.mjs
 
+      - name: Full staff claim and native roster bridge composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/full-native-staff-bridge-composition.test.mjs
+
       - name: Claim revision invalidation model on full actual schema (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/claim-revision-invalidation.test.mjs
 
@@ -225,7 +228,7 @@ jobs:
         run: npx vitest run src/lib/leads.functions.test.ts 'src/routes/dashboard.team.leads_.$id.test.tsx' --maxWorkers=1
 
       - name: Receipt read DTO and caller contracts (never quarantined)
-        run: npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts --maxWorkers=1
+        run: npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts src/lib/native-command-caller.server.test.ts --maxWorkers=1
 
       - name: Independent Workers build source freeze (offline, never quarantined)
         run: node --test scripts/ci/independent-workers-build.test.mjs
