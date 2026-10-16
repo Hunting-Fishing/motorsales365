@@ -200,6 +200,9 @@ jobs:
       - name: Locked atomic quote candidate (offline SQL, synthetic roles, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/native-quote-create-transaction.test.mjs
 
+      - name: Native quote PostgreSQL runner safety (offline, never quarantined)
+        run: node --test scripts/ci/native-quote-postgres.test.mjs
+
       - name: Independent Workers build source freeze (offline, never quarantined)
         run: node --test scripts/ci/independent-workers-build.test.mjs
 
@@ -321,6 +324,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      # The quote runner uses Node builtins and psql, without application packages.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install native PostgreSQL 17 (ephemeral runner only)
         timeout-minutes: 5
         shell: bash
@@ -424,3 +431,12 @@ jobs:
           if [ -f "$parts_pg_root/server.log" ]; then cp "$parts_pg_root/server.log" parts-rls-server.log; fi
           # This is only the validated, unique directory allocated by mktemp.
           rm -rf -- "$parts_pg_root"
+      - name: Locked quote transaction and independent sessions (native PostgreSQL 17)
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/ci/run-native-quote-postgres.sh --run
+      - name: Clean private quote PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-quote-postgres.sh --cleanup

@@ -13,8 +13,10 @@ import {
   installCandidate,
   withNativeQuoteFixture,
   grantFixtureOperator,
+  asActor,
   invoke,
 } from "./fixtures/native-quote-create-fixture.mjs";
+import * as nativeSource from "./fixtures/native-quote-create-source.mjs";
 
 // Actual memory-only SQL/physical-constraint rehearsal, NOT a migration, live
 // native authority/JWT/API, PG17 independent-session concurrency/restore, final
@@ -25,6 +27,7 @@ function input(overrides = {}) {
   const next = ++ordinal * 1000;
   return {
     expectedAccount: IDs.actorA,
+    expectedShop: IDs.shopA,
     quoteId: uuid(next),
     customerId: IDs.customerA,
     vehicleId: IDs.vehicleA,
@@ -170,6 +173,41 @@ test("unapplied quote candidate source is disconnected and contains no new recei
         `candidate must remain disconnected: ${file}`,
       );
   }
+});
+
+test("shared source/setup module is engine-independent, local-only and preserves exact fixture exports", () => {
+  const source = fs.readFileSync(
+    new URL("./fixtures/native-quote-create-source.mjs", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(
+    source,
+    /from\s+["'](?!node:)|new\s+PGlite\b|process\.env|child_process|\bfetch\s*\(|\b(?:writeFile|appendFile|unlink|rm)(?:Sync)?\s*\(/,
+  );
+  assert.equal(
+    nativeSource.SIGNATURE,
+    "shop_manager.create_quote_atomic_candidate(uuid,uuid,uuid,uuid,uuid,text,date,text,text,jsonb)",
+  );
+  assert.equal(nativeSource.SIGNATURE, SIGNATURE);
+  assert.equal(nativeSource.IDs, IDs);
+  assert.equal(nativeSource.nativeTables, nativeTables);
+  assert.equal(nativeSource.nativeForeignKeys, nativeForeignKeys);
+  assert.equal(nativeSource.nativeNumberFunction, nativeNumberFunction);
+  assert.ok(Array.isArray(nativeSource.setupStatements));
+  assert.ok(Object.isFrozen(nativeSource.setupStatements));
+  assert.ok(
+    nativeSource.setupStatements.every(
+      (statement) => typeof statement === "string" && statement.trim().length > 0,
+    ),
+  );
+  assert.equal(nativeSource.setupStatements.length, 22);
+  assert.ok(nativeSource.setupStatements.includes(nativeSource.nativeNumberTrigger));
+  assert.ok(nativeSource.setupStatements.includes(nativeSource.legacyShopHelper));
+  assert.ok(
+    nativeSource.setupStatements.every(
+      (statement) => !/^\s*(?:BEGIN|START\s+TRANSACTION)\s*;/i.test(statement),
+    ),
+  );
 });
 
 test("actual candidate SQL under exact selected native schema and fixture-only legacy-scoped role", async (t) => {
@@ -430,6 +468,51 @@ test("actual candidate SQL under exact selected native schema and fixture-only l
       await t.test(`${name} rejects without any partial row`, () =>
         bodyFailure(db, input(overrides), "42501", actorOptions),
       );
+
+    await t.test(
+      "wrong expected shop rejects a currently visible selected customer without granting authority",
+      () => bodyFailure(db, input({ expectedShop: IDs.shopB }), "42501"),
+    );
+    await t.test(
+      "null expected shop rejects rather than resolving or defaulting caller authority",
+      () => bodyFailure(db, input({ expectedShop: null })),
+    );
+    await t.test(
+      "missing expected shop is sent as typed null and rejects, never silently defaulted",
+      async () => {
+        const value = input();
+        delete value.expectedShop;
+        await bodyFailure(db, value);
+      },
+    );
+
+    await t.test(
+      "former selected customer and legacy profile may move together and remain visible, but prior expected shop still rejects",
+      async () => {
+        const value = input();
+        await db.exec(
+          `UPDATE shop_manager.customers SET shop_id='${IDs.shopB}' WHERE id='${IDs.customerA}'; UPDATE shop_manager.profiles SET shop_id='${IDs.shopB}' WHERE id='${IDs.actorA}'`,
+        );
+        try {
+          const visible = await asActor(
+            db,
+            async () =>
+              (
+                await db.query(
+                  "SELECT id::text,shop_id::text FROM shop_manager.customers WHERE id=$1",
+                  [IDs.customerA],
+                )
+              ).rows,
+          );
+          assert.deepEqual(visible, [{ id: IDs.customerA, shop_id: IDs.shopB }]);
+          await bodyFailure(db, value, "42501");
+        } finally {
+          await db.exec(
+            `UPDATE shop_manager.customers SET shop_id='${IDs.shopA}' WHERE id='${IDs.customerA}'; UPDATE shop_manager.profiles SET shop_id='${IDs.shopA}' WHERE id='${IDs.actorA}'`,
+          );
+        }
+      },
+    );
 
     await t.test(
       "fresh relation changes after a former caller read are rechecked in actual SQL",
@@ -811,6 +894,7 @@ test("actual candidate SQL under exact selected native schema and fixture-only l
       async () => {
         const other = input({
           expectedAccount: IDs.actorB,
+          expectedShop: IDs.shopB,
           customerId: IDs.customerB,
           vehicleId: IDs.vehicleB,
         });
@@ -937,7 +1021,11 @@ test("candidate installation rejects existing function collision without replace
       ).rows[0];
       await assert.rejects(
         () => installCandidate(db),
-        (error) => error.code === "42723",
+        (error) => {
+          assert.equal(error.code, "42723");
+          assert.equal(error.message, "Quote candidate publication failed.");
+          return true;
+        },
       );
       assert.deepEqual(
         (
@@ -947,6 +1035,47 @@ test("candidate installation rejects existing function collision without replace
           )
         ).rows[0],
         before,
+      );
+      assert.deepEqual(await counts(db), { quotes: 0, items: 0 });
+    },
+    { install: false },
+  );
+});
+
+test("candidate installation refuses a preexisting nine-argument same-name function and preserves its source/ACL", async () => {
+  await withNativeQuoteFixture(
+    async (db) => {
+      const legacy =
+        "shop_manager.create_quote_atomic_candidate(uuid,uuid,uuid,uuid,text,date,text,text,jsonb)";
+      await db.exec(
+        `CREATE FUNCTION ${legacy} RETURNS jsonb LANGUAGE sql SECURITY INVOKER AS $$ SELECT '{"fixture":"preexisting-nine-args"}'::jsonb $$; REVOKE EXECUTE ON FUNCTION ${legacy} FROM PUBLIC; GRANT EXECUTE ON FUNCTION ${legacy} TO anon`,
+      );
+      const before = (
+        await db.query(
+          "SELECT prosrc,proacl::text AS acl FROM pg_proc WHERE oid=$1::regprocedure",
+          [legacy],
+        )
+      ).rows[0];
+      await assert.rejects(
+        () => installCandidate(db),
+        (error) => {
+          assert.equal(error.code, "42723");
+          assert.equal(error.message, "Quote candidate publication failed.");
+          return true;
+        },
+      );
+      assert.deepEqual(
+        (
+          await db.query(
+            "SELECT prosrc,proacl::text AS acl FROM pg_proc WHERE oid=$1::regprocedure",
+            [legacy],
+          )
+        ).rows[0],
+        before,
+      );
+      assert.equal(
+        (await db.query("SELECT to_regprocedure($1) AS candidate", [SIGNATURE])).rows[0].candidate,
+        null,
       );
       assert.deepEqual(await counts(db), { quotes: 0, items: 0 });
     },

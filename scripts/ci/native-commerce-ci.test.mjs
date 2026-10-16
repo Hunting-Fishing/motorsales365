@@ -89,6 +89,29 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
   assert.match(cleanup.run, /-m immediate -w -t 15 stop/);
   assert.match(cleanup.run, /cp "\$parts_pg_root\/server\.log" parts-rls-server\.log/);
   assert.match(cleanup.run, /rm -rf -- "\$parts_pg_root"/);
+  const quote = parts.steps.find(
+    (step) =>
+      step.name === "Locked quote transaction and independent sessions (native PostgreSQL 17)",
+  );
+  const quoteCleanup = parts.steps.find(
+    (step) => step.name === "Clean private quote PostgreSQL cluster (always)",
+  );
+  assert.ok(quote && quoteCleanup);
+  assert.equal(quote.run, "bash scripts/ci/run-native-quote-postgres.sh --run");
+  assert.equal(quote.if, undefined);
+  assert.equal(quote["continue-on-error"], undefined);
+  assert.equal(quote["timeout-minutes"], 5);
+  assert.equal(quoteCleanup.run, "bash scripts/ci/run-native-quote-postgres.sh --cleanup");
+  assert.equal(quoteCleanup.if, "always()");
+  assert.equal(quoteCleanup["continue-on-error"], undefined);
+  assert.equal(quoteCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(quote) > parts.steps.indexOf(cleanup));
+  assert.ok(parts.steps.indexOf(quoteCleanup) > parts.steps.indexOf(quote));
+  const nodeSetup = parts.steps.filter((step) => step.uses === "actions/setup-node@v4");
+  assert.equal(nodeSetup.length, 1);
+  assert.equal(nodeSetup[0].with["node-version"], "${{ env.NODE_VERSION }}");
+  assert.equal(nodeSetup[0].if, undefined);
+  assert.ok(parts.steps.indexOf(nodeSetup[0]) < parts.steps.indexOf(quote));
   assert.doesNotMatch(JSON.stringify(parts), /docker|postgres:17|secrets\.|systemctl start/i);
 });
 
@@ -118,6 +141,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     [
       "Locked atomic quote candidate (offline SQL, synthetic roles, never quarantined)",
       "node --test --test-concurrency=1 scripts/ci/native-quote-create-transaction.test.mjs",
+    ],
+    [
+      "Native quote PostgreSQL runner safety (offline, never quarantined)",
+      "node --test scripts/ci/native-quote-postgres.test.mjs",
     ],
     [
       "Independent Workers build source freeze (offline, never quarantined)",

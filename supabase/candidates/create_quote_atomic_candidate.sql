@@ -10,8 +10,24 @@
 -- Install the CREATE and revocations together; reject any existing identity.
 BEGIN;
 
+DO $existing_name$
+BEGIN
+  -- Refuse an existing same-name function/procedure of ANY signature or kind,
+  -- including the earlier nine-argument candidate. Never drop or replace it.
+  -- This check is not a reservation against uncoordinated concurrent DDL.
+  IF EXISTS (
+    SELECT 1 FROM pg_catalog.pg_proc AS p
+    JOIN pg_catalog.pg_namespace AS n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'shop_manager' AND p.proname = 'create_quote_atomic_candidate'
+  ) THEN
+    RAISE EXCEPTION USING ERRCODE = '42723', MESSAGE = 'Quote candidate publication failed.';
+  END IF;
+END;
+$existing_name$;
+
 CREATE FUNCTION shop_manager.create_quote_atomic_candidate(
   p_expected_account pg_catalog.uuid,
+  p_expected_shop pg_catalog.uuid,
   p_quote_id pg_catalog.uuid,
   p_customer_id pg_catalog.uuid,
   p_vehicle_id pg_catalog.uuid,
@@ -69,7 +85,7 @@ BEGIN
   IF v_actor IS NULL OR p_expected_account IS NULL OR v_actor <> p_expected_account THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'Quote creation failed.';
   END IF;
-  IF p_quote_id IS NULL OR p_customer_id IS NULL THEN
+  IF p_expected_shop IS NULL OR p_quote_id IS NULL OR p_customer_id IS NULL THEN
     RAISE EXCEPTION USING ERRCODE = '22023', MESSAGE = 'Quote creation failed.';
   END IF;
   -- Match the current caller's ordinary calendar-date input subset only.
@@ -179,7 +195,10 @@ BEGIN
   -- not promote legacy profile/shop helpers into trusted human authority.
   SELECT c.id, c.shop_id INTO v_check_id, v_shop_id
     FROM shop_manager.customers AS c WHERE c.id = p_customer_id FOR UPDATE;
-  IF NOT FOUND OR v_check_id IS DISTINCT FROM p_customer_id OR v_shop_id IS NULL THEN
+  -- Caller-selected shop is an intent precondition, not trusted authority.
+  -- Compare after acquiring the lock, including any wait on a changed row.
+  IF NOT FOUND OR v_check_id IS DISTINCT FROM p_customer_id OR v_shop_id IS NULL
+    OR v_shop_id IS DISTINCT FROM p_expected_shop THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'Quote creation failed.';
   END IF;
   IF p_vehicle_id IS NOT NULL THEN
@@ -195,7 +214,8 @@ BEGIN
   SELECT c.id, c.shop_id INTO v_check_id, v_check_shop
     FROM shop_manager.customers AS c WHERE c.id = p_customer_id;
   IF NOT FOUND OR v_check_id IS DISTINCT FROM p_customer_id
-    OR v_check_shop IS DISTINCT FROM v_shop_id OR v_check_shop IS NULL THEN
+    OR v_check_shop IS DISTINCT FROM v_shop_id OR v_check_shop IS NULL
+    OR v_check_shop IS DISTINCT FROM p_expected_shop THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'Quote creation failed.';
   END IF;
   IF p_vehicle_id IS NOT NULL THEN
@@ -301,7 +321,8 @@ BEGIN
   SELECT c.id, c.shop_id INTO v_check_id, v_check_shop
     FROM shop_manager.customers AS c WHERE c.id = p_customer_id;
   IF NOT FOUND OR v_check_id IS DISTINCT FROM p_customer_id
-    OR v_check_shop IS DISTINCT FROM v_shop_id OR v_check_shop IS NULL THEN
+    OR v_check_shop IS DISTINCT FROM v_shop_id OR v_check_shop IS NULL
+    OR v_check_shop IS DISTINCT FROM p_expected_shop THEN
     RAISE EXCEPTION USING ERRCODE = '42501', MESSAGE = 'Quote creation failed.';
   END IF;
   IF p_vehicle_id IS NOT NULL THEN
@@ -337,13 +358,13 @@ END;
 $candidate$;
 
 REVOKE EXECUTE ON FUNCTION shop_manager.create_quote_atomic_candidate(
-  pg_catalog.uuid, pg_catalog.uuid, pg_catalog.uuid, pg_catalog.uuid,
+  pg_catalog.uuid, pg_catalog.uuid, pg_catalog.uuid, pg_catalog.uuid, pg_catalog.uuid,
   pg_catalog.text, pg_catalog.date, pg_catalog.text, pg_catalog.text, pg_catalog.jsonb
 ) FROM PUBLIC, anon, authenticated, service_role RESTRICT;
 
 DO $locked_acl$
 DECLARE
-  v_function pg_catalog.oid := 'shop_manager.create_quote_atomic_candidate(uuid,uuid,uuid,uuid,text,date,text,text,jsonb)'::pg_catalog.regprocedure;
+  v_function pg_catalog.oid := 'shop_manager.create_quote_atomic_candidate(uuid,uuid,uuid,uuid,uuid,text,date,text,text,jsonb)'::pg_catalog.regprocedure;
 BEGIN
   -- Fail publication if unexpected default grantees remain; do not broaden
   -- revocation to unrelated roles or silently claim they were contained.
