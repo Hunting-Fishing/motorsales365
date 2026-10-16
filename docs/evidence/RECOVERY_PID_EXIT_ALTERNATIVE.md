@@ -6,7 +6,9 @@ untruncated PG17.11/Parts247/quote6/selected recovery/all21 ordered expense/draf
 Auth-user proofs/terminators/EXIT+always-cleanup. Alternative1 is consumed;
 original source-stop cause remains unconfirmed. No second guessed repair if it
 recurs. Bounded50/75/166ms is not full recovery/RTO;47 failures remain. Build/type/
-OCR/lint pass, unit117174018596 running, no cancellation/inherited acceptance.
+OCR/lint/unit now complete: all six Actions38960489710 pass by exact28295c10
+status. Unit117174018596 log unread after502 initial+one retry; read stopped,
+no fresh count/runtime. Hold cleared without cancellation/inherited acceptance.
 Current next provider-version prerequisite and exact limits:
 [AUTH_PROVIDER_VERSION_PREREQUISITE.md](AUTH_PROVIDER_VERSION_PREREQUISITE.md).
 Older preparation/failure/hold statements below are historical, not a new retry.

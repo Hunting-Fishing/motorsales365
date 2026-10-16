@@ -22,8 +22,8 @@ compared full actual vector to the required shell list. Alternative1 consumed,
 selected trial passed; original failure cause still unconfirmed. No unchanged
 rerun or second guessed repair if the same source-stop failure recurs. Bounded
 dump50/restore75/verify166ms is NOT full recovery/RTO;47 replay failures remain.
-Own build/type/OCR/lint pass, unit117174018596 running; no cancellation or inherited
-new-head passes. Preview success is a verified configuration skip
+All six own Actions38960489710 now pass by exact28295c10 status, including unit 117174018596. Its log is unread after502 initial+one retry; no fresh count/runtime
+claim. Hold cleared without cancellation/inherited passes. Preview success is a verified configuration skip
 (`DEPLOY_VIA_ACTIONS` not true), not upload/deployment; production/migrations skip.
 Workersaa067e57 fails cause unverified, hosting STOP unchanged.
 
@@ -37,7 +37,9 @@ RLS-active/C-byte refusal prevents partial-reader metadata certification. Final
 local19/19 three-suite model/capture/privacy/wiring gate passes in2.1727946s after
 one reviewed parsed-YAML mandatory-step guard correction; no unchanged
 23/111/app suite. Existing baseline manifest/pins/flags remain unchanged.
-Source publication must wait for282 unit completion; no docs-only cancellation.
+Source42d97b31c04ab278895738c94d6340beb798fea3 is locally committed;282 completed
+unit status now clears publication hold without cancellation. Publish it once
+with these evidence notes in the same PR68; new-head required checks are separate.
 Unit log117174018596 returned HTTP502 initially and after ONE same-tool retry;
 that log read is STOPPED. Completion status can clear the hold without inventing
 count/runtime or retrying the log; no CLI/dashboard fallback. Record fresh status.
@@ -45,7 +47,7 @@ Same PR68/commit subject `Capture bounded Auth provider migration-version proven
 exact source/publication will be in its evidence comment.
 [Exact observation, native proof and limits](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
 
-Next exact-head completed checks, immutable upstream/bootstrap/body mapping of82
+Next published-head required checks, immutable upstream/bootstrap/body mapping of82
 version IDs, then reviewed fresh Docker-free native Auth API isolation. A numeric
 version ledger does NOT identify hosted Auth binary or prove migration bodies.
 Current original-human/session/native-shop positive admission remains blocked by

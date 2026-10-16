@@ -25,8 +25,9 @@ verify166ms is NOT whole baseline/Auth/API/private Storage/config recovery or RT
 the one safe alternative is consumed and passes this selected trial. Do not retry
 unchanged work or invent a second repair if that same failure recurs.
 
-Own build/type/OCR/lint also pass; unit117174018596 remains running at this
-checkpoint. Actual build117174018772 final summaries verify214 tracked media,
+All six own Actions38960489710 now pass by exact28295c10 status, including unit 117174018596. Its log stays unread after502 initial+one retry; no fresh count/
+runtime. Publication hold clears without cancellation or inherited acceptance.
+Actual build117174018772 final summaries verify214 tracked media,
 15 OCR/202 PDF assets, server boundary, Worker `motorsales365`, sole365 backend
 binding and dry-run (returned log truncated). CI merge
 acc29857d4876cd7cafb06e3dcfdcdfb8ca865c7 has the same current tree
@@ -94,7 +95,11 @@ format/diff and final independent review pass. No unchanged
 Unit117174018596 log retrieval failed HTTP502 initially and after ONE same-tool
 retry at2026-10-16T20:34UTC. That read is STOPPED, owner notified once; no CLI/
 dashboard fallback. Later completed exact-head status may clear publication hold
-without a fresh count/runtime or unchanged log retry. New-head CI stays separate.
+without a fresh count/runtime or unchanged log retry; that completed success
+status is now observed. New-head CI stays separate. Implemented source
+42d97b31c04ab278895738c94d6340beb798fea3 is committed, clean; publish it with these
+verification notes once in same draft PR68. Exact publication will be in the PR
+evidence comment. No docs-only CI cancellation or separate planning PR.
 
 Primary source supports a later native standalone Auth binary against external
 Postgres: [Makefile](https://github.com/supabase/auth/blob/master/Makefile),

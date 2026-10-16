@@ -46,8 +46,9 @@ Current provider-version source prerequisite follows actual28295c10 native21
 success: untruncated job117174018706/run38960489710 proves PG17.11/Parts247/quote6/
 selected recovery/all21 ordered markers/terminators/cleanup. Alternative1 consumed
 and selected trial passes; original cause unconfirmed. No repeat/second repair
-for recurrence. Bounded50/75/166ms not full/RTO;47 failures retained. Own build/
-type/OCR/lint pass, unit117174018596 running; no cancellation/inherited pass.
+for recurrence. Bounded50/75/166ms not full/RTO;47 failures retained. All six own
+Actions38960489710 now pass by exact28295c10 status, including unit117174018596.
+Log unread after502+one retry; no fresh count/runtime or inherited pass/cancellation.
 
 Actual bounded sole365 READ ONLY migration-VERSION observation recovers82 IDs,
 including00, complete/nontruncated/zero invalid/duplicate; query8832dd2c… and
@@ -56,7 +57,8 @@ body/baseline/authority/release flags false. Local19/19 three-suite gate passes
 in2.1727946s after reviewed parsed-YAML mandatory-step correction;
 mandatory serialized non-quarantined CI added, no limits/coverage relaxation.
 Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
-hold source publication until282 unit completes, exact commit in PR comment.
+Source42d97b31c04ab278895738c94d6340beb798fea3 committed; completed282 unit status
+clears publication hold, same PR68/new-head checks separate; exact publication in PR comment.
 Unit log117174018596 initial+ONE same-tool retry returned HTTP502; retrieval
 STOPPED/owner notified once. Completion status may clear hold without log count/
 runtime claim; no unchanged log retry/CLI/dashboard fallback.
