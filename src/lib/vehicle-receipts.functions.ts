@@ -4,6 +4,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getRequest } from "@tanstack/react-start/server";
 import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
+  receiptInstallationRequestSchema,
+  RECEIPT_INSTALLATION_FAILURE,
+  parseReceiptInstallationItemResponse,
+  parseReceiptInstallationTargetResponse,
+  parseReceiptInstallationResponse,
+} from "./vehicle-receipt-installation-contract";
+import {
   receiptExpenseRequestSchema,
   RECEIPT_EXPENSE_FAILURE,
   parseReceiptExpenseTargetResponse,
@@ -34,7 +41,6 @@ import {
 } from "./vehicle-receipt-read-contract";
 import {
   RECEIPT_DISCARD_UNAVAILABLE,
-  receiptDate,
   receiptSaveSchema,
   parseReceiptExtraction,
   categoryKeys,
@@ -278,22 +284,69 @@ export const saveVehicleReceipt = createServerFn({ method: "POST" })
   );
 export const installReceiptItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
-    z
-      .object({
-        itemId: uuid,
-        installedOn: receiptDate,
-        odometerKm: z.number().int().nonnegative().max(2000000).nullable(),
-      })
-      .parse(d),
-  )
-  .handler(async ({ data, context }) =>
-    rpc(context.supabase, "install_vehicle_receipt_item", {
-      _item_id: data.itemId,
-      _installed_on: data.installedOn,
-      _odometer_km: data.odometerKm,
-    }),
-  );
+  .inputValidator((input: unknown) => {
+    const parsed = receiptInstallationRequestSchema.safeParse(input);
+    if (!parsed.success) throw new Error("Invalid receipt installation request.");
+    return parsed.data;
+  })
+  .handler(async ({ data, context }) => {
+    const intent = Object.freeze({ ...data });
+    if (context?.userId !== intent.expectedAccountId)
+      throw new Error("Account changed. Refresh before recording an installation.");
+    try {
+      const caller = captureNativeRequestCaller(context, intent.expectedAccountId);
+      const request = getRequest();
+      const assertCurrent = await caller.verify(request);
+      assertCurrent();
+      const db = context.supabase as unknown as {
+        from(table: "vehicle_receipt_items" | "vehicle_receipts"): ReceiptReadBuilder;
+        rpc(
+          name: "install_vehicle_receipt_item",
+          args: { _item_id: string; _installed_on: string; _odometer_km: number | null },
+        ): ReceiptReadBuilder;
+      };
+      const itemQuery = db
+        .from("vehicle_receipt_items")
+        .select("id,receipt_id")
+        .eq("id", intent.itemId)
+        .abortSignal(request.signal)
+        .retry(false)
+        .single();
+      assertCurrent();
+      const itemResponse = await itemQuery;
+      assertCurrent();
+      parseReceiptInstallationItemResponse(itemResponse, intent);
+      assertCurrent();
+      const targetQuery = db
+        .from("vehicle_receipts")
+        .select("id,vehicle_id,shop_vehicle_id")
+        .eq("id", intent.receiptId)
+        .abortSignal(request.signal)
+        .retry(false)
+        .single();
+      assertCurrent();
+      const targetResponse = await targetQuery;
+      assertCurrent();
+      parseReceiptInstallationTargetResponse(targetResponse, intent);
+      assertCurrent();
+      const query = db
+        .rpc("install_vehicle_receipt_item", {
+          _item_id: intent.itemId,
+          _installed_on: intent.installedOn,
+          _odometer_km: intent.odometerKm,
+        })
+        .abortSignal(request.signal)
+        .retry(false);
+      assertCurrent();
+      const response = await query;
+      assertCurrent();
+      const acknowledgment = parseReceiptInstallationResponse(response, intent);
+      assertCurrent();
+      return acknowledgment;
+    } catch {
+      throw new Error(RECEIPT_INSTALLATION_FAILURE);
+    }
+  });
 export const setReceiptSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>

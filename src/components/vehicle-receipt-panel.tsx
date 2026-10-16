@@ -33,6 +33,19 @@ import {
   parseReceiptExpenseAcknowledgment,
   RECEIPT_EXPENSE_FAILURE,
 } from "@/lib/vehicle-receipt-expense-contract";
+import {
+  receiptInstallationRequestSchema,
+  parseReceiptInstallationAcknowledgment,
+  RECEIPT_INSTALLATION_FAILURE,
+  type ReceiptInstallationRequest,
+} from "@/lib/vehicle-receipt-installation-contract";
+
+type InstallationSelection = Readonly<
+  Pick<
+    ReceiptInstallationRequest,
+    "expectedAccountId" | "receiptId" | "itemId" | "expectedVehicleId" | "expectedShopVehicleId"
+  > & { session: number; description: string }
+>;
 
 // The import itself must be client-only, not just the exported scanner body.
 // Start's SSR import protection rejects any server-visible .client module edge.
@@ -140,6 +153,7 @@ function AuthenticatedVehicleReceiptPanel({
   const signFn = useServerFn(getPrivateReceiptUrl);
   const shareFn = useServerFn(setReceiptSharing);
   const expenseFn = useServerFn(recordVehicleReceiptExpense);
+  const installFn = useServerFn(installReceiptItem);
   const receipts = useQuery({
     queryKey: receiptKey,
     enabled: Boolean(userId),
@@ -171,7 +185,22 @@ function AuthenticatedVehicleReceiptPanel({
     );
   }
   const [edit, setEdit] = useState<VehicleReceipt | "new" | null>(null);
-  const [install, setInstall] = useState<VehicleReceipt["items"][number] | null>(null);
+  const [install, setInstall] = useState<InstallationSelection | null>(null);
+  const installationSelection = useRef<InstallationSelection | null>(null);
+  const installationSequence = useRef(0);
+  const installationRead = useRef<{ key: readonly unknown[]; data: typeof data } | null>(null);
+  const installationScope = useRef({
+    active: false,
+    lifetime: 0,
+    held: false,
+    attempt: null as {
+      controller: AbortController;
+      selection: InstallationSelection;
+      acknowledged: boolean;
+    } | null,
+  });
+  const [installationPending, setInstallationPending] = useState(false);
+  const [installationUnknown, setInstallationUnknown] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [openingReceiptId, setOpeningReceiptId] = useState<string | null>(null);
   const privateRead = useRef({ active: false, lifetime: 0, attempt: null as symbol | null });
@@ -297,6 +326,176 @@ function AuthenticatedVehicleReceiptPanel({
       }
     }
   }
+  useLayoutEffect(() => {
+    installationRead.current = {
+      key: ["vehicle-receipts", userId, vehicleId, shopVehicleId, readLifetime, page],
+      data,
+    };
+  }, [data, userId, vehicleId, shopVehicleId, readLifetime, page]);
+  useLayoutEffect(() => {
+    const scope = installationScope.current;
+    scope.active = true;
+    scope.lifetime += 1;
+    setInstallationPending(false);
+    setInstallationUnknown(scope.held);
+    return () => {
+      scope.active = false;
+      scope.lifetime += 1;
+      installationRead.current = null;
+      const pending = scope.attempt;
+      if (pending) {
+        if (!pending.acknowledged) scope.held = true;
+        pending.controller.abort();
+      }
+      scope.attempt = null;
+    };
+  }, []);
+  function matchesInstallationTarget(receipt: VehicleReceipt) {
+    if (Boolean(vehicleId) === Boolean(shopVehicleId)) return false;
+    return vehicleId
+      ? receipt.vehicle_id?.toLowerCase() === vehicleId.toLowerCase()
+      : receipt.shop_vehicle_id?.toLowerCase() === shopVehicleId!.toLowerCase();
+  }
+  function installationWitness(selection: InstallationSelection, snapshot: typeof data) {
+    if (!snapshot || selection.expectedAccountId !== userId) return null;
+    const receipt = snapshot.receipts.find(
+      (row) => row.id.toLowerCase() === selection.receiptId.toLowerCase(),
+    );
+    if (
+      !receipt ||
+      receipt.status !== "confirmed" ||
+      receipt.can_write !== true ||
+      !matchesInstallationTarget(receipt)
+    )
+      return null;
+    const item = receipt.items.find(
+      (row) => row.id.toLowerCase() === selection.itemId.toLowerCase(),
+    );
+    if (!item || item.installed_on !== null || item.reviewed !== true) return null;
+    return { receipt, item };
+  }
+  function currentInstallationWitness(selection: InstallationSelection) {
+    const snapshot = installationRead.current;
+    if (!snapshot?.data || snapshot.data.page !== pageIntent.current) return null;
+    const state = qc.getQueryState(snapshot.key);
+    if (
+      state?.status !== "success" ||
+      state.fetchStatus !== "idle" ||
+      state.isInvalidated ||
+      state.data !== snapshot.data
+    )
+      return null;
+    return installationWitness(selection, snapshot.data);
+  }
+  function launchInstallation(receipt: VehicleReceipt, item: VehicleReceipt["items"][number]) {
+    const scope = installationScope.current;
+    if (!scope.active || scope.attempt || installationSelection.current || !canUseReceiptRead())
+      return;
+    const selection = Object.freeze({
+      session: ++installationSequence.current,
+      description: item.description,
+      expectedAccountId: userId,
+      receiptId: receipt.id,
+      itemId: item.id,
+      expectedVehicleId: vehicleId ?? null,
+      expectedShopVehicleId: shopVehicleId ?? null,
+    });
+    const witness = currentInstallationWitness(selection);
+    if (!witness || witness.receipt !== receipt || witness.item !== item) return;
+    installationSelection.current = selection;
+    setInstall(selection);
+  }
+  function closeInstallation(selection: InstallationSelection) {
+    const scope = installationScope.current;
+    if (!scope.active || installationSelection.current !== selection) return;
+    const pending = scope.attempt;
+    if (pending?.selection === selection) {
+      if (!pending.acknowledged) {
+        scope.held = true;
+        setInstallationUnknown(true);
+      }
+      pending.controller.abort();
+      scope.attempt = null;
+      setInstallationPending(false);
+    }
+    installationSelection.current = null;
+    setInstall(null);
+  }
+  function endInstallationSession(selection: InstallationSelection) {
+    const scope = installationScope.current;
+    if (!scope.active || installationSelection.current !== selection) return;
+    const pending = scope.attempt;
+    if (pending?.selection === selection && !pending.acknowledged) {
+      scope.held = true;
+      setInstallationUnknown(true);
+      pending.controller.abort();
+      scope.attempt = null;
+      setInstallationPending(false);
+    }
+  }
+  async function requestInstallation(
+    selection: InstallationSelection,
+    installedOn: string,
+    odometerKm: number | null,
+  ) {
+    const scope = installationScope.current;
+    if (
+      !scope.active ||
+      scope.held ||
+      scope.attempt ||
+      installationSelection.current !== selection ||
+      !currentInstallationWitness(selection)
+    )
+      return;
+    const parsed = receiptInstallationRequestSchema.safeParse({
+      expectedAccountId: selection.expectedAccountId,
+      receiptId: selection.receiptId,
+      itemId: selection.itemId,
+      expectedVehicleId: selection.expectedVehicleId,
+      expectedShopVehicleId: selection.expectedShopVehicleId,
+      installedOn,
+      odometerKm,
+    });
+    if (!parsed.success || parsed.data.installedOn > localReceiptDate()) return;
+    const intent = Object.freeze(parsed.data);
+    const lifetime = scope.lifetime;
+    const attempt = { controller: new AbortController(), selection, acknowledged: false };
+    scope.attempt = attempt;
+    setInstallationPending(true);
+    const current = () =>
+      scope.active &&
+      scope.lifetime === lifetime &&
+      scope.attempt === attempt &&
+      installationSelection.current === selection &&
+      !attempt.controller.signal.aborted;
+    try {
+      const raw = await installFn({ data: intent, signal: attempt.controller.signal });
+      if (!current()) return;
+      parseReceiptInstallationAcknowledgment(raw, intent);
+      if (!current()) return;
+      attempt.acknowledged = true;
+      toast.message("Installation request acknowledged. Refresh vehicle history to confirm.");
+      if (!current()) return;
+      void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });
+      if (!current()) return;
+      void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
+      if (!current()) return;
+      installationSelection.current = null;
+      setInstall(null);
+      scope.attempt = null;
+      setInstallationPending(false);
+    } catch {
+      if (current()) {
+        scope.held = true;
+        setInstallationUnknown(true);
+      }
+    } finally {
+      if (current()) {
+        scope.attempt = null;
+        setInstallationPending(false);
+      }
+    }
+  }
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: ["vehicle-receipts", userId] });
     void qc.invalidateQueries({ queryKey: ["vehicle-history"] });
@@ -355,6 +554,11 @@ function AuthenticatedVehicleReceiptPanel({
       {expensePending && (
         <p role="status" className="text-sm">
           Checking expense request…
+        </p>
+      )}
+      {installationUnknown && !install && (
+        <p role="alert" className="text-sm text-destructive">
+          {RECEIPT_INSTALLATION_FAILURE}
         </p>
       )}
       {(receipts.isPending || receipts.fetchStatus !== "idle") && (
@@ -554,17 +758,20 @@ function AuthenticatedVehicleReceiptPanel({
                         : "Not recorded as installed"}
                     </p>
                   </div>
-                  {r.status === "confirmed" && r.can_write === true && !i.installed_on && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        if (canUseReceiptRead()) setInstall(i);
-                      }}
-                    >
-                      <Wrench className="mr-1 h-3 w-3" /> Record installation
-                    </Button>
-                  )}
+                  {r.status === "confirmed" &&
+                    r.can_write === true &&
+                    i.reviewed === true &&
+                    i.installed_on === null &&
+                    matchesInstallationTarget(r) && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={installationPending}
+                        onClick={() => launchInstallation(r, i)}
+                      >
+                        <Wrench className="mr-1 h-3 w-3" /> Record installation
+                      </Button>
+                    )}
                 </div>
               ))}
             {vehicleId && r.status === "confirmed" && (
@@ -636,11 +843,14 @@ function AuthenticatedVehicleReceiptPanel({
       )}
       {install && (
         <InstallReceiptDialog
-          item={install}
-          onClose={() => {
-            setInstall(null);
-            refresh();
-          }}
+          key={install.session}
+          selection={install}
+          pending={installationPending}
+          held={installationUnknown}
+          witnessReady={Boolean(installationWitness(install, data))}
+          onSubmit={(date, km) => void requestInstallation(install, date, km)}
+          onClose={() => closeInstallation(install)}
+          onSessionCleanup={() => endInstallationSession(install)}
         />
       )}
     </section>
@@ -1200,28 +1410,47 @@ function ReceiptEditor({
     </Dialog>
   );
 }
+function InstallationSessionBoundary({ onCleanup }: { onCleanup: () => void }) {
+  // Radix mounts portal content after its dialog wrapper. Fence the committed
+  // content lifetime itself, including its real StrictMode cleanup/replay.
+  const cleanup = useRef(onCleanup);
+  useLayoutEffect(() => () => cleanup.current(), []);
+  return null;
+}
 function InstallReceiptDialog({
-  item,
+  selection,
+  pending,
+  held,
+  witnessReady,
+  onSubmit,
   onClose,
+  onSessionCleanup,
 }: {
-  item: VehicleReceipt["items"][number];
+  selection: InstallationSelection;
+  pending: boolean;
+  held: boolean;
+  witnessReady: boolean;
+  onSubmit: (date: string, km: number | null) => void;
   onClose: () => void;
+  onSessionCleanup: () => void;
 }) {
-  const install = useServerFn(installReceiptItem);
   const [date, setDate] = useState(localReceiptDate()),
     [km, setKm] = useState(""),
-    [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   return (
     <Dialog
       open
       onOpenChange={(o) => {
-        if (!o && !busy) onClose();
+        if (!o) onClose();
       }}
     >
       <DialogContent>
+        <InstallationSessionBoundary onCleanup={onSessionCleanup} />
         <DialogHeader>
-          <DialogTitle>Record installation: {item.description}</DialogTitle>
+          <DialogTitle>Record installation: {selection.description}</DialogTitle>
+          <DialogDescription>
+            Review the actual fitting date and vehicle odometer before submitting.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
@@ -1233,6 +1462,7 @@ function InstallReceiptDialog({
             type="date"
             value={date}
             max={localReceiptDate()}
+            disabled={pending || held}
             onChange={(e) => setDate(e.target.value)}
           />
           <Label htmlFor="installed-km">Odometer (km, optional)</Label>
@@ -1240,31 +1470,51 @@ function InstallReceiptDialog({
             id="installed-km"
             type="number"
             min={0}
+            max={2_000_000}
+            step={1}
             value={km}
+            disabled={pending || held}
             onChange={(e) => setKm(e.target.value)}
           />
-          {error && (
+          {!witnessReady && !held && (
+            <p role="status" className="text-sm text-muted-foreground">
+              Refresh receipts and find this matching uninstalled item before submitting.
+            </p>
+          )}
+          {pending && (
+            <p role="status" className="text-sm">
+              Checking installation request…
+            </p>
+          )}
+          {(held || error) && (
             <p role="alert" className="text-sm text-destructive">
-              {error}
+              {held ? RECEIPT_INSTALLATION_FAILURE : error}
             </p>
           )}
         </div>
         <DialogFooter>
           <Button
-            disabled={busy || !date}
-            onClick={async () => {
-              setBusy(true);
-              try {
-                await install({
-                  data: { itemId: item.id, installedOn: date, odometerKm: num(km) },
-                });
-                toast.success("Installation recorded");
-                onClose();
-              } catch (e: any) {
-                setError(e.message);
-              } finally {
-                setBusy(false);
+            disabled={pending || held || !witnessReady || !date}
+            onClick={() => {
+              if (pending || held || !witnessReady) return;
+              const odometerKm = km === "" ? null : /^\d+$/.test(km) ? Number(km) : NaN;
+              const parsed = receiptInstallationRequestSchema.safeParse({
+                expectedAccountId: selection.expectedAccountId,
+                receiptId: selection.receiptId,
+                itemId: selection.itemId,
+                expectedVehicleId: selection.expectedVehicleId,
+                expectedShopVehicleId: selection.expectedShopVehicleId,
+                installedOn: date,
+                odometerKm,
+              });
+              if (!parsed.success || parsed.data.installedOn > localReceiptDate()) {
+                setError(
+                  "Check the installation date and enter whole kilometres from 0 to 2,000,000, or leave the odometer blank.",
+                );
+                return;
               }
+              setError("");
+              onSubmit(parsed.data.installedOn, parsed.data.odometerKm);
             }}
           >
             Save installation

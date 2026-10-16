@@ -7,10 +7,12 @@ import {
   getPrivateReceiptUrl,
   recordVehicleReceiptExpense,
   discardReceiptDraft,
+  installReceiptItem,
 } from "./vehicle-receipts.functions";
 import { PRIVATE_RECEIPT_URL_FAILURE } from "./private-receipt-url.server";
 import { RECEIPT_EXPENSE_FAILURE } from "./vehicle-receipt-expense-contract";
 import { RECEIPT_DISCARD_UNAVAILABLE } from "./vehicle-receipts";
+import { RECEIPT_INSTALLATION_FAILURE } from "./vehicle-receipt-installation-contract";
 const mocks = vi.hoisted(() => ({
   request: vi.fn(),
   privileged: vi.fn(),
@@ -62,6 +64,15 @@ const expenseRequest = () => ({
   expectedShopVehicleId: shopVehicle,
 });
 const expenseAcknowledgment = () => ({ receiptId, shopVehicleId: shopVehicle, expenseId });
+const installationIntent = (shop = false) => ({
+  expectedAccountId: account,
+  receiptId,
+  itemId,
+  expectedVehicleId: shop ? null : vehicle,
+  expectedShopVehicleId: shop ? shopVehicle : null,
+  installedOn: "2026-10-15",
+  odometerKm: 12345,
+});
 const receiptProjection =
   "id,vehicle_id,shop_vehicle_id,created_by,file_path,file_name,media_type,vendor,purchased_on,currency,total,status,share_with_shop,created_at";
 const itemProjection =
@@ -120,7 +131,10 @@ type Stage =
   | "links"
   | "private"
   | "expense"
-  | "expenseTarget";
+  | "expenseTarget"
+  | "installationItem"
+  | "installationTarget"
+  | "installation";
 type Read = {
   stage: Stage;
   table?: string;
@@ -186,7 +200,13 @@ function client(
                     ? { id: receiptId, shop_vehicle_id: shopVehicle }
                     : read.stage === "expense"
                       ? expenseId
-                      : [link()],
+                      : read.stage === "installationItem"
+                        ? { id: itemId, receipt_id: receiptId }
+                        : read.stage === "installationTarget"
+                          ? { id: receiptId, vehicle_id: vehicle, shop_vehicle_id: shopVehicle }
+                          : read.stage === "installation"
+                            ? null
+                            : [link()],
     error: null,
     ...(["headers", "items", "links"].includes(read.stage) ? { count: 1 } : {}),
   });
@@ -202,6 +222,8 @@ function client(
         if (projection === activeProjection) read.stage = "activeLink";
         if (projection === "id,file_path") read.stage = "private";
         if (projection === "id,shop_vehicle_id") read.stage = "expenseTarget";
+        if (projection === "id,receipt_id") read.stage = "installationItem";
+        if (projection === "id,vehicle_id,shop_vehicle_id") read.stage = "installationTarget";
         return op("select");
       },
       eq: (column: string, value: unknown) => {
@@ -295,7 +317,9 @@ function client(
             ? "access"
             : name === "record_vehicle_receipt_expense"
               ? "expense"
-              : "attachments",
+              : name === "install_vehicle_receipt_item"
+                ? "installation"
+                : "attachments",
         args,
         filters: {},
         orders: [],
@@ -351,6 +375,11 @@ async function discardDraft(data: unknown, ctx: unknown) {
       data: unknown;
       context: unknown;
     }) => Promise<unknown>
+  )({ data, context: ctx });
+}
+async function recordInstallation(data: unknown, ctx: unknown) {
+  return (
+    installReceiptItem as unknown as (args: { data: unknown; context: unknown }) => Promise<unknown>
   )({ data, context: ctx });
 }
 beforeEach(() => {
@@ -1946,6 +1975,367 @@ describe("temporary draft discard source interlock", () => {
       const caller = client();
       await expect(discardDraft(input, context(caller))).rejects.toThrow();
       expectNoClientAccess(caller);
+    },
+  );
+});
+
+describe("installation caller, selected target and void transport boundary", () => {
+  // Actual handler with synthetic SDK responses; no SQL authority, durable
+  // operation receipt, persisted installation/history or cancellation proof.
+  afterEach(() => {
+    expect(mocks.writes).not.toHaveBeenCalled();
+    expect(mocks.privileged).not.toHaveBeenCalled();
+  });
+  const phases = ["installationItem", "installationTarget", "installation"] as const;
+  const valid = (phase: (typeof phases)[number]): Response => ({
+    data:
+      phase === "installationItem"
+        ? { id: itemId, receipt_id: receiptId }
+        : phase === "installationTarget"
+          ? { id: receiptId, vehicle_id: vehicle, shop_vehicle_id: shopVehicle }
+          : null,
+    error: null,
+  });
+
+  it.each([false, true])(
+    "preflights exact item/receipt/selected target shop=%s then acknowledges only one legacy void RPC",
+    async (shop) => {
+      const caller = client(),
+        request = installationIntent(shop);
+      await expect(recordInstallation(request, context(caller))).resolves.toEqual(request);
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.from.mock.calls).toEqual([["vehicle_receipt_items"], ["vehicle_receipts"]]);
+      expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("install_vehicle_receipt_item", {
+        _item_id: itemId,
+        _installed_on: request.installedOn,
+        _odometer_km: request.odometerKm,
+      });
+      expect(caller.reads).toEqual([
+        expect.objectContaining({
+          stage: "installationItem",
+          projection: "id,receipt_id",
+          filters: { id: itemId },
+          signal: controller.signal,
+          retry: false,
+          single: true,
+        }),
+        expect.objectContaining({
+          stage: "installationTarget",
+          projection: "id,vehicle_id,shop_vehicle_id",
+          filters: { id: receiptId },
+          signal: controller.signal,
+          retry: false,
+          single: true,
+        }),
+        expect.objectContaining({ stage: "installation", signal: controller.signal, retry: false }),
+      ]);
+      expect(caller.storage.from).not.toHaveBeenCalled();
+    },
+  );
+  it.each([
+    null,
+    {},
+    { ...installationIntent(), expectedAccountId: "PRIVATE" },
+    { ...installationIntent(), receiptId: "PRIVATE" },
+    { ...installationIntent(), itemId: "PRIVATE" },
+    { ...installationIntent(), expectedVehicleId: null },
+    { ...installationIntent(), expectedShopVehicleId: shopVehicle },
+    { ...installationIntent(), installedOn: "2026-02-30" },
+    { ...installationIntent(), odometerKm: 1.5 },
+    { ...installationIntent(), extra: true },
+  ])(
+    "rejects malformed installation intent before request/Auth/native dispatch: %j",
+    async (input) => {
+      const caller = client();
+      await expect(recordInstallation(input, context(caller))).rejects.toThrow(
+        "Invalid receipt installation request.",
+      );
+      expect(mocks.request).not.toHaveBeenCalled();
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it("preserves early installation account denial", async () => {
+    const caller = client();
+    await expect(
+      recordInstallation({ ...installationIntent(), expectedAccountId: uid(9) }, context(caller)),
+    ).rejects.toThrow("Account changed. Refresh before recording an installation.");
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it("captures all seven primitive fields before request hooks mutate the validated object", async () => {
+    const caller = client();
+    mocks.request.mockImplementationOnce(() => {
+      Object.assign(mocks.validated as object, {
+        expectedAccountId: uid(9),
+        receiptId: uid(10),
+        itemId: uid(11),
+        expectedVehicleId: null,
+        expectedShopVehicleId: uid(12),
+        installedOn: "2026-10-16",
+        odometerKm: 22,
+      });
+      return currentRequest();
+    });
+    await expect(recordInstallation(installationIntent(), context(caller))).resolves.toEqual(
+      installationIntent(),
+    );
+    expect(caller.rpc).toHaveBeenCalledExactlyOnceWith("install_vehicle_receipt_item", {
+      _item_id: itemId,
+      _installed_on: "2026-10-15",
+      _odometer_km: 12345,
+    });
+  });
+  it.each([null, "Basic PRIVATE", "Bearer opaque", "Bearer fixture.access.token,second"])(
+    "refuses malformed installation Bearer: %j",
+    async (authorization) => {
+      const caller = client();
+      mocks.request.mockReturnValue({
+        signal: controller.signal,
+        headers: { get: () => authorization },
+      });
+      await expect(recordInstallation(installationIntent(), context(caller))).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it.each([
+    null,
+    { sub: account, role: "service_role" },
+    { sub: account, role: "authenticated", is_anonymous: true },
+  ])("refuses incompatible installation claims before request access: %j", async (claims) => {
+    const caller = client();
+    await expect(
+      recordInstallation(installationIntent(), { ...context(caller), claims }),
+    ).rejects.toThrow(RECEIPT_INSTALLATION_FAILURE);
+    expect(mocks.request).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  it.each([
+    { data: { user: null }, error: null },
+    { data: { user: { id: uid(9) } }, error: null },
+    { data: { user: { id: account, is_anonymous: true } }, error: null },
+    { data: { user: { id: account } }, error: { message: "PRIVATE Auth" } },
+  ])("refuses unconfirmed current installation Auth: %j", async (response) => {
+    const caller = client();
+    caller.auth.getUser.mockResolvedValue(response);
+    await expect(recordInstallation(installationIntent(), context(caller))).rejects.toThrow(
+      RECEIPT_INSTALLATION_FAILURE,
+    );
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  const losses = ["account", "client", "claims", "auth-method", "header", "abort"] as const;
+  function loseCaller(
+    ctx: ReturnType<typeof context>,
+    loss: (typeof losses)[number],
+    request: ReturnType<typeof currentRequest>,
+  ) {
+    if (loss === "account") ctx.userId = uid(9);
+    if (loss === "client") ctx.supabase = client();
+    if (loss === "claims") ctx.claims.role = "service_role";
+    if (loss === "auth-method")
+      ctx.supabase.auth.getUser = vi.fn(() =>
+        Promise.resolve({ data: { user: { id: account } }, error: null }),
+      );
+    if (loss === "header") request.headers.set("authorization", "Bearer changed.access.token");
+    if (loss === "abort") controller.abort(new Error("PRIVATE abort"));
+  }
+  it.each(["account", "client", "claims", "auth-method"] as const)(
+    "captures installation caller before request replacement of %s",
+    async (loss) => {
+      const caller = client(),
+        ctx = context(caller),
+        request = currentRequest();
+      mocks.request.mockImplementationOnce(() => {
+        loseCaller(ctx, loss, request);
+        return request;
+      });
+      await expect(recordInstallation(installationIntent(), ctx)).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it.each(losses)("denies %s loss while explicit installation Auth is pending", async (loss) => {
+    const pending = deferred<unknown>(),
+      caller = client(),
+      ctx = context(caller),
+      request = currentRequest();
+    mocks.request.mockReturnValue(request);
+    caller.auth.getUser.mockReturnValue(pending.promise);
+    const result = recordInstallation(installationIntent(), ctx);
+    loseCaller(ctx, loss, request);
+    pending.resolve({ data: { user: { id: account } }, error: null });
+    await expect(result).rejects.toThrow(RECEIPT_INSTALLATION_FAILURE);
+    expect(caller.from).not.toHaveBeenCalled();
+    expect(caller.rpc).not.toHaveBeenCalled();
+  });
+  for (const phase of phases) {
+    for (const point of ["build", "result"] as const) {
+      it.each(losses)(
+        `denies %s loss at ${phase} ${point} without a captured-intent acknowledgment`,
+        async (loss) => {
+          const request = currentRequest();
+          const caller = client({
+              onBuild: (read, method) => {
+                if (
+                  point === "build" &&
+                  read.stage === phase &&
+                  method === (phase === "installation" ? "retry" : "single")
+                )
+                  loseCaller(ctx, loss, request);
+              },
+              onResult: (read) => {
+                if (point === "result" && read.stage === phase) loseCaller(ctx, loss, request);
+              },
+            }),
+            ctx = context(caller);
+          mocks.request.mockReturnValue(request);
+          await expect(recordInstallation(installationIntent(), ctx)).rejects.toThrow(
+            RECEIPT_INSTALLATION_FAILURE,
+          );
+          if (point === "build")
+            expect(caller.reads.map((read) => read.stage)).not.toContain(phase);
+          if (phase !== "installation") expect(caller.rpc).not.toHaveBeenCalled();
+          else expect(caller.rpc).toHaveBeenCalledTimes(1);
+        },
+      );
+    }
+    it.each([undefined, false, "", { message: "PRIVATE provider cause" }])(
+      `requires explicit ${phase} error:null with valid control/data: %j`,
+      async (error) => {
+        const control = client();
+        await expect(recordInstallation(installationIntent(), context(control))).resolves.toEqual(
+          installationIntent(),
+        );
+        const caller = client({ responses: { [phase]: { ...valid(phase), error } } });
+        const result = await recordInstallation(installationIntent(), context(caller)).catch(
+          (value: unknown) => value,
+        );
+        expect((result as Error).message).toBe(RECEIPT_INSTALLATION_FAILURE);
+        expect(result).not.toHaveProperty("cause");
+        expect(String(result)).not.toContain("PRIVATE");
+        if (phase !== "installation") expect(caller.rpc).not.toHaveBeenCalled();
+      },
+    );
+    it.each(["data", "error"] as const)(`never invokes ${phase} SDK %s accessors`, async (key) => {
+      const response = valid(phase),
+        get = vi.fn(() => "PRIVATE");
+      Object.defineProperty(response, key, { enumerable: true, get });
+      const caller = client({ responses: { [phase]: response } });
+      await expect(recordInstallation(installationIntent(), context(caller))).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(get).not.toHaveBeenCalled();
+      if (phase !== "installation") expect(caller.rpc).not.toHaveBeenCalled();
+    });
+    it(`rechecks caller after ${phase} parsing reflection`, async () => {
+      const trap = vi.fn();
+      const body = valid(phase);
+      const reflection =
+        phase === "installation"
+          ? new Proxy(body, {
+              getOwnPropertyDescriptor: (target, key) => {
+                if (key === "data") {
+                  trap();
+                  ctx.claims.role = "service_role";
+                }
+                return Reflect.getOwnPropertyDescriptor(target, key);
+              },
+            })
+          : {
+              ...body,
+              data: new Proxy(body.data as object, {
+                ownKeys: (target) => {
+                  trap();
+                  ctx.claims.role = "service_role";
+                  return Reflect.ownKeys(target);
+                },
+              }),
+            };
+      const caller = client({ responses: { [phase]: reflection } }),
+        ctx = context(caller);
+      await expect(recordInstallation(installationIntent(), ctx)).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(trap).toHaveBeenCalledExactlyOnceWith();
+      if (phase !== "installation") expect(caller.rpc).not.toHaveBeenCalled();
+    });
+    it(`denies an ignored late ${phase} result after request abort without another dispatch`, async () => {
+      const pending = deferred<Response>(),
+        caller = client({ responses: { [phase]: pending.promise } });
+      const result = recordInstallation(installationIntent(), context(caller));
+      await vi.waitFor(() => expect(caller.reads.map((read) => read.stage)).toContain(phase));
+      controller.abort();
+      pending.resolve(valid(phase));
+      await expect(result).rejects.toThrow(RECEIPT_INSTALLATION_FAILURE);
+      if (phase !== "installation") expect(caller.rpc).not.toHaveBeenCalled();
+      else expect(caller.rpc).toHaveBeenCalledTimes(1);
+    });
+  }
+  it.each([null, {}, { id: uid(9), receipt_id: receiptId }, { id: itemId, receipt_id: uid(9) }])(
+    "rejects missing/misbound item before receipt or installation dispatch: %j",
+    async (data) => {
+      const caller = client({ responses: { installationItem: { data, error: null } } });
+      await expect(recordInstallation(installationIntent(), context(caller))).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(caller.from).toHaveBeenCalledTimes(1);
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it.each([false, true])(
+    "refuses an unrelated selected target shop=%s even with readable linked-vehicle evidence",
+    async (shop) => {
+      const data = {
+        id: receiptId,
+        vehicle_id: shop ? vehicle : uid(9),
+        shop_vehicle_id: shop ? uid(9) : shopVehicle,
+      };
+      const caller = client({ responses: { installationTarget: { data, error: null } } });
+      await expect(recordInstallation(installationIntent(shop), context(caller))).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(caller.rpc).not.toHaveBeenCalled();
+    },
+  );
+  it.each([undefined, false, true, 0, [], {}, itemId])(
+    "rejects non-null legacy void RPC data instead of installation success: %j",
+    async (data) => {
+      const caller = client({ responses: { installation: { data, error: null } } });
+      await expect(recordInstallation(installationIntent(), context(caller))).rejects.toThrow(
+        RECEIPT_INSTALLATION_FAILURE,
+      );
+      expect(caller.rpc).toHaveBeenCalledTimes(1);
+    },
+  );
+  it.each(["resolve", "reject"] as const)(
+    "ignores late installation Auth %s after its bounded wait",
+    async (settlement) => {
+      vi.useFakeTimers();
+      const pending = deferred<unknown>(),
+        caller = client();
+      caller.auth.getUser.mockReturnValue(pending.promise);
+      const result = recordInstallation(installationIntent(), context(caller));
+      const assertion = expect(result).rejects.toThrow(RECEIPT_INSTALLATION_FAILURE);
+      await vi.advanceTimersByTimeAsync(10000);
+      await assertion;
+      if (settlement === "resolve")
+        pending.resolve({ data: { user: { id: account } }, error: null });
+      else pending.reject(new Error("PRIVATE late Auth"));
+      await Promise.resolve();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.rpc).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
     },
   );
 });

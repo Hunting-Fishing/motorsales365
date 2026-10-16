@@ -2889,3 +2889,490 @@ describe("temporary receipt draft-removal unavailability", () => {
     expectNoRemovalDispatch();
   });
 });
+
+describe("receipt installation intent, acknowledgment and committed session", () => {
+  const accountA = "41000000-aaaa-4000-8000-000000000001";
+  const accountB = "41000000-bbbb-4000-8000-000000000002";
+  const shop = "42000000-aaaa-4000-8000-000000000001";
+  const otherVehicle = "10000000-0000-4000-8000-000000000002";
+  const parentId = "43000000-aaaa-4000-8000-000000000001";
+  const itemId = "44000000-aaaa-4000-8000-000000000001";
+  const installedOn = "2020-01-02";
+  const failure =
+    "Installation change could not be confirmed. Check vehicle history before repeating this request.";
+  const neutral = "Installation request acknowledged. Refresh vehicle history to confirm.";
+  type Intent = {
+    expectedAccountId: string;
+    receiptId: string;
+    itemId: string;
+    expectedVehicleId: string | null;
+    expectedShopVehicleId: string | null;
+    installedOn: string;
+    odometerKm: number | null;
+  };
+  type Ack = Awaited<ReturnType<typeof api.installReceiptItem>>;
+  type ReadOptions = {
+    data: { expectedAccountId: string; vehicleId?: string; shopVehicleId?: string; page?: number };
+  };
+  function row(): VehicleReceipt {
+    return {
+      ...receipt("Installation supplier"),
+      id: parentId,
+      vehicle_id: vehicle,
+      shop_vehicle_id: shop,
+      status: "confirmed",
+      items: [
+        {
+          id: itemId,
+          description: "Retained brake assembly",
+          category: "brakes",
+          brand: null,
+          part_number: null,
+          quantity: 1,
+          total: null,
+          confidence: 1,
+          reviewed: true,
+          installed_on: null,
+          odometer_km: null,
+          public_summary_allowed: false,
+        },
+      ],
+    };
+  }
+  function page(input: ReadOptions["data"] = { expectedAccountId: accountA }): ReceiptRead {
+    const receipt = {
+      ...row(),
+      vehicle_id: input.vehicleId ?? vehicle,
+      shop_vehicle_id: input.shopVehicleId ?? shop,
+    };
+    if (input.page === 1) receipt.id = "43000000-bbbb-4000-8000-000000000002";
+    return receiptPage(
+      { receipts: [receipt], linkedVehicleId: null, canWrite: true },
+      input.page,
+      26,
+    );
+  }
+  function request(index = 0) {
+    return vi.mocked(api.installReceiptItem).mock.calls[index][0] as unknown as {
+      data: Intent;
+      signal: AbortSignal;
+    };
+  }
+  function rawClick(button: HTMLElement) {
+    const key = Object.getOwnPropertyNames(button).find((name) => name.startsWith("__reactProps$"));
+    expect(key).toBeDefined();
+    const handler = (Reflect.get(button, key!) as { onClick: () => void }).onClick;
+    expect(handler).toBeTypeOf("function");
+    return handler;
+  }
+  function fields(dialog: HTMLElement, date = installedOn, km = "12345") {
+    fireEvent.change(within(dialog).getByLabelText("Installation date"), {
+      target: { value: date },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Odometer (km, optional)"), {
+      target: { value: km },
+    });
+  }
+  async function open(target: ReceiptTarget = { vehicleId: vehicle }) {
+    const context = show(undefined, target);
+    fireEvent.click(await screen.findByRole("button", { name: "Record installation" }));
+    const dialog = screen.getByRole("dialog");
+    fields(dialog);
+    return { ...context, dialog };
+  }
+  beforeEach(() => {
+    auth.userId = accountA;
+    vi.mocked(api.installReceiptItem)
+      .mockReset()
+      .mockImplementation((options) =>
+        Promise.resolve({ ...(options as unknown as { data: Intent }).data }),
+      );
+    vi.mocked(api.getVehicleReceipts).mockImplementation((options) =>
+      Promise.resolve(page((options as unknown as ReadOptions).data)),
+    );
+    vi.spyOn(toast, "message").mockImplementation(() => 0);
+    vi.spyOn(toast, "success").mockImplementation(() => 0);
+    vi.spyOn(toast, "error").mockImplementation(() => 0);
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it.each(["owner", "shop"] as const)(
+    "captures a dual-ID %s receipt and synchronously admits only one checked installation",
+    async (mode) => {
+      const pending = deferred<Ack>();
+      vi.mocked(api.installReceiptItem).mockReturnValueOnce(pending.promise);
+      const { dialog, client } = await open(
+        mode === "owner" ? { vehicleId: vehicle } : { shopVehicleId: shop },
+      );
+      if (mode === "shop") fields(dialog, installedOn, "");
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      const submit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+      act(() => {
+        submit();
+        submit();
+      });
+      expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+      expect(request().data).toEqual({
+        expectedAccountId: accountA,
+        receiptId: parentId,
+        itemId,
+        expectedVehicleId: mode === "owner" ? vehicle : null,
+        expectedShopVehicleId: mode === "shop" ? shop : null,
+        installedOn,
+        odometerKm: mode === "owner" ? 12345 : null,
+      });
+      expect(Object.isFrozen(request().data)).toBe(true);
+      expect(request().signal.aborted).toBe(false);
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+      await act(async () => pending.resolve({ ...request().data }));
+      expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral);
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate.mock.calls.map(([filter]) => filter?.queryKey)).toEqual([
+        ["vehicle-receipts", accountA],
+        ["vehicle-history"],
+      ]);
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    },
+  );
+
+  it.each(["void", "wrong item", "changed date"] as const)(
+    "holds a %s acknowledgment and cannot repeat via a captured submit",
+    async (kind) => {
+      vi.mocked(api.installReceiptItem).mockImplementationOnce((options) => {
+        const intent = (options as unknown as { data: Intent }).data;
+        return Promise.resolve(
+          (kind === "void"
+            ? null
+            : {
+                ...intent,
+                ...(kind === "wrong item" ? { itemId: parentId } : { installedOn: "2020-01-03" }),
+              }) as Ack,
+        );
+      });
+      const { dialog, client } = await open();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      const submit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+      act(submit);
+      await within(dialog).findByText(failure);
+      act(submit);
+      expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+      expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeDisabled();
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    { date: "9999-12-31", km: "0" },
+    { date: "2020-02-30", km: "0" },
+    { date: "", km: "0" },
+    { date: installedOn, km: "-1" },
+    { date: installedOn, km: "1.5" },
+    { date: installedOn, km: "2000001" },
+  ])("refuses invalid date/odometer input without dispatch: %j", async ({ date, km }) => {
+    const { dialog } = await open();
+    // Expose the caller validator beyond native input sanitization/disabled admission.
+    (within(dialog).getByLabelText("Installation date") as HTMLInputElement).type = "text";
+    (within(dialog).getByLabelText("Odometer (km, optional)") as HTMLInputElement).type = "text";
+    fields(dialog, date, km);
+    act(rawClick(within(dialog).getByRole("button", { name: "Save installation" })));
+    expect(api.installReceiptItem).not.toHaveBeenCalled();
+    expect(within(dialog).getByRole("alert")).toHaveTextContent("Check the installation date");
+    expect(within(dialog).queryByText(failure)).not.toBeInTheDocument();
+  });
+
+  it("preserves fields through read refresh and paging, then retains an unknown hold across close/reopen", async () => {
+    const context = show();
+    const next = await screen.findByRole("button", { name: "Next receipts" });
+    await waitFor(() => expect(next).toBeEnabled());
+    const previous = rawClick(screen.getByRole("button", { name: "Previous receipts" }));
+    fireEvent.click(screen.getByRole("button", { name: "Record installation" }));
+    const dialog = screen.getByRole("dialog");
+    fields(dialog);
+    const refresh = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(refresh.promise);
+    act(() => {
+      void context.client.refetchQueries({ queryKey: ["vehicle-receipts", accountA] });
+    });
+    expect(screen.getByRole("dialog")).toBe(dialog);
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeDisabled(),
+    );
+    await act(async () => refresh.resolve(page()));
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeEnabled(),
+    );
+    fireEvent.click(next);
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeDisabled(),
+    );
+    expect(within(dialog).getByLabelText("Installation date")).toHaveValue(installedOn);
+    expect(within(dialog).getByLabelText("Odometer (km, optional)")).toHaveValue(12345);
+    act(previous);
+    await waitFor(() =>
+      expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeEnabled(),
+    );
+    vi.mocked(api.installReceiptItem).mockRejectedValueOnce(
+      new Error("PRIVATE native installation detail"),
+    );
+    const oldSubmit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+    act(oldSubmit);
+    await within(dialog).findByText(failure);
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(screen.getByText(failure)).toBeVisible();
+    act(() => {
+      void context.client.refetchQueries({ queryKey: ["vehicle-receipts", accountA] });
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Record installation" }));
+    const reopened = screen.getByRole("dialog");
+    expect(reopened).not.toBe(dialog);
+    expect(within(reopened).getByText(failure)).toBeVisible();
+    act(oldSubmit);
+    act(rawClick(within(reopened).getByRole("button", { name: "Save installation" })));
+    expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(/PRIVATE/)).not.toBeInTheDocument();
+    expect(toast.message).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it.each(["write", "status", "reviewed", "installed", "target"] as const)(
+    "rechecks same-ID current rows after %s eligibility changes, even through the old submit",
+    async (kind) => {
+      const { dialog, client } = await open();
+      const submit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+      const replacement = page();
+      const receipt = replacement.receipts[0];
+      if (kind === "write") receipt.can_write = false;
+      if (kind === "status") receipt.status = "draft";
+      if (kind === "reviewed") receipt.items[0].reviewed = false;
+      if (kind === "installed") receipt.items[0].installed_on = "2020-01-01";
+      if (kind === "target") receipt.vehicle_id = otherVehicle;
+      const key = client
+        .getQueryCache()
+        .find({ queryKey: ["vehicle-receipts"], exact: false })!.queryKey;
+      act(() => {
+        client.setQueryData(key, replacement);
+      });
+      await waitFor(() =>
+        expect(within(dialog).getByRole("button", { name: "Save installation" })).toBeDisabled(),
+      );
+      act(submit);
+      expect(api.installReceiptItem).not.toHaveBeenCalled();
+      expect(within(dialog).getByLabelText("Installation date")).toHaveValue(installedOn);
+      expect(within(dialog).queryByText(failure)).not.toBeInTheDocument();
+    },
+  );
+
+  it("admits an unchanged fresh replacement witness, rather than requiring the launch object's identity forever", async () => {
+    const { dialog, client } = await open();
+    const submit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+    const replacement = page();
+    replacement.receipts[0].vendor = "Fresh replacement supplier";
+    const key = client
+      .getQueryCache()
+      .find({ queryKey: ["vehicle-receipts"], exact: false })!.queryKey;
+    act(() => {
+      client.setQueryData(key, replacement);
+    });
+    await screen.findByText("Fresh replacement supplier");
+    act(submit);
+    await waitFor(() => expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral));
+    expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+  });
+
+  it("blocks a raw submit in the exact tick its current receipt read is invalidated", async () => {
+    const { dialog, client } = await open();
+    const submit = rawClick(within(dialog).getByRole("button", { name: "Save installation" }));
+    const refresh = deferred<ReceiptRead>();
+    vi.mocked(api.getVehicleReceipts).mockReturnValueOnce(refresh.promise);
+    act(() => {
+      void client.invalidateQueries({ queryKey: ["vehicle-receipts", accountA] });
+      submit();
+    });
+    expect(api.installReceiptItem).not.toHaveBeenCalled();
+    await act(async () => refresh.resolve(page()));
+  });
+
+  it.each(["both selected", "linked other target", "unreviewed"] as const)(
+    "does not launch installation for %s visibility",
+    async (kind) => {
+      const source = page();
+      if (kind === "linked other target")
+        source.receipts[0].shop_vehicle_id = "42000000-bbbb-4000-8000-000000000002";
+      if (kind === "unreviewed") source.receipts[0].items[0].reviewed = false;
+      vi.mocked(api.getVehicleReceipts).mockResolvedValueOnce(source);
+      show(
+        undefined,
+        kind === "both selected"
+          ? { vehicleId: vehicle, shopVehicleId: shop }
+          : kind === "linked other target"
+            ? { shopVehicleId: shop }
+            : { vehicleId: vehicle },
+      );
+      await screen.findByText("Installation supplier");
+      expect(screen.queryByRole("button", { name: "Record installation" })).not.toBeInTheDocument();
+      expect(api.installReceiptItem).not.toHaveBeenCalled();
+    },
+  );
+
+  for (const settlement of ["resolve", "reject"] as const) {
+    it.each(["account", "account ABA", "target ABA", "Auth loading", "logout"] as const)(
+      `silences late ${settlement} after %s without releasing the new installation lock`,
+      async (kind) => {
+        const old = deferred<Ack>(),
+          current = deferred<Ack>();
+        vi.mocked(api.installReceiptItem)
+          .mockReturnValueOnce(old.promise)
+          .mockReturnValueOnce(current.promise);
+        const { dialog, client, container, rerender, view } = await open();
+        const invalidate = vi.spyOn(client, "invalidateQueries");
+        fireEvent.click(within(dialog).getByRole("button", { name: "Save installation" }));
+        const original = request();
+        if (kind === "account" || kind === "account ABA") {
+          auth.userId = accountB;
+          rerender(view());
+        }
+        if (kind === "account ABA") {
+          auth.userId = accountA;
+          rerender(view());
+        }
+        if (kind === "target ABA") {
+          rerender(view({ vehicleId: otherVehicle }));
+          rerender(view());
+        }
+        if (kind === "Auth loading") {
+          auth.loading = true;
+          rerender(view());
+          expect(container).toBeEmptyDOMElement();
+          auth.loading = false;
+          rerender(view());
+        }
+        if (kind === "logout") {
+          auth.userId = null;
+          rerender(view());
+          expect(container).toBeEmptyDOMElement();
+          auth.userId = accountA;
+          rerender(view());
+        }
+        expect(original.signal.aborted).toBe(true);
+        fireEvent.click(await screen.findByRole("button", { name: "Record installation" }));
+        const next = screen.getByRole("dialog");
+        fields(next);
+        fireEvent.click(within(next).getByRole("button", { name: "Save installation" }));
+        expect(api.installReceiptItem).toHaveBeenCalledTimes(2);
+        expect(request(1).data.expectedAccountId).toBe(auth.userId);
+        await act(async () =>
+          settlement === "resolve"
+            ? old.resolve({ ...original.data })
+            : old.reject(new Error("PRIVATE abandoned installation")),
+        );
+        expect(within(next).getByRole("button", { name: "Save installation" })).toBeDisabled();
+        expect(toast.message).not.toHaveBeenCalled();
+        expect(toast.success).not.toHaveBeenCalled();
+        expect(toast.error).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalled();
+        expect(within(next).queryByText(failure)).not.toBeInTheDocument();
+        await act(async () => current.resolve({ ...request(1).data }));
+        expect(toast.message).toHaveBeenCalledExactlyOnceWith(neutral);
+        expect(original.data.expectedAccountId).toBe(accountA);
+      },
+    );
+
+    it(`silences installation ${settlement} after unmount`, async () => {
+      const old = deferred<Ack>();
+      vi.mocked(api.installReceiptItem).mockReturnValueOnce(old.promise);
+      const { dialog, client, unmount } = await open();
+      const invalidate = vi.spyOn(client, "invalidateQueries");
+      fireEvent.click(within(dialog).getByRole("button", { name: "Save installation" }));
+      const original = request();
+      unmount();
+      expect(original.signal.aborted).toBe(true);
+      await act(async () =>
+        settlement === "resolve"
+          ? old.resolve({ ...original.data })
+          : old.reject(new Error("PRIVATE unmounted installation")),
+      );
+      expect(toast.message).not.toHaveBeenCalled();
+      expect(toast.success).not.toHaveBeenCalled();
+      expect(toast.error).not.toHaveBeenCalled();
+      expect(invalidate).not.toHaveBeenCalled();
+    });
+  }
+
+  it("holds a pending write when its installation dialog closes, and does not revive it on reopen", async () => {
+    const old = deferred<Ack>();
+    vi.mocked(api.installReceiptItem).mockReturnValueOnce(old.promise);
+    const { dialog, client } = await open();
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save installation" }));
+    const original = request();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+    expect(original.signal.aborted).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "Record installation" }));
+    const next = screen.getByRole("dialog");
+    expect(within(next).getByText(failure)).toBeVisible();
+    act(rawClick(within(next).getByRole("button", { name: "Save installation" })));
+    await act(async () => old.resolve({ ...original.data }));
+    expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+    expect(within(next).getByText(failure)).toBeVisible();
+    expect(toast.message).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+
+  it("does not revive a real write started during the installation dialog's first StrictMode commit", async () => {
+    const old = deferred<Ack>();
+    vi.mocked(api.installReceiptItem).mockReturnValueOnce(old.promise);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const invalidate = vi.spyOn(client, "invalidateQueries");
+    render(
+      <StrictMode>
+        <QueryClientProvider client={client}>
+          <VehicleReceiptPanel vehicleId={vehicle} />
+        </QueryClientProvider>
+      </StrictMode>,
+    );
+    const launch = await screen.findByRole("button", { name: "Record installation" });
+    let started = false;
+    const append = Node.prototype.appendChild;
+    const spy = vi.spyOn(Node.prototype, "appendChild").mockImplementation(function <
+      T extends Node,
+    >(this: Node, node: T): T {
+      const result = append.call(this, node) as T;
+      const submit = Array.from(document.querySelectorAll("button")).find(
+        (button) => button.textContent === "Save installation",
+      );
+      if (!started && submit?.isConnected && !submit.disabled) {
+        started = true;
+        // React's delegated event admission may be disabled during mutation
+        // commit. Invoke the actual installed source prop at this same point,
+        // before the dialog's real layout setup/StrictMode cleanup runs.
+        rawClick(submit)();
+      }
+      return result;
+    });
+    try {
+      fireEvent.click(launch);
+    } finally {
+      spy.mockRestore();
+    }
+    expect(started).toBe(true);
+    expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+    const original = request();
+    expect(original.signal.aborted).toBe(true);
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText(failure)).toBeVisible();
+    act(rawClick(within(dialog).getByRole("button", { name: "Save installation" })));
+    await act(async () => old.resolve({ ...original.data }));
+    expect(api.installReceiptItem).toHaveBeenCalledTimes(1);
+    expect(within(dialog).getByText(failure)).toBeVisible();
+    expect(toast.message).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(invalidate).not.toHaveBeenCalled();
+  });
+});
