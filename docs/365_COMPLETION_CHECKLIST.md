@@ -54,7 +54,23 @@ specific access/capacity/decision blockers on Day1 and reassess deadline feasibi
 by Day2. One existing automation only; no continuous-execution guarantee. The owner
 plan is preserved in commit `0aa3fb5`; publication status is recorded below.
 
-Latest backend slice: `c2f7f3153d13a2453db863877bf9ae880628b1e1`, locked/unapplied
+Latest backend slice: `ad776aa8a18ed181293bbc6fd01a65518ca62949`, same draft PR #68.
+Locked/unapplied quote SQL now requires prior expected-shop intent and refuses
+any existing same-name overload/procedure without replacement. All prior 88 cases
+plus six additions pass 94/94 on PGlite/PostgreSQL 18.6 (69.636s total; actual main
+SQL 3.466s, disconnected source scan 62.510s). No timeout/coverage/quarantine change.
+The same pinned setup now feeds a separate private native-PG17 CI runner with
+actual independent-session blocking barriers, after existing Parts cleanup;
+source is implemented, actual Linux execution/cleanup **pending**. Offline guards/
+CI wiring 11/11, syntax/format/six-file lint/review pass after stdio-error repair.
+214 tracked public copies and existing Worker/backend/assets verify; no app-build
+input changed or fresh local build/deployment claimed. See
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. Expected shop is caller intent, not
+trusted native authority. Next: verify new exact-head native17 marker/barriers/
+cleanup, then compose original-human/fresh authority, durable retry/numbering and
+all-writer scope; real API/private-storage/restore/owner gates remain open.
+
+Prior backend slice: `c2f7f3153d13a2453db863877bf9ae880628b1e1`, locked/unapplied
 atomic quote candidate outside migrations, same draft PR #68. Actual header/items
 SQL, strict native-compatible inputs, target locks/rechecks, persisted outcomes
 and fail-closed transactional publication pass 88/88 memory-only tests (9.096s;
@@ -67,6 +83,19 @@ SQL or deployment. C3.02 remains open: no prior expected-shop binding, trusted
 fresh authority, durable retry receipt, native PG17 independent-session/API/
 private-storage/restore or owner acceptance. Compose those gates with this
 transaction rather than repeat the caller slice or enable a legacy bypass.
+
+Publication `bb1f193fd8d05c4b442c103dfafa44d317282b81` is verified on the canonical
+remote and same attached draft PR #68/base; main unchanged. All 214 tracked public
+copies verify again. New exact-head run `38840486491`: Parts `116779196476`
+passes on native PG17.11 with all 247 assertions/cleanup and 47 retained replay
+failures. All six Actions gates now pass on this exact head. Unit job
+`116779196629` confirms 2,595/2,595 application tests across 79 files (56.84s),
+zero unexpected/quarantined failures; the returned log is truncated overall but
+includes the final summary/checker. Wrapper
+`38840486567` migrations/production and Supabase Preview skipped; preview uses its
+skip path, not upload proof. Workers build `b6b6255a-380a-4ee6-a5c1-df569e0260df`
+fails with ID/link only, fresh cause unverified. These local follow-up notes join
+the next integrated slice; do not restart active CI just to publish them.
 
 Prior creation caller slice: `bcc253507d65294d5dc73f37b39e91c13e7c87d8`, same
 branch/draft PR #68. Quote/work-order creation now uses account/mount-scoped bounded

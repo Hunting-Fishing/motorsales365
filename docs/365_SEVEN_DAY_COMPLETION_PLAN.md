@@ -76,7 +76,15 @@ classification does not satisfy baseline/schema/replay/recovery gates. Bounded
 financial actions C3.01–C3.14 are now enumerated in the acceptance ledger, while
 the complete application action inventory is still unfinished.
 
-Backend source `c2f7f315` adds a revoked/unapplied atomic quote transaction outside
+Latest backend source `ad776aa8` adds required expected-shop intent, same-name
+publication containment and a separate private native-PG17 independent-session
+CI path. PGlite 94/94 and offline guards/wiring 11/11 pass; actual new Linux
+server/race/cleanup results remain pending. The candidate stays revoked/unapplied,
+with trusted authority/durable retry/API/restore/owner gates open. Parent
+`bb1f193f` now passes all six Actions gates, including application 2,595/2,595
+(79 files,56.84s); that is not acceptance of this newer source or a release.
+
+Prior backend source `c2f7f315` adds a revoked/unapplied atomic quote transaction outside
 migrations, with 88/88 partial PGlite SQL tests and mandatory CI wiring. It is not
 connected or accepted authority/retry/API/recovery behavior; exact limits and
 next dependencies are in `evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. Published

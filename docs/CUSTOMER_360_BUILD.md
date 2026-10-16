@@ -1523,3 +1523,13 @@ trusted native authority, and mounted locks are not durable retry protocols.
 No SQL/ACL/business/Auth mutation, provider activation, email or deployment. Close
 the authorized atomic C3.02 transaction first, then C3.03–C3.04 with shared fresh
 authority, private-storage/transaction/restore and designated owner acceptance.
+
+## Locked quote transaction and shop intent (2026-10-16)
+
+Source `ad776aa8`, same draft PR #68, adds an unapplied/unconnected quote
+transaction with prior expected-shop intent. PGlite 94/94 and offline CI/safety
+guards 11/11 pass. A separate private native-PG17 concurrency path is implemented
+but awaits actual Linux execution/cleanup. No UI hookup or production change;
+trusted authority, durable retry, all-writer scope and real API/storage/recovery/
+owner acceptance remain open. Exact evidence/resumption:
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`.
