@@ -126,6 +126,24 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
   assert.equal(recoveryCleanup["timeout-minutes"], 2);
   assert.ok(parts.steps.indexOf(recovery) > parts.steps.indexOf(quoteCleanup));
   assert.ok(parts.steps.indexOf(recoveryCleanup) > parts.steps.indexOf(recovery));
+  const expense = parts.steps.find(
+    (step) =>
+      step.name === "Receipt expense operation and independent sessions (native PostgreSQL 17)",
+  );
+  const expenseCleanup = parts.steps.find(
+    (step) => step.name === "Clean private expense PostgreSQL cluster (always)",
+  );
+  assert.ok(expense && expenseCleanup);
+  assert.equal(expense.run, "bash scripts/ci/run-native-expense-postgres.sh --run");
+  assert.equal(expense.if, undefined);
+  assert.equal(expense["continue-on-error"], undefined);
+  assert.equal(expense["timeout-minutes"], 5);
+  assert.equal(expenseCleanup.run, "bash scripts/ci/run-native-expense-postgres.sh --cleanup");
+  assert.equal(expenseCleanup.if, "always()");
+  assert.equal(expenseCleanup["continue-on-error"], undefined);
+  assert.equal(expenseCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(expense) > parts.steps.indexOf(recoveryCleanup));
+  assert.ok(parts.steps.indexOf(expenseCleanup) > parts.steps.indexOf(expense));
   const nodeSetup = parts.steps.filter((step) => step.uses === "actions/setup-node@v4");
   assert.equal(nodeSetup.length, 1);
   assert.equal(nodeSetup[0].with["node-version"], "${{ env.NODE_VERSION }}");
@@ -148,6 +166,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     [
       "Locked receipt expense transaction candidate (memory-only, never quarantined)",
       "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs",
+    ],
+    [
+      "Native expense source parity and runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs",
     ],
     [
       "Native invoice read lifetimes and financial acknowledgments (never quarantined)",

@@ -86,6 +86,9 @@ jobs:
       - name: Locked receipt expense transaction candidate (memory-only, never quarantined)
         run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs
 
+      - name: Native expense source parity and runner safety (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs
+
       - name: Seven day integration inventory capture guards (never quarantined)
         run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
 
@@ -471,3 +474,12 @@ jobs:
         timeout-minutes: 2
         shell: bash
         run: bash scripts/ci/run-native-recovery-postgres.sh --cleanup
+      - name: Receipt expense operation and independent sessions (native PostgreSQL 17)
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/ci/run-native-expense-postgres.sh --run
+      - name: Clean private expense PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-expense-postgres.sh --cleanup
