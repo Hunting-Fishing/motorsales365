@@ -2,13 +2,28 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Day2 private manual-adjustment prerequisite passes FIRST12/12 isolated18.6174385s
+and separate wiring3/3 in5671.3378ms, no failed runtime/alternative, lint0/reviews.
+Same PR68/subject `Prepare private atomic manual stock adjustment`;
+[exact evidence](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md). The paired stock/
+movement candidate remains private/unapplied; native wait/CAS/COMMIT/rollback,
+all-writer/global ordering/native authority/durable reconciliation/full recovery
+and app/device/owner gates remain substantive work. Timestamp/current body and
+conservative counter policy adoption are unresolved. Existing OCR runner headroom
+hosts the memory-only gate; no raised timeout/coverage cut/new job. Day2 milestone
+and all18+N1–N3 remain open;22 October is at risk, not a supported forecast.
+
 Direct owner authorization resumed the stopped scanner: first16/16 in1.5891188s
 and ONE sole365 read-only capture pin29tables501columns193constraints83indexes/
 49policies288triggers57functions, bounded complete/no truncation/failures. Missing
 throttle name/all5flagsFALSE/six selected body matches do not close provenance.
 New artifact-validator limits-key error uses ONE correction, final8/8 in385.9347ms;
 no query/artifact change/recapture. [Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
-Local source/gates wait6a9 unit before push. Broad grants/two stock quantity models
+Published01406/same draft PR68/comment6228023389 passes all six own38991316306
+Actions. Actual unit5,036/96 files101.47s0unexpected/quarantined (clipped/final
+summaries); early catalog-step transcript clipped, no separate Linux24 claim.
+Native21+8/build/current2,618-object artifact/Preview skip already verified, not
+deployment. Publication hold clears without cancellation. Broad grants/two stock quantity models
 and compatible all-writer/native authority/durable recovery remain substantive
 Day2 work, not polish. All scope/47/12/5/2/hosting/QA/device/owner/main/live and
 22 October risk retained; no full-scope forecast or scope cut.
@@ -22,10 +37,11 @@ adjustment/counter/PO/receive/return/cascades add substantive protocol work, not
 polish or an approved public-only stock subset. Day2 stock/native authority stays
 OPEN and22 October remains at risk, without defensible full-scope forecast.
 
-Current catalog scanner/capture STOP01:00UTC: initial21/22, ONE test-only correction
+Historical catalog scanner/capture STOP01:00UTC: initial21/22, ONE test-only correction
 again21/22 fails SELECT syntax; no hosted query. Owner notified once/async resumed
 repair direction asked; local probe/test files unadmitted and no second correction
-or alternate capture unchanged. Current catalog/compatible atomic all-writer/
+or alternate capture unchanged. Owner-authorized01406 publication above supersedes
+that STOP/local-only state. Compatible atomic all-writer/
 native authority/durable recovery dependencies are delayed. Parent53c all six
 38986941600 Actions pass, actual5,036/96 files70.13s zero unexpected/quarantined
 failures (truncated/final summaries); completed native8/artifact/Preview evidence

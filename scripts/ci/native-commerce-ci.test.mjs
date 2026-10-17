@@ -299,3 +299,36 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     assert.equal(matches[0]["continue-on-error"], undefined);
   }
 });
+
+test("manual stock memory candidate uses existing OCR runner headroom without weakening gates", () => {
+  const job = workflow.jobs["receipt-ocr-browser"];
+  assert.equal(job["timeout-minutes"], 15);
+  assert.equal(job.if, undefined);
+  assert.equal(job["continue-on-error"], undefined);
+  const name = "Manual stock adjustment transaction candidate (memory-only, never quarantined)";
+  const command =
+    "node --test --test-concurrency=1 scripts/parts-stock/manual-adjustment-candidate.test.mjs";
+  const allSteps = Object.values(workflow.jobs).flatMap((value) => value.steps);
+  assert.equal(allSteps.filter((step) => step.name === name).length, 1);
+  assert.equal(allSteps.filter((step) => step.run === command).length, 1);
+  const matches = job.steps.filter((step) => step.name === name);
+  assert.equal(matches.length, 1);
+  const [step] = matches;
+  assert.equal(step.run, command);
+  assert.equal(step.if, undefined);
+  assert.equal(step["continue-on-error"], undefined);
+  assert.equal(step["timeout-minutes"], 2);
+  const install = job.steps.findIndex((value) => value.run === "${{ env.NPM_CI }}");
+  const browser = job.steps.findIndex(
+    (value) => value.run === "npx playwright install --with-deps chromium",
+  );
+  const ocr = job.steps.findIndex((value) => value.run === "npm run test:receipt-ocr:browser");
+  assert.ok(install >= 0 && job.steps.indexOf(step) > install);
+  assert.ok(browser > job.steps.indexOf(step) && ocr > browser);
+  assert.equal(job.steps[browser].if, undefined);
+  assert.equal(job.steps[ocr].if, undefined);
+  assert.equal(job.steps[browser]["continue-on-error"], undefined);
+  assert.equal(job.steps[ocr]["continue-on-error"], undefined);
+  assert.equal(workflow.jobs.test["timeout-minutes"], 25);
+  assert.equal(workflow.jobs["parts-rls"]["timeout-minutes"], 25);
+});

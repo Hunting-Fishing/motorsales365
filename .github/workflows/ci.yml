@@ -41,6 +41,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: ${{ env.NPM_CI }}
+      # Serialized memory-only stock mechanics use this existing runner's
+      # headroom before Chromium setup; they are not browser/native authority.
+      - name: Manual stock adjustment transaction candidate (memory-only, never quarantined)
+        timeout-minutes: 2
+        run: node --test --test-concurrency=1 scripts/parts-stock/manual-adjustment-candidate.test.mjs
       - run: npx playwright install --with-deps chromium
       - run: npm run test:receipt-ocr:browser
 

@@ -134,12 +134,38 @@ quarantine and PG17/adversarial/transaction/cleanup coverage. Final local gate
 and independent review results are recorded at publication; own-head CI is
 separate. Do not repeat this unchanged capture or earlier local/native suites.
 
-Current published parent6a9af7ebad1a3278ee00778861c1c6c3bfb455ff has five required
-Actions passing; unit117268130186/run38989388938 is still running. Preserve it:
-this source/capture can be committed locally but not pushed to cancel the unit.
-Parent53c all six/actual5,036/96 files70.13s/zero unexpected/quarantined failures
-and its native8/artifact/Preview evidence are retained, not inherited. Hosting,
-Auth upstream recovery and dedicated QA stops remain separate/unchanged.
+Published source01406e1dd1c176ccc5e375918e383767352b6310/same draft PR68/
+[comment6228023389](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6228023389).
+Exact remote/head/prior64,364-character body/title/non-main base/draft/main are
+preserved. Parent6a9af7ebad1a3278ee00778861c1c6c3bfb455ff completed all six Actions
+38989388938 before this one push. Actual unit117268130186 reports5,036/96 files
+101.46s, zero unexpected/quarantined failures (returned log clipped/final
+summaries); no cancellation. Parent native21+8/build/current2,612-object artifact/
+Preview config skip are verified, not inherited by new source.
+
+Own01406/run38991316306 build117274112383/type117274112360/OCR117274112196/
+lint117274112432/native117274112398 and unit117274112374 now PASS: all six own
+Actions38991316306 complete. Actual unit5,036/96 files101.47s, zero unexpected/
+quarantined failures (returned log truncated/final summaries); early catalog/
+body-step transcript clipped, NOT separately observed Linux24. Actual
+untruncated native log117649 characters proves installed postgres/psql17.11 /
+server170011, Parts247, quote6, all21 exact ordered expense and8 stock markers,
+both terminals/closed phase/EXIT+always-cleanup. Root compares both full vectors
+to admitted unchanged source. Selected dump71/restore89/verify233ms is NOT whole
+baseline/Auth/API/private Storage/configuration recovery or RTO;47 remain.
+
+Actual own build final214media/15OCR/202PDF/server-boundary/canonical Worker
+motorsales365/sole365backend/dry-run summaries pass (returned log clipped/final
+summaries). COMPLETE CI mergecf1fc0786ef809b8460269bb746c9cfff661697a has parents
+576fb17d1fdea96d73b4ae68ea6b725eef62efdf and01406e1dd1c176ccc5e375918e383767352b6310;
+its current treec3f83be8cbdf66c2f731b4df66a9169fca6a6002 equals the candidate,
+2,618 objects0missing, NOT historical recovery. Actual untruncated Preview
+117274112534 configuration skip/no upload; production/migrations/Supabase Preview
+skip. Workers117274262423/buildd2cde0c7-ede4-4d85-b070-dfd00bb0285b fails without a
+new verified cause; old hosting STOP remains/no new diagnostic authority.
+Auth upstream recovery/dedicated QA stops remain separate. Completed own unit
+clears the publication hold without cancellation or inherited pass; local
+read-back notes join the next implementation, not a docs-only publication.
 
 Next compatible stock protocol must cover public direct edits/adjust/delete,
 inquiry/B2B ship/receive/transfer/return/quarantine, invoices, native adjustments/

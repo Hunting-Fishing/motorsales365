@@ -12,7 +12,60 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
-**Owner-authorized scanner repair/capture is now complete locally.** Direct owner
+**Private manual adjustment source passes its first isolated run.** New private
+INVOKER candidate pairs one exact stock delta with one caller-ID movement, CAS/
+bindings, mixed-hold/counter-MAX floors and full row acknowledgments. Root first
+12/12 in18.6174385s, zero fail/skip/cancel, no runtime alternative consumed;
+separate CI wiring3/3 in5671.3378ms, lint0/syntax/format/diff/reviews pass. Existing
+14-table/75-action/49-span source is unchanged. Mandatory memory-only gate uses
+existing OCR runner headroom before Chromium, with all six jobs/normal budgets/
+native/OCR/quarantine coverage preserved. Same draft PR68/commit subject
+`Prepare private atomic manual stock adjustment`.
+[Exact source, counter policy and gaps](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md).
+UNAPPLIED/no app or ordinary grant. Current timestamp body differs from retained
+fixture, not proof of changed semantics. Next own-head gate, then native PG17
+manual/mixed-writer waits/CAS/COMMIT/ROLLBACK/deletion/FK witnesses and compatible
+all-writer/native authority/durable reconciliation/recovery before adoption.
+Old native21+8 is not this SQL; no global no-oversell/fullCRM/main/live claim.
+
+**Dedicated QA signup UI action STOPPED (17 October, 09:54 Asia/Manila).** Owner
+asked to complete the signup/account. Initial existing-signup browser binding
+timed out before any page observation or input. ONE read-only inventory
+alternative returned no available apps/browsers, so there is no controllable
+signup surface. No fields, password, Terms, account or confirmation mail were
+submitted; no Auth API/SQL bypass, identity reset or privilege change. Resume only
+after the owner reconnects/reopens the signup browser or new browser access is
+available. Owner credential/contact/Terms/verification handoff remains; existing
+controlled recipient nomination is not requested again. This delays QA/native
+pilot acceptance, not independent repository work. No unchanged UI retry or
+alternate account-creation mechanism; local stop note joins next implementation.
+
+**Owner-authorized scanner repair/capture is published.** Current integrated head
+`01406e1dd1c176ccc5e375918e383767352b6310`, same draft PR68,
+[evidence comment6228023389](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6228023389).
+Exact remote/head/body/title/non-main base/draft/main read-back is preserved.
+Parent6a9 all six Actions38989388938 completed before this one push; actual
+unit117268130186:5,036/96 files101.46s, zero unexpected/quarantined failures
+(returned log truncated/final summaries). No unit cancellation.
+
+Own01406/run38991316306 now completes all six Actions. Actual unit117274112374
+reports5,036/96 files101.47s, zero unexpected/quarantined failures (returned log
+truncated/final summaries); the early catalog-step transcript is clipped, not
+separately observed Linux24. Publication hold clears without cancellation.
+Actual untruncated native117274112398 PG17.11/server170011/Parts247/quote6/
+all21 expense and8 stock markers/terminals/EXIT+always-cleanup match retained
+vectors exactly. Selected71/89/233ms recovery is NOT full/RTO. Actual build
+117274112383 final214media/15OCR/202PDF/server-boundary/canonical Worker+sole365/
+dry-run guards pass (returned log truncated/final summaries). COMPLETE CI merge
+cf1fc0786ef809b8460269bb746c9cfff661697a equals candidate current tree
+c3f83be8cbdf66c2f731b4df66a9169fca6a6002/2,618 objects0missing, NOT history recovery.
+Actual Preview117274112534 configuration skip/no upload; production/migrations/
+Supabase Preview skip. Workers117274262423 fails without new verified cause;
+existing hosting STOP unchanged. Own job success does not imply full catalog/
+all-writer/native authority or release. These local post-publication notes join
+the next implementation, not another docs-only publication.
+
+Direct owner
 reply `Authorize reviewed scanner repair` changed the stopped condition. Fresh
 full-token diagnosis identified only reservedSELECT; one reviewed fixed lexical
 repair adds exact15-token/immutableSQLpin/nested-ingress controls. First resumed
@@ -28,13 +81,12 @@ parity. Public/native numeric domains and broad effective stock grants remain
 explicit adoption/authority/containment/recovery gates; no live permissions or
 stock writes changed. [Exact capture and limits](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
 Original STOP/consumed alternative below remains historical; no automatic retry
-or second capture occurred. Current6a9 own five Actions pass/unit117268130186
-running: preserve it, commit locally if ready but do not push/cancel. Current
-catalog slice is not published/accepted from parent CI; next compatible global
+or second capture occurred. Current catalog slice is not accepted from parent
+CI; next compatible global
 stock/authority/durable/recovery protocol before grants/app/UI. All scope/stops/
 47/12/5/2/owner/device/main/live and22 October risk remain.
 
-**Independent selected writer frontier implemented.** Fixed22 whole LF source
+**Retained source-frontier checkpoint (catalog next step superseded above).** Fixed22 whole LF source
 pins/exact selected spans cover10 families across public business stock and the
 separate native Shop Manager stock domain. All seven readiness/authority/parity/
 oversell/recovery flags stay FALSE. Final source+CI wiring9/9 in217.8239ms, zero
@@ -45,9 +97,10 @@ commit subject `Pin selected stock writer frontier without advancing catalog acc
 This closes selected source inventory only, not current catalog/all writers or
 stock/CRM acceptance. Direct edits, invoice deductions, native adjustment/counter/
 PO, shipping/receiving/returns/cascades remain in the compatible atomic protocol;
-no silent public-only stock scope. Next own-head checks and changed-direction
-catalog repair, then current correspondence/native authority/all-writer/durable
-recovery before app/grant adoption. No old native/local-suite rerun.
+no silent public-only stock scope. Its former catalog-repair/check direction is
+closed by the owner-authorized01406 publication above. Compatible all-writer/
+native authority/durable recovery remain before app/grant adoption; no old
+native/local-suite rerun.
 
 **Historical catalog STOP (17 October, 01:00UTC; resumed only by owner above).** New selected stock
 catalog safety scanner first fails21/22 combined checks because its FROM scanner
@@ -681,14 +734,15 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
    transaction coverage and normal timeouts/quarantine. No Docker, paid resources,
    customer outreach, destructive repair or unreviewed production experiments.
 
-| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                                                                        | Resume condition                                                                                                                                                                          |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                                                                         | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
-| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.                                                      | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
-| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                                                                         | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
-| Selected stock catalog scanner/capture | Initial21/22 failed DISTINCT/FROM Boolean parsing; ONE test-only correction consumed, alternative21/22 fails SELECT syntax. STOP01:00UTC; no hosted query. Three unadmitted files stay local; independent frontier9/9 passes.                                             | Owner direction/new source/config/access changes condition for reviewed parser repair. No second guessed correction, unchanged rerun or another capture mechanism.                        |
-| Authorized catalog resumption          | Direct owner reply resumes targeted lexical repair: first16/16, then ONE successful actual read-only metadata capture. New artifact-validator7/8 limits-key error uses ONE correction, final8/8; no recapture or sourceSQL change. Prior stop/budget retained as history. | Selected capture is complete, no unchanged re-query. Current catalog/body/ACL/full-schema/compatible stock/authority/recovery adoption gates remain separate.                             |
-| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                                                                         | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
+| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                                                                        | Resume condition                                                                                                                                                                            |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dedicated QA signup UI control         | Owner asks to finish signup. Existing-tab binding times out before input; ONE read-only inventory alternative returns no apps/browsers. STOP09:54 Manila; no account/credentials/Terms/submission/API mutation.                                                           | Owner reconnects/reopens signup or new browser access. Complete ordinary QA signup with private credential/contact/Terms/verification handoff; no existing identity reset or elevated role. |
+| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                                                                         | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                          |
+| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.                                                      | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch.   |
+| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                                                                         | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                               |
+| Selected stock catalog scanner/capture | Initial21/22 failed DISTINCT/FROM Boolean parsing; ONE test-only correction consumed, alternative21/22 fails SELECT syntax. STOP01:00UTC; no hosted query. Three unadmitted files stay local; independent frontier9/9 passes.                                             | Owner direction/new source/config/access changes condition for reviewed parser repair. No second guessed correction, unchanged rerun or another capture mechanism.                          |
+| Authorized catalog resumption          | Direct owner reply resumes targeted lexical repair: first16/16, then ONE successful actual read-only metadata capture. New artifact-validator7/8 limits-key error uses ONE correction, final8/8; no recapture or sourceSQL change. Prior stop/budget retained as history. | Selected capture is complete, no unchanged re-query. Current catalog/body/ACL/full-schema/compatible stock/authority/recovery adoption gates remain separate.                               |
+| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                                                                         | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                              |
 
 Unit log117174018596 at28295c10: initial HTTP502 plus ONE same-tool retry also502
 on2026-10-16T20:34UTC. Retrieval STOPPED and owner notified once. Do not repeat the

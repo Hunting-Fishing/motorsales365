@@ -2,14 +2,28 @@
 
 ## Current delivery authority (17 October 2026)
 
+Private public-stock adjustment now pairs quantity and movement in one statement:
+FIRST12/12 isolated18.6174385s/separate CI guard3/3 in5671.3378ms, no failed SQL
+trial or alternative, lint0/syntax/reviews. Same PR68/subject
+`Prepare private atomic manual stock adjustment`.
+[Exact evidence](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md). No CRM app/RPC/grant
+activation. Counter-MAX is a conservative private rule, not approved production
+semantics. Native/public domains remain separate; actual timestamp body parity,
+new native wait/CAS/COMMIT/rollback/all-writer/native authority/durable recovery/
+API/device/owner acceptance remain open. Old native21+8 does not run new SQL.
+
 Owner-authorized scanner repair passes first resumed16/16 in1.5891188s; ONE actual
 sole365 read-only catalog captures29tables501columns193constraints83indexes49policies/
 288triggers57functions, bounded complete/no truncation/failures. Missing throttle
 name/all5flagsFALSE/actual JSON856330B/638be776… and six selected body matches are
 pinned, NOT fullCRM authority/schema/parity. New artifact-validator limits-label
 bug receives ONE correction, final8/8 in385.9347ms; no recapture/query change.
-[Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md). Local catalog/body
-gate waits6a9 unit before push. Two stock domains/broad grants/all-writer/native
+[Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md). Published01406/same
+draft PR68/comment6228023389 now passes all six own38991316306 Actions; actual
+unit5,036/96 files101.47s0unexpected/quarantined (clipped/final summaries), no
+separate early Linux24 transcript. Native21+8/build/current2,618-object artifact/
+Preview configuration skip already verified, no deployment. Two stock domains/
+broad grants/all-writer/native
 authority/durable recovery/API/device/owner/main/live gates remain open.
 
 Independent source frontier now pins22 files/exact spans and10 public/native
@@ -17,10 +31,11 @@ stock families; final source+CI guard9/9 in217.8239ms, lint0/reviews pass and al
 seven acceptance flags FALSE. Native inventory adjustment/counter/PO/invoice are
 separate from the public14-table selected proof, not fully functioning CRM.
 Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
-[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). Current catalog action STOPPED
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). Historical catalog action STOPPED
 after initial21/22 plus ONE test-only correction again21/22 fails SELECT syntax;
 no hosted query. Owner notified once/async direction asked; local unadmitted
-catalog files await changed conditions, no second repair/retry. Strict authority/
+catalog files awaited changed conditions; owner-authorized01406 publication above
+supersedes that STOP/local-only state. No unchanged retry. Strict authority/
 compatible all-writer/durable recovery/API/device/owner gates precede UI/adoption.
 Parent53c all six38986941600 Actions now pass, actual5,036/96 files70.13s zero
 unexpected/quarantined failures (truncated/final summaries); prior native8/build/

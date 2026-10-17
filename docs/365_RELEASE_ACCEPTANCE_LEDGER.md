@@ -10,6 +10,17 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+P1/PA3/PA5/C3/N1/N2 receive a private manual stock/movement transaction candidate:
+FIRST12/12 isolated18.6174385s, no fail/skip/cancel/alternative; separate CI
+wiring3/3 in5671.3378ms, syntax/lint0/format/diff/reviews. Same PR68, subject
+`Prepare private atomic manual stock adjustment`.
+[Exact source, private counter-MAX rule and gates](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md).
+No app/grant/migration/deployment or workflow acceptance advances. Existing
+14-table fixture unchanged; owner/id-onlyAuth/manager is synthetic, timestamp
+current-body parity open, old native21+8 not new SQL. Required own-head gates,
+native independent manual/mixed races, compatible all-writer/native authority/
+durable reconciliation/API/private Storage/full recovery/device/owner gates stay.
+
 Owner-authorized scanner resumption passes16/16 in1.5891188s. ONE sole365 metadata
 capture now pins29tables501columns193constraints83indexes49policies288triggers/
 57functions/server170006/01:11:13.137905UTC, bounded complete/no truncation/failures.
@@ -18,24 +29,43 @@ Missing throttle name/all5flagsFALSE and six selected LF body matches/actual JSO
 artifact-validator7/8 limits-key error receives ONE test-only correction; final
 8/8 in385.9347ms, query/artifact unchanged/no recapture.
 [Exact scope and findings](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
-Local gate ready, publication waits6a9 unit without cancellation. P1/PA3/PA5/C3/
+Published01406e1dd1c176ccc5e375918e383767352b6310/same draft PR68/
+[comment6228023389](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6228023389),
+exact remote/body/title/base/draft/main preserved. Parent6a9 all six38989388938
+pass, actual5,036/96 files101.46s0unexpected/quarantined (clipped/final summaries),
+no cancellation. Own38991316306 all six Actions now PASS; actual unit117274112374
+5,036/96 files101.47s0unexpected/quarantined (clipped/final summaries). The early
+catalog-step transcript is clipped, no separately observed Linux24 claim.
+Actual untruncated native
+117274112398 PG17.11/Parts247/quote6/retained21expense+8stock/terminals/cleanup
+verified, selected71/89/233ms not full/RTO. Own build214media/15OCR/202PDF/Worker+
+sole365/server-boundary/dry-run verified (clipped/final summaries); complete CI
+mergecf1fc078… equals candidate current treec3f83be8…/2,618 objects0missing, not
+history recovery. Actual Preview117274112534 config skip/no upload; production/
+migrations/Supabase Preview skip. Workers117274262423 unverified cause/old hosting
+STOP. Completed unit clears hold without cancellation; local read-back notes
+join next implementation, not docs-only publication.
+P1/PA3/PA5/C3/
 N1/N2 still require all-writer atomic/native authority/grant containment/durable
 recovery/API/device/owner acceptance. No workflow/grant/main/live advancement.
 
-Independent selected source frontier now freezes22 whole LF pins/exact spans and
+Retained6a9 source-frontier checkpoint freezes22 whole LF pins/exact spans and
 10 writer families across public/native stock; final source+CI wiring9/9 in
 217.8239ms, zero fail/skip/cancel, syntax/lint0/format/independent review pass.
 All seven parity/authority/durable/oversell/adoption/release flags remain FALSE.
 Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
-[Exact source and stopped catalog prerequisite](evidence/STOCK_WRITER_FRONTIER.md).
+[Exact source and historical stopped prerequisite](evidence/STOCK_WRITER_FRONTIER.md).
 P1/PA3/PA5/C3/N1/N2 remain unaccepted; direct edits, invoices/native stock/counter/
 PO, receive/return/cascade writers cannot be omitted from the atomic protocol.
 
-Catalog scanner/capture STOP01:00UTC after initial21/22 and ONE correction again
+**Historical catalog STOP01:00UTC; resumed by owner and superseded by01406 above.**
+At that checkpoint initial21/22 and ONE correction again
 21/22 fails SELECT syntax; SQL unchanged/no hosted query, three probe/test files
 remain local/unadmitted. Owner notified once/async resumed-repair direction asked;
 no second guessed repair/capture mechanism/unchanged rerun. Source-only mandatory
 gate preserves prior native/adversarial/transaction/quarantine/budget coverage.
+The stopped condition and local-only files describe that historical checkpoint,
+not current resumption directions or the current published catalog state.
 Parent53c all six38986941600 Actions now pass; actual5,036/96 files70.13s, zero
 unexpected/quarantined failures (truncated/final summaries), no cancellation.
 Prior native8/artifact/Preview skip retained, not inherited; own-head gates are

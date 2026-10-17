@@ -42,6 +42,17 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Private manual adjustment pairs exact stock/movement with CAS/mixed-hold and
+counter-MAX floors: FIRST12/12 in18.6174385s, no fail/skip/cancel/alternative;
+separate CI guard3/3 in5671.3378ms, lint0/syntax/format/diff/reviews. Same PR68,
+commit subject `Prepare private atomic manual stock adjustment`.
+[Exact evidence and unsatisfied gates](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md).
+Private/unapplied/no app/grants; retained timestamp/current body mismatch is
+explicit. Mandatory memory-only step uses existing OCR runner headroom without
+new jobs/raised budgets/dropped native or real OCR coverage. Own-head gates and
+new native independent manual/mixed sessions remain before compatible all-writer/
+native authority/durable/recovery/adoption. Old21+8 does not run this SQL.
+
 Owner explicitly authorized reviewed scanner repair after the recorded STOP.
 First resumed16/16 in1.5891188s/SQLc604084f…/lint0/review pass. ONE actual sole365
 pg_catalog read at01:11:13.137905UTC/server170006 captures29tables501columns/
@@ -51,11 +62,26 @@ truncation/failures. Missing throttle name remains/all5flagsFALSE. Actual JSON
 schema/ACL/all-writer parity. New artifact-validator7/8 limits-label extraction
 failure uses ONE reviewed test-only correction, final8/8 in385.9347ms; no query/
 artifact change or recapture. [Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
-Local source/body gate awaits6a9 unit completion before push. Broad grants,
+Published01406e1dd1c176ccc5e375918e383767352b6310/same draft PR68/
+[comment6228023389](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6228023389),
+exact remote/body/title/non-main base/draft/main preserved. Parent6a9 all six
+38989388938 pass; actual5,036/96 files101.46s0unexpected/quarantined (clipped/final
+summaries) completed before push. Own38991316306 all six Actions now pass;
+actual unit1172741123745,036/96 files101.47s0unexpected/quarantined (clipped/final
+summaries). Early catalog-step transcript clipped, no separate Linux24 claim.
+Actual untruncated native117274112398 PG17.11/
+Parts247/quote6/all21expense+8stock/terminals/cleanup verified; selected71/89/233ms
+not full/RTO. Own build214media/15OCR/202PDF/canonical Worker+sole365/server-boundary/
+dry-run verified (clipped/final summaries); complete CI mergecf1fc078… equals
+candidate treec3f83be8…/2,618 objects0missing, not history recovery. Actual Preview
+117274112534 configuration skip/no upload; production/migrations/Supabase Preview
+skip. Workers117274262423 unverified cause/hosting STOP retained. Own completion
+clears publication hold without cancellation; post-publication notes join next
+implementation, not docs-only publication. Broad grants,
 separate stock numeric domains, compatible atomic protocol/native authority/
 durable recovery/API/device/owner/main/live gates and22 October risk remain.
 
-Current independent source frontier fixes22 whole LF pins/exact spans and10 writer
+Retained6a9 source-frontier checkpoint fixes22 whole LF pins/exact spans and10 writer
 families across public/native stock. Final source+CI guard9/9 in217.8239ms, zero
 fail/skip/cancel; syntax/lint0/format/independent review pass. All seven parity/
 authority/durable/oversell/adoption/release flags remain FALSE. Same draft PR68,
@@ -63,12 +89,14 @@ commit subject `Pin selected stock writer frontier without advancing catalog acc
 [Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). No existing app/SQL/grants/
 migration/hosted/main/deployment change; own-head full gates are separate.
 
-Catalog scanner/capture STOP01:00UTC: initial21/22 then ONE test-only correction
+**Historical catalog STOP01:00UTC; resumed by owner and superseded by01406 above.**
+At that checkpoint initial21/22 then ONE test-only correction
 again21/22 fails on SELECT syntax. No hosted query; three unadmitted probe/test
 files stay local, no further correction/retry/capture unchanged. Owner notified
 once/asked for resumed parser-repair direction. Source-only gate preserves all
-existing mandatory/native/timeout/quarantine coverage. Current correspondence/
-global protocol/native authority/durable recovery remain before grant/app/UI;
+existing mandatory/native/timeout/quarantine coverage. That stopped condition and
+local-only publication state are historical, not current retry directions.
+Global protocol/native authority/durable recovery remain before grant/app/UI;
 all18+N1–N3/47/12/5/2/stops/device/owner/main/live/22 October risk retained.
 
 Closed parent53c now passes all six38986941600 Actions; actual unit117260493854
