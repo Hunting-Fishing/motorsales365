@@ -19,16 +19,20 @@ concurrency:
 
 env:
   NODE_VERSION: "22"
-  # npm is the package manager of record: package-lock.json is what the
-  # Cloudflare Worker build uses. --legacy-peer-deps is required because
+  # npm is the Actions/local package manager of record (package-lock.json).
+  # Independent Workers Builds currently auto-detects Bun before its build command;
+  # it is separately frozen, not repaired or approved by an Actions pass.
+  # --legacy-peer-deps is required because
   # @tanstack/zod-adapter declares a Zod 3 peer while the app runs Zod 4.
   NPM_CI: npm ci --legacy-peer-deps --no-audit --no-fund
   CI: "true"
 
 jobs:
+  # Keep this candidate on the current OS family while ubuntu-latest transitions.
+  # https://github.com/actions/runner-images/issues/14748
   receipt-ocr-browser:
     name: Receipt OCR (real browser, same-origin assets)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -37,12 +41,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: ${{ env.NPM_CI }}
+      # Serialized memory-only stock mechanics use this existing runner's
+      # headroom before Chromium setup; they are not browser/native authority.
+      - name: Manual stock adjustment transaction candidate (memory-only, never quarantined)
+        timeout-minutes: 2
+        run: node --test --test-concurrency=1 scripts/parts-stock/manual-adjustment-candidate.test.mjs
       - run: npx playwright install --with-deps chromium
       - run: npm run test:receipt-ocr:browser
 
   typecheck:
     name: Typecheck (tsc --noEmit)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +64,7 @@ jobs:
 
   test:
     name: Unit tests (vitest + quarantine)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -68,10 +77,61 @@ jobs:
       - name: Verify test report and migration evidence gates
         run: node --test scripts/ci/check-vitest-results.test.mjs scripts/ci/migration-provenance.test.mjs scripts/ci/migration-replay-preflight.test.mjs scripts/ci/baseline-scope-inventory.test.mjs scripts/ci/shop-manager-invoice-security.test.mjs scripts/ci/shop-manager-invoice-containment.test.mjs scripts/ci/shop-manager-profile-authority.test.mjs scripts/ci/shop-manager-role-membership.test.mjs scripts/ci/shop-manager-profile-resolution.test.mjs scripts/ci/business-staff-authority.test.mjs scripts/ci/shop-manager-bootstrap-authority.test.mjs scripts/ci/shop-manager-helper-containment.test.mjs scripts/ci/supabase-release-safety.test.mjs scripts/vehicle-receipts/verify-ocr-assets.test.mjs scripts/vehicle-receipts/verify-pdf-assets.test.mjs
 
+      - name: Native Auth session catalog privacy and dependencies (offline, never quarantined)
+        run: node --test scripts/ci/auth-session-catalog-review.test.mjs
+
+      - name: Auth provider migration-version provenance (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/auth-provider-migration-review.test.mjs
+
+      - name: Buddy delivery handoff contract (offline, never quarantined)
+        run: npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1
+
+      - name: Mixed inquiry and B2B stock reservation candidate (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs
+
+      - name: Mixed stock native-source and actual B2B writer composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-native-source.test.mjs scripts/parts-stock/mixed-reservation-order-source.test.mjs
+
+      - name: Native mixed-stock runner safety (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/native-mixed-stock-postgres.test.mjs scripts/ci/run-native-mixed-stock-postgres.test.mjs
+
+      - name: Selected stock writer frontier (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
+
+      - name: Selected stock catalog and body fingerprints (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/stock-writer-catalog-review.test.mjs scripts/ci/stock-writer-catalog-runtime.test.mjs scripts/ci/stock-writer-catalog-evidence.test.mjs scripts/ci/stock-writer-body-correspondence.test.mjs
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db
           npm run test:installed-components:db
+
+      - name: Retained expense and journal composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-posting-fixture.test.mjs
+
+      - name: Expense operation request and reported-posting contract (offline, never quarantined)
+        run: node --test scripts/vehicle-receipts/expense-operation-contract.test.mjs
+
+      - name: Locked receipt expense transaction candidate (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs
+
+      - name: Locked single draft receipt line candidate (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-edit-candidate.test.mjs
+
+      - name: Native expense source parity and runner safety (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs
+
+      - name: Native draft-line source parity and cohort guards (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-native-source.test.mjs scripts/ci/native-draft-line-postgres.test.mjs
+
+      - name: Seven day integration inventory capture guards (never quarantined)
+        run: node --test scripts/ci/seven-day-integration-inventory.test.mjs
+
+      - name: Recovered Parts and remaining migration source guards (never quarantined)
+        run: node --test scripts/ci/parts-plan-reference.test.mjs scripts/ci/migration-remaining-source-ledger.test.mjs scripts/ci/retired-cloud-auth.test.mjs
+
+      - name: Complete public asset release guard regressions (never quarantined)
+        run: node --test scripts/ci/verify-release-assets.test.mjs
 
       - name: Customer vehicle activity and receipt ownership boundaries (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/customer-vehicle-activity.test.mjs scripts/ci/vehicle-receipt-ownership-boundary.test.mjs
@@ -157,6 +217,9 @@ jobs:
       - name: Full claim evidence ownership writer composition (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/claim-evidence-catalog-review.test.mjs scripts/ci/full-claim-evidence-composition.test.mjs
 
+      - name: Full staff claim and native roster bridge composition (memory-only, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/full-native-staff-bridge-composition.test.mjs
+
       - name: Claim revision invalidation model on full actual schema (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/claim-revision-invalidation.test.mjs
 
@@ -168,6 +231,63 @@ jobs:
 
       - name: Account creation server returned-row evidence (never quarantined)
         run: npx vitest run src/routes/api/admin/create-user.test.tsx --maxWorkers=1
+
+      - name: Internal staff acknowledgments and private UI lifetimes (never quarantined)
+        run: npx vitest run src/lib/internal-staff.functions.test.ts src/components/internal-staff/InternalStaffView.test.tsx --maxWorkers=1
+
+      - name: Native invoice read lifetimes and financial acknowledgments (never quarantined)
+        run: npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1
+
+      - name: Native quote and work-order list read lifetimes (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-list.test.tsx src/components/shop-manager/work-order-list.test.tsx src/components/shop-manager/work-order-detail.test.tsx --maxWorkers=1
+
+      - name: Native quote detail private lifetimes and conversion interlock (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-detail.test.tsx --maxWorkers=1
+
+      - name: Native quote and work-order creation callers (never quarantined)
+        run: npx vitest run src/components/shop-manager/quote-create.test.tsx src/components/shop-manager/work-order-create.test.tsx --maxWorkers=1
+
+      - name: Locked atomic quote candidate (offline SQL, synthetic roles, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/native-quote-create-transaction.test.mjs
+
+      - name: Native quote PostgreSQL runner safety (offline, never quarantined)
+        run: node --test scripts/ci/native-quote-postgres.test.mjs
+
+      - name: Native PostgreSQL recovery runner safety (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/native-recovery-postgres.test.mjs scripts/ci/run-native-recovery-postgres.test.mjs
+
+      - name: Native customer callers and receipt entry lifetimes (never quarantined)
+        run: npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/lib/customer-commercial.functions.test.ts src/lib/customer-communications.functions.test.ts src/components/vehicle-receipt-panel.test.tsx src/lib/vehicle-receipts.test.ts --maxWorkers=1
+
+      - name: Retail lead assignment caller and private lifetimes (never quarantined)
+        run: npx vitest run src/lib/leads.functions.test.ts 'src/routes/dashboard.team.leads_.$id.test.tsx' --maxWorkers=1
+
+      - name: Receipt read DTO and caller contracts (never quarantined)
+        run: npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts src/lib/native-command-caller.server.test.ts --maxWorkers=1
+
+      - name: Owned receipt command ingress and middleware custody (never quarantined)
+        run: npx vitest run src/lib/receipt-command-ingress.server.test.ts src/lib/receipt-command-middleware.server.test.ts --maxWorkers=1
+
+      - name: Independent Workers build source freeze (offline, never quarantined)
+        run: node --test scripts/ci/independent-workers-build.test.mjs
+
+      - name: Native commerce test and pinned CI runner guards (offline, never quarantined)
+        run: node --test scripts/ci/native-commerce-ci.test.mjs
+
+      - name: Native Google OAuth handoff and route lifetimes (never quarantined)
+        run: npx vitest run src/lib/google-oauth.test.ts src/hooks/use-google-oauth.test.tsx src/__tests__/google-oauth-routes.test.tsx --maxWorkers=1
+
+      - name: Native webhook authenticity and bounded reads (never quarantined, no delivery)
+        run: npx vitest run src/lib/webhooks/standard-webhooks.server.test.ts --maxWorkers=1
+
+      - name: Native Auth email plans and first-address rendering (never quarantined, no delivery)
+        run: npx vitest run src/lib/email/native-auth-email-plan.server.test.ts src/lib/email-templates/email-change.test.tsx --maxWorkers=1
+
+      - name: Native Auth reservation acknowledgments and bounded provider attempts (never quarantined, fake transport only)
+        run: npx vitest run src/lib/email/native-auth-email-reservation.server.test.ts src/lib/email/resend-auth-attempt.server.test.ts --maxWorkers=1
+
+      - name: Unsubscribe acknowledgments and public UI lifetimes (never quarantined)
+        run: npx vitest run src/routes/email/unsubscribe.test.ts src/routes/unsubscribe.test.tsx --maxWorkers=1
 
       - name: Approved helper execution envelope and metadata review regressions (memory-only)
         run: node --test --test-concurrency=1 scripts/ci/approved-helper-execution-envelope.test.mjs scripts/ci/approved-helpers-catalog-review.test.mjs scripts/ci/approved-helper-release-evidence.test.mjs
@@ -206,7 +326,7 @@ jobs:
 
   build:
     name: Build (vite build, Cloudflare Worker bundle)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
@@ -224,6 +344,8 @@ jobs:
           restore-keys: |
             build-cache-v1-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
       - run: npm run build
+      - name: Verify complete tracked public assets before packaging
+        run: node scripts/ci/verify-release-assets.mjs
       - name: Validate Worker package (wrangler deploy --dry-run, no credentials)
         run: |
           set -euo pipefail
@@ -232,7 +354,7 @@ jobs:
 
   lint:
     name: ESLint (changed lines only)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -263,43 +385,151 @@ jobs:
 
   parts-rls:
     name: Parts adversarial RLS suite (throwaway Postgres)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
-    env:
-      # --local mode only accepts a local server; the service container is
-      # disposable and destroyed with the job. No remote database is touched.
-      PGHOST: localhost
-      PGPORT: "5432"
-      PGUSER: postgres
-      PGPASSWORD: postgres
+    runs-on: ubuntu-24.04
+    # Retain the existing 15-minute budget plus bounded recovery/run cleanup.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Install psql client
-        run: |
-          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
-          psql --version
-      - name: Run suite (--local replay of supabase/migrations)
+      # The quote runner uses Node builtins and psql, without application packages.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install native PostgreSQL 17 (ephemeral runner only)
+        timeout-minutes: 5
+        shell: bash
         run: |
           set -euo pipefail
+          # Ubuntu 24.04's built-in PG16 is not the required PG17 server.
+          # Official signed PGDG repository; major is explicit, minor packages float.
+          # https://www.postgresql.org/download/linux/ubuntu/
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          # Do not create/start a package-managed main cluster. Only our private
+          # initdb cluster below is used, never a preinstalled runner cluster.
+          printf '\ncreate_main_cluster = false\n' \
+            | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            postgresql-17 postgresql-client-17
+          /usr/lib/postgresql/17/bin/postgres --version
+          /usr/lib/postgresql/17/bin/psql --version
+      - name: Run suite (--local replay of supabase/migrations)
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PATH="/usr/lib/postgresql/17/bin:$PATH"
+          unset DATABASE_URL PGSERVICE PGSERVICEFILE PGHOSTADDR PGPASSWORD PGOPTIONS
+          export PGUSER=postgres PGDATABASE=postgres PGPORT=55432 PGCONNECT_TIMEOUT=5
+          parts_temp_base="$(realpath -e "$RUNNER_TEMP")"
+          parts_pg_root="$(mktemp -d "$parts_temp_base/parts-rls.XXXXXX")"
+          case "$parts_pg_root" in "$parts_temp_base"/parts-rls.*) ;; *) exit 1 ;; esac
+          test "$(dirname "$parts_pg_root")" = "$parts_temp_base"
+          [[ "$(basename "$parts_pg_root")" =~ ^parts-rls\.[A-Za-z0-9]{6}$ ]]
+          test ! -L "$parts_pg_root"
+          printf 'PARTS_PG_ROOT=%s\n' "$parts_pg_root" >> "$GITHUB_ENV"
+          # A private socket and no TCP listener prevent use of any other local
+          # or hosted database. initdb/pg_ctl run as the unprivileged runner owner.
+          export PGHOST="$parts_pg_root/socket"
+          mkdir -m 700 "$PGHOST"
+          cleanup_parts_cluster() {
+            parts_status=$?
+            trap - EXIT
+            if [ -f "$parts_pg_root/data/postmaster.pid" ]; then
+              if ! pg_ctl -D "$parts_pg_root/data" -m fast -w -t 15 stop; then
+                if ! pg_ctl -D "$parts_pg_root/data" -m immediate -w -t 15 stop; then
+                  echo '::error::Could not stop the private Parts PostgreSQL cluster.'
+                  parts_status=1
+                fi
+              fi
+            fi
+            exit "$parts_status"
+          }
+          trap cleanup_parts_cluster EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          initdb -D "$parts_pg_root/data" --username=postgres --encoding=UTF8 \
+            --locale=C.UTF-8 --auth-local=trust --auth-host=reject \
+            --set=listen_addresses= --set="unix_socket_directories=$PGHOST" \
+            --set=unix_socket_permissions=0700 --set="port=$PGPORT" --no-instructions
+          pg_ctl -D "$parts_pg_root/data" -l "$parts_pg_root/server.log" -w -t 30 start
+          pg_isready -d postgres -t 5
+          parts_server_version="$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW server_version_num')"
+          if [[ ! "$parts_server_version" =~ ^17[0-9]{4}$ ]]; then
+            echo '::error::The adversarial suite requires an actual PostgreSQL 17 server.'
+            exit 1
+          fi
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW data_directory')" = "$parts_pg_root/data"
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW unix_socket_directories')" = "$PGHOST"
+          test -z "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SHOW listen_addresses')"
+          test "$(psql -X -Atq -v ON_ERROR_STOP=1 -c 'SELECT rolsuper FROM pg_roles WHERE rolname = current_user')" = t
           if [ ! -f scripts/test-parts-rls-adversarial.sh ] || [ ! -f supabase/tests/parts_network_adversarial_rls.sql ]; then
-            echo "::notice::Parts adversarial RLS suite not on this branch yet (lands with PR #5); skipping."
-            exit 0
+            echo '::error::The existing Parts adversarial runner and SQL suite are required.'
+            exit 1
           fi
           bash scripts/test-parts-rls-adversarial.sh --local 2>&1 | tee parts-rls.log
           # The script exits 0 on a privilege SKIP; in CI we own a superuser, so a SKIP is a failure.
           if grep -q "SKIP.*parts adversarial RLS suite" parts-rls.log; then echo "::error::Suite skipped unexpectedly"; exit 1; fi
           grep -m1 "assertions passed" parts-rls.log >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Clean private PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${PARTS_PG_ROOT:-}" ] || [ ! -d "$PARTS_PG_ROOT" ]; then exit 0; fi
+          parts_temp_base="$(realpath -e "$RUNNER_TEMP")"
+          parts_pg_root="$(realpath -e "$PARTS_PG_ROOT")"
+          case "$parts_pg_root" in "$parts_temp_base"/parts-rls.*) ;; *) echo '::error::Unsafe cleanup target.'; exit 1 ;; esac
+          test "$(dirname "$parts_pg_root")" = "$parts_temp_base"
+          [[ "$(basename "$parts_pg_root")" =~ ^parts-rls\.[A-Za-z0-9]{6}$ ]]
+          test ! -L "$PARTS_PG_ROOT"
+          if [ -f "$parts_pg_root/data/postmaster.pid" ]; then
+            if ! /usr/lib/postgresql/17/bin/pg_ctl -D "$parts_pg_root/data" -m fast -w -t 15 stop; then
+              /usr/lib/postgresql/17/bin/pg_ctl -D "$parts_pg_root/data" -m immediate -w -t 15 stop
+            fi
+          fi
+          if [ -f "$parts_pg_root/server.log" ]; then cp "$parts_pg_root/server.log" parts-rls-server.log; fi
+          # This is only the validated, unique directory allocated by mktemp.
+          rm -rf -- "$parts_pg_root"
+      - name: Locked quote transaction and independent sessions (native PostgreSQL 17)
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/ci/run-native-quote-postgres.sh --run
+      - name: Clean private quote PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-quote-postgres.sh --cleanup
+      - name: Synthetic database dump and second-cluster restore (native PostgreSQL 17)
+        timeout-minutes: 7
+        shell: bash
+        run: bash scripts/ci/run-native-recovery-postgres.sh --run
+      - name: Clean private recovery PostgreSQL clusters (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-recovery-postgres.sh --cleanup
+      - name: Receipt expense operation and independent sessions (native PostgreSQL 17)
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/ci/run-native-expense-postgres.sh --run
+      - name: Clean private expense PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-expense-postgres.sh --cleanup
+      - name: Mixed inquiry and B2B independent sessions (native PostgreSQL 17)
+        timeout-minutes: 5
+        shell: bash
+        run: bash scripts/ci/run-native-mixed-stock-postgres.sh --run
+      - name: Clean private mixed-stock PostgreSQL cluster (always)
+        if: always()
+        timeout-minutes: 2
+        shell: bash
+        run: bash scripts/ci/run-native-mixed-stock-postgres.sh --cleanup

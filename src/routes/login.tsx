@@ -3,20 +3,13 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { useGoogleOAuth } from "@/hooks/use-google-oauth";
+import { safeAuthInternalPath as safeInternalPath } from "@/lib/google-oauth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
-import { siteOrigin } from "@/lib/site-config";
-
-function safeInternalPath(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  // Only allow same-origin relative paths (must start with single "/")
-  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
-  return value;
-}
 
 export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
@@ -35,16 +28,20 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [googleSubmitting, setGoogleSubmitting] = useState(false);
   // Single-flight lock: survives re-renders and guarantees only one in-flight
   // auth request at a time, even if React batches state updates.
   const inFlightRef = useRef(false);
   const redirectTimerRef = useRef<number | null>(null);
+  const google = useGoogleOAuth({
+    redirect: redirectTo,
+    scopeKey: JSON.stringify([redirectTo, user?.id]),
+    blocked: loading || !!user,
+    flight: inFlightRef,
+  });
+  const googleSubmitting = google.busy;
 
-  // Disable auth actions only while a request is in flight or we already
-  // have a session and are about to redirect. We deliberately do NOT gate
-  // on the auth hook's `loading` flag — bootstrap can take a moment on
-  // slow networks, and signing in overrides whatever it finds anyway.
+  // Preserve password bootstrap behavior. Google additionally waits for auth
+  // loading to finish, so an unknown/current account cannot start a handoff.
   const authBusy = submitting || googleSubmitting || !!user;
 
   const goToPostLogin = () => {
@@ -118,31 +115,7 @@ function LoginPage() {
   };
 
 
-  const handleGoogle = async () => {
-    if (inFlightRef.current || authBusy) return;
-    inFlightRef.current = true;
-    setGoogleSubmitting(true);
-    try {
-      // Preserve `redirect` (e.g. the MCP consent URL) through the Google
-      // round-trip: route Google back to /login?redirect=..., where the
-      // signed-in effect below forwards the user to the intended destination.
-      const returnTo = redirectTo
-        ? `${siteOrigin()}/login?redirect=${encodeURIComponent(redirectTo)}`
-        : siteOrigin();
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: returnTo,
-      });
-      if (result.error) {
-        toast.error("Could not sign in with Google");
-        return;
-      }
-      if (result.redirected) return;
-      goToPostLogin();
-    } finally {
-      inFlightRef.current = false;
-      setGoogleSubmitting(false);
-    }
-  };
+  const handleGoogle = () => void google.start();
 
   return (
     <SiteLayout>
@@ -205,7 +178,7 @@ function LoginPage() {
         <Button
           variant="outline"
           onClick={handleGoogle}
-          disabled={authBusy}
+          disabled={authBusy || loading}
           aria-busy={googleSubmitting}
           className="w-full"
         >

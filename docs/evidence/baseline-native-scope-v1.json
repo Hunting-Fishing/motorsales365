@@ -304,6 +304,11 @@
       "sha256Lf": "aaece0fb7c90dbae55a19f797bc9baff647b64901cc321cb1c43b029b8ee6a4a"
     },
     {
+      "id": "authSessionCatalog",
+      "path": "docs/evidence/auth-session-catalog-2026-10-17.json",
+      "sha256Lf": "9e2106517fcf040392db69acb8d315bcb04950c409a95d3175dd338fca113804"
+    },
+    {
       "id": "correspondenceAudit",
       "path": "docs/evidence/migration-object-audit-2026-10-15.md",
       "sha256Lf": "cde396be3c4a722a854d95b8cbcd84ae2eb1481e57d3f48d282ee62ff8cc3dfc"
@@ -317,7 +322,8 @@
     "table:public.vehicle_receipts",
     "table:public.vehicle_receipt_items",
     "table:public.vehicle_history_events",
-    "function:public.save_vehicle_receipt(uuid,text,date,text,numeric,jsonb,boolean)"
+    "function:public.save_vehicle_receipt(uuid,text,date,text,numeric,jsonb,boolean)",
+    "external:receipt-command-session-and-authority-requirements"
   ],
   "objects": [
     {
@@ -2719,6 +2725,193 @@
       }
     },
     {
+      "id": "external:receipt-command-session-and-authority-requirements",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth.uid()",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth.sessions",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth.jwt()",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth-session-termination-and-revocation-ordering",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth-configured-session-timeouts",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:receipt-native-role-authority",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:auth-session-catalog-evidence-2026-10-17",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "requirementsOnlyNotAnExecutedReceiptCaller": "unreviewed",
+        "originalBearerRealAuthAdmission": "unreviewed",
+        "sessionAndNativeAuthorityAtMutationBoundary": "unreviewed",
+        "allWriterAndRevocationOrderingClosure": "unreviewed",
+        "releaseAndDeploymentAcceptance": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth.sessions",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "external:auth.users",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "platformManagedInstallationAndLineage": "unreviewed",
+        "sessionIdentityAndJwtSessionBinding": "unreviewed",
+        "expiryAndInactivitySemantics": "unreviewed",
+        "terminationAndRefreshWriters": "unreviewed",
+        "effectivePrivilegesRlsAndApiExposure": "unreviewed",
+        "realAuthAdmissionAndRevocation": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth.jwt()",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "external:auth.sessions",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "platformManagedInstallationAndLineage": "unreviewed",
+        "verifiedBearerClaimsVersusDatabaseGuc": "unreviewed",
+        "sessionIdExpiryAndRoleClaims": "unreviewed",
+        "realAuthAdmissionAndRefreshSemantics": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth-session-termination-and-revocation-ordering",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "external:auth.sessions",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:receipt-native-role-authority",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "allSessionTerminationAndRefreshWriters": "unreviewed",
+        "authorityRevocationAndOffboardingWriters": "unreviewed",
+        "lockOrderingAndCommitBoundary": "unreviewed",
+        "realAuthAndConcurrentMutationNegativeControls": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth-configured-session-timeouts",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "external:auth.sessions",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "projectSessionTimeoutConfiguration": "unreviewed",
+        "timeboxInactivityRefreshAndSingleSessionSemantics": "unreviewed",
+        "expiryAtReadVersusMutationCommit": "unreviewed",
+        "noConfiguredValuesInCatalogCapture": "unreviewed"
+      }
+    },
+    {
+      "id": "external:receipt-native-role-authority",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [
+        {
+          "id": "table:shop_manager.profiles",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "table:shop_manager.user_roles",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "table:shop_manager.roles",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        },
+        {
+          "id": "external:identity-constraints-policies-grants-and-trigger-closure",
+          "relation": "external-prerequisite",
+          "reviewStatus": "unverified"
+        }
+      ],
+      "facets": {
+        "trustedNativeProfileAndShopBinding": "unreviewed",
+        "independentOriginalActorAuthority": "unreviewed",
+        "allRoleAssignmentAndCatalogWriters": "unreviewed",
+        "roleRevocationOffboardingAndLockOrdering": "unreviewed",
+        "noAuthorityFromCallerSuppliedRoleOrMutableProfile": "unreviewed"
+      }
+    },
+    {
+      "id": "external:auth-session-catalog-evidence-2026-10-17",
+      "kind": "external",
+      "disposition": "unverified",
+      "sourceRefs": [],
+      "dependencies": [],
+      "facets": {
+        "selectedMetadataSnapshotPinned": "source-observed",
+        "platformManagedInstallationAndLineage": "unreviewed",
+        "configuredTimeoutAndExpirySemantics": "unreviewed",
+        "allWriterAndRevocationOrderingClosure": "unreviewed",
+        "realAuthAndNativeRoleAuthority": "unreviewed"
+      }
+    },
+    {
       "id": "external:storage.objects",
       "kind": "external",
       "disposition": "unverified",
@@ -2752,6 +2945,11 @@
     {
       "id": "platform:auth-storage-roles-and-api-exposure",
       "reason": "Platform-managed auth/storage schemas, anon/authenticated/service roles, JWT actor semantics and exposed-schema configuration require a separately reviewed disposable Supabase environment; fixture stubs cannot certify them.",
+      "reviewStatus": "unverified"
+    },
+    {
+      "id": "platform:receipt-command-session-and-native-authority",
+      "reason": "Receipt command requirements need independently verified platform-managed auth.sessions/auth.jwt() lineage, original bearer session binding, configured timeout/refresh/termination semantics, native-role authority and all-writer revocation/lock ordering. A selected catalog snapshot cannot establish these contracts, execute a future gate or replace real Auth and concurrent mutation acceptance.",
       "reviewStatus": "unverified"
     },
     {
@@ -2849,6 +3047,11 @@
     {
       "id": "data:role-catalog-and-extension-prerequisites",
       "reason": "Enum values/order, native/public role catalogs, required reference rows and extension functions need independent deterministic initialization and compatibility tests.",
+      "status": "unverified"
+    },
+    {
+      "id": "data:receipt-command-session-authority-acceptance",
+      "reason": "The requirements-only dependency root does not assert that retained receipt source calls a session/native-role gate. Auth session rows, configured timeout values and live authority are not inspected by this inventory. Expired/terminated/refreshed sessions, all-writer revocation ordering and real Auth mutation-boundary negative controls remain blocking and unverified; metadata correspondence is not production admission or release evidence.",
       "status": "unverified"
     },
     {

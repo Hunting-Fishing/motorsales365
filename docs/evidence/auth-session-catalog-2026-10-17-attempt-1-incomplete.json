@@ -1,0 +1,1315 @@
+{
+  "caps": {
+    "columns": 96,
+    "indexes": 64,
+    "policies": 32,
+    "triggers": 64,
+    "acl_bytes": 8192,
+    "functions": 32,
+    "config_keys": 32,
+    "constraints": 64,
+    "config_bytes": 8192,
+    "policy_roles": 32,
+    "definition_bytes": 65536,
+    "expression_bytes": 65536,
+    "policy_role_bytes": 8192,
+    "trigger_argument_bytes": 4096
+  },
+  "mode": "read-only-auth-session-catalog-fingerprints-v1",
+  "roles": [
+    {
+      "name": "anon",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "authenticated",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "service_role",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "supabase_auth_admin",
+      "login": true,
+      "exists": true,
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    }
+  ],
+  "scope": {
+    "roles": ["anon", "authenticated", "service_role", "supabase_auth_admin"],
+    "source": "pg_catalog only; no Auth/application rows or row counts",
+    "triggers": "all sessions attachments plus users DELETE and inbound sessions-FK attachments",
+    "relations": ["auth.sessions", "auth.users"],
+    "usersColumns": ["id", "is_anonymous", "deleted_at"],
+    "attachedFunctions": "fingerprints only for selected trigger function OIDs in any schema; no execution",
+    "requestedFunctions": ["auth.uid()", "auth.jwt()"]
+  },
+  "limits": [
+    "Catalog fingerprints only; no managed Auth migration lineage, raw source recovery or complete baseline adoption.",
+    "No Auth/user/session rows, identifiers, row counts, credentials, configuration values or helper execution.",
+    "Effective privileges are dated metadata, not permission to grant access or a strict-session/native-role authorization path.",
+    "No logout, termination, timebox/inactivity, JWT/API behavior, lock-order/all-writer concurrency, financial, recovery or release acceptance."
+  ],
+  "schema": {
+    "name": "auth",
+    "owner": "unclassified-role",
+    "aclIsNull": false,
+    "aclSha256": "76992ba0687fcceba0c86d4c4cf61b39b3e538076870daeef4e2abab1025d353",
+    "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c"
+  },
+  "columns": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "user_id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "factor_id",
+      "type": "uuid",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "aal",
+      "type": "auth.aal_level",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "not_after",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refreshed_at",
+      "type": "timestamp without time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "user_agent",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "ip",
+      "type": "inet",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "tag",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "oauth_client_id",
+      "type": "uuid",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refresh_token_hmac_key",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refresh_token_counter",
+      "type": "bigint",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "scopes",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "deleted_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 34,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "is_anonymous",
+      "type": "boolean",
+      "notNull": true,
+      "identity": "",
+      "position": 35,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": true,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+    }
+  ],
+  "indexes": [
+    {
+      "live": true,
+      "name": "sessions_not_after_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "not_after",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "fd14f9a7fb296a2f7fcf3a1df4dc0c59f05155eefd0f6bc57c4365d961cde95a"
+    },
+    {
+      "live": true,
+      "name": "sessions_oauth_client_id_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "oauth_client_id",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "688658cd1282ffcd8e603306b5111f19ccf48786a350721b61b3a555d8e2c395"
+    },
+    {
+      "live": true,
+      "name": "sessions_pkey",
+      "ready": true,
+      "valid": true,
+      "unique": true,
+      "columns": [
+        {
+          "key": true,
+          "name": "id",
+          "expression": false
+        }
+      ],
+      "primary": true,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "4d7325cc989cea5be27ff2c7c6313da8a98e599f3004046771423366321641fe"
+    },
+    {
+      "live": true,
+      "name": "sessions_user_id_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "user_id",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "31c69630e665d05220e7d4fd215c7349df53d2891699c87151e8ae44ebcf457e"
+    },
+    {
+      "live": true,
+      "name": "user_id_created_at_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "user_id",
+          "expression": false
+        },
+        {
+          "key": true,
+          "name": "created_at",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 2,
+      "relation": "auth.sessions",
+      "definitionSha256": "dd715b29ca934da9ed3fc34cfa9ded7375bf3e82f3cfb0a10af53db41c91fe5e"
+    }
+  ],
+  "complete": false,
+  "failures": ["trigger-cap-exceeded"],
+  "policies": [],
+  "triggers": [],
+  "functions": [
+    {
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "sql",
+      "aclIsNull": false,
+      "aclSha256": "8d5c15c3b6c726905e5739f1a26ade1fca239cf4fac811a90ebf2fe3e4477f84",
+      "requested": true,
+      "signature": "auth.jwt()",
+      "configKeys": [],
+      "resultType": "jsonb",
+      "returnsSet": false,
+      "volatility": "s",
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec",
+      "bodySha256Lf": "fed2a8ac0349ffaba807c1b574698bfb1348825b8ef5163ad72d8408386f5e3e",
+      "configSha256": null,
+      "definitionBytes": 265,
+      "securityDefiner": false,
+      "definitionSha256": "7ce3ad8fb99f7ad5f5cd869fbd5479a6325e9444da472c26394cfa66c83b2d11"
+    },
+    {
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "sql",
+      "aclIsNull": false,
+      "aclSha256": "c0142c975731328858e0ab516208763d0f6ecd1efcbe9629f321da20d7b01177",
+      "requested": true,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec",
+      "bodySha256Lf": "9ab5ea099e74ec09e83b1505c51a3647791195aed7c742dcc3f257dfc7d2f300",
+      "configSha256": null,
+      "definitionBytes": 274,
+      "securityDefiner": false,
+      "definitionSha256": "7c1ff2ecbe653c9358b3115a2607db9573f88a2944ae4eca9e296a89cc5186a7"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_cascade_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "cb707bf687ab9c93a070362e30893e7ef02254969eccc216279c39b51be66693",
+      "configSha256": null,
+      "definitionBytes": 163,
+      "securityDefiner": false,
+      "definitionSha256": "e8ddfdfc933c009d6d55fdf46f4a7ec8284f89a8259f9b57774b2baed540c73a"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_check_ins()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "c7d3cb0e7da60ad104d23855d5c4706fc5adec81a52ac04d903eb2e0e59c1320",
+      "configSha256": null,
+      "definitionBytes": 159,
+      "securityDefiner": false,
+      "definitionSha256": "1fb27f5e28adb2459b50710e06e589994dbce63be44d164630b1c0e929b5f0b7"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_check_upd()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "94ab317bbd11988d53472ae31f8bce5e46edde004cb89f6a91c68176b61fb4b3",
+      "configSha256": null,
+      "definitionBytes": 159,
+      "securityDefiner": false,
+      "definitionSha256": "f7bc324f04c13acc429da6d04d030ffe2a97edd2c30373425893448a5e6fd977"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_noaction_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "4ffbfbc6ff38962d9c39a1a4940135ccd4e46e61d400e2e157be1217ce5fb4f7",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "0ea378155aad58c22fc0bfd63c717f36bd7743ac15acd40b922e53cf34e5ad40"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_noaction_upd()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "be4d637c94a9aab4f10f1e19d7e16b5e35f397eacf2ad6ac606f6056848a841d",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "da6531c61156e0102d6a65e2c79cb331a434da43d803bff2982434c96018c6e1"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_restrict_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "e33de01aabce0d344c59dd01c73dc748fb170463137e9f207215cdee0792c7e5",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "ff46f8b5fc795ba430d509d288aa113a221a10ef343396b55c18ab6fb975415b"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_setnull_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "4b1980ec42146eedf2c6fb2db212b5aacca7275404277e80e833b07e8bb20140",
+      "configSha256": null,
+      "definitionBytes": 163,
+      "securityDefiner": false,
+      "definitionSha256": "f039bb50e3286dc121b50c584c28efca1b6c01b409c17957055b87cce7133d9a"
+    }
+  ],
+  "relations": [
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "auth.sessions",
+      "owner": "supabase_auth_admin",
+      "forceRls": false,
+      "aclIsNull": false,
+      "aclSha256": "3e2494906df9f3ac1600086611fb275147dddda2de489926a1c023b827adb287",
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true,
+          "schemaUsage": true
+        }
+      ],
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec"
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "auth.users",
+      "owner": "supabase_auth_admin",
+      "forceRls": false,
+      "aclIsNull": false,
+      "aclSha256": "2ea3c8ff9f1aa9b68a180fa8e82b187d7ab868758b6c2c6723c4a4f734413525",
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true,
+          "schemaUsage": true
+        }
+      ],
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec"
+    }
+  ],
+  "truncated": true,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "sessions_oauth_client_id_fkey",
+      "type": "f",
+      "columns": ["oauth_client_id"],
+      "relation": "auth.sessions",
+      "matchType": "s",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": "c",
+      "updateAction": "a",
+      "definitionSha256": "b97dbaa718c2abc233dc925a8fd74cb33ab22579b64a7d959720c27c69e09fdd",
+      "initiallyDeferred": false,
+      "referencedColumns": ["id"],
+      "referencedRelation": "auth.oauth_clients"
+    },
+    {
+      "name": "sessions_pkey",
+      "type": "p",
+      "columns": ["id"],
+      "relation": "auth.sessions",
+      "matchType": " ",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": " ",
+      "updateAction": " ",
+      "definitionSha256": "8c8464f42472e42ee190fc91ca8db79b5351d3a4609040516578d229c56f6fa5",
+      "initiallyDeferred": false,
+      "referencedColumns": [],
+      "referencedRelation": null
+    },
+    {
+      "name": "sessions_scopes_length",
+      "type": "c",
+      "columns": ["scopes"],
+      "relation": "auth.sessions",
+      "matchType": " ",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": " ",
+      "updateAction": " ",
+      "definitionSha256": "824af3e9b2f01679696b7d346253635a561fc563bb75e978f102e304850ed84a",
+      "initiallyDeferred": false,
+      "referencedColumns": [],
+      "referencedRelation": null
+    },
+    {
+      "name": "sessions_user_id_fkey",
+      "type": "f",
+      "columns": ["user_id"],
+      "relation": "auth.sessions",
+      "matchType": "s",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": "c",
+      "updateAction": "a",
+      "definitionSha256": "7dffc1fe5c72443147ef9227e966626cdc6e5997f36e90bcc553577512766d2a",
+      "initiallyDeferred": false,
+      "referencedColumns": ["id"],
+      "referencedRelation": "auth.users"
+    }
+  ],
+  "observedAtUtc": "2026-10-16T18:16:31.210235",
+  "serverVersionNum": "170006",
+  "observedCatalogCounts": {
+    "roles": 4,
+    "columns": 18,
+    "indexes": 5,
+    "schemas": 1,
+    "policies": 0,
+    "triggers": 218,
+    "functions": 9,
+    "relations": 2,
+    "constraints": 4,
+    "requested_functions": 2,
+    "index_bytes_exceeded": false,
+    "column_bytes_exceeded": false,
+    "policy_bytes_exceeded": false,
+    "policy_roles_exceeded": false,
+    "required_user_columns": 3,
+    "trigger_bytes_exceeded": false,
+    "function_bytes_exceeded": false,
+    "required_session_columns": 3,
+    "constraint_bytes_exceeded": false,
+    "schema_acl_bytes_exceeded": false,
+    "relation_acl_bytes_exceeded": false
+  }
+}

@@ -1,0 +1,3932 @@
+{
+  "caps": {
+    "columns": 96,
+    "indexes": 64,
+    "policies": 32,
+    "triggers": 256,
+    "acl_bytes": 8192,
+    "functions": 32,
+    "config_keys": 32,
+    "constraints": 64,
+    "config_bytes": 8192,
+    "policy_roles": 32,
+    "definition_bytes": 65536,
+    "expression_bytes": 65536,
+    "policy_role_bytes": 8192,
+    "trigger_argument_bytes": 4096
+  },
+  "mode": "read-only-auth-session-catalog-fingerprints-v1",
+  "roles": [
+    {
+      "name": "anon",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "authenticated",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": false,
+      "superuser": false
+    },
+    {
+      "name": "service_role",
+      "login": false,
+      "exists": true,
+      "inherit": true,
+      "bypassRls": true,
+      "superuser": false
+    },
+    {
+      "name": "supabase_auth_admin",
+      "login": true,
+      "exists": true,
+      "inherit": false,
+      "bypassRls": false,
+      "superuser": false
+    }
+  ],
+  "scope": {
+    "roles": ["anon", "authenticated", "service_role", "supabase_auth_admin"],
+    "source": "pg_catalog only; no Auth/application rows or row counts",
+    "triggers": "all sessions attachments plus users DELETE and inbound sessions-FK attachments",
+    "relations": ["auth.sessions", "auth.users"],
+    "usersColumns": ["id", "is_anonymous", "deleted_at"],
+    "attachedFunctions": "fingerprints only for selected trigger function OIDs in any schema; no execution",
+    "requestedFunctions": ["auth.uid()", "auth.jwt()"]
+  },
+  "limits": [
+    "Catalog fingerprints only; no managed Auth migration lineage, raw source recovery or complete baseline adoption.",
+    "No Auth/user/session rows, identifiers, row counts, credentials, configuration values or helper execution.",
+    "Effective privileges are dated metadata, not permission to grant access or a strict-session/native-role authorization path.",
+    "No logout, termination, timebox/inactivity, JWT/API behavior, lock-order/all-writer concurrency, financial, recovery or release acceptance."
+  ],
+  "schema": {
+    "name": "auth",
+    "owner": "unclassified-role",
+    "aclIsNull": false,
+    "aclSha256": "76992ba0687fcceba0c86d4c4cf61b39b3e538076870daeef4e2abab1025d353",
+    "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c"
+  },
+  "columns": [
+    {
+      "name": "id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 1,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "user_id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 3,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 4,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "factor_id",
+      "type": "uuid",
+      "notNull": false,
+      "identity": "",
+      "position": 5,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "aal",
+      "type": "auth.aal_level",
+      "notNull": false,
+      "identity": "",
+      "position": 6,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "not_after",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 7,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refreshed_at",
+      "type": "timestamp without time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 8,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "user_agent",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 9,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "ip",
+      "type": "inet",
+      "notNull": false,
+      "identity": "",
+      "position": 10,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "tag",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 11,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "oauth_client_id",
+      "type": "uuid",
+      "notNull": false,
+      "identity": "",
+      "position": 12,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refresh_token_hmac_key",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 13,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "refresh_token_counter",
+      "type": "bigint",
+      "notNull": false,
+      "identity": "",
+      "position": 14,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "scopes",
+      "type": "text",
+      "notNull": false,
+      "identity": "",
+      "position": 15,
+      "relation": "auth.sessions",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "id",
+      "type": "uuid",
+      "notNull": true,
+      "identity": "",
+      "position": 2,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "deleted_at",
+      "type": "timestamp with time zone",
+      "notNull": false,
+      "identity": "",
+      "position": 34,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": false,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": null
+    },
+    {
+      "name": "is_anonymous",
+      "type": "boolean",
+      "notNull": true,
+      "identity": "",
+      "position": 35,
+      "relation": "auth.users",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "generated": "",
+      "hasDefault": true,
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true
+        }
+      ],
+      "defaultSha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa"
+    }
+  ],
+  "indexes": [
+    {
+      "live": true,
+      "name": "sessions_not_after_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "not_after",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "fd14f9a7fb296a2f7fcf3a1df4dc0c59f05155eefd0f6bc57c4365d961cde95a"
+    },
+    {
+      "live": true,
+      "name": "sessions_oauth_client_id_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "oauth_client_id",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "688658cd1282ffcd8e603306b5111f19ccf48786a350721b61b3a555d8e2c395"
+    },
+    {
+      "live": true,
+      "name": "sessions_pkey",
+      "ready": true,
+      "valid": true,
+      "unique": true,
+      "columns": [
+        {
+          "key": true,
+          "name": "id",
+          "expression": false
+        }
+      ],
+      "primary": true,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "4d7325cc989cea5be27ff2c7c6313da8a98e599f3004046771423366321641fe"
+    },
+    {
+      "live": true,
+      "name": "sessions_user_id_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "user_id",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 1,
+      "relation": "auth.sessions",
+      "definitionSha256": "31c69630e665d05220e7d4fd215c7349df53d2891699c87151e8ae44ebcf457e"
+    },
+    {
+      "live": true,
+      "name": "user_id_created_at_idx",
+      "ready": true,
+      "valid": true,
+      "unique": false,
+      "columns": [
+        {
+          "key": true,
+          "name": "user_id",
+          "expression": false
+        },
+        {
+          "key": true,
+          "name": "created_at",
+          "expression": false
+        }
+      ],
+      "primary": false,
+      "keyCount": 2,
+      "relation": "auth.sessions",
+      "definitionSha256": "dd715b29ca934da9ed3fc34cfa9ded7375bf3e82f3cfb0a10af53db41c91fe5e"
+    }
+  ],
+  "complete": true,
+  "failures": [],
+  "policies": [],
+  "triggers": [
+    {
+      "name": "RI_ConstraintTrigger_a_16728",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "refresh_tokens_session_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "96f01201431b3988b6fdc4275b656824ac772a0ada9cfe1e1ec4932a3fd4781f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16729",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_upd",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 17,
+      "argumentBytes": 0,
+      "constraintName": "refresh_tokens_session_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "9c45b51fa5a216f0ab3055dd02d11d84b819f6dee27d6a2b6515eba64f8b54d1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16784",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "mfa_amr_claims_session_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "8d8d458923955f98f728344ca141a5b132c2216cceec3925d1ec7cb5d6edc45d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16785",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_upd",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 17,
+      "argumentBytes": 0,
+      "constraintName": "mfa_amr_claims_session_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "54b1d01940d93adce628b3013add53438b765fff86d15e4f71f1de7a67f3f12e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_c_16725",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_check_ins",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 5,
+      "argumentBytes": 0,
+      "constraintName": "sessions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0d46a7d3545a1de432e9fbdf341a0e70d1cc8dc6298f682aa0d20aa620299c42"
+    },
+    {
+      "name": "RI_ConstraintTrigger_c_16726",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_check_upd",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 17,
+      "argumentBytes": 0,
+      "constraintName": "sessions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "557e893f6b26e9c4be03a3ef85c6773ebc75f7067a62a31e3d61b9d113d8cf5c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_c_17069",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_check_ins",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 5,
+      "argumentBytes": 0,
+      "constraintName": "sessions_oauth_client_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "10b0dec20c83a594c36e2bd8d4d0148cf31e12e2a314058cbdee39994f262863"
+    },
+    {
+      "name": "RI_ConstraintTrigger_c_17070",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_check_upd",
+      "internal": true,
+      "relation": "auth.sessions",
+      "typeBits": 17,
+      "argumentBytes": 0,
+      "constraintName": "sessions_oauth_client_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "44645bef98d816a42db6d50ed8f1ca381944c39fb93de786e018de1804f7a587"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16695",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "identities_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c17f13ae40a473057033679374830d097c883d63147d8c7f4a819b45b5e47804"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16723",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sessions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "aafbdfca0af2324c3b425c1dfd09dd53046d79429a11bd6be9d87598d27f580f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16724",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_upd",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 17,
+      "argumentBytes": 0,
+      "constraintName": "sessions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b55631c193bcbad9375715fc7863a5ac4feb8218f0a6c4b7506a6f487c6596be"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16759",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "mfa_factors_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7ba16e8fe21aa73959a97e91f305b5a0f1a7dbab4b27871ed8904525dcce20b5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_16950",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "one_time_tokens_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "971f878782e961e54e3c1286576941169bc2c2bf256597b65f8c374b47edfde8"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17029",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "oauth_authorizations_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "8ca646ac304bbdb20f2a6769790c4d985c8e20804f6efaa9b0fc92202bfe6d69"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17048",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "oauth_consents_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5fe3dc49b83611801d8ad14160f3ebaf21ad495c1c2710f71309e0d9dcf1d9b6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17143",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "webauthn_credentials_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b4b0a0fae5273af98287303607dcd59b38163a01f88b8ad633f36fc6d8642554"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17160",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "webauthn_challenges_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "caad784b0d362d9ebe31cf64734285663b3ba7ccd0460dbefc08133bb5f63310"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17662",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "profiles_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4a125da023154c5d8f13ba01179f57e064e84ec8097e3640b8cda1a513da9d6b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17676",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_roles_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5e8e54fdf8e6d29f16d4aa3e9eae3c0b3c5438e614f95044f60c34882eceebaa"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17707",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listings_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "34da48ac8f4266c14f04c98fe831fc54e73404c63b18e69ff38859bc68f61d7a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17743",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "favorites_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "58743ba9dd9d4f855b2b6b20a2463bcaecb4b2768725ace52675abc220cf868f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17767",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "messages_sender_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "dea2d770e93312ab45267d9e0a879fdea88320df308b28b87f63b1b5afdb60dc"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17772",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "messages_recipient_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "d8168e3e8fe8f7542cbb46597123d73f6cd2839e1c18ba13b52c041e4b019f9a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17794",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "reports_reporter_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "75000334a3e755db023e5afd20b16d7e037e70891ab75cf5ae7de3ed605317ff"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17829",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "subscriptions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "11fd5650df92ec51d950842327dded3a328c2b82c04e1bc49249e4c83754ab1d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_17849",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "payments_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "32a1204ac60d1e8b0e2f05c80b39d83f06fbbf3c45c5b0161073cbd8c96291de"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_18088",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "otp_send_log_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "90b0b1f98388a9ccd270b4c82be171a8609674c893d8ff2b315e4a9cd94d1f54"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_18581",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_referrals_staff_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "d705b891e0fbbd85314b5b34493dbaebc8f3d7429cfe569af6e4b20902e43c8f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_18631",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_referrals_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "86b0c23f13ab46343548afb05e50119eacc2c04d408e3ec6d486dbadbc3ebe6a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_18980",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "fb_import_jobs_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c77cfad10a21d4c5f6fa5208574cb7cd667afc268b0b7b1d0225694485f79ad9"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19220",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "advertisements_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "53d2ca942ce552eed895f9a15feb8611f17929b9f25501a9e29c8983cda79a04"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19247",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_events_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c3c03866b4ed5c65d10f240ad06ba394deeb8d2d7ddf80eb9c2c9fe6ed05ce6b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19273",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "export_inquiries_assigned_to_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3061e418ca4ac7cd31bc4f3486813fc2bae895ec097c7c09ba4da35591755a54"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19278",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "export_inquiries_submitter_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f690005e653dd586b11d16753a259f44f0f2a3a90a45caf46a70bfb934eb4884"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19515",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listing_boosts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "88a5fd4560afe00da52c6f61a74cac4dba6a77b9ac104260c45514694779e211"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19575",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "service_inquiries_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "bd4477c68b15506fe9976639532a7ce0207a9e0e3b86469a36bc562f960c49d3"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19585",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "service_inquiries_assigned_to_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "00fbd7285f79eb7dd5527d786c660f5f36516a11e52a86186a7492020102f15a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19701",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "organizations_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c768ede6e75f708e5d82df0dd3282d2ae53e488b12ff67ce53d5a75e58111610"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19721",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "organization_members_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0ca3c6cd3044cf207c766254302a2e57622063920c5793fc10030cb02c2609e0"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19726",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "organization_members_invited_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ec1cf7af8aa2ea4ea9c334d59b9686093b5b66ad63185c0afcd874f59d0ce048"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_19750",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "organization_invites_invited_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "61a3188701b5624926082f1fd40c556366395cf95fa128127a95f9824dd243b6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_20953",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "share_kit_layouts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7e808482a258a8d1224b72eaa758a3b22ce7d9dfe7703e2f2f50dfe09471b215"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21040",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_discounts_target_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "91a8cd29dd80d850d029fe3b82d045df1f53a0eace45194c1a75c19d8356b2eb"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21045",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_discounts_issued_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b7a99bc244b17a3cbe00908a1ea3ec436cb4c1273ca8372778800f82e6943f38"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21068",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_profiles_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "63a91161926dfcf587ae456aba2de1aebb5d4b1b4c94fb45318633291d507e7e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21088",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_territories_rep_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a2f8739ddac7de48789bcaf42766a9da531b3d76eeb750b2fa0c3693f11c4c00"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21125",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_assignments_rep_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "47bdc185a85efd3759bff7016274e7082297a6ad3c11974c8e8cfc73154836f9"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21130",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_assignments_assigned_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c1c22ae66381466add80fbaad06eca42f6a6a7b328f5ad472e7a9fa6cfd30493"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21174",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_followups_rep_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "8047cdb689e1ee667ee5be82265005db39457f0933f9aa5987bd6397fbcb36b4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21199",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "sales_rep_audit_log_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "cde92f44b24a1775d03316d5685b64409e8e13419620b1f51c75c976838e69ad"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21224",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "lead_offer_unlocks_buyer_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "da9e5405ac011f5373d78e5312efebabdf7516c69a957af3be423f62f77a5c8c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21262",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "lead_offers_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "18c2887146e3b19e9ccb6f405844c56f8c70d1d67b6e5f2ef44774ed207750f3"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21318",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "bundle_purchases_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2807dec0fc03f12673cc5b80f81ec69d26543777cbaf1ea4f09b062a4e4ccf7b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21434",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_discovery_searches_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0cf7b8b83170c2a92021c6c71f432f5119b34017713a36c0f873c736fa1c2460"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21470",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_discovery_queue_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "96ac4bd9ad87a7ed17ea314fe9f3de5008fb609cb721284ed2b25744062c8be7"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21597",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "wanted_posts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "47917f6a36974567297aecb3f94ca716b26264346b07ae4ffc352f9e5a9014f4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21625",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "wanted_post_responses_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "72b0de61169afa1f72424a69cf574f5043f6e1c83422f675478213d4257fe3ae"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21675",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "seller_reviews_reviewer_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0005da216baeff210e542ebb87d935d4562ddda5ab86c0a38d6467da773f4400"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21766",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "inspection_orders_buyer_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5ee1a890226c9fd9d56b95427da152d5f4238214ece0dc1b11f06ef6be3c88cc"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_21878",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "passport_premium_purchases_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2c789db53c2eaea583c297e67ebc3ab5f69ecc47140f94c3d4dbe2e94bd606b9"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22061",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_blocks_blocker_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "51e56427c669c3c20c3c15aac9d2a5ce22b98a62b6a0535e99abbb3f5a97f23c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22066",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_blocks_blocked_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "d8f754f2e933b7fb512731cc7054529a0b7077820843b0e6e73a7000cc7ef497"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22094",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shop_category_keywords_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ccc6de5520b49e338c52961624f2581f4d546dccb12732b534177e0173fb5fd9"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22203",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "part_quote_requests_requester_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "01118e3369654cbc1af1c6e3a193c0ed3cb803b131f43033ed449b45c08b09d8"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22239",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "reports_made_public_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ec9b99615a222466e3c7d6d333d0ac51b4dd1a3d11484081cacfc2ea362e242b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22265",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listing_promotions_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2d469893ff6c2f4c7c75f5a59d35587fa8a88750cce31d981f659a61042ce503"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22311",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_wanted_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "8d3042ddfd3936844bf2336f48a03b7381fb5ad8297d826947af4c4ec692a174"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22376",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shop_manager_provisioning_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5d39eeff81e261f9ea33755c2b96b45b573542a637f48ba8673ccff4868b5e6d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22386",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "reports_resolved_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "16be41c8eedef75a939e875747b1cf8161e206ce5c217c308ac48f114676759b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22406",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "form_feedback_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0af816ea19ec05c373d689c24f4b18a685b96ee50126bc48819c08f8ee9f5278"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22455",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_client_contact_requests_requester_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "30d05b805cdb68da3f402a262a556713bd85aee57879d31ec39da4de54e68864"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22460",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_client_contact_requests_owner_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "765ca8bbd1bf549804163e46aa1e7db89a7697601bd14df67478441b9308c1d2"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22465",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_client_contact_requests_client_profile_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ea2bdb7300f4f593bc858cabf70a8b87f57a89521ebb69fa92938bb240e69a1c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22470",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_client_contact_requests_decided_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f16d4ed6fabfa7df9cd9cde93bb6ac1d73530957cc33c4ce5ac3ca7372e81d66"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22493",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_client_contact_audit_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5a14fbbfcd7e810bf950cb57d16a1a46f691250f022feb8596ad125ab4ef4aa7"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22532",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "report_actions_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "88eab5b035a84fda80ac0f0911b38fffc3497a3d96d522595545f673dfdfb8db"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22566",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "report_disputes_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ad9fcce5bad3d5e0dd6064701422a3f99006942adb10338e78c0aefbf230220d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22571",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "report_disputes_resolved_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c0ab68b3481383ec8e5847f60490c20ae501f7948698c3bd100cd96b5cfb2884"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22594",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "trust_score_events_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "00167579ca04e2052105273dc317d14f54cbb62318fee135436e083a9ea6673f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22599",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "trust_score_events_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c7c93137369d09934effc57d914b586cf717a071ec1f564a029686a8ad0754de"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22636",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "member_rewards_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2a18c90a0afd21c625cd7204602c47096be2dfa8bc15a4de7bfb827922394b10"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22646",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "member_rewards_granted_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6e088b581f51e693f215bf9f1910eae4d8193d706d0b39b2c7182572a6e62377"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22670",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "boost_credits_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "d60a0dfeb30fb1e01b410d777ed8f3da0f9ba778036e9832110255f8e26c212c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22685",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "boost_credits_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "283aad70a1dfb33b2b8dd9ee9de2098956ee170002f330abe4c6e99d44608d9a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22945",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "service_catalog_suggestions_submitter_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "dbc739a98144025d54e67503a1c8ceb019d6f28b79ad207ff7ed4efec7d70f71"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_22960",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "service_catalog_suggestions_decided_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "98676f65285e57e77fb438d44467aa162953272859b7054366e79f03a2c84c11"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23051",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_bookings_assigned_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "bf6c4cbb0923cd7f37567140434714b06403acb34072b73bc73da2ffd47ac8c8"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23096",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "share_kit_custom_templates_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "099819a681f416ccf746f64ddbea3d6b1475c112f4d94243f42f0254e99245d0"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23113",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "share_kit_hidden_builtins_hidden_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3abf06baf01326bf14eff796d7d12c45c9b65d84eb038ca6070c512dcccebd4d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23133",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "share_kit_builtin_categories_updated_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "14f1f3af7c1c11d6a5cf93f11bb2208e7fab9ccedc988448365dd80c7d76c1b4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23282",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_packages_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "77978d6d6739fddfa3100b905faa867023f008f7ee486f580c3aa7ab5ce8f50c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23303",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_orders_advertiser_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3ff53a21255bfb1df8a74f167f7f7d24e229ab6cd51c0db3bfc51a437bacd4c6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23318",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_orders_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b56b4b308aee428bb2886b40a02f32e0e0bdd62608cd4a13046766b1f64fb819"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23351",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_creatives_uploaded_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a9c63a1fa711c897ab1660a1dc1b64addb441c551bd5d5d37be04656eee660e5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23356",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_creatives_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7c99664004f9d1839319fd9633053ee82296f68aa4f30007e495991b80aeab4d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23436",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_order_events_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "e60e83aeeedb3473f04476774cf36131a5c0c13aa38b48aec393914ca1044949"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23473",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "ad_creative_audit_log_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "77dd47c516c7ba4c14f96afaab87de1b743bd184402e79cbcca3c8ec9d8c330b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23493",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_notifications_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "e1e88ee151deb9e9b7986e20f53aa75175c3fbe56adadf363134bfbd163001d0"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23524",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "flashcard_content_synced_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0dc1701dff6770043307ddcb6fbf5ea4e4c03d16981aab387f1edfa465ea52de"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23547",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "flashcard_progress_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3cdc6301ea9de6d75a7f11ef9dd498828d21368b3c6de5840970432ece81314d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23620",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_outlets_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7545e8b1a0b2772dd51c6ae2d9ec6ebf688b0854aa7ad68cfcd6b69906722831"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23711",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "affiliate_clicks_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "272783c37f048cf93b97cbe799b25b88de342c3517f38a18a6c5fbaf96855be4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_23735",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_supplier_applications_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "286c5cd998f5bc3d5e1805538fc00801426c9fb62f4908ae31bb16c876c17203"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24062",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_applications_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "77c99a3c82559c5a115190d62d69331b848fd3ae4c12e2ffd787c9f258225d52"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24067",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_applications_reviewer_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "10d8f8161aafda8da0d7679be4921a1193d50ab3a24812f8ea7af5a592f589b1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24090",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_partners_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "9da36b0a870a5cdf1be94d7a09836255c6f122f84e8d05e11a4fcf0199ecc457"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24148",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_payouts_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "856b746de54b4f74051b0cfbede181a9d0cb2d442325a819cede91e533c4d1a6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24153",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_payouts_paid_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "04be2cefe7deeb7c2f974c35416fc19138955c08055e4c124c7e2722f07e311a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24166",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_commission_events_approved_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4487963f3d3d65fb7596e02cc3a6b1f0fc325c15342fa28ab3a7665ee41f3475"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24171",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "partner_program_commission_events_clawed_back_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7bb7b647c51963b8705294956bcc89603e046bf60621b5c1c17570fc8084cbef"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24404",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "clubs_owner_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "9a9e853cc0bed2fea57ca5a1c29b92241c4aeb6e97bc31df05e218e5d61008e7"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24409",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "clubs_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1628d1f96396b9387e278dd6e071028031ae02bb400d4487937923cacfcf687d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24431",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_documents_uploaded_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "737533bd8b46d13c32164193f8d92345fd601c5b8e762665fbbe819e658a9384"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24453",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_members_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0ed85728550f02d83ec4d2ec5e85ef2351bb6b7fc1b2cf00cf39f1003277162a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24476",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_events_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "74c7634da03598342256e7c1240ea2c37cd42c7008780a830e181af733047c2b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24498",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_event_rsvps_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "83c81556a2cc91903fc866881b1fdd62a158e225624064d9e32f4bc99b778a05"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24523",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_rides_added_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b3bdfd3a62a5eeb750c0626a2886c5b2e87706ab16edb1955e7abbb1430eae0b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24543",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_posts_author_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "881d6439eae58ecf1363e9794115c39d15b1c117e2acdb1c1c3fe6eec9a6acb6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24600",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "club_member_discount_grants_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4cd18660ce1b60c4fd5178e5b194ca65e8a3e3609f35cc4ad38e90052a1c58ec"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24683",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "profiles_intent_evaluated_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "eca311f66f521b68c7fcb1c166530cfedf9765907639cf7edc6269c3e31c3707"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24751",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_academy_assets_uploaded_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "058d44686ff4d00d680295cb33d67520fc43348176e1ea8a531c7c7574fd0977"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24785",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_academy_article_history_changed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "838f4d22472fa850c01dabc1d09d50e9c7a418d403e1e9899106a9bf92642808"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24808",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_academy_article_views_viewer_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f92b1766a47a76a881d7b2d3726827ee64f067282b5d8714f0e1c6738936ff2f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24866",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "profiles_manager_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "05efa715d7aada5b452a5f21861fa07ae4e83c1b7de6f49c4e2c671e40cdcd6e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24885",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_dms_sender_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "58db6816fe1f47a1321e56ae5f9de0e9c0c42d831bc082aea91382172a8a90c8"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24890",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "staff_dms_recipient_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "12d1b0dca0b20ba1dd18d95e598f89db422e839f5441fa4d6f15b40e8c4cf74a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24910",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "qr_lead_captures_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b246bd0e09968abda8798e0e923726db54f06e2ed674af79312f4c537c6ade82"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24916",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "qr_scans_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c55f32a5a1547b1733b47de4af54c5e2cb019739868a336baa681c7432f234a9"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24922",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "referral_visits_linked_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a663d43b207e438a658d2a722604220b2115a4921841047bd17f61655e401725"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24978",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "franchise_applications_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f3df70ed7534e134ce42fedca7afa914e1fabef4e906392d3d3be4b25ad9e07c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_24988",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "franchise_applications_reviewer_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "637d4c9a1ff8da5812c1a6c883f3b567c6f7712381abe136be4337f0f880f506"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25019",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "franchise_memberships_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "228400fb9e82f00c66f96a4eac9a44e904dca22b457d61bee0867e79466a1d18"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25055",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "franchise_application_messages_sender_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0e9d508c85a16aade74e3109fefd1c7b7a4edaf2893816e3e6c96b8380ee482d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25103",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "network_part_inquiries_requester_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "dc355ad739046e063e19843edfe4cf2da6c5b4dae8f19119c25c787c57b1cd48"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25117",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "network_part_inquiries_responded_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1322717288471e0ae8ec76bedd187fad35bc70b2b58f475ce6658ff0091a960e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25131",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "businesses_network_exposure_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "51758dca480abdc1ff2962bd3c51c959eb6572a1bdb6bc6638197e382ec7d24e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25161",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_network_exposure_audit_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7f31dc53aa218299e8e164c301c9dab7367204b6dc2a55606cb43a89a420f9e0"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25212",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "franchise_application_audit_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "9fa5ae51e3737ea239e07249c5a9440fdfb409e869a76be5aa851629c5af246f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25258",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listing_documents_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0494134cacae8a2a16d915db3ba6bb66bcde45e52d3cffecb759bfb41928f51c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25283",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listing_verifications_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6229ff74c0490199297efe1a12b33544170c226b4c9e1e6b7fa2e3f6756b97e7"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25318",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "listing_drafts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3773ec82604e61851c737c8c4ec1530f8a76281a51e5c68d4e73bac532a76119"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25374",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "buyer_checklist_progress_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3f41570a6f8efca9e36bdbb50ddf81295195319d49244643dbd0d7fe789e7a5f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25414",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "chat_threads_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c16a578b520709f508f47ab57902bca5cd4b9ae6162c5abeef9190e3abd65a07"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25434",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "chat_thread_members_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b912ff3258c981765a7fc07afbe05391eb224f3fe6491b98d7ad0e1504aad7fb"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25439",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "chat_thread_members_invited_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c20349ab65c470ab83ce47d65ef5e4317e35f75571fd4f4028a26cd5e463ff6a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25459",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "chat_thread_messages_sender_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f2ff983c34b6b5eaa84bbcfa54a3c5aa94fb68703fdb99680e9988929f428806"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25515",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "message_thread_state_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "deaba2437fb1ac00ca634b5b38d7f0a03cbde68f86253169ffff585b42c1a34d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_25536",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "quick_replies_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1b6a8df95d74eaa00ce64546ba39f6553128d0b62468bef2c86f1bf59a55106f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28420",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "appointments_advisor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5c5ce64d08d1f4f61f069de6a1952af0c7166265efee7fbf19d5c20656cfb45e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28425",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_addresses_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "50c294d52532b35a77b73ebb7753bd9018539ad49f7140c933c7c9e004333ec1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28430",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_form_comments_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1a397a65d2a15cfde0b01984a48a5376d87b1ed7ef156318677755492593f9a2"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28435",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_payment_methods_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4bba50a2e58bbc369d6f26d7e3dad2cc6f067661e948c3e4e644ba4a693041d2"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28440",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_profiles_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1053e03ec44905f6328013243c5db4430761539d58d888f8d10cd4ffcb9b94ab"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28445",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_provided_forms_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "38ee0500fad825490409bba10125575b2ff7b2744b86efb6089df858345f9ade"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28450",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customers_auth_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6dc1015d2975f48e5b934b77582846f8f7da395e5a77ecd91edb611f47e5a204"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28455",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customers_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ec3ba696be7ffd797327470cc977b417ed1d5c1a511e7a22652a277e5dff154f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28460",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "discount_code_usage_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "77fe6c00dad90632ea0bb0e44c3925b1ea89ccef5737d8f70b5006c1b1c7bcd1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28465",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "discount_codes_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "ce84218936f67b4ae994a5e6b39220570c73a24a593620f47cac0e07e43c27d5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28470",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_availability_employee_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0803fc313087e3c6ad4078af9f70b7076383beacc0340a683dd731da61256dcf"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28475",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "inventory_adjustments_adjusted_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0cb28493ed709bdf8e478f9937b235d81e8a850a7e9dc0038c20f9dcb043c397"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28480",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "inventory_alerts_acknowledged_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3737b689bc21a85d7b6c4f8a93af00e72ca88240ac7a6be0f4eb3b24b34b0f49"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28485",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "profiles_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "27563ec6111282f2424bc450027c97db8ee1c3c416687b48a5d1b6de6b0aeb17"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28490",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "purchase_orders_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4dca95903aabfcbb04100bce0fde08d81a801fa41f608823f2773872971eb472"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28495",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "quotes_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "930ed687d3e035517343a8429fde55a8b261985b384420d2ed15917da56a5cf5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28500",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "schedule_notifications_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "066e1aa667f4b1c76238b04e81fe09aae624c7de7c382792091834d9d16f5088"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28505",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shift_chats_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6d52ba6fbb2f046865302ad850d906ca160b19a63d9350c32f66f46f1f825bf6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28510",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shift_swap_requests_requesting_employee_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "52cec14bb8d83456310387da6e9883f5c53b6e6529e96c033dbe3c94ac53588f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28515",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shift_swap_requests_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2de91135caec0821e2a5ed28a827fc782505566544b5a23d3d86c3a8fc55e73e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28520",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shift_swap_requests_target_employee_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5b687d08f2a5f032fd87a20d4b68f8f9c8ac101621f5aedbfe1aba02325c00d2"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28525",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shift_templates_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "5493ce25d31e1997032cae6c334cf9eb1c84914448848c213769d8995f143f0d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28530",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "shopping_carts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "77f73b972eba614f2f126bc38bc4c0381ad626a9c6d0d58a846d6b84d657d605"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28535",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "user_roles_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a9b42e3e4da88e3e369bc909bd13d33491ace07c3ddafc05b89861cdc45a09f1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28540",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "vehicle_inspections_technician_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "869cfe29447d2d5d43a924ac90bc02c0c2c138cb6766d0443c526937648e37fd"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28545",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_order_document_versions_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2afccb0463f6a6ac0f73b8eab712546446e6238248d1a37cf01f66cf2fc8eb5e"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28550",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_order_documents_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c0f292ce10da1cdcc80eb9e107824ae40d8cd94f580761f8dcc7d6644d46e964"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28555",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_order_documents_uploaded_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "deb944fa169ea9d8beb8174fbe1b27699871b70200e40a8f2f6411777cba1054"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28560",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_order_job_line_history_changed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "418e7066b21dc18d8ad4aab40802c3446abfd676d8622c65446667aa1cb20e13"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28565",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_order_part_history_changed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "51ab35c10056c6eea64e6d76adfc2b967c30cd27fece45a906a833513eba588f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28570",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_orders_advisor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6dea490de61f8ecb9fa6ba06568d90f839c082156571b7d491c66af8a345150d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_28575",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "work_orders_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "7a0ae4fed25c41dc4927344a5228e886d6f2c555edf2e132cd4f8b5a2a9da236"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_29094",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_invoices_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2cc690ee0cf6d680e26379555fe96ca9005971734a600fc4f4dde3118c14d120"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_31454",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_fitment_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "cc20171a028a55556a3477ab69149d216a0db7ffd6fb2b9ed3c6f5ba4d9fa022"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32452",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_orders_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "990f45b65abd98cc2761c1f2c8df90e42898306021cd5348f58dc8a938eb4367"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32536",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_reservations_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c463d9538b64dc4735ba671c61180b5c1e8871ffe08d683d4e128b25f3d6bf11"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32556",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_order_events_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "d25a66fd9dd78f982b04ceaba43d464b4c3ff5ad63e66c590df6916eac13647a"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32593",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_receipts_received_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b726603864fbeed04210abe88477232f74e0e4562e550b830d3d24366cb36c20"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32666",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "installed_components_installer_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "980ea8c3d9f725e307c63bf35a1a819f3b67a5128c73dcfb10b75ffc4af940b5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32705",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_returns_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3b61d3f00fffbe5555c1852b8658169c3f8483357ed9afc1df3b29a5378b1f91"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32773",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_warranty_claims_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "814d7a9bc3f12f950d6f5418597499c448df91983a15dcb6322c45822b841f42"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32861",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_associate_applications_applicant_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "e14c9aabf6123dc8c3e75de2d317004f38ec881f4f6bcb70dfdaf216b2d24b88"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32866",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_associate_applications_reviewed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a7b77c279a4639ebf8fa08460cb627be95f093d41cc58c5bef44b0f143b304b4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32966",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "associate_access_audit_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "8e4f8a55627b6b13304e32824967026ad24c6334f8a13e219f8274fb6bd888b1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_32993",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "associate_api_connections_revoked_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "35f19bbd5709b853a134314cdd647b9c7b476824cbd72deb5b5335bb7de02790"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33022",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "customer_accounts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "727bebddf7672de1ba0cacd312f4c89264a57306c281a5ff922fec9916f86417"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33084",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "vehicle_history_events_actor_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b551a35c21b6a5833135cc2c410d1f13435e05a9423d40e4165728f88afd7271"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33166",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_shifts_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "3b7605aed843ba9801f430b3cd520d355ced99ee9f7794cdef02f2c0577aa3b8"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33176",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_shifts_closed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "b7b5fff89fcb6ee8fd8fca4023a959db01bb283c61bf91bc473f8e89c38330be"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33209",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_shift_events_actor_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c8a0c891bd340484a7767fbf012b879a6c3ddf209c3e642f6531346d4b781283"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33239",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_approval_requests_requested_by_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "20f3e1f013c3b750cec07abc98f8ac3f8794d880b41432c8576709351ec3905f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33249",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_approval_requests_decided_by_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c0a60b4604b8be03a4f306d05a47c4a3ec1d03fa7d48aa3dee6d46600503645f"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33278",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "employee_operational_events_actor_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "39b0de74e71c10dfec21d9b1d06bb500e54020e38b10a2687eb06216c27dc49b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33433",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "register_sessions_opened_by_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "92bfdec439211f7ccfecae3c6302b1457dae44394b3362cd81c9e6e8745edd76"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33438",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "register_sessions_closed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "67deede6e95946c9df541ee241d89c797f45be28095b8f2d244b192e56011b5b"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33463",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "price_book_rules_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2fb0a9ee1e2893bcd869f1432df860fab173af71a44096191b32164641a3e29c"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33516",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "counter_sales_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "74e20ee27c2bbff7a3783cc96729e9a69494633b003736e8682c4569ea50e631"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33940",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_part_cross_references_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "a883d15b10de26459b14f17596b1ca3b97b2832bbf0e79eb10b58e13cd05c6ee"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33994",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_staff_temporary_permissions_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "6483a869f4037d43c801ad7b388716758139f3c3bf7068764c1c2e5a2ddcba84"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_33999",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_staff_temporary_permissions_granted_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "fbfab9e347e1dc5e42688e60d1e11d9e77a55a792747c587a9f0f7dcb4377cf5"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_34004",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "business_staff_temporary_permissions_revoked_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "595fae2c146016f8c941a6ef94260ade4dc40da5a5123db1063e82514f7a45b6"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_35184",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_restrict_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_receiving_exceptions_reported_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "4fe490bed53495fb254e1464d9be0ddf14575c3a0b9e0fca47c34eda2a0db52d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_35189",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "parts_receiving_exceptions_resolved_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "35beaa1efedf89e61d6c6dd5551047019bda46e1fb80b63f4436432d7b6647ec"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_35909",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_setnull_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "scim_users_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "36e0eaac1730c72af075d9f821504dc2025d4ba9164353bff8d779adcf1677c3"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_35957",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_cascade_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "mfa_recovery_code_sets_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "f1ef8983e4359020d362a791acd4603d6eb832acd00267d5d379e93eb22aa833"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_37743",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "vehicle_shop_links_approved_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "e8358dda891808da3a9b198d8fdcfcc6162a864f268a573a53c4c16fd32cbac1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_37762",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "link_requests_requested_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "2691531a417b335acbde05ecd6f11a3faf6a51e664d4590d036075d5bfb68d5d"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_37797",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "vehicle_receipts_created_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "c43b798dbbbe82f9899de1416208470d6de3df347b0b1c74f85e078f35f67ba4"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_37830",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "vehicle_receipt_items_installed_by_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "0417fcfd005281dade15cccb9741fc0d670f8ede5a9b6a09ac30e01a75e10fe1"
+    },
+    {
+      "name": "RI_ConstraintTrigger_a_37842",
+      "enabled": "O",
+      "function": "pg_catalog.RI_FKey_noaction_del",
+      "internal": true,
+      "relation": "auth.users",
+      "typeBits": 9,
+      "argumentBytes": 0,
+      "constraintName": "scan_budgets_user_id_fkey",
+      "argumentsSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "definitionSha256": "1be0a079551209a51517f48a6b6e5c9a7f5d42e6ffbfa0698514f2f2d9b7f427"
+    }
+  ],
+  "functions": [
+    {
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "sql",
+      "aclIsNull": false,
+      "aclSha256": "8d5c15c3b6c726905e5739f1a26ade1fca239cf4fac811a90ebf2fe3e4477f84",
+      "requested": true,
+      "signature": "auth.jwt()",
+      "configKeys": [],
+      "resultType": "jsonb",
+      "returnsSet": false,
+      "volatility": "s",
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec",
+      "bodySha256Lf": "fed2a8ac0349ffaba807c1b574698bfb1348825b8ef5163ad72d8408386f5e3e",
+      "configSha256": null,
+      "definitionBytes": 265,
+      "securityDefiner": false,
+      "definitionSha256": "7ce3ad8fb99f7ad5f5cd869fbd5479a6325e9444da472c26394cfa66c83b2d11"
+    },
+    {
+      "kind": "f",
+      "owner": "supabase_auth_admin",
+      "strict": false,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "sql",
+      "aclIsNull": false,
+      "aclSha256": "c0142c975731328858e0ab516208763d0f6ecd1efcbe9629f321da20d7b01177",
+      "requested": true,
+      "signature": "auth.uid()",
+      "configKeys": [],
+      "resultType": "uuid",
+      "returnsSet": false,
+      "volatility": "s",
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec",
+      "bodySha256Lf": "9ab5ea099e74ec09e83b1505c51a3647791195aed7c742dcc3f257dfc7d2f300",
+      "configSha256": null,
+      "definitionBytes": 274,
+      "securityDefiner": false,
+      "definitionSha256": "7c1ff2ecbe653c9358b3115a2607db9573f88a2944ae4eca9e296a89cc5186a7"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_cascade_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "cb707bf687ab9c93a070362e30893e7ef02254969eccc216279c39b51be66693",
+      "configSha256": null,
+      "definitionBytes": 163,
+      "securityDefiner": false,
+      "definitionSha256": "e8ddfdfc933c009d6d55fdf46f4a7ec8284f89a8259f9b57774b2baed540c73a"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_check_ins()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "c7d3cb0e7da60ad104d23855d5c4706fc5adec81a52ac04d903eb2e0e59c1320",
+      "configSha256": null,
+      "definitionBytes": 159,
+      "securityDefiner": false,
+      "definitionSha256": "1fb27f5e28adb2459b50710e06e589994dbce63be44d164630b1c0e929b5f0b7"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_check_upd()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "94ab317bbd11988d53472ae31f8bce5e46edde004cb89f6a91c68176b61fb4b3",
+      "configSha256": null,
+      "definitionBytes": 159,
+      "securityDefiner": false,
+      "definitionSha256": "f7bc324f04c13acc429da6d04d030ffe2a97edd2c30373425893448a5e6fd977"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_noaction_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "4ffbfbc6ff38962d9c39a1a4940135ccd4e46e61d400e2e157be1217ce5fb4f7",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "0ea378155aad58c22fc0bfd63c717f36bd7743ac15acd40b922e53cf34e5ad40"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_noaction_upd()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "be4d637c94a9aab4f10f1e19d7e16b5e35f397eacf2ad6ac606f6056848a841d",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "da6531c61156e0102d6a65e2c79cb331a434da43d803bff2982434c96018c6e1"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_restrict_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "e33de01aabce0d344c59dd01c73dc748fb170463137e9f207215cdee0792c7e5",
+      "configSha256": null,
+      "definitionBytes": 165,
+      "securityDefiner": false,
+      "definitionSha256": "ff46f8b5fc795ba430d509d288aa113a221a10ef343396b55c18ab6fb975415b"
+    },
+    {
+      "kind": "f",
+      "owner": "unclassified-role",
+      "strict": true,
+      "execute": [
+        {
+          "role": "anon",
+          "allowed": true
+        },
+        {
+          "role": "authenticated",
+          "allowed": true
+        },
+        {
+          "role": "service_role",
+          "allowed": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "allowed": true
+        }
+      ],
+      "language": "internal",
+      "aclIsNull": true,
+      "aclSha256": null,
+      "requested": false,
+      "signature": "pg_catalog.RI_FKey_setnull_del()",
+      "configKeys": [],
+      "resultType": "trigger",
+      "returnsSet": false,
+      "volatility": "v",
+      "ownerSha256": "4b6d6781f04497e02d70c678d3d8de520289d903cf21fa46c91f5a7ddd16e99c",
+      "bodySha256Lf": "4b1980ec42146eedf2c6fb2db212b5aacca7275404277e80e833b07e8bb20140",
+      "configSha256": null,
+      "definitionBytes": 163,
+      "securityDefiner": false,
+      "definitionSha256": "f039bb50e3286dc121b50c584c28efca1b6c01b409c17957055b87cce7133d9a"
+    }
+  ],
+  "relations": [
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "auth.sessions",
+      "owner": "supabase_auth_admin",
+      "forceRls": false,
+      "aclIsNull": false,
+      "aclSha256": "3e2494906df9f3ac1600086611fb275147dddda2de489926a1c023b827adb287",
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true,
+          "schemaUsage": true
+        }
+      ],
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec"
+    },
+    {
+      "rls": true,
+      "kind": "r",
+      "name": "auth.users",
+      "owner": "supabase_auth_admin",
+      "forceRls": false,
+      "aclIsNull": false,
+      "aclSha256": "2ea3c8ff9f1aa9b68a180fa8e82b187d7ab868758b6c2c6723c4a4f734413525",
+      "privileges": [
+        {
+          "role": "anon",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "authenticated",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "service_role",
+          "select": false,
+          "update": false,
+          "schemaUsage": true
+        },
+        {
+          "role": "supabase_auth_admin",
+          "select": true,
+          "update": true,
+          "schemaUsage": true
+        }
+      ],
+      "ownerSha256": "787a86741d88df5aa3d5d7050c9d57cd155753c407c8d0f5160468df45fec5ec"
+    }
+  ],
+  "truncated": false,
+  "projectRef": "wjxaajgvddtrxxtocxen",
+  "constraints": [
+    {
+      "name": "sessions_oauth_client_id_fkey",
+      "type": "f",
+      "columns": ["oauth_client_id"],
+      "relation": "auth.sessions",
+      "matchType": "s",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": "c",
+      "updateAction": "a",
+      "definitionSha256": "b97dbaa718c2abc233dc925a8fd74cb33ab22579b64a7d959720c27c69e09fdd",
+      "initiallyDeferred": false,
+      "referencedColumns": ["id"],
+      "referencedRelation": "auth.oauth_clients"
+    },
+    {
+      "name": "sessions_pkey",
+      "type": "p",
+      "columns": ["id"],
+      "relation": "auth.sessions",
+      "matchType": " ",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": " ",
+      "updateAction": " ",
+      "definitionSha256": "8c8464f42472e42ee190fc91ca8db79b5351d3a4609040516578d229c56f6fa5",
+      "initiallyDeferred": false,
+      "referencedColumns": [],
+      "referencedRelation": null
+    },
+    {
+      "name": "sessions_scopes_length",
+      "type": "c",
+      "columns": ["scopes"],
+      "relation": "auth.sessions",
+      "matchType": " ",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": " ",
+      "updateAction": " ",
+      "definitionSha256": "824af3e9b2f01679696b7d346253635a561fc563bb75e978f102e304850ed84a",
+      "initiallyDeferred": false,
+      "referencedColumns": [],
+      "referencedRelation": null
+    },
+    {
+      "name": "sessions_user_id_fkey",
+      "type": "f",
+      "columns": ["user_id"],
+      "relation": "auth.sessions",
+      "matchType": "s",
+      "validated": true,
+      "deferrable": false,
+      "deleteAction": "c",
+      "updateAction": "a",
+      "definitionSha256": "7dffc1fe5c72443147ef9227e966626cdc6e5997f36e90bcc553577512766d2a",
+      "initiallyDeferred": false,
+      "referencedColumns": ["id"],
+      "referencedRelation": "auth.users"
+    }
+  ],
+  "observedAtUtc": "2026-10-16T18:18:36.401211",
+  "serverVersionNum": "170006",
+  "observedCatalogCounts": {
+    "roles": 4,
+    "columns": 18,
+    "indexes": 5,
+    "schemas": 1,
+    "policies": 0,
+    "triggers": 218,
+    "functions": 9,
+    "relations": 2,
+    "constraints": 4,
+    "requested_functions": 2,
+    "index_bytes_exceeded": false,
+    "column_bytes_exceeded": false,
+    "policy_bytes_exceeded": false,
+    "policy_roles_exceeded": false,
+    "required_user_columns": 3,
+    "trigger_bytes_exceeded": false,
+    "function_bytes_exceeded": false,
+    "required_session_columns": 3,
+    "constraint_bytes_exceeded": false,
+    "schema_acl_bytes_exceeded": false,
+    "relation_acl_bytes_exceeded": false
+  }
+}

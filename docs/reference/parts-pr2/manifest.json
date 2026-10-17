@@ -1,0 +1,235 @@
+{
+  "formatVersion": 1,
+  "kind": "immutable-non-authoritative-plan-reference",
+  "repository": "Hunting-Fishing/motorsales365",
+  "source": {
+    "pullRequest": 2,
+    "commit": "cc75542f183e5b8ab363edef24f712a3899fb96f",
+    "baseCommit": "c8b66ebd9eecfd5b76c385c4442e1282d27bd9ac",
+    "statusAtObservation": "draft-open"
+  },
+  "observedIntegrationCommit": "06e21a2ef968975fc43e840d17c84ad77c4ea48c",
+  "noAuthorityTransfer": true,
+  "approval": {
+    "sourcePrMerged": false,
+    "activeBaselineReplaced": false,
+    "buildOrLaunchApproved": false,
+    "runtimeAccepted": false,
+    "newHostedBackendApproved": false,
+    "paidResourcesApproved": false
+  },
+  "canonicalHostedProjectRef": "wjxaajgvddtrxxtocxen",
+  "files": [
+    {
+      "sourcePath": "docs/365_PARTS_DECISION_REGISTER.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_DECISION_REGISTER.md",
+      "bytes": 13859,
+      "gitBlob": "caeba24c4d8f5abe217094538d49dedb71b03d21",
+      "sha256": "2502d039632ff9c6299805d46f0f223784ae9cef927de03375161a12e389a84d",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_DECISION_REGISTER.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_EXECUTION_ROADMAP.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_EXECUTION_ROADMAP.md",
+      "bytes": 20487,
+      "gitBlob": "c03289cddeaad4d41863cba9f47448568611773f",
+      "sha256": "c95aaf11eb641e7806667983025cdc16645f098327ff36fee8756286c8b77b6f",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_EXECUTION_ROADMAP.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_GLOBAL_EXPANSION_PLAN.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_GLOBAL_EXPANSION_PLAN.md",
+      "bytes": 66995,
+      "gitBlob": "e60c825b900b84287a8d82b1682f2c0cefbd5dee",
+      "sha256": "0118b531aeb8df025c9fd906966d09dd412497615b84c5b8648c9e0f204ea401",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_GLOBAL_EXPANSION_PLAN.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_GLOBAL_EXPORT_DISTRIBUTION_PLAN.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_GLOBAL_EXPORT_DISTRIBUTION_PLAN.md",
+      "bytes": 79809,
+      "gitBlob": "a7bfd90f400bc8c4ad3e5d85e056ff7503b84c4e",
+      "sha256": "c67bcbd2b79d0c27c7ba8c5caf48167be949a06291c7b7cb3abcc7de556dd13c",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_GLOBAL_EXPORT_DISTRIBUTION_PLAN.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_PROGRAM_INDEX.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_PROGRAM_INDEX.md",
+      "bytes": 17641,
+      "gitBlob": "1e3e22bdcf3efbbc4489ab45fcc432bd0061194f",
+      "sha256": "c492db259b83823b78a0951c5069a1d131b2b9b2fbb234d09ad12deee2631e8f",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_PROGRAM_INDEX.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_QUALITY_TRACEABILITY_PLAN.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_QUALITY_TRACEABILITY_PLAN.md",
+      "bytes": 15853,
+      "gitBlob": "db5a959e87ec3483f3790676225fe7bff0c58a5e",
+      "sha256": "cea83815e5d4a3fdc673b7e3c306059ade9a87778ca96e2b27d7ddf60aa1a60e",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_QUALITY_TRACEABILITY_PLAN.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_REGULATORY_CHANGE_REGISTER.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_REGULATORY_CHANGE_REGISTER.md",
+      "bytes": 13974,
+      "gitBlob": "14bd615b1e20d026fa249c754f5461b4e9cabdd4",
+      "sha256": "c9ff544865eb74b9757a0ad9ad1f0cbf030a7b2a5eab51118a07416081a3f9fa",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_REGULATORY_CHANGE_REGISTER.md"
+    },
+    {
+      "sourcePath": "docs/365_PARTS_UNIT_ECONOMICS_CAPITAL_PLAN.md",
+      "referencePath": "docs/reference/parts-pr2/source/365_PARTS_UNIT_ECONOMICS_CAPITAL_PLAN.md",
+      "bytes": 14615,
+      "gitBlob": "72040e408a5955f30e6c05cf077737b9a4f690aa",
+      "sha256": "ffb351e8e51da1ef23e8b77e6b6b79d665cc8de9c2e92a5ff03f932070328286",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/365_PARTS_UNIT_ECONOMICS_CAPITAL_PLAN.md"
+    },
+    {
+      "sourcePath": "docs/country-packs/PHILIPPINES.md",
+      "referencePath": "docs/reference/parts-pr2/source/country-packs/PHILIPPINES.md",
+      "bytes": 17359,
+      "gitBlob": "13ace6527680134d76725d62909074f6dede56df",
+      "sha256": "8be401bb1b42f1a882677daa413e92d8745fa6d95453b416589293afe2f1e20c",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/country-packs/PHILIPPINES.md"
+    },
+    {
+      "sourcePath": "docs/history/365_PARTS_PARTNER_NETWORK_PLAN_BRANCH_ARCHIVE.md",
+      "referencePath": "docs/reference/parts-pr2/source/history/365_PARTS_PARTNER_NETWORK_PLAN_BRANCH_ARCHIVE.md",
+      "bytes": 98728,
+      "gitBlob": "62af9a5e5a5f63ee73036520931b528d74ffd11c",
+      "sha256": "000740b473f3384a2705b46ab0e39faa9c854eef1ddcd73b65cdda672cf9fab0",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/history/365_PARTS_PARTNER_NETWORK_PLAN_BRANCH_ARCHIVE.md"
+    },
+    {
+      "sourcePath": "docs/trade-lanes/PH_ORIGIN_PILOT.md",
+      "referencePath": "docs/reference/parts-pr2/source/trade-lanes/PH_ORIGIN_PILOT.md",
+      "bytes": 21716,
+      "gitBlob": "2df2dbbaf02151d47d6449d2db8bc28b8b176b2b",
+      "sha256": "2d5fa9f3c6a40d43e8867883a7e521bd82891d0bb0e62846ad37804a442556d3",
+      "sourceUrl": "https://github.com/Hunting-Fishing/motorsales365/blob/cc75542f183e5b8ab363edef24f712a3899fb96f/docs/trade-lanes/PH_ORIGIN_PILOT.md"
+    }
+  ],
+  "sharedChangeNotAdopted": {
+    "path": "docs/365_REPAIR_KNOWLEDGE_NETWORK_PLAN.md",
+    "activeBlobAtObservation": "6939c590c8108cc0b112a2ee7f3a5f38cd983ae2",
+    "sourceBlob": "df07ecf6520d08280688b5e209a8231e5959cb68",
+    "addedLines": 2,
+    "proposedText": "> **Related Parts program:** See [`365_PARTS_PROGRAM_INDEX.md`](./365_PARTS_PROGRAM_INDEX.md) for Parts-program control and reading order. The Repair Knowledge Network owns repair data and technician workflow; the Parts specifications own commerce, availability, export, and regional market operation.\n\n",
+    "reason": "Do not transfer the unmerged draft's control authority or overwrite current specialist plans."
+  },
+  "precedence": {
+    "platform": "docs/365_PLATFORM_PROGRAM_INDEX.md",
+    "activeParts": "docs/365_PARTS_PARTNER_NETWORK_PLAN.md",
+    "activeRlsReport": "docs/365_PARTS_P2_RLS_ADVERSARIAL_REPORT.md",
+    "activeRepair": "docs/365_REPAIR_KNOWLEDGE_NETWORK_PLAN.md",
+    "activeHistory": "docs/365_VEHICLE_HISTORY_NETWORK_PLAN.md",
+    "activePartsGateNamespace": "PARTS-G",
+    "platformGateNamespace": "PG",
+    "referenceGateNamespace": "PR2-G",
+    "activeBuildAuthorizationGate": "PARTS-G4",
+    "activeSecurityGate": "PARTS-G2"
+  },
+  "gateCrosswalk": [
+    {
+      "draftGate": "PR2-G0",
+      "draftMeaning": "concept",
+      "activeGates": ["PARTS-G0"],
+      "activeMeaning": "authority",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G1",
+      "draftMeaning": "architecture",
+      "activeGates": ["PARTS-G1", "PARTS-G2"],
+      "activeMeaning": "architecture plus separate tenancy/security",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G2",
+      "draftMeaning": "legal/financial",
+      "activeGates": ["PARTS-G3"],
+      "activeMeaning": "legal and commercial",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G3",
+      "draftMeaning": "partner/data",
+      "activeGates": ["PARTS-G7", "PARTS-G3", "PARTS-G6"],
+      "activeMeaning": "licensed data, relevant contracts and pilot cohort",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G4",
+      "draftMeaning": "internal sandbox",
+      "activeGates": ["PARTS-G5"],
+      "activeMeaning": "internal readiness",
+      "limits": ["Not PARTS-G4 build authorization"],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G5",
+      "draftMeaning": "assisted pilot",
+      "activeGates": ["PARTS-G6"],
+      "activeMeaning": "Philippine pilot",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G6",
+      "draftMeaning": "domestic scale",
+      "activeGates": ["PARTS-G8"],
+      "activeMeaning": "Philippine scale",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G7",
+      "draftMeaning": "country activation",
+      "activeGates": ["PARTS-G9"],
+      "activeMeaning": "foreign domestic market",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G8",
+      "draftMeaning": "trade-lane activation",
+      "activeGates": ["PARTS-G10"],
+      "activeMeaning": "trade lane under PG10",
+      "limits": [],
+      "equivalent": false,
+      "passed": false
+    },
+    {
+      "draftGate": "PR2-G9",
+      "draftMeaning": "strategic capital",
+      "activeGates": [],
+      "activeMeaning": "no equivalent active Parts gate",
+      "limits": ["Separate explicit capital authority required"],
+      "equivalent": false,
+      "passed": false
+    }
+  ],
+  "knownLinkLimits": [
+    "Original relative links are preserved, not repaired or accepted as a complete navigation graph.",
+    "Original Parts/Repair authority links must be read through the README link map.",
+    "The history archive has original root-style relative links that do not resolve from its subdirectory."
+  ],
+  "decisionLimits": [
+    "Roadmap Step2 cites D-001 through D-010; concrete entity/seller/invoice/payment/refund decisions D-011 through D-025 remain separate.",
+    "D-050 regional Supabase topology is a deferred proposal, not new hosted-backend permission.",
+    "Historical status/dates/schedules are not current verified implementation or acceptance.",
+    "Future foreign markets, export lanes, credit, warehouses, private label/manufacturing and acquisitions are not seven-day activation commitments."
+  ]
+}

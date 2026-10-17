@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
   customerDetailInput,
   customerDetailProjections,
@@ -45,10 +46,13 @@ export const getCustomerDetailSnapshot = createServerFn({ method: "POST" })
     // capture. Fail before even reading the request or binding a schema.
     assertActor();
     try {
-      const signal = getRequest().signal;
+      const caller = captureNativeRequestCaller(context, data.expectedAccountId);
+      const request = getRequest();
+      const signal = request.signal;
+      const assertCaller = await caller.verify(request);
       function assertReady() {
         assertActor();
-        if (signal.aborted) throw new Error(failure);
+        assertCaller();
       }
       assertReady();
       // Generated types cover public only. This bounded adapter retains the

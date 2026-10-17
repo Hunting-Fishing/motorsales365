@@ -137,11 +137,12 @@ jobs:
       - name: Build
         if: steps.cfg.outputs.ready == 'true'
         run: npm run build
-      - name: Verify Worker identity and Supabase target
+      - name: Verify Worker identity, Supabase target and complete public assets
         if: steps.cfg.outputs.ready == 'true'
         run: |
           set -euo pipefail
           node scripts/ci/verify-worker-bundle.mjs
+          node scripts/ci/verify-release-assets.mjs
       - name: Deploy to Cloudflare
         if: steps.cfg.outputs.ready == 'true'
         uses: cloudflare/wrangler-action@v3
@@ -200,6 +201,12 @@ jobs:
       - name: Build
         if: steps.cfg.outputs.ready == 'true'
         run: npm run build
+      - name: Verify preview identity, target and complete public assets
+        if: steps.cfg.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          node scripts/ci/verify-worker-bundle.mjs
+          node scripts/ci/verify-release-assets.mjs
       # `versions upload` creates a version WITHOUT routing production traffic to it.
       # Previews use the production Supabase project (the committed .env.production);
       # treat preview links as production data.

@@ -1,6 +1,32 @@
 # 365 application completion checklist
 
-Updated: 2026-10-15 (Asia/Manila)
+Updated: 2026-10-17 (Asia/Manila)
+
+## Consolidated current delivery authority
+
+Current source in same draft PR68 includes selected actual native PG17 draft-line
+acceptance and connected owned receipt-expense ingress; current resumption below
+supersedes historical consolidation40fd9aee/1014b72e next statements. Base/title/
+prior full body/main remain unchanged. Hosting remediation stays STOPPED after
+permitted summary/detail gave no error log or safe evidenced alternate; no
+unchanged retry. New evidence joins implementation, not a docs-only restart.
+
+Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequence,
+Day 2 feasibility, fail-fast stops, CRM/device acceptance, multi-store ordering /
+Barangay Buddy boundaries and conditional main promotion. All 18 existing
+workflow IDs and detailed actions remain in the acceptance ledger; N1–N3 now
+explicitly track consumer ordering/delivery closure. Historical checkpoints and
+their former "next" steps below are evidence, not repeated work instructions.
+Owner rule: after failure, at most one safe alternate approach; if still blocked
+(or no safe alternate), stop that action and notify with evidence/needed help.
+Continue independent work; no blind retry of unknown writes or unchanged failures.
+Consolidation validation:21 workflow IDs, four board pointers, nine relative links,
+ten policy checks, six-file Prettier/diff and two independent read-only reviews
+pass. Existing automation update/readback preserves identity/active30min/thread.
+Same PR68, commit subject "Consolidate 365 delivery, fail-fast and network
+acceptance plan"; new-head CI is separate. No app/SQL/migration/hosted/Buddy change
+or deployment in that consolidation. Its next native PG17 step is now complete
+at0fbec296; strict authority/provenance/recovery continue under current board.
 
 ## Authority and source
 
@@ -10,10 +36,1604 @@ the platform, Parts, Repair Knowledge, or Vehicle History program decisions.
 
 Canonical repository: `Hunting-Fishing/motorsales365`.
 Starting main: `70ab892a8b7c05eac288ea4a6cce7a002d316f00`.
-Implementation branch: `completion/365-foundation`.
+Current integration branch: `completion/365-seven-day-integration`.
+Historical foundation branch: `completion/365-foundation`.
 Security reconciliation branch: `completion/365-security`.
 
-## Current resumption order (2026-10-15)
+## Current resumption order (2026-10-17)
+
+Private manual adjustment pairs exact stock/movement with CAS/mixed-hold and
+counter-MAX floors: FIRST12/12 in18.6174385s, no fail/skip/cancel/alternative;
+separate CI guard3/3 in5671.3378ms, lint0/syntax/format/diff/reviews. Same PR68,
+commit subject `Prepare private atomic manual stock adjustment`.
+[Exact evidence and unsatisfied gates](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md).
+Private/unapplied/no app/grants; retained timestamp/current body mismatch is
+explicit. Mandatory memory-only step uses existing OCR runner headroom without
+new jobs/raised budgets/dropped native or real OCR coverage. Own-head gates and
+new native independent manual/mixed sessions remain before compatible all-writer/
+native authority/durable/recovery/adoption. Old21+8 does not run this SQL.
+
+Owner explicitly authorized reviewed scanner repair after the recorded STOP.
+First resumed16/16 in1.5891188s/SQLc604084f…/lint0/review pass. ONE actual sole365
+pg_catalog read at01:11:13.137905UTC/server170006 captures29tables501columns/
+193constraints83indexes49policies288triggers57functions, bounded complete/no
+truncation/failures. Missing throttle name remains/all5flagsFALSE. Actual JSON
+856330B/638be776… and six selected retained LF-body matches pinned, not whole
+schema/ACL/all-writer parity. New artifact-validator7/8 limits-label extraction
+failure uses ONE reviewed test-only correction, final8/8 in385.9347ms; no query/
+artifact change or recapture. [Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
+Published01406e1dd1c176ccc5e375918e383767352b6310/same draft PR68/
+[comment6228023389](https://github.com/Hunting-Fishing/motorsales365/pull/68#issuecomment-6228023389),
+exact remote/body/title/non-main base/draft/main preserved. Parent6a9 all six
+38989388938 pass; actual5,036/96 files101.46s0unexpected/quarantined (clipped/final
+summaries) completed before push. Own38991316306 all six Actions now pass;
+actual unit1172741123745,036/96 files101.47s0unexpected/quarantined (clipped/final
+summaries). Early catalog-step transcript clipped, no separate Linux24 claim.
+Actual untruncated native117274112398 PG17.11/
+Parts247/quote6/all21expense+8stock/terminals/cleanup verified; selected71/89/233ms
+not full/RTO. Own build214media/15OCR/202PDF/canonical Worker+sole365/server-boundary/
+dry-run verified (clipped/final summaries); complete CI mergecf1fc078… equals
+candidate treec3f83be8…/2,618 objects0missing, not history recovery. Actual Preview
+117274112534 configuration skip/no upload; production/migrations/Supabase Preview
+skip. Workers117274262423 unverified cause/hosting STOP retained. Own completion
+clears publication hold without cancellation; post-publication notes join next
+implementation, not docs-only publication. Broad grants,
+separate stock numeric domains, compatible atomic protocol/native authority/
+durable recovery/API/device/owner/main/live gates and22 October risk remain.
+
+Retained6a9 source-frontier checkpoint fixes22 whole LF pins/exact spans and10 writer
+families across public/native stock. Final source+CI guard9/9 in217.8239ms, zero
+fail/skip/cancel; syntax/lint0/format/independent review pass. All seven parity/
+authority/durable/oversell/adoption/release flags remain FALSE. Same draft PR68,
+commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). No existing app/SQL/grants/
+migration/hosted/main/deployment change; own-head full gates are separate.
+
+**Historical catalog STOP01:00UTC; resumed by owner and superseded by01406 above.**
+At that checkpoint initial21/22 then ONE test-only correction
+again21/22 fails on SELECT syntax. No hosted query; three unadmitted probe/test
+files stay local, no further correction/retry/capture unchanged. Owner notified
+once/asked for resumed parser-repair direction. Source-only gate preserves all
+existing mandatory/native/timeout/quarantine coverage. That stopped condition and
+local-only publication state are historical, not current retry directions.
+Global protocol/native authority/durable recovery remain before grant/app/UI;
+all18+N1–N3/47/12/5/2/stops/device/owner/main/live/22 October risk retained.
+
+Closed parent53c now passes all six38986941600 Actions; actual unit117260493854
+5,036/96 files70.13s, zero unexpected/quarantined failures (truncated/final
+summaries), no cancellation. Prior native8/build/current artifact/Preview skip
+are retained, not repeated or inherited by this source frontier.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904ff945f3842e9d0125b250219736a9ac8/same draft PR68/comment6227396249,
+exact body/title/base/draft/main preserved. Actual own native117260493711 PASSES
+untruncated PG17.11/Parts247/quote6/retained21+new8 exact ordered stock markers/
+both terminals/EXIT+always-cleanup. First trial passes, no new alternative consumed.
+Own build/type/OCR/lint/native pass; unit117260493854 running. Actual build guards/
+current2,609 objects0missing/Preview configuration skip verified, not deployment/
+history or whole recovery. Selected71/122/218ms not full/RTO. Next own unit then
+current catalog/all-writer/native authority/TTL/durable outcomes/recovery before
+grant/app connection. Notes join next implementation, no docs-only cancellation.
+
+### Closed runner preparation (actual native result above)
+
+Fresh native mixed-stock runner now has35/35 offline checks2.5179738s plus CI
+wiring2/2 in74.8001ms, zero fail/skip/cancel; lint0/format/diff/reviews pass.
+Four new files preserve all seven previous stock sources and75 setup actions.
+Private socket-only PG17 actual three-session wait/COMMIT/ROLLBACK/visibility/
+late-FK/full selected-graph proof is authored, **first Linux trial pending**, not
+accepted from fake transport/pure Bash. Same PR68/commit subject
+`Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). Next own-head gates/
+actual8 ordered PASS/terminals/EXIT+always-cleanup, no inherited parent results or
+unchanged35/2/app rerun. No app/grant/migration/live activation. Catalog/all-writer/
+native authority/TTL/durable outcomes/recovery/device/owner/main gates remain.
+
+### Closed native-source composition checkpoint
+
+Publisheda69d291886659d0ee2ef2d52de2b72207f478521/same draft PR68/comment6226732481,
+exact body/title/base/draft/main preserved. Own38982570784 all six Actions PASS;
+actual unit1172465786435,036/96 files103.31s zero unexpected/quarantined failures
+(truncated/final summaries), early native-source6/order13 transcript clipped.
+Publication hold clears without cancellation/inherited passes. Actual native117246578586 is
+untruncated PG17.11/Parts247/quote6/retained21 ordered expense markers/terminators/
+cleanup, NOT stock SQL; selected63/79/208ms not full/RTO. Actual build guards and
+complete CI mergef03364aa…=candidate tree89d9694b…/2,604 current objects0missing
+verified, not history recovery. Actual Preview skips/no
+upload; hosting STOP unchanged. Follow-up identity/schedule/thread/creation/
+prompt read-back passes. Notes join next implementation, no docs-only restart.
+
+Native stock source parity and actual retained B2B writer composition now pass
+root6/6 in2.1367703s and13/13 in10.8898883s, zero fail/skip/cancel. Fixed exports
+preserve the66-action core, extend49 spans/14 tables/75 actions/30FK and retain
+the original complete B2B writer with fixture execution withheld from ordinary/
+service roles. Actual acceptance/cancel/inverse availability/late-FK/outer
+rollback preserve the complete selected graph; synthetic owner/Auth support is
+not native authority. Wiring2/2 in75.6675ms/ESLint0/independent reviews pass.
+Same PR68/commit subject `Compose native stock sources with retained B2B writer`;
+own-head CI remains separate. [Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md).
+Next own exact-head gates then fresh private Docker-free PG17 independent
+actual-writer sessions/wait/commit/rollback/recheck; no native stock process ran.
+No app/migration/grant/hosted activation. Catalog/all-writer/native authority/
+TTL/durable unknown outcomes/full recovery/device/owner/main/live gates remain.
+
+### Closed mixed-stock candidate checkpoint
+
+Stock4050ec27de26564af807a2d3eace898ac2556e36 is published same draft PR68/comment
+6226237118, exact body/title/base/draft/main preserved. Parentc59 all six own
+Actions pass, actual5,036/96 files103.47s zero unexpected/quarantined failures
+(truncated/final summaries), no cancelled unit. Own405 all six38978627414 Actions
+now pass, actual5,036/96 files64.75s zero unexpected/quarantined failures
+(truncated/final summaries). Early memory16 step log clipped, no separately
+observed Linux16 claim. Actual native117233967523 untruncated PG17.11/Parts247/
+quote6/retained21 ordered expense markers/cleanup, not stock execution; selected
+68/88/225ms not full/RTO. Build/full current tree2,599 objects0missing and actual
+Preview configuration skip verified, not deployment/history recovery. Native-source
+parity/B2B composition now passes above; independent sessions remain. No unchanged
+local16/2 rerun or docs-only unit restart.
+
+Current independent stock slice is private/unapplied mixed inquiry+B2B hold
+correction, actual isolated SQL16/16 in14.6660125s, zero fail/skip/cancel. Legacy
+10+8+5=13 reproduces; candidate rejects5/permits2 with real selected NUMERIC/
+28FK/trigger/late-fault rollback and ordinary/service denial.12 complete retained
+tables plus one synthetic Auth id table/12 whole pins/41 spans, no invented
+stock/business/order DDL. Owner/GUC Auth
+support is synthetic, no native authority or app/grant/migration activation.
+Mandatory serialized non-quarantined CI/wiring2/2 in93.3995ms and changed-script
+ESLint0 pass; one test-only review correction narrows target normalization.
+Same PR68/commit subject `Prepare private mixed stock reservation correction`;
+published afterc59 unit completed, exact hash in comment6226237118.
+Next native independent-session mixed-writer wait/commit/rollback, then current
+catalog/all-writer/native authority/TTL/durable outcome/full recovery acceptance.
+Atomic stock Day2 remains open;22 October still at risk, no scope cut.
+[Exact scope, pins and limits](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md).
+
+Publishedc59ae10655f06e89aa5ea04ca85ae048737e1fbf/same draft PR68/comment6225907444,
+exact prior body/title/base/draft/main preserved. All six own Actions pass,
+actual unit5,036/96 files103.47s with zero unexpected/quarantined failures.
+Actual untruncated native117225560643 proves
+PG17.11/Parts247/quote6/all21 exact ordered expense markers/terminators/cleanup,
+vector equals unchanged admitted21. Selected65/82/211ms not full/RTO;47 failures
+remain. Actual Preview skips upload; hosting STOP unchanged. Follow-up identity/
+schedule/thread/creation/exact prompt retained. Actual build guards and complete
+current CI merge06e8f212…=candidate tree6ebdc320…/2,594 objects0missing verified,
+not history recovery. No docs-only push while unit runs.
+
+Current C3/U6 Add Part slice associates six controls, including the Type combobox
+trigger, with stable visible labels. Together with published job-line labels,
+twelve fields are explicitly associated. Actual-route DOM18/18 in30.97s, full
+normal TypeScript, ESLint0 errors/15 unchanged warnings and independent review
+pass; all prior16 tests and stock/pricing/payload/write/lifetime behavior retained.
+Same draft PR68/commit subject `Associate part editor controls with accessible labels`;
+exact publication in evidence comment, own-head required CI separate. No SQL/
+permission/live activation or real-role/device/full-CRM acceptance.
+[Exact source and limitations](evidence/SHOP_MANAGER_PART_LABELS.md).
+Parent7de40ba2 all six38971996346 Actions are now complete: actual5,034/96 files
+103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+
+Next independent critical source work is a private, unapplied combined inquiry/
+B2B hold correction: the retained inquiry writer omits Parts holds from its
+availability sum. Isolated selected-schema reproduction/correction is not current
+catalog, native authority, independent-session or all-writer/durable recovery
+acceptance. No historical migration replay or live stock write. Auth-source/
+QA/hosting STOPs, all18+N1–N3/47/12/5/2 and the at-risk22 October target remain.
+
+### Closed job-line checkpoint
+
+Independent C3/U6 Add job line label fix associates six controls with stable React
+IDs. Published7de40ba2870920a6e49892d2bd85e4e3437111e5/same draft PR68/comment
+6225360928, exact remote/body/title/base/draft/main preserved. Own build/type/OCR/
+lint/native/unit pass, all six38971996346 Actions. Actual unit117212338746 has
+5,034/96 files103.93s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native all21 ordered markers/
+cleanup and current build/full artifact2,592 objects0missing verified separately;
+selected54/58/160ms not full/RTO,47 failures remain. Actual Preview skips upload.
+Existing follow-up exact prompt/identity/schedule/thread/creation read-back passes.
+Notes join next implementation, no docs-only push or inherited acceptance.
+Two appended real-route DOM regressions preserve all prior tests and
+business/lifetime logic. Root154/154 three suites41.68s, lint0 errors/15 retained
+legacy warnings, independent review, full normal TypeScript and nine-file format/
+diff pass; own-head CI pending. Same PR68/commit subject `Associate native job-line
+fields with accessible labels`, exact publication in evidence comment. No backend/
+migration/permissions/live activation. Join retained
+provenance notes in same PR68; no unchanged capture/app suite or stopped-action retry.
+[Exact bounded accessibility evidence](evidence/SHOP_MANAGER_JOB_LINE_LABELS.md).
+
+Current provider-version source prerequisite follows actual28295c10 native21
+success: untruncated job117174018706/run38960489710 proves PG17.11/Parts247/quote6/
+selected recovery/all21 ordered markers/terminators/cleanup. Alternative1 consumed
+and selected trial passes; original cause unconfirmed. No repeat/second repair
+for recurrence. Bounded50/75/166ms not full/RTO;47 failures retained. All six own
+Actions38960489710 now pass by exact28295c10 status, including unit117174018596.
+Log unread after502+one retry; no fresh count/runtime or inherited pass/cancellation.
+
+Actual bounded sole365 READ ONLY migration-VERSION observation recovers82 IDs,
+including00, complete/nontruncated/zero invalid/duplicate; query8832dd2c… and
+JSONd845ba39… pinned. No users/sessions/keys/config reads, all provider-version/
+body/baseline/authority/release flags false. Local19/19 three-suite gate passes
+in2.1727946s after reviewed parsed-YAML mandatory-step correction;
+mandatory serialized non-quarantined CI added, no limits/coverage relaxation.
+Same PR68/commit subject `Capture bounded Auth provider migration-version provenance`;
+Source42d97b31c04ab278895738c94d6340beb798fea3 is published at
+0ee7a2261728cdce88164e870c80937786eeb0f6/same PR68/comment6224248921, exact body/
+title/base/draft/main preserved. Completed282 unit cleared hold without cancellation.
+All six own Actions38963656014 now pass at exact0ee7a226. Actual unit117184665375
+reports5,032/96 files102.10s, zero unexpected/quarantined failures (truncated/final summaries).
+Actual native117184664999 untruncated PG17.11/Parts247/quote6/all21 exact ordered
+markers/terminators/cleanup pass; selected58/67/203ms not full/RTO. Current build
+guards and COMPLETE current CI tree closure2,591/zero missing verified separately.
+Existing follow-up exact prompt/identity/schedule/thread/creation read-back passes.
+These notes join next implementation; no docs-only CI cancellation or inherited pass.
+Unit log117174018596 initial+ONE same-tool retry returned HTTP502; retrieval
+STOPPED/owner notified once. Completion status may clear hold without log count/
+runtime claim; no unchanged log retry/CLI/dashboard fallback.
+Next pinned upstream/bootstrap/body mapping and reviewed native Auth isolation,
+not ordinary Auth grants/admin fallback/another wrapper or synthetic authority.
+All scope/47/12/5/2/stops/owner/device/main/live gates and deadline risk retained.
+[Exact native/metadata evidence](evidence/AUTH_PROVIDER_VERSION_PREREQUISITE.md).
+
+### Historical recovery publication and initial failure checkpoints
+
+Current ONE recovery alternative source490089329470d771b382f5c111544b45cbc1a538
+is verified unchanged at reviewed hashes,23/23 local validation not rerun.
+Parent20dd unit117153435216 now passes actual5,032/96 files90.94s, zero unexpected/
+quarantined failures (truncated/final summaries); build/type/OCR/lint also pass.
+Native remains failed, not all-six acceptance. Hold cleared without cancellation;
+publish reviewed alternative once in same PR68 and inspect fresh recovery+
+expense21/terminators/cleanup. New-head required gates are separate. If alternative
+fails STOP/notify once; no second guessed repair or old-job rerun. No app/live/
+permissions/main/Buddy/366 change, no unchanged tests, all release gates retained.
+
+### Historical Auth-user ordering / initial recovery failure checkpoint
+
+Publication20dd5a3eb90c0608e24007289b5b07351faec48f/source78e5fdfe… verified same
+draft PR68/comment6223011064, exact body/title/base/draft/main preserved. Own build/
+type/OCR/lint pass; unit117153435216 running, no follow-up push cancellation.
+Native117153435094 fails existing recovery source-stop verification BEFORE new
+expense21 execution; actual untruncated log has PG17.11/Parts247/quote6 pass only.
+One log/source diagnosis; precise failing subcheck/root cause unverified. ONE
+conservative max2s wait for actual verified PID disappearance selected, no signals/
+zombie exemption/final check relaxation. Trial not yet executed; parent20dd unit
+must complete before publication. If that one fresh Linux alternative fails STOP
+recovery/expense acceptance and notify, no second speculative repair. Existing
+hosting/QA stops unchanged; this increases Day2 receipt/recovery schedule risk.
+No DB/Auth row/grant/app/main/deploy/Buddy/366 change. Exact resume in board.
+Selected recovery alternative locally validates23/23 in2.6393822s, syntax/nonCI/
+lint/format/diff/independent review pass; initial21/23 test-only construction
+failure received ONE narrow correction, production helper unchanged. Original
+entire shell reconstructed exactly after removing only PID poll helpers/one
+call site. Fresh Linux alternative not executed; publish once only after20dd
+unit completion. No unchanged111/app suite rerun. If native alternative fails,
+STOP and notify; [exact quota/evidence](evidence/RECOVERY_PID_EXIT_ALTERNATIVE.md).
+
+Private receipt-expense Auth-user ordering source is implemented: exact expected
+user KEY SHARE before outcome/business locks, missing42501 before posting. SQL
+eec735a6… stays private/unapplied, no Auth grant/definer/fallback/app activation.
+Four new synthetic native deletion scenarios preserve existing FKs; strict CI
+transcript requires all18 old plus three new markers and unchanged cleanup/limits.
+Root75/75 in35.5518278s plus retained draft36/36 in11.6102602s pass; lint/syntax/
+format/diff/independent review clear. Actual new native21-marker execution and
+own-head required checks pending. Source78e5fdfe62ffbc3c877351b1a6523a0a7c8836c0
+committed; parentcaa all six Actions finish before publication, actual unit5,032/
+96 files101.60s, zero unexpected/quarantined failures (truncated/final summaries).
+No cancellation/docs-only restart. Same PR68/commit subject `Order private receipt expense
+Auth-user lock before business writes`; exact commit in publication comment.
+Next fresh native result, then strict original-human/session/native authority,
+compatible all writers and durable reconciliation. Not non-key changes/session/
+role/tenant/API/private-original/recovery or production acceptance. No live/
+grant/main/Buddy/366 change; all scope,47/12/5/2, stops and deadline risk retained.
+[Exact deletion/FK prerequisite](evidence/AUTH_USER_EXPENSE_LOCK_ORDER.md).
+
+### Proposed Buddy contract checkpoint
+
+Publishedcaa1e4c4f7a9b52ca07dc0aaf1da8633cc015102 verified same canonical branch/
+draft PR68/comment6222580829, exact prior body/title/base/main preserved. Own
+38951117451 all six Actions pass; actual unit117142431397 reports5,032/96 files
+101.60s, zero unexpected/quarantined failures (truncated/final summaries), not
+inherited/cancelled. Actual native117142431134 untruncated PG17.11/
+Parts247/all18 ordered selected proofs/cleanup pass,47 failures retained,
+bounded57/59/157ms not full/RTO. Preview config skip/no upload, production/
+migration/Supabase Preview skip; Workers0eb20ff8 fails cause unknown, stop unchanged.
+Existing follow-up exact source checkpoint updated/readback, identity/settings/
+thread/creation preserved. Notes join next integrated slice, not docs-only unit
+cancellation. Actual build final214/Worker/backend/OCR/PDF/server/dry-run guards
+present (truncated log); COMPLETE CI merge14a1878c… equals candidate tree8c0a4920…,
+current2,586 objects/zero missing, not history recovery. Publication hold cleared;
+no unchanged24/1231/121 or native/preview log reread.
+
+Independent N3 proposed365-side request/offer codec is implemented: strict v1/
+namespaced refs/calendar/sequence, required independent expected store/order/leg,
+immutable whole-payload comparison and privacy-minimized offer. UNWIRED: no
+transport/signature/durable writer/Auth/provider/Buddy/live order or dispatch.
+Final24/24 in1.44s, CI wiring2/2 in87.2558ms, full normal TypeScript/changed-file
+ESLint/format/diff/review pass; narrow own-value/null-prototype correction adds two
+regressions. Mandatory offline CI gate retains limits/coverage. Parent19fd2a7e
+all-six Actions pass; actual5,008/95 files101.25s, zero unexpected/quarantined
+failures (truncated/final summaries). New-head CI separate, no parent cancellation
+or unchanged1231/121. Same PR68, commit subject:
+`Define private-by-design Buddy delivery request contract`.
+[Exact proposed request codec](evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md).
+Next current-head checks, strict native transaction authority/all-writer/durable/
+recovery and N1/N2 authoritative stock/order/outbox before signed N3 handoff.
+No migration/grant/production/main change; existing stops/risk/scope retained.
+
+### Verified Auth catalog checkpoint
+
+Published19fd2a7ed8d0e7df27168f91035b87457f076ed0 verified same canonical branch/
+draft PR68/comment6222081796 with exact prior64,364-character body/title/base/main
+preserved. All six38947359743 Actions pass; actual unit117129750943 reports
+5,008/95 files101.25s, zero unexpected/quarantined failures (truncated/final
+summaries), not inherited/cancelled. Actual native117129750990 untruncated PG17.11/
+Parts247/all18 ordered expense+draft/cleanup pass;47 failures remain, bounded
+67/82/215ms recovery not full/RTO. Actual build117129750739 final214/Worker/backend/
+OCR/PDF/server/dry-run markers visible (truncated). COMPLETE merge09f63857… equals
+candidate whole treea4f1b0b0… . Preview config skip/no upload; production/migration/
+Supabase Preview skip; Workers eca54607 fails fresh cause unknown, existing stop
+unchanged. Check-statusHTTP500 resolved by ONE permitted retry, not fallback.
+Existing follow-up updated/readback same identity/settings/thread/creation, no
+duplicate. These notes join next implementation without docs-only unit cancellation.
+
+Selected Auth catalog/dependency integration now captures actual sole365 metadata
+without Auth rows/IDs/values/helper execution. ONE initial64-trigger bound reports
+incomplete; ONE reviewed same-scope256-bound alternative passes with218 selected
+attachments. Both captures retained. Final dated artifact9e210651…/queryed3d0459…
+pin18 columns/4 constraints/5 indexes/0 session policies/9 functions on170006.
+Explicit session/JWT/termination/timeout/native-role requirements are reachable
+but unverified; only selected metadata is source-observed. Existing source pins/
+date/lineage/function projections and all false release/parity flags remain.
+Offline mandatory CI gate and final local62/62 six-suite validation are integrated;
+new exact-head CI is separately required. No unchanged1231/121/full Windows rerun.
+Evidence: [Auth prerequisite](evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md).
+Next reviewed original-human/session/native-shop transaction admission, all-writer/
+current-catalog/durable reconciliation, not another unchanged catalog capture.
+No Auth access grant, privileged fallback, DDL/DML/history/setting/account/Buddy/
+main/deployment change. QA/hosting stops and47 replay failures/12/5/2 remain;
+R2/C1.07/C1.08/R3 owner/API/private-original/device/recovery/live acceptance open.
+
+### Verified parent owned-ingress checkpoint
+
+Owned-ingress source29172a0b/publicationfb881504bbd35821fd8e8d0b4497c76176ab72b4
+is verified on canonical branch/same draft PR68 with exact prior64,364-character
+body/title/base/draft/main preserved. Final local1231/1231/full normal TypeScript/
+review/lint/format/preservation pass. All six38942225928 Actions now pass; actual
+unit117112437695 reports5,008/95 files72.81s, zero unexpected/quarantined failures
+(truncated log, final summaries/new core117+middleware28 file results visible).
+Actual native117112437626 untruncated
+PG17.11/Parts247/all18 ordered expense/draft proofs/cleanup pass;47 replay failures
+remain, bounded57/82/203ms recovery not RTO. Build final214 assets/Worker/backend/
+15 OCR/202 PDF/server-boundary/dry-run markers present (truncated log). COMPLETE
+merge1e9714c2… equals candidate tree9e58de6d… . Preview config skip/no upload;
+production/migration/Supabase Preview skip; Workers8eda6e24 fails, cause unknown.
+Existing automation updated/readback preserves identity/settings/thread/creation;
+known stops retained. Unit hold closed; these notes join next implementation:
+value-free Auth catalog capture/explicit baseline session and native-role gates,
+then reviewed strict authority/all-writer/durable/recovery. No repeated source/
+tests, invented provider DDL, ordinary Auth table grant or privileged fallback.
+
+Published source4fea1607/evidence0fbec296 in same draft PR68 after parent40fd9aee
+completed all six Actions; no cancellation/repeated121 tests. Actual new native
+job117094365266/run38936842687 passes PGDG17.11/server170011, all18 ordered
+expense/draft-line proofs, final terminators and EXIT/always cleanup (untruncated).
+Independent-session waits/CAS/outer COMMIT/ROLLBACK/scope/CHECK/late rewrites are
+now selected synthetic PG17 evidence, not real native authority. Parts247/six
+quote groups and bounded69/83/208ms recovery pass;47 replay failures remain.
+Complete CI mergee74556da… has identical whole tree3ea4b80f… to0fbec296.
+All six Actions now pass; unit117094365659 reports4,863/4,863 across93 files100.43s,
+zero unexpected/quarantined failures (truncated log, final summaries present).
+Preview configuration skip/no upload; production/migrations/Supabase Preview skip.
+Workersdc0de1fa/check117094539617 fails, cause unverified; existing stop retained.
+No migration/grant/live/deployment/main/Buddy change. Parent unit log remains
+unread after prior502 initial/one retry; completion status already cleared hold.
+
+Owned original-Bearer receipt-expense ingress is now connected in source and
+passes1231/1231 seven suites10.37s, full normal TypeScript/full changed-file lint
+(zero errors/two unchanged legacy warnings), independent review and exact14-other-export/
+generated Auth/helper/dependency preservation. Real installed SDK composition
+uses synthetic HTTP, not a live Auth/session/native-role proof. See
+`evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`. Fresh new-head build/full CI
+checks are separate. Strict session/native-shop/team/tenant authority,
+catalog/all-writer/durable outcome/API/private-original/full recovery/owner/device
+gates still precede safe draft editing. C1.07/C1.08/R2/R3 remain unaccepted.
+Evidence: `evidence/NATIVE_DRAFT_LINE_PG17_REHEARSAL.md`.
+Unchanged QA/hosting stops, provenance classifications and22 October risk remain.
+
+### Historical checkpoints (not current resumption instructions)
+
+Published1014b72e/source34a90930 verified canonical remote/same draft PR68/base/
+title/draft/main/original history. All six Actions gates38926258007 pass; unit
+117058446033 reports4,863/4,863 across93 files102.07s, zero unexpected/quarantined
+failures. Returned unit log truncated; final summaries present. Whole job uses
+roughly24min of unchanged25min budget, so headroom stays a risk. Actual fresh
+build117058445835 final214 assets/Worker/
+canonical365/OCR/PDF/dry-run and COMPLETE merge-tree18312eba… equality pass;
+returned build log truncated. Actual native117058446020 untruncated PG17.11/
+Parts247/quotes/expense/bounded recovery/cleanup pass,47 replay failures remain,
+tiny63/79/201ms not RTO; this does NOT execute/prove new draft-line SQL in PG17.
+Preview117058446694 config skip/no upload; production/migration/Supabase Preview
+skip; Workersdbf2a69a… fails, fresh cause unverified. Next new draft-line native
+PG17 wait/CAS/outer transaction/
+rollback harness before authority/catalog/all-writer/durable/UI connection gates.
+Owner explicitly requested this consolidated documentation slice after parent
+unit completion; publish in same PR68, not a duplicate planning PR. New publication
+head checks are separate; no inherited parent result or release promotion.
+
+Source34a90930 adds ONLY an unapplied owner-only single-existing-draft-item SQL
+candidate over unchanged receipt/expense source. Exact receipt/item NUMERIC-text
+CAS, selected account/target/shop and post-wait draft/install/expense/access
+guards, seven-field UPDATE and persisted reread preserve IDs/unseen rows/header/
+provenance/consent/order in the selected model. Final54/54 four suites45.847s
+(20 new), reviews/format/lint/syntax/diff/214 assets/existing-output Worker checks
+pass. No app/legacy writer/permission/migration/live/deploy change. C1.07/C1.08/
+R2/R3 stay unaccepted; no enabled101+ editor, ABA epoch, durable retry or native
+authority. Next new-head CI, then Docker-free PG17 independent-session wait/CAS/
+outer transaction/rollback proof; compatible all-writer/current catalog/owned
+ingress/strict session/native authority/durable recovery before handler/dialog
+connection. Exact constraints, tests, initial invalid seed repair and limits:
+`evidence/DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`. Parent380 all six Actions
+pass,4,863/93 files74.31s; truncated log omits individual bridge markers, not
+invented Linux10/10.47 replay/Cloudflare/QA/private-original/recovery/release gates
+and22 October risk remain. No Docker or scope cut.
+
+Publication380beb40/sourcef53c8ea8 is verified on canonical remote/same draft PR68,
+unchanged title/base/draft/main/history. All six Actions gates pass38922330671;
+unit117045110299 reports4,863/93 files74.31s, zero unexpected/quarantined failures.
+Returned log is truncated; individual earlier bridge markers are not independently
+visible. Normal25min timeout/guarded unconditional composition remain. Build final214 assets/Worker/backend/OCR/PDF/dry-run markers
+are present (truncated log); fetched CI merge3847c810… has the COMPLETE identical
+treec658e602… to published head. Actual native117045110403 untruncated PG17.11/
+Parts247/quotes/ten expense markers/bounded recovery/cleanup pass;47 replay
+failures remain, tiny62/61/185ms not RTO. Preview117045111364 confirms config
+skip/no upload; production/migrations/Supabase Preview skip; Workers865be24a…
+fails, fresh cause unverified. Earlier next-unit/single-item-candidate steps are
+superseded by source34a90930 above. Preserve authority/current-catalog/all-writer/
+recovery gates. Never feed pages to delete/recreate legacy save or
+manufacture SDK UPDATE privileges. Follow-up notes join next source slice, not
+a docs-only restart. Exact evidence: `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`.
+
+Latest source `f53c8ea8` closes the named bounded full platform staff/claim to
+native roster source composition, not authority. Unchanged full parent plus
+retained native selections now guard36 tables/53 functions/41 attachments/two
+added enums/no client policies, original provider uid/parent rows/settings and
+member sequence with no reset. Final serial68/68 across5 files81.967s includes
+10 new cases, legacy profile/roster-ID preservation with native role-row churn,
+early real chat FK23503 and later retained missing-role P0001 rollback, and21
+drift refusals. Syntax/format/full lint/root+independent review/diff/changed-line
+lint and214 assets/existing-output Worker guards pass. Parentb2c0328c now passes
+all six Actions,4,863/93 files100.48s, zero unexpected/quarantined failures,
+truncated unit log/final summaries. New-head CI is separate; normal25min retained.
+See `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`. No source/migration/
+permission/activation/live change to the app or existing fixtures. Next actual
+new-head composition/unit/runtime-budget result, then owned ingress/strict
+session/native-team/role/tenant authority and compatible catalog/all-writer/
+financial/full recovery closure; safe101+ draft editing stays independent.
+R2/C1.04/C3/R3, QA/pilot/owner/live and22 October risk remain open. No Docker.
+
+Published `b2c0328c` is verified on the canonical remote/same draft PR68 with
+unchanged base/title/main and49,044-character prior PR history preserved.
+All six exact-head38917399787 gates pass; unit117028294149 reports4,863/93 files
+100.48s, zero unexpected/quarantined failures (truncated/final summaries).
+Build log is truncated with final214 media/
+Worker/backend/15 OCR/202 PDF/server-boundary markers. CI's PR-merge checkout
+bffced3b71c514af599e8629c20b095cde849c4d has the COMPLETE same treefb87b2aa… as
+b2c0328c (parents576fb17d…/b2c0328c), verified by read-only fetch/diff.
+Native117028294367 untruncated PGDG17.11/server170011/ten expense markers/cleanup,
+Parts247/quote/bounded recovery pass; tiny48/67/148ms not RTO,47 replay failures
+remain. Preview117028284731/38917397437 log confirms config skip/no upload;
+production/migration/Supabase Preview skip. Workers117028447628/buildaf30218f…
+fails with fresh cause unverified. Earlier next-unit/composition steps are
+superseded by the checkpoint above; preserve the
+remaining ingress/strict session/native authority/financial/recovery gates.
+Follow-up notes join the next meaningful source slice. No live/SQL/grant/deploy.
+
+Latest source `d4538923` (initial source50cf029c plus checked-callable typing fix)
+connects command-strict session-claim custody ONLY to receipt expense recording.
+Same-client exact-observed-bearer claims/current-user checks, immutable security
+tuple/expiry/lifetime and a shared monotonic10s Auth budget deny observed drift.
+Reader compatibility/generated middleware/legacy RPC/private SQL stay unchanged.
+Final978/978 across4 suites12.65s, full TypeScript, root/independent review,
+format/diff and changed-line lint pass; full-file lint has2 retained legacy
+warnings, zero errors.214 tracked assets and existing-output Worker/backend/OCR/
+PDF guards pass; no new local build due low memory, new-head CI is independent.
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md` records pins and exact limits.
+No strict session revocation, original-token/native authority or financial
+acceptance is claimed. Next owned ingress/session/native authority and bounded
+full staff/claim/native bridge composition, current catalog/all-writer/financial/
+recovery closure before private SQL connection; safe101+ edit remains separate.
+QA signup is still unsubmitted on fresh read-only browser check; no repeated
+question, grant, Docker, hosted write, migration, provider activation or deploy.
+Earlier next-dependency wording below is superseded, not repeated work.
+
+Published `0eae8692` now passes actual native expense PG17 job116999369392/
+run38908883680: untruncated server170011/all ten ordered markers, observed retry/
+binding/outer-transaction/real account+ledger FK/post-wait drift and EXIT+always-
+cleanup proofs. Synthetic owner/GUC only, no native human/Auth/API/private-original/
+restore/release promotion. Parts247/quote/bounded recovery pass,47 replay failures
+remain; tiny66/81/209ms not RTO. All six Actions gates now pass, including
+unit116999369587:4,696/92 files96.87s, zero unexpected/quarantined failures;
+returned unit log truncated with final summaries. Preview confirms skip/no upload;
+migration/production/Supabase Preview skip; newest Workersf5173470… fails with
+fresh cause unverified. Current214 media/Worker checks/remote/main/PR body verified.
+Next trusted original-human/fresh session/native-shop command
+admission and current-catalog/all-writer/account-phantom/financial/full recovery
+closure before connection; safe101+ review/edit remains independent unfinished
+receipt work. Do not repeat completed native harness/restrictions/recovery or
+manufacture authority with grants. Follow-up notes join the next source slice,
+not a docs-only CI restart. QA/pilot/owner/live and deadline-risk gates remain.
+
+Latest source `7d866ce0`: Docker-free native PG17 expense session harness and
+frozen-source builder, same candidate/PR #68. Final root104/104 (39.882s), no
+skips/failures, independent frozen reviews/syntax/format/six-file lint/diff and214
+assets/Worker guards pass. Actual new native execution remains PENDING; owner/GUC
+positives are synthetic, ordinary roles deny only, no grant/activation/live change.
+The following pending-native text is superseded by the verified checkpoint above.
+Parent92d05890 all six Actions pass, application4,696/92 files93.50s, zero
+unexpected/quarantined failures (truncated log/final summaries). Bounded native
+Parts/quote/recovery pass,47 replay failures remain; Preview config skip/no upload,
+Workers newest failure cause unverified. Full authority/catalog/all-writer/account
+phantom/financial/API/Auth/private-original/recovery and QA/pilot/owner/live gates
+remain. `evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md` has pins/tests/next action.
+Previous next-native-harness statements below are superseded;22 October risk and
+17 October feasibility review unchanged. No Docker, new hosted backend or deploy.
+
+Latest source `f7632817`: private, unapplied receipt CREATE transaction and full
+payload-bound outcome ledger; one retained posting, no legacy adoption/repost,
+post-wait financial row locks/rechecks and exact retry/drift refusal. Root20/20
+standalone (23.724s), combined56/56 (32.361s), two frozen reviews/syntax/format/
+full changed-file ESLint/diff and214 assets/Worker boundaries pass. No client
+execute/ledger grants, connected writer, migration, hosted change or deployment.
+Owner/test.user authority is synthetic; account phantoms/all-writer/native-role/
+policy/recovery remain unaccepted. Parent50baa80a now passes all six Actions,
+application4,696/92 files92.72s, zero unexpected/quarantined failures; truncated
+unit log has final summaries. Native bounded Parts/quote/restore pass,47 replay
+failures remain; Preview config skip/no upload, independent Workers failure cause
+unverified. Next: Docker-free PG17 independent-session retry/visibility/rollback/
+post-wait drift acceptance, then authority/current-catalog/all-writer/financial/
+full recovery closure before connection. Evidence:
+`evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`. Previous next-transaction
+entries below are superseded, not duplicate unfinished work. QA/owner/live and
+22 October risk/17 October feasibility gates remain. New-head CI is separate.
+
+Latest resumption source `10d23d37`: unconnected receipt CREATE operation contract
+prepares exact-cent intent, complete normalized payload binding and strict
+reported expense/journal/two-line results, including null-vendor/fallback collision
+refusal. Root serial36/36 (8.906s:22 pure contract/12 retained SQL/2 CI guards),
+independent review/syntax/format/full changed-file ESLint/diff pass; changed-line
+lint zero errors/warnings/retained findings.214 copies/Worker/backend/OCR/PDF/
+server boundaries reverify at10d23d37. No app writer/SQL/ledger/grant/live/deploy;
+forged matching DTOs still pass and unsupported cohorts are not scope cuts or
+approved financial policy. Parent `de7152df` now passes all six Actions gates,
+application4,696/4,696 across92 files (59.03s), zero unexpected/quarantined
+failures; returned unit log truncated, final summaries present. Its Actions
+runtime deprecation warning and separate Workers failure are retained. Native
+Parts247/quote/synthetic restore/rollback/cleanup pass,47 replay failures remain;
+Preview confirms config skip/no upload. New exact-head publication/CI is separate.
+Next: locked unapplied owner-only receipt CREATE transaction plus immutable
+payload-bound outcome ledger, then native authority/current-catalog/financial/
+competing-writer/concurrency/recovery closure before any connection. Details:
+`evidence/EXPENSE_OPERATION_CONTRACT.md`. Earlier checkpoint next-fixture/contract
+work below is complete; do not repeat it. Target/owner/live gates unchanged.
+
+Latest checkpoint, source `7804bd98`: retained expense-to-journal composition is implemented
+as a pinned, memory-only fixture on the same integrated candidate/draft PR #68.
+Seven whole LF source pins/22 unchanged selections preserve the actual selected
+constraints, posting and binding attachments. Local12/12 (12.218s), then14/14
+including CI-wiring guards (8.842s), syntax/format/full changed-file ESLint and
+independent review pass. The new explicit single-worker CI step is never
+quarantined; all six jobs/native PG17/Parts/quote/recovery/timeouts are retained.
+No application writer, SQL migration, grant, live data or deployment changes.
+This characterizes rounding/conflict/zero/NaN/Cash/AP and actual late-FK rollback,
+not a corrected financial command, current catalog or native authority proof.
+Exact source/publication and new-head CI are recorded in
+`evidence/EXPENSE_POSTING_SOURCE_REHEARSAL.md`.
+
+Expense-read publication `ef1cb798` is verified on the canonical remote/same PR.
+All six Actions gates pass; completed unit116945850260/run38892723856 confirms
+application4,696/4,696 across92 files (61.59s), zero unexpected/quarantined
+failures (overall log truncated, final summaries present). Native116945850239
+passes Parts247/six quote groups and bounded synthetic restore/ACL/RLS/sequence/
+late-failure rollback/cleanup; tiny67/86/206ms is not production RTO. The47
+replay failures remain. Preview116945850534 confirms config skip/no upload;
+migrations/production/Supabase Preview skip. Workers7522b11b-0909-430e-bc7f-50cbb5b32c36
+fails with fresh cause unverified. This is not new fixture-head CI proof.
+
+Next: an unconnected locked expense/journal command with payload-bound durable
+operation receipts, exact-money/conflict/late-failure/retry/recovery tests and
+explicit native-authority/current-catalog/financial-policy gates before connection.
+Do not repeat completed read/fixture/recovery work, invent an expense URL guard
+or shop-fill attachment, overwrite a legacy conflict, or equate a UUID with
+posting. Whole baseline/47 replay failures, safe101+ review/edit, private originals,
+pilot/owner/live release acceptance remain open. Target22 October and17 October
+feasibility review unchanged. Earlier checkpoint entries below retain history;
+their pending-publication/next-read statements are superseded by this checkpoint.
+
+Expense read support is implemented at `1953f580`, same integrated branch/draft
+PR #68. Account/observed-shop-bound100-row expense/category/vehicle windows,
+strict native DATE/amount/DTO checks, independent retries and exact-query UI
+lifetimes replace global/capped/error-to-empty reads and the false MTD total.
+Unknown vehicle/customer shop binding refuses the whole page, not a silent
+omission. Related1,468/1,468 across nine suites (27.59s), final strengthened
+contract/handler253/253 (2.26s), UI/panel276/276 (18.05s),294 new synthetic cases,
+independent review/format/diff/full TypeScript/build/214 public copies/Worker/
+backend/OCR/PDF/server checks pass. Lint: zero blocking errors, one moved legacy
+any warning, eight retained findings elsewhere. All three legacy mutationFn
+bodies remain byte-identical; reader/callback fences are not native write fences.
+No SQL/migration/grant/live change/deployment. New exact-head publication/CI
+remains required. Next: unchanged-source receipt-expense/journal posting graph
+fixture, then locked atomic/durable writer and native authority/financial/recovery
+closure; do not equate insert/duplicate-ID acknowledgment with journal posting.
+Whole baseline,47 replay failures, private originals, safe101+ review/edit and
+owner/live gates remain. Evidence: `evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`.
+
+Publication `4af1d906` is verified on canonical remote/same attached draft PR #68;
+title/base/draft/history/main `70ab892a` are preserved, and final214 public copies/
+Worker/backend/OCR/PDF/server checks pass. New-head build/typecheck/lint/browser
+OCR/native pass; completed unit `116923466985` in run `38885907605` confirms
+application4,402/4,402 across89 files (95.99s), zero unexpected/quarantined
+failures. The overall log is truncated but final summaries are present. All six
+Actions gates pass on this exact head. Untruncated native `116923467192` confirms Parts247/six quote groups and
+synthetic restore/ACL/RLS/sequence/late-failure rollback/cleanup (tiny61/77/194ms,
+not production RTO), retaining47 replay failures. Preview `116923462760` is a
+confirmed config skip/no upload; migrations/production/Supabase Preview skip.
+Workers build `a40c6591-1125-4912-a33b-29d11a669f55` fails with fresh cause
+unverified. These publication notes join the next source slice without a
+docs-only CI restart. Next connected slice: account/shop-bound expense read
+windows with explicit errors/counts, while whole baseline/private originals/
+native authority and safe101+ review/edit remain open. Do not repeat the
+completed read-only viewer or synthetic recovery, replay approved restrictions
+or equate this candidate with owner/live acceptance. No deployment.
+
+C1.08 read-only complete-line viewing is implemented at `c8beede8` on the same
+integrated candidate/PR #68. Strict separate100-line display windows and matching
+account/receipt/target/consent checks connect to an actual Dialog/QueryClient
+viewer fenced by parent read version, session and page lifetimes. Existing editor,
+sharing, installation, expense/discard holds and100-line replacement writer stay
+unchanged. Focused1,542/1,542 across18 suites (35.42s),241 new cases with all485
+handler/215 panel cases retained; independent review/format/diff/full TypeScript
+pass. Changed-line lint zero new findings (six retained), fresh complete build/
+214 public copies/Worker/backend/OCR/PDF/server checks pass. New exact-head CI is
+still required. No SQL/migration/live change/deployment. C1.08 review/edit101+
+lines and real API/native role/atomic writer/QA/owner/live acceptance remain open.
+Next: published-head CI, whole-baseline/private-original/native authority recovery
+and safe full-line review/write contract; no partial-set editor unlock. Evidence:
+`evidence/RECEIPT_COMPLETE_LINE_VIEWER.md`.
+
+R3 bounded synthetic recovery now passes on published `75974057`, native job
+`116912992234` / run `38882590003`: actual PG17 data/catalog/owner/ACL/RLS/sequence
+comparison, offline-source restore, late restore-failure rollback and scoped
+cleanup. Observed tiny-fixture dump66ms/restore79ms/verification205ms, not a
+production RTO. Retained Parts247/six quote groups pass and 47 replay failures
+remain. All six Actions gates now pass on this exact parent; completed unit
+`116912992545` confirms4,170/4,170 across87 files (92.02s), zero unexpected/
+quarantined failures, with a truncated overall log but final summaries present.
+This does not transfer to new C1.08 head. Whole baseline/API/Auth/private-original/
+configuration/owner/live recovery
+are still open; R3 as a whole stays blocked. Continue separate read-only C1.08
+line-window viewing now in implementation, without unlocking incomplete-row
+edit/share/write. These follow-up results join the next source slice, no docs-only
+CI restart. No Docker, app migration/live changes or deployment. Full evidence:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+R3 ACL snapshot repair `6fb1e895` follows actual published `afde5a81` native job
+`116909139334` (run `38881411362`): identity/pristine admission and fixture now
+pass, but source-access fails SQLSTATE22023 before dump/restore. A zero-dimensional
+empty ACL fallback is a source-confirmed PG17 defect; direct nullable column ACL
+input preserves explicit grants and normalizes absent grants through the existing
+aggregate. Final offline101/101 (3,034.21ms), syntax/format/diff, independent review
+and changed-line lint zero findings pass. New exact-head native execution remains
+required; R3 is not accepted. Build/typecheck/lint/browser OCR pass on `afde5a81`;
+unit remains running at capture. Preview is a confirmed configuration skip, no
+upload; migrations/production/Supabase Preview skip. New Workers failure cause is
+unverified. No Docker, application migration/live change or deployment. Next:
+verify repaired native recovery, then real-stack/private-byte prerequisites and
+separate read-only C1.08 complete-line viewing. Exact evidence and open gates:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+Latest R3 repair `719255fb` replaces nonregular libpq credential controls with
+verified empty private files, retaining strict stderr rejection and every
+identity/recovery/cleanup condition. Third actual `aff9f829` run fails first
+client read (`identity-read/unavailable`); PG17 source confirms the old `/dev/null`
+password-file warning blocker consistent with that stage, not a captured sole
+cause. Final offline100/100 (2,854.39ms), format/syntax/diff and independent
+review pass. Next is actual repaired Linux recovery, not acceptance yet.
+No Docker, application SQL/live change or deployment. Evidence and open gates:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+Latest R3 diagnostic source `176732c6` preserves all admission conditions and
+adds fixed identity-field/pristine-inventory checkpoints. The second Linux run
+at `e4b316b0` still refuses `server-identity/unavailable` before any fixture/dump/
+restore; Parts247/six quote groups/stops and cleanup pass, not recovery. Final
+offline98/98 (2,796.64ms), syntax/format/diff/review and changed-line lint zero
+findings pass. New exact-head native execution must locate the remaining refusal;
+do not bypass identity or infer that the catalog fix solved the first failure.
+Evidence/next dependencies: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+R3 initial source `c25f79f3`/published `c08c25c8` is on the same draft PR #68.
+Actual Linux job `116896620628` fails during synthetic recovery prepare; Parts247
+and all six quote groups/stops pass and recovery cleanup completes. No restore
+or recovery-time success is claimed. The hidden first/sole internal cause is not
+proven; independent source review finds a definite wrong role-settings catalog.
+Repair source `3393d29a` uses the correct global settings catalog and fixed bounded
+failure codes without raw diagnostics or relaxed conditions. Final offline96/96
+(1,791.91ms), syntax/format/diff, independent review and changed-line lint zero
+findings pass; repaired exact-head Linux execution is still required.
+Contract/checks/deployment status: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+No Docker, application migration or live operation; full API/Auth/private-original
+recovery and production RTO remain open. Next: verify repaired native recovery,
+then real-stack/private-byte recovery prerequisites and a separate read-only
+account/receipt/target-bound C1.08 line-window viewer, preserving incomplete-row
+editor/sharing flags and the existing100-line replacement-write cap. The fresh
+read-only QA check still finds unsubmitted signup; no credential/Terms/native
+pilot/session bypass. Keep 47 replay failures and exact release gaps open for
+the 17 October feasibility review.
+
+Publication `0b836b15` is verified on canonical remote/same attached draft PR #68;
+title/base/draft/history/main `70ab892a` are preserved. Final-head 214 public assets
+and Worker/backend/OCR/PDF/server checks pass. Run `38873619165` has build/
+typecheck/lint/browser OCR/native Parts passing; unit `116883321839` still runs
+at the earlier capture. The completed unit log now confirms application
+4,170/4,170 across 87 files (69.56s), zero unexpected/quarantined failures;
+overall log is truncated but final summaries are present. All six Actions gates
+pass on this exact head. Completed untruncated native `116883321961` confirms PGDG17.11/170011,
+Parts247/247, six quote groups, both stops/scoped cleanup and 47 retained replay
+failures, not full baseline/API/restore proof. Wrapper preview `116883322027` is
+a confirmed configuration skip without application upload; migrations/production/
+Supabase Preview skip. Workers build `abd7d11d-0509-4ec3-ba24-e540f18060e2` fails
+with fresh cause unverified. These notes join the next source slice, no docs-only
+CI restart. Unit result is recovered; continue synthetic second-private-PG17-cluster
+dump/restore rehearsal; do not repeat completed C1.05/C1.06 source or approvals.
+Full API/private-object/native authority, atomic domain writers and QA/owner/live
+acceptance remain open; no deployment or scope cut.
+
+C1.06 source `ee9af3a8` captures installation account/receipt/item/selected
+vehicle/date/odometer intent, checks same-client child/parent preflights and the
+legacy void transport acknowledgment, and fences dialog-content/session/write
+lifetimes with mounted uncertainty holds and neutral feedback. Final focused
+1,705/1,705 across 13 suites (32.14s), 247 new cases, all prior 179 panel cases
+retained; final review/format/diff/full TypeScript and explicit offline CI guards
+pass; changed-line lint zero new findings. Fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings; publication
+joins C1.05 on the same draft PR #68, not a duplicate. New exact-head CI remains
+separate from this local verification. The actual
+Radix content cleanup boundary was corrected after two diagnosed new-test runs,
+without weakening assertions/timeouts/quarantine. Exact checks/publication and
+non-atomic/native-authority/durable-history limitations:
+`evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`. No SQL/live write or deployment.
+Next shared release dependency: synthetic dump/second-private-PG17-cluster restore
+rehearsal on the established ephemeral Linux host, including roles/ACLs/sequences
+and measured recovery; selected SQL or that partial restore cannot satisfy real
+API/Auth/private-object recovery. No complete Docker-free stack runner is present,
+47 retained replay failures remain, and QA/native pilot acceptance is unverified.
+Keep those exact gaps for the 17 October feasibility review. Independent C1.08
+complete-line viewing and atomic sharing/discard/financial recovery remain open.
+
+C1.05 source `5ede72c6` temporarily refuses every draft removal before any
+handler-level business/client/Storage/RPC access. The panel keeps an accessible
+disabled control and preservation notice, without a destructive binding/listener;
+eligible review and all other receipt workflows stay unchanged. Focused synthetic
+1,458/1,458 across 12 suites (29.30s), 43 new cases, all prior 161 panel cases
+retained; independent review/format/diff/full TypeScript/offline CI guards pass.
+Changed-line lint zero new findings; fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Parent
+`15743f05` now has all six Actions gates passing: application 3,880/3,880 across
+86 files (90.09s), zero unexpected/quarantined failures, final summaries present
+in a truncated overall log. Source will publish with connected installation work
+on the same PR. Exact checks/publication and remaining
+coordinator/restore gate: `evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`.
+This is not completed discard, live ACL containment or recoverable deletion;
+direct native capabilities remain unchanged. No SQL/live mutation or scope cut.
+Continue independent sharing/installation/complete-line viewing while durable
+original-byte/row recovery, native authority and real-role acceptance stay open.
+QA signup remains unsubmitted at the fresh read-only check; no credential/Terms
+handoff or privilege was bypassed.
+
+Expense publication `15743f05` is verified on canonical remote/same attached
+draft PR #68; title/base/draft/history/main `70ab892a` are preserved. Final-head
+214 public assets and Worker/backend/OCR/PDF/server checks pass. Run `38867685088`
+has build/typecheck/lint/OCR/native Parts passing; unit `116864182583` still runs
+at capture. Completed untruncated native `116864182433` confirms PGDG17.11/170011,
+Parts247/247, six quote groups, both stops/scoped cleanup and 47 retained replay
+failures, not full baseline/API/restore acceptance. Wrapper preview
+`116864182898` is a confirmed configuration skip without application upload;
+migrations/production/Supabase Preview skip. Workers build
+`896c3483-5607-4d08-8f88-cc6cabafa831` fails with fresh cause unverified. These
+follow-up notes join the next source slice, no docs-only CI restart. Verify the
+remaining unit result, then C1.05 discard and remaining sharing/install command
+boundaries; do not repeat completed expense/read/approval recovery. No deployment.
+
+C1.04 source `5bd1a715` adds captured account/receipt/selected-shop intent,
+same-client target preflight, checked UUID transport acknowledgment, synchronous
+expense admission and current-only neutral feedback/mounted unknown holds.
+Focused 1,415/1,415 across 12 suites (28.51s), all 124 prior panel cases plus 37
+new, independent review/format/diff/CI guards and final full TypeScript pass.
+Two test-only fixture casts repair mock typing without runtime/assertion changes.
+Changed-line lint has zero new findings; fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Evidence and
+publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`. The target check is
+not atomic or proof of persisted financial mapping; the separate expense reader
+retains its legacy unscoped key. Exact-money/conflict, native authority and durable
+recovery stay open. Next: C1.05 discard and remaining sharing/install caller/
+acknowledgment/lifetime boundaries, preserving editor/unknown holds. No SQL/live
+write or deployment.
+
+Publication `20198972` is verified on canonical remote/same attached draft PR #68,
+with title/base/draft and main `70ab892a` unchanged. Final-head 214 public assets
+and Worker/backend/OCR/PDF/server checks pass. Run `38864305932` has five Actions
+gates passing initially; completed unit `116853501011` now makes all six green.
+Linux application 3,645/3,645 across 85 files (89.38s), zero unexpected/quarantined
+failures; overall log truncated, final summaries/checker present. Completed
+untruncated native `116853501063` confirms PGDG17.11/170011, Parts247/247, six quote
+groups, both stops/scoped cleanup and 47 retained replay failures. Wrapper preview
+`116853500746` is a confirmed configuration skip, not upload; migrations/production/
+Supabase Preview skip. Workers build `39487f97-afab-4b78-865a-b1e7ab794b33` fails
+with ID/link only, fresh cause unverified. These notes join the next source slice;
+no docs-only restart. C1.04 expense-only caller/acknowledgment/lifetime/unknown
+handling is now in progress, without changing other receipt writers or SQL.
+
+Mixed-consent source `1a49acc5` now refuses both receipt-level sharing operations
+when complete items have different public preferences. Disabled controls plus
+event predicates inspect the full unfiltered set; the visible notice preserves
+the temporary restriction as unfinished independent-sharing work. All 109 prior
+panel tests are unchanged and 15 regressions are appended. Final combined
+1,180/1,180 across 11 suites (24.98s), independent review and format/diff pass.
+Final full TypeScript, seven-file changed-line lint (zero new findings), fresh
+complete build/214 public copies/Worker/backend/OCR/PDF/server checks pass with
+retained warnings. Exact evidence/publication status:
+`evidence/RECEIPT_READ_CONTRACTS.md`. Direct/concurrent SQL sharing, row mutation
+caller/lifetime/acknowledgment/unknown guards, exact-money and durable recovery
+remain open. Next: C1.04/C1.05 row actions, preserving editor/install holds.
+
+Private attachment signing is implemented at `39a1ab1e` in the same integrated
+candidate/draft PR #68. It binds captured account/receipt intent, selected DB key,
+canonical URL and own successful SDK evidence, with generic errors and a bounded
+late-result wait. Signing integration 1,165/1,165 across 11 suites (34.84s), full
+TypeScript, changed-line lint (zero new findings), format/diff and independent
+review pass. Packaging/publication are recorded after completion in
+`evidence/RECEIPT_READ_CONTRACTS.md`. No migration, live write or deployment.
+Mixed per-item summary consent is now guarded above, rather than letting a
+shop-sharing toggle publish every item. Next: row-action caller/lifetime/
+acknowledgment/unknown holds and atomic exact-money/durable recovery dependencies.
+The expense RPC can coerce unscaled receipt totals into NUMERIC(14,2), and its
+existing-conflict UUID does not bind amount/shop/vehicle. This remains an explicit
+financial gap, not solved by browser rounding or accepting the UUID.
+
+Prior connected receipt source `f50aaa0d` adds account-bound server readers, fixed DTOs,
+exact visible counts, receipt/link pages of 25/100 and four-worker item reads with a
+100-line display cap. Missing attachment-access evidence fails closed. New review
+requires complete, entry-compatible draft fields and no installation/public-summary
+metadata that the unchanged replacement writer would lose; empty interrupted
+drafts remain resumable. UI paging preserves open editors/installation/unknown
+holds and fences old DOM admission synchronously. Final focused 966/966 across ten
+suites (43.49s), full TypeScript, seven-file changed-line lint (zero new findings),
+format/diff/independent review and mandatory CI guards pass. Fresh complete build,
+214 public Git/source/output copies, Worker/canonical backend/OCR/PDF/server
+boundaries pass at this source, with existing warnings. Publication and
+remaining gates are in `evidence/RECEIPT_READ_CONTRACTS.md`; this is not an atomic
+snapshot or trusted native authority. Next: typed writer outcomes/durable retry,
+complete-line viewing, private URL caller binding, then the shared release and
+retail/recruitment dependencies. No SQL, live write or deployment is included.
+
+Publication `7f2fcd4c` is verified on canonical remote/same attached draft PR #68/
+base/main. Final-head 214 public copies/Worker boundaries verify. Run `38859267928`
+has all six Actions gates passing. Completed unit `116837596293` confirms
+application 3,431/3,431 across 84 files (93.55s), zero unexpected/quarantined
+failures; overall log truncated, final summaries/checker present.
+Actual untruncated native `116837596063` log confirms PGDG17.11/170011, Parts247/247,
+six quote groups, both server stops/scoped cleanup and 47 retained replay failures,
+not full baseline/API/restore proof. Wrapper `38859263186` preview is a confirmed
+configuration skip without upload; migrations/production/Supabase Preview skip.
+Workers build `b72864b7-42c9-44af-81f1-a9c50563c853` fails, fresh cause unverified.
+Follow-up notes join the next source slice; no docs-only CI restart. The private
+URL contract is now implemented above. New source needs exact-head checks;
+no release gate, approval or scope reduction follows from parent green.
+
+Owner directive, 2026-10-16: **no Docker**. Do not install/start/use Docker, pull
+images or ask the owner to open Docker Desktop. Continue Docker-free work and
+record any real API/Auth/private-storage/transaction/restore gates that lack a
+valid substitute; mocks or live disposable testing do not satisfy them. The
+owner subsequently requested maximum Docker-free work and authorized a dedicated
+QA login. Reviewed native-PostgreSQL17 Parts CI is committed at `166ff0c4`, with
+the same adversarial SQL/roles/stub/no-SKIP coverage and private scoped cleanup.
+Offline wiring and published `bf091dc7` Linux installation/SQL/cleanup pass;
+all 247 Parts assertions ran on native PostgreSQL 17.11 without Docker.
+Validate that Docker-free candidate, not an older containerized workflow. Do not
+silently remove coverage. Earlier Docker-access requests below are
+historical and superseded. The existing recurring follow-up is updated, unchanged
+in schedule/authority; no duplicate was created.
+
+Owner backend clarification, 2026-10-15: 365 MotorSales must use only hosted
+Supabase project `wjxaajgvddtrxxtocxen`, API `https://wjxaajgvddtrxxtocxen.supabase.co`.
+Project `ujkizgblscqcejghxemb` belongs to 366 AI and is out of scope. No backend
+switch or new project has been made. The earlier separate-hosted-staging/cost
+question is superseded; do not repeat it or create/repurpose another hosted target.
+Prepare isolated local synthetic testing and a reviewed production-safe acceptance
+path consistent with this requirement. This does not waive real API/role/storage,
+transaction/recovery or release gates, or authorize risky tests against live data.
+If a required gate cannot be satisfied under this constraint, state the exact gap
+without silently substituting privileged fixtures or assuming release approval.
+
+Owner scheduling directive, 2026-10-15: target completion of the existing software
+scope within seven days, by 2026-10-22 21:00 Asia/Manila. Follow
+`365_SEVEN_DAY_COMPLETION_PLAN.md` alongside this checklist. The schedule does not
+change release/approval gates, declare prototypes accepted, select an external CRM
+or silently reduce scope. Immediate priority is the integrated release candidate,
+PR dependency/feature acceptance ledger, staging/full-artifact/hosting/migration/
+recovery blockers and bounded parallel feature work. Continue the named authority
+dependency below as part of that integration path, not an indefinite standalone
+research chain. Preserve all work and existing approved restrictions. Raise
+specific access/capacity/decision blockers on Day1 and reassess deadline feasibility
+by Day2. One existing automation only; no continuous-execution guarantee. The owner
+plan is preserved in commit `0aa3fb5`; publication status is recorded below.
+
+Previous published source slices: receipt reads `eb90d15c1805cb7f004bdb7a7db384b89219aa6b`
+and retail assignment `bd5e4b0406c899d84d348386e5bfcebfb0f9d7cc`, same draft PR #68.
+Receipt/shop-link per-mount queries now mask fetching, paused, failed and
+invalidated snapshots, forward signals, offer generic explicit retries and check
+current cache state at new-action admission. Open editors/installations/unknown
+holds survive ordinary refresh; retained-user Auth loading is separate teardown.
+Existing opener/editor/install bodies are byte-identical. Receipt panel 101/101.
+Retail assignment now captures account/prior-org/lead/assignee intent, checks
+strict existing memberships/manager authority, filters the update by lead/org and
+requires an exact returned assignment. Its real detail route has fresh private
+reads, actual-org choices, duplicate/stale-callback fences and mounted uncertainty
+holds. Handler106/route45 pass; other status/note server policies are unchanged.
+Final combined 703/703 across eight suites (35.65s), seven-file changed-line lint
+zero new errors/warnings (23 older findings), format/diff/independent review and
+mandatory CI guards pass. One test-only QueryCache manual-seed flag corrected the
+sole first full-TypeScript diagnostic without weakening in-flight StrictMode.
+Full TypeScript and fresh complete build now pass at `bd5e4b04`; all 214 tracked
+public Git/source/output copies, Worker/canonical backend/15 OCR/202 PDF/server
+boundary verify. Expected route-test/module/chunk/Wrangler warnings remain.
+Publication/exact-head CI are recorded separately after verification.
+Evidence: `evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. No SQL/migration/live write/deployment.
+The receipt/server link expected-account denial, counted DTO/attachment evidence
+and safe editor eligibility are now implemented at `f50aaa0d` above. Next: typed
+writer outcomes/durable retry and complete-line viewing. Do not relabel separate HTTP checks as atomic
+membership, strict session/native authority or recovery acceptance. U1/U2 action
+inventory now distinguishes retail triage, parts-network partnerships and the
+dedicated affiliate program; linked due tasks/conversion/recruitment remain real
+implementation gaps. QA signup remains unsubmitted in the now-available browser;
+native pilot membership, original-human/native-team/claim/offboarding, full
+baseline/recovery/hosting and owner acceptance still threaten the seven-day target.
+No scope reduction; Day 2 feasibility review remains required.
+
+Publication `3242e7dfcbfc14154ace182ed0c743984d838557` verified on the canonical
+remote/same attached draft PR #68/base; main remains `70ab892a`. Final-head 214
+public copies and Worker/backend/OCR/PDF/server boundaries verify. Run
+`38853369943`: build/lint/browser OCR/native Parts pass; typecheck and unit
+`116819315311` remain in progress at capture. Native job `116819315343` has an
+untruncated log: actual PG17.11 (`170011`), Parts247/247, all six quote scenario
+groups, both server stops/scoped cleanup and 47 retained replay failures. This is
+selected SQL rehearsal, not full baseline/API/Auth/private-storage/restore proof.
+Wrapper `38853369954` preview succeeds through its confirmed configuration skip
+without upload; detection/migrations/production and Supabase Preview skip.
+Independent Workers build `095169aa-05f0-422b-9c69-cce4a7c502be` fails with ID/link
+only; fresh cause unverified. These follow-up notes remain local for the next
+integrated source slice, not a documentation-only CI restart. Next: verify this
+exact head's remaining checks, then receipt/server link caller/DTO/attachment
+completeness and writer/recovery dependencies above. No deployment/live write.
+
+Prior connected slice: `a56480a129bc72f93e381ecffd93e5f2ea10a61b`, same draft PR #68.
+The existing customer commercial/communications readers now compose the captured
+caller/current-record denial guard while preserving primary visibility,
+projections/ordering/caps and legacy invoice TEXT values. Receipt entry has one
+synchronous cross-action latch, committed account/target lifetime fences, shared
+manual/file preflight and checked draft/upload/void-save acknowledgments.
+Unacknowledged writes hold this mounted editor without deleting entries or blind
+retry; acknowledged upload plus scan failure still permits manual entry against
+the same draft. This is not durable idempotency, cancellation or persisted-value
+proof. Final critical suites 533/533 across six files (15.19s), full TypeScript,
+ten-file changed-line lint zero new errors/warnings (13 older findings), format/
+diff, independent review and mandatory CI guards 2/2 pass. A test-only inference
+fix and serialized compiler retry after a 1536-MiB heap exhaustion preserve
+source/timeouts/assertions. Fresh complete build and 214 public copies/Worker/
+canonical backend/15 OCR/202 PDF/server boundary verify; existing warnings remain.
+Publication/new-head CI are separately recorded in
+`evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md` after capture.
+No migration/live write/deployment or positive authority acceptance.
+Next: receipt/shop-link per-mount read freshness and generic failure handling;
+then bounded reader DTO/caller binding and server typed outcomes/durable retry.
+Real API/Auth/private-storage/transaction/recovery/pilot/owner gates remain open.
+
+Publication `3dfca78aebb2e16f1d91fe6271d5b4d965709051` verified on the canonical
+remote and same attached draft PR #68/base; main unchanged at `70ab892a`. All 214
+tracked public copies and Worker boundaries verify again at publication. Run
+`38848994735`: all six Actions gates pass. Completed unit `116805801841` confirms
+critical 533/533 (12.71s), locked quote 94/94 and application 2,998/2,998 across
+80 files (64.38s), zero unexpected/quarantined failures. The overall unit log is
+truncated but final summaries/checker are present. Native `116805801627` has an untruncated
+log confirming actual PG17.11 (`170011`), Parts 247/247, six quote scenario groups,
+both server stops and scoped always-cleanup, with 47 retained replay failures.
+In-progress unit-log reads returned provider HTTP 502; the completed read
+succeeded without CLI/API fallback. Wrapper `38848994666` preview succeeds via its configured
+skip path, not an upload; migrations/detection/production and Supabase Preview
+skip. Independent Workers build `a3c621f8-bc5b-41cf-a4ce-fe420b3237ca` fails with
+ID/link only; fresh cause unverified. These follow-up notes join the next
+integrated source slice, avoiding a documentation-only CI restart. No live
+write, upload, deployment or migration; do not replay completed SQL/approvals.
+
+Prior connected slice: `9a4059bde546ed81eaa886124cc3e5b59529b5bc`, same draft PR #68.
+Customer 360's existing reader now adds same-caller explicit-token Auth record
+checks, strict credential/verified-subject binding, a bounded wait and observed
+context-loss denial before/after private reads. Receipt file opening has a
+synchronous duplicate-read latch and committed lifetime fences across account/
+target/logout/unmount/StrictMode, without mutation-cache refresh or raw errors.
+Combined critical suites pass 192/192 (final 5.77s: helper92, handler67, receipt33),
+full TypeScript and seven-file changed-line lint pass; nine older lint findings
+remain outside changed lines. Independent source/test/CI review and two mandatory
+CI guards pass. A test-only unsupported ByRole option was corrected to an exact
+anchored matcher; no source/timeout/assertion weakening. Fresh complete build and
+214 tracked Git/source/output public copies, Worker/canonical backend/15 OCR/
+202 PDF/server boundary verify at `9a4059bd`; existing warnings remain. New-head
+publication/CI is recorded after verification. This is connected
+caller denial/read lifetime safety, not strict session revocation, original-human/
+native-shop authority, storage/transaction/recovery or owner acceptance. Evidence:
+`evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`. Generated middleware, permissions,
+SQL, package/configuration/media and other hosted projects remain unchanged.
+Its commercial/communications and editor follow-up is implemented at `a56480a1`
+above. Receipt list/read freshness and remaining mutation paths still need work.
+Do not treat read locks or mounted uncertainty holds as purchase dedupe or new
+positive native authority. Shared original-human/fresh session/role/tenant,
+native-team/claim/offboarding, durable financial/stock writers and real private-
+object/restore/pilot acceptance remain release-blocking.
+
+Publication `a69903a750a07f8758be4f3adc934b023729a312` is verified on the canonical
+remote and same attached draft PR #68/base; main stays `70ab892a`. Final-head 214
+public copies verify. Exact-head run `38846180291`: native Parts/quote job
+`116797113332` passes, untruncated log confirms actual PG17.11 (`170011`), all
+six quote scenario groups, 247 Parts assertions, 47 retained replay failures,
+server stops and successful always-cleanup. All six Actions gates pass. Completed
+unit job `116797113345` confirms critical192/192 (3.95s), locked quote94/94 and
+application2,745/2,745 across80files (52.00s), zero unexpected/quarantined failures.
+The overall unit log is truncated but contains final summaries/checker. Do not
+reuse this green for newer source. Wrapper `38846180356` preview succeeds
+through its configured skip path, not an upload; migration/detection/production
+and Supabase Preview skipped. Independent Workers build
+`ef57aefb-0ec5-4e48-8daf-81514569432c` failed with ID/link only; fresh cause is
+unverified. These publication/check notes join the next integrated slice,
+avoiding a documentation-only CI restart. No live mutation/deployment.
+
+Prior backend slice: `ad776aa8a18ed181293bbc6fd01a65518ca62949`, same draft PR #68.
+Locked/unapplied quote SQL now requires prior expected-shop intent and refuses
+any existing same-name overload/procedure without replacement. All prior 88 cases
+plus six additions pass 94/94 on PGlite/PostgreSQL 18.6 (69.636s total; actual main
+SQL 3.466s, disconnected source scan 62.510s). No timeout/coverage/quarantine change.
+The same pinned setup now feeds a separate private native-PG17 CI runner with
+actual independent-session blocking barriers, after existing Parts cleanup;
+source is implemented, actual Linux execution/cleanup **pending**. Offline guards/
+CI wiring 11/11, syntax/format/six-file lint/review pass after stdio-error repair.
+214 tracked public copies and existing Worker/backend/assets verify; no app-build
+input changed or fresh local build/deployment claimed. See
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. Expected shop is caller intent, not
+trusted native authority. Next: verify new exact-head native17 marker/barriers/
+cleanup, then compose original-human/fresh authority, durable retry/numbering and
+all-writer scope; real API/private-storage/restore/owner gates remain open.
+
+Publication `2cbf20a45ecfec9affbec110b8e808af87af2571` is verified on the canonical
+remote and same attached draft PR #68/base; main is unchanged. Exact-head Actions
+run `38843686721`, job `116789263074`, has an untruncated log confirming signed
+PGDG 17.11 packages, all 247 Parts assertions and 47 retained replay failures,
+followed by the separate quote cluster's actual `server_version_num=170011`, all
+six independent-session scenario groups, server stop and successful always-cleanup.
+This closes that selected Docker-free native SQL rehearsal, not R2 authority,
+whole-baseline/API/Auth/private-storage/restore or financial acceptance. All 214
+tracked public copies/Worker boundaries verify again at publication. All six Actions
+gates pass. Completed unit log confirms locked quote 94/94 and application
+2,595/2,595 across 79 files (78.12s), zero unexpected/quarantined failures. Log is
+truncated overall but contains both summaries/checker. Two earlier in-progress
+unit-log reads returned provider HTTP 502; the completed read succeeded without
+CLI/API diagnostic fallback.
+Wrapper `38843686801` migrations/production and Supabase Preview skipped;
+preview's configured skip path is not an upload. Independent Workers build
+`5f3fb782-58e0-49d7-9177-6625fea20b1b` failed (ID/link only; fresh cause unverified).
+These follow-up notes remain local for the next integrated slice, avoiding a
+documentation-only CI restart. No live mutation/deployment occurred. Next: final
+new-head Actions results, then trusted original-human/fresh native authority and
+durable retry/numbering/all-writer composition; do not repeat the completed races.
+
+Prior backend slice: `c2f7f3153d13a2453db863877bf9ae880628b1e1`, locked/unapplied
+atomic quote candidate outside migrations, same draft PR #68. Actual header/items
+SQL, strict native-compatible inputs, target locks/rechecks, persisted outcomes
+and fail-closed transactional publication pass 88/88 memory-only tests (9.096s;
+PGlite 0.5.9/PostgreSQL 18.6). Native selected constraints and number trigger stay
+enabled; late CHECK/PK/trigger/RLS and final vehicle-binding failures roll back
+the operation. Format/syntax/lint, independent review and unconditional offline
+CI wiring (2/2) pass. Exact boundaries and next action:
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`. No grant/application connection/live
+SQL or deployment. C3.02 remains open: no prior expected-shop binding, trusted
+fresh authority, durable retry receipt, native PG17 independent-session/API/
+private-storage/restore or owner acceptance. Compose those gates with this
+transaction rather than repeat the caller slice or enable a legacy bypass.
+
+Publication `bb1f193fd8d05c4b442c103dfafa44d317282b81` is verified on the canonical
+remote and same attached draft PR #68/base; main unchanged. All 214 tracked public
+copies verify again. New exact-head run `38840486491`: Parts `116779196476`
+passes on native PG17.11 with all 247 assertions/cleanup and 47 retained replay
+failures. All six Actions gates now pass on this exact head. Unit job
+`116779196629` confirms 2,595/2,595 application tests across 79 files (56.84s),
+zero unexpected/quarantined failures; the returned log is truncated overall but
+includes the final summary/checker. Wrapper
+`38840486567` migrations/production and Supabase Preview skipped; preview uses its
+skip path, not upload proof. Workers build `b6b6255a-380a-4ee6-a5c1-df569e0260df`
+fails with ID/link only, fresh cause unverified. These local follow-up notes join
+the next integrated slice; do not restart active CI just to publish them.
+
+Prior creation caller slice: `bcc253507d65294d5dc73f37b39e91c13e7c87d8`, same
+branch/draft PR #68. Quote/work-order creation now uses account/mount-scoped bounded
+options, fresh selected-record revalidation, exact returned identities/values and
+mounted uncertainty holds. Invalid quote shop/type/tax representation mappings are
+corrected; text encoding/resource checks precede dispatch, and abandoned renders
+do not cancel committed quote saves. Quote 84/84 and work-order 89/89 pass;
+combined creation/security run 183/183 (18.68s), full TypeScript, five-file changed
+line lint and independent final review pass. Mandatory creation CI wiring passes
+2/2. Exact artifact/publication results and limits are in
+`evidence/NATIVE_COMMERCE_CREATION_READINESS.md`.
+No SQL/ACL, live business/Auth write, email, upload or deployment. C3.02–C3.04
+remain unfinished: browser preflight/acknowledgments are not fresh native authority,
+atomic header/items/scope, durable retry, stock/financial/recovery or owner proof.
+Next is the complete authorized C3.02 quote transaction and shared authority/
+API/private-storage/restore acceptance, not repeated reader-only tests.
+
+Published and verified head `6037678d9629956aabd39fd5d57b210f97d3d65e` contains
+source `bcc25350` plus evidence, same attached draft PR #68/base; main unchanged.
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public copies pass, including final published-head asset verification. New run
+`38837739930` Parts job `116770527450` passes all 247 assertions on native PG17.11
+with cleanup; the same 47 retained replay failures remain. All six Actions gates
+now pass on this exact head. Unit job `116770527477` confirms 2,595/2,595 across
+79 application files (77.47s), zero unexpected/quarantined failures. Its returned
+log is truncated overall, but the final summary and report checker are present.
+Wrapper `38837739975` migration/
+production and Supabase Preview skipped. Independent Workers build
+`57f7ae46-a59f-4580-b546-02dc45e68f67` fails with ID/link only; its fresh log was
+not inspected or assumed to have the prior cause. These final check notes join
+the next integrated source slice; they are not new deployment evidence.
+
+Prior quote-detail/build-freeze/Docker-free CI slice: `166ff0c4`, same branch/draft PR #68; source commit
+and exact final checks are in `evidence/NATIVE_QUOTE_DETAIL_READINESS.md`.
+Fresh matching primary/item read lifetimes, complete fixed projections, 101/100
+visible bounds/counts, generic independent retry and native received-value/date
+display pass 108/108 focused tests. Full TypeScript, targeted lint/format and
+independent review pass. Freeze/CI wiring passes 12/12; release/report/assets
+passes 70/70 on final rerun after documented local subprocess timeouts. Full
+application/artifact verification is recorded in the evidence, not assumed here.
+Local verification blocker: full application passed 2,421/2,422, with the source
+scanner timing out. Coverage-preserving Dirent traversal passes focused 10/10
+(scanner 213ms; identical 1,144-path manifest), but full rerun still fails that one
+assertion (17.117s; 190.22s whole run). No proven root cause/full-suite pass. Keep
+ordinary timeout, coverage and quarantine; verify new-head Linux CI. Fresh complete
+build/Worker/canonical-backend/15 OCR/202 PDF/server-boundary and all 214 tracked public
+Git/source/output checks pass at `166ff0c4`; packaging is not deployment/acceptance.
+
+QA email nomination is received; do not ask for it again. One nominated personal
+address is already registered; preserve it and the company/staff alternative.
+A separate plus-tagged owner-controlled QA email is proposed, not created. Live
+signup is prepared with a synthetic QA name and ordinary Buyer & Private Seller
+choice only; credentials/contact fields/Terms/submission remain for the owner.
+No password/OTP/keys in chat. Initial setup may invoke existing confirmation/
+welcome/onboarding paths; no customer outreach or new email adapter activation.
+Standard Auth/org ownership does not grant trusted native-shop authority. Pilot
+synthetic shop, least-privilege membership and QA session remain unverified.
+
+Published evidence head `bf091dc7` is verified on the canonical remote, same draft
+PR #68; main unchanged. Actual Docker-free Parts CI passed in run `38833837897`,
+job `116758376432`: native PGDG PostgreSQL 17.11 and all 247 adversarial assertions.
+Native install/private-cluster/cleanup steps passed. The retained replay reports
+47 local migration failures, so this is Parts SQL coverage, not whole baseline/
+replay or Supabase API/Auth/Storage/restore acceptance. Lint/OCR/typecheck also
+passed at capture; build and unit subsequently passed, completing all six Actions
+gates on `bf091dc7`. Linux application tests pass 2,422/2,422 across 77 files
+(69.02s); the report checker records zero unexpected or quarantined failures.
+The security scanner file passes 10/10 (118ms); Windows full-run failure remains
+recorded, not fixed by this Linux result. Wrapper migration/production and
+Supabase Preview skipped; independent Workers build
+`42f57dc7-de56-48cd-8cc3-3e2518596bc0` failed. Authenticated current-head hosting
+logs confirm automatic `bun install --frozen-lockfile` fails before npm build or
+version upload; the source freeze was not reached. Verify current
+exact-head checks; no deployment claim. These follow-up CI notes are local until
+the next integrated commit; new source still needs its own exact-head checks.
+
+The unsafe browser quote-conversion handler is removed from the unreleased
+candidate. Its disabled button explicitly awaits an authorized atomic writer;
+fresh already-converted work-order navigation remains. This is **unfinished
+C3.03**, not a scope cut or live restriction. The retained legacy RPC also lacks
+caller/shop/concurrency checks and has incompatible shop/part mappings; do not
+reconnect it or infer stock identity/part_type from quote item names. Next safe
+dependency is actual authorized atomic C3.02-C3.04 creation/conversion, followed
+by financial/stock/concurrent-retry/recovery acceptance, not repeated reader proof.
+
+Hosting access is now available. Prior exact head `65733393` passed all six Actions
+gates (`38788467751`), but independent build
+`c9a76b64-c814-400b-8229-8faf36b15548` failed in automatic
+`bun install --frozen-lockfile`, before the configured npm build/version upload.
+No lockfile/provider setting/token/upload change. WORKERS_CI presence now blocks
+both build entrypoints and prebuild hooks locally; actual npm ignore-scripts
+attempts are tested. This source guard cannot precede automatic installation or
+govern raw/operator-replaced commands; it is not a hosting repair/upload firewall
+or release approval. Keep provider remediation gated. New head needs exact checks.
+
+Docker is now explicitly prohibited, not an owner setup/access request. An earlier
+owner-access check found 1.17 GiB available of 15.71 GiB; the no-Docker response
+check found 2.44 GiB (transient snapshots, not a capacity promise). Controlled
+email nomination is received; dedicated QA/pilot shop/native membership remain
+unverified. No daemon/images/local API/Auth/storage stack, live database
+write, restriction replay, deployment, provider activation, customer send or new
+resource. Original-human/fresh authority/native-team/private custody, baseline/
+replay/atomic financial/stock/recovery/owner/live gates remain open. The seven-day
+target still requires a Day 2 feasibility review against those concrete gaps.
+
+Previous quote/work-order list slice: `8302c62d`, same branch/draft PR #68. Both
+readers now use Auth-loading/account/per-mount private lifetimes, fixed 101/100
+visible-row bounds, qualified counts, generic manual retry and no stale/false-empty
+views. Native UUID aliases, received amounts and native date/time cohorts are
+handled without invented financial/date policies. Hidden/null customer/vehicle
+embeds are unavailable, not absent; matched IDs alone get links. The obsolete
+legacy-source/new-form advice is removed without claiming form acceptance.
+
+Two bounded read-only catalog checks on the sole 365 project verified duplicate
+work-order customer/vehicle FK pairs and selected quote-conversion child columns.
+List/detail readers use explicit confirmed relationship names; no constraints,
+schema or business/Auth rows were changed or read. Quote conversion still sends
+nonexistent labor/part columns and omits required part_type, with four separate
+writes and unfenced callbacks. Correct mappings alone would not make it atomic.
+
+138 new tests (93 quote +45 work-order list), focused integration 152/152 including
+14 strengthened existing detail tests (11.03s), fresh full application 2,314/2,314
+across 76 files (124.92s), full TypeScript/report/format checks pass; zero failures/
+skips/quarantine. Six CI jobs pin Ubuntu24.04 with two offline guards, preserving
+Node22/Postgres17/job count and release/migration freezes. It is an OS-family pin,
+not immutable image proof. Existing any/dialog/build warnings remain. Evidence:
+`evidence/NATIVE_COMMERCE_LIST_LIFETIMES.md` and two dated catalog JSON captures.
+
+Fresh complete build/Worker/canonical backend/OCR/PDF/server boundary and all 214
+tracked public Git/source/output checks pass at `8302c62d`. Changed-line lint
+across seven files has zero errors/warnings and 15 pre-existing findings outside
+changed lines. Source guards 103/103, release/report/inventory/assets 75/75 and
+new CI wiring guards 2/2 pass; five inventory tests overlap. This is local artifact/
+source evidence, not API/private-storage/financial/recovery/owner acceptance.
+
+Prior published invoice head `86c10c1d` passed all six CI gates (`38784952101`).
+Independent hosting `9e90f3b6-f999-4ed0-b77c-6da1a6d250c7` failed with ID/link
+only, no diagnostics. Wrapper `38784952185` preview used its configured skip path;
+migrations/production skipped. New head needs exact checks. Next safe dependency
+is quote-detail private lifetimes/complete items, then schema-correct current-shop
+create/conversion acknowledgments plus actual atomic financial/stock writers.
+No deployment, migration, restriction replay, provider activation, customer send
+or resource creation. Real-role/API/private-storage/recovery/owner gates remain.
+
+Previous invoice caller slice: `0c23d336`, same branch/draft PR #68. List/detail
+reads now require current account and per-mount lifetimes, matching private rows,
+explicit visible-row completeness and independent generic retries. Unknown/capped
+reads are not empty or complete; recorded payment entries are not settlement.
+The list's incorrect outstanding aggregate is removed. Payment and inventory-line
+callers verify returned rows and every separate follow-up; unsupported amounts,
+status or stock fail closed before dispatch. A shared mounted-invoice write hold
+blocks local duplicate/second-editor writes and keeps uncertain outcomes visible
+across dialog reopen. It is not durable idempotency, atomic posting or recovery.
+
+133/133 focused tests (70 detail +63 list, 11.85s), fresh full application
+2,176/2,176 across 74 files (129.13s), report checker, full TypeScript and targeted
+lint/format/diff pass; zero failures/skips/quarantine. Both route suites have an
+explicit never-quarantined CI step. Independent read-only review corrections are
+included. Exact source, artifact checks, retained trigger risks and unsupported
+decimal/adjustment/overpayment requirements are recorded in
+`evidence/NATIVE_INVOICE_ACKNOWLEDGMENTS.md`. No SQL or live financial/Auth write,
+email/provider activation, deployment, merge or new resource. Actual authorized
+atomic money/stock/refund writers and API/private-storage/recovery/owner acceptance
+remain open; PDF export is not implemented by this caller slice.
+
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public Git/source/output checks pass at `0c23d336`. Changed-line lint across four
+files has zero errors/warnings/pre-existing findings. Source guards 103/103
+(2.557s) and release/report/inventory/assets 75/75 (8.348s) pass; five inventory
+tests overlap. Existing build warnings remain. Packaging is not deployment,
+actual role/private-storage/financial/recovery acceptance or owner approval.
+
+Prior published `d101f650` passed all six CI gates (`38778102213`). Independent
+hosting build `60d22afc-094a-4845-8d6e-f87a1e4e5cfe` failed with ID/link only and
+no root-cause diagnostics; authenticated hosting logs/configuration remain needed.
+Wrapper `38778102490` preview passed, migration/production skipped. The invoice
+publication needs its own exact-head checks. Latest local RAM snapshot: 1.21 GiB
+free of 15.71 GiB; no Docker daemon/image/API/Auth/storage stack started.
+
+Previous native Auth delivery-boundary slice: `0271fc09`, same branch/draft PR #68.
+The unwired reservation command requires every same-plan prepared recipient and
+binds source kind/original event/subject/plan version plus exact provider bytes,
+fingerprints and full stable keys. Source-event uniqueness is independent of plan
+version. Exact queued-receipt comparison rejects partial/conflicting fanout and
+lossy/noncanonical queue IDs; it is not storage or atomic-transaction proof.
+The bounded one-attempt Resend candidate requires explicit fake/injected transport
+and key; no environment/default fetch/route/scheduler. A five-second shared
+header/body deadline, 4,096-byte response cap and strict sole-ID HTTP200 schema
+separate provider acceptance from outcome unknown. No retries, queue deletion or
+delivery-confirmed result. Controlled provider compatibility remains a gate.
+
+New focused tests 198/198 (112 provider +86 reservation); combined email boundary
+550/550 across five files (2.30s). Independent review corrected UTF-8 classification
+and array pre-enumeration; no remaining finding. Full TypeScript, targeted lint,
+changed-line lint (zero errors/warnings), formatting/diff pass. Both new suites
+are explicit and never quarantined in CI. Source guards 103/103 (5.229s) and
+release/report/inventory/assets 75/75 (9.046s) pass; five inventory tests overlap.
+Full application and artifact evidence follows in
+`evidence/NATIVE_AUTH_EMAIL_DELIVERY_BOUNDARY.md`.
+Fresh full application 2,043/2,043 across 72 files (152.91s), zero failures/skips/
+quarantine, includes all 198 new tests without double counting. Full TypeScript
+and report checker pass. Fresh complete build/Worker/backend/OCR/PDF/browser-engine
+and all 214 tracked public Git/source/output checks pass at `0271fc09`. Existing
+build warnings remain; no upload or runtime/owner acceptance is inferred.
+
+The bounded financial action scan adds C3.01–C3.14 to the acceptance ledger:
+quote/work-order/invoice/payment/approval/refund actions. C3.10–C3.12 caller
+acknowledgments/private lifetimes are now hardened at `0c23d336`, not financially
+accepted. Quote/work-order list/create/conversion bindings and separate-write
+risks remain, and refund approval is not connected native financial execution.
+Next safe source slice is remaining C3.01–C3.04 quote/work-order callers, while
+closing shared authority and actual atomic financial/stock/recovery acceptance.
+Do not expand into indefinite email-only proofs. Native email still needs actual
+durable ingress/lease/fenced completion and consent transactions; legacy backlog
+must remain untouched and separate. No SQL/provider/live writes or deploy.
+
+Prior exact head `52145a0a`: all six CI gates passed (`38774110116`) on follow-up
+discovery. An earlier diagnostic HTTP 502 was transient, not a failed test. Independent hosting
+build `8acd0607-20da-4608-a980-8635015eb2bc` failed with ID/link only; no root-cause
+diagnostics. Wrapper `38774110207` preview passed, migration/production skipped.
+New publication needs exact-head checks. Local RAM snapshot: 0.90 GiB free of 15.71;
+no daemon/image/local API stack started. Mapping 404/423, typed 12/5/2, approved
+restrictions and all release/baseline/replay/parity gates are unchanged.
+
+Previous native Auth plan slice: `0dfac563`, same branch/draft PR #68. The planner
+requires a current verifier-instance result, explicit canonical-project/site/
+secure-change policy and fresh bounded native payloads. It produces immutable
+commands only, with stable event/recipient identities, exact-body/policy
+fingerprints and a strict record comparison; no durable reservation or enqueue.
+Six existing actions are supported; eight documented other/notification actions
+explicitly reject and remain an activation gate. Fixed action-specific website
+callbacks are distinct from the hook's validated Auth/API base.
+
+Secure current/new token-hash mappings, non-secure single-token variants and
+explicit phone-only first-email confirmation are tested. Missing/null current
+email or partial secure pairs never downgrade the policy. The template now
+renders first-address confirmation without an empty/from link; both existing
+recipient halves retain accurate old-to-new copy. Three bounded agents owned
+separate tests/template/review without branch changes or overlapping edits.
+Focused 352/352 passes (212 new planner + seven new render +133 existing verifier);
+full TypeScript/targeted lint/format/diff and independent review pass. Combined
+integration results are in `evidence/NATIVE_AUTH_EMAIL_PLAN.md`.
+Fresh full application 1,845/1,845 across 70 files (144.15s) includes all 219 new
+tests, zero quarantine. Report checker/full TypeScript/targeted lint/format/diff
+pass. Source guards 103/103 (4.398s), release/report/inventory/assets 75/75 (8.797s)
+pass; five overlapping inventory checks are not double-counted or substituted for
+older full SQL/tooling evidence.
+Fresh full build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked public
+Git/source/output checks pass at `0dfac563`; changed-line lint has zero errors/
+warnings. Existing build warnings remain explicit; no upload or live acceptance.
+
+Prior exact published head `67f81e7e` passed all six CI gates (`38769939396`).
+Independent hosting build `c9b12d3b-50ed-4b68-96d5-6f345d685f83` failed with only
+ID/link reported, no diagnostic text/annotations/root cause. Wrapper `38769939461`
+preview passed; migration/production skipped. New publication requires its own
+exact-head checks. No email activation, SQL/live write, provider change or deploy.
+Mapping 404/423, typed 12/5/2 and all baseline/replay/parity/release flags unchanged.
+
+Previous email-safety slices: bounded raw-byte webhook verifier `5e5d5f8a` and
+unsubscribe acknowledgment/public-page fixes `65475626`, same branch/draft PR #68.
+The verifier is intentionally unwired: fixed body/read/freshness/header/key bounds,
+actual WebCrypto HMAC verification and generic errors, with 133 focused tests.
+The unsubscribe handlers require exact returned suppression evidence, never
+reapply suppression from a consumed token, and no longer log raw token/database
+diagnostics. The public page respects HTTP status and request lifetime, separates
+used-but-unconfirmed/transient/invalid results and acknowledges recorded opt-out,
+not a proven dispatcher stop. Sixty-two focused handler/page tests pass; both
+slices have separate never-quarantined CI steps and independent read-only review.
+Combined integration results are recorded in the evidence below.
+Fresh full application 1,626/1,626 across 68 files (109.46s) includes all 195 new
+tests. Report checker/full TypeScript/changed-line lint pass, zero quarantine or
+new lint warnings. Follow-up `3f829a6b` corrects only a test Buffer type annotation;
+no runtime behavior or assertion was weakened.
+Fresh full build/Worker and all 214 tracked public Git/source/output checks pass
+at `3f829a6b`; 15 OCR/202 PDF assets retained. Source guards103/103 (2.263s) and
+release/report/inventory/assets75/75 (11.532s) pass, with five overlapping inventory
+checks not double-counted. Older full SQL/tooling evidence is not freshly rerun.
+Build still reports skipped test-route/directive/config warnings. No upload.
+
+Native email delivery is not ready/activated. Signature authenticity is not
+schema validation, project ownership, fresh human/role/tenant authority or durable
+dedupe. Legacy token-first writes, stronger suppression reason overwrite, consent
+revision/recovery, unbounded parser/runtime backend binding, queue payload/backlog/
+reservation/suppression and provider receipt/timeout/correlation remain gates.
+No SQL, provider setting, email send or deployment. Source mapping stays 404/423;
+12 historical unresolved/five recorded-unapplied/two embedded executions and all
+release/baseline/replay/parity flags remain unchanged. See
+`evidence/NATIVE_EMAIL_WEBHOOK_VERIFIER.md` and
+`evidence/UNSUBSCRIBE_ACKNOWLEDGMENTS.md`.
+
+Prior exact published head `e72553b6` passed all six CI gates (`38764688404`).
+Independent hosting build `e96dd8b6-cdb0-4211-bc13-db782a9badfb` fails separately;
+GitHub-reported output contains only its ID/link, no diagnostic/root-cause text.
+Wrapper `38764688552` preview passes; migration/production skip. One diagnostic
+read returned HTTP 502; a later discovery read confirmed CI success, not a failed
+unit run. New publication requires its own exact-head checks; no live acceptance
+or upload is inferred.
+
+The one existing follow-up was updated, not duplicated: same active interval,
+name and target chat, now retaining the seven-day plan/ledger, sole 365 backend,
+superseded staging question, recovered-but-unselected CRM options and inactive
+email boundary. Do not repeat completed recovery or promise continuous execution.
+
+Previous integration reconciliation: unused cloud-auth retirement `f46b048d`,
+Parts reference recovery `a420a44d`, remaining migration ledger/CI `2350e403`.
+Same branch/draft PR #68. Eleven missing PR #2 documents are preserved exactly
+(7,186 lines / 381,036 bytes) under `reference/parts-pr2/`, not adopted as control
+authority. Gate crosswalk preserves active G2 security/G4 build authorization;
+current platform/specialist/RLS plans remain unchanged. Source recovery is now
+complete; formal baseline adoption and operational acceptance are not.
+
+The exact 19 outside whole-source classification are individually recorded as
+12 historical unresolved / five recorded-unapplied candidates / two recorded
+embedded executions. Do not replay the two approved helper restrictions or
+substitute embedded bytes for stored-envelope hashes. Exact mapping stays 404/423;
+replay/cost-trap/baseline/parity/release flags stay blocked/false. PR #9's media
+rewrite is absent/outside 423, not one of these 19 or accepted migration ingress.
+
+PR #9's full scope is inventoried (205 rename-aware / 211 physical paths), not
+blindly adopted. Only the unused cloud-auth dependency/wrapper were retired after
+native Google: one lock entry removed, all other package fields/versions retained.
+The wrapper is recoverable in Git. Provider/config/assets/MCP/email/billing/data
+cutover remains bounded review/implementation work, not operationally complete.
+Three bounded agents completed separate review/edit tasks without branch changes
+or overlapping edits; independent review covers Parts preservation, not runtime.
+
+Fresh 119/119 Node checks (98 new + 21 existing), application 1,431/1,431 across 65 files,
+report checker/full TypeScript/new-guard lint/format/diff/primary review pass.
+Fresh full build/Worker/214-file Git-source-output verification passes at `2350e403`,
+canonical backend and 15 OCR/202 PDF assets retained. No live write/migration/deploy,
+restriction replay, paid resource, PR merge or new automation. Evidence and exact
+remaining provider/Parts/migration boundaries:
+`evidence/PARTS_AND_PROVIDER_RECONCILIATION.md` and
+`evidence/migration-remaining-source-ledger-2026-10-15.json`.
+
+Previous application slice: native Google OAuth handoff, source
+`c3f6bb9cc11c46246c0662f2030a3056b2287854`, with guard follow-up `b3acef0e`,
+on the same integration branch/PR #68.
+Selectively adopts PR #9's native-client intent without merging its broader
+provider/configuration/asset/migration changes. Login/signup use the existing
+canonical 365 Supabase client; returned authorization URLs and internal return
+paths are checked before navigation. Shared form locks prevent duplicate and
+cross-flow dispatch; changed account/return target/signup details or unmount
+suppress late handoffs/errors. Signup identity/terms validation and pending-profile
+snapshot remain; a generated URL never claims signup/provisioning success.
+Verification and remaining provider/real-session gates:
+`evidence/NATIVE_GOOGLE_OAUTH_HANDOFF.md`. No SQL or provider settings changed.
+Fresh full application 1,431/1,431 across 65 files passes (105.08s), including
+all 98 new OAuth tests. Report checker/full TypeScript/changed-line lint pass;
+zero quarantine, no new warnings. One earlier repository-scan failure passed
+alone and in the clean full rerun without test changes; root cause not asserted.
+Fresh complete-checkout build/Worker verification and Git/source/copied-public
+guard pass at formatting follow-up `8e1be6ac`: all 214 tracked public files,
+15 OCR/202 PDF assets and canonical 365 target. Release/report/inventory guards
+65/65 (7.910s), asset regressions10/10 (0.236s), format/diff/primary review pass.
+This is local artifact verification, not upload or broader release acceptance.
+
+Previous release-safety slice: `75b2304fae26f9572041ff88d3cff86aeeaec5a0` on the
+same `completion/365-seven-day-integration` / draft PR #68. The working checkout
+is now complete (`core.sparseCheckout=false`): 214 tracked public files restored,
+56,116,946 bytes, with generated OCR/PDF manifest hashes unchanged. Fresh build
+and byte-exact Git HEAD/source/output media verification pass; this clears the
+local missing-media subgate only. No upload/deploy or complete artifact/owner/
+runtime approval is inferred. Never deploy the earlier sparse output.
+
+New read-only `verify-release-assets.mjs` rejects sparse/missing/altered/copied/
+unsafe/excluded public assets before CI dry-run and both Actions uploads. Preview
+also now runs existing Worker identity/target/OCR/PDF verification. Production
+environment, migration freeze, readiness/fork/secrets/release flags are unchanged.
+Independent Workers Builds/raw Wrangler remain outside this gate. 50 new Node
+regressions plus 15 existing inventory/report/release tests pass 65/65 (7.591s);
+OCR/PDF assets 10/10 (0.201s), lint/format/diff/primary review/full build/Worker
+checks pass. App/SQL unchanged; prior 1,333 app/701 tooling are not fresh reruns.
+Evidence: `evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
+
+PR #68 prior exact head `06e21a2e` now passed all six CI gates (`38759812700`),
+including real-browser OCR and disposable Parts PG. Hosting build
+`7f06007f-914b-4484-a3b7-66da30fc8f3b` fails separately; reported output contains
+only ID/link, no diagnostic text/annotations/root cause. Wrapper `38759812816`
+preview passes; migration/production skip. No upload is inferred.
+The new reconciliation publication needs its own exact-head
+checks; prior-head green CI is not new-head or live acceptance.
+
+Owner answered the staging question with production project `wjxaajgvddtrxxtocxen`.
+Do not assign it as isolated staging or run destructive acceptance tests there.
+The later sole-backend clarification above supersedes the separate-project/cost
+follow-up. Do not repeat it or act on a late organization-selection answer as
+creation permission. Earlier pilot-shop/test-account question remains open.
+Docker Desktop status is stopped/unavailable; a read-only snapshot found 1.93 GiB
+free of 15.71 GiB RAM. No daemon, image download or local Supabase stack was started.
+Local synthetic component/SDK tests are not real API/Auth/storage acceptance.
+Safe work continues on the remaining selective PR #9/#2 and action-level inventory,
+then fresh authority/native-team/claim/offboarding/private-custody transactions
+and recovery as the integrated release path. Source 404/423, 19 unclassified and
+all baseline/replay/parity/release flags unchanged. Migration impact/deployment
+none; zero live SQL/business/Auth mutation, restriction replay, history repair,
+customer message, paid resource, PR merge or duplicate automation.
+
+Previous staff integration slice: `completion/365-seven-day-integration`, source
+`ece7e2a0288a9a70be58feeeaefdfe1922fde887`. Initial workflow gates are in
+`365_RELEASE_ACCEPTANCE_LEDGER.md`; action-level inventory is not yet exhaustive.
+Dated 13:44:13 UTC inventory finds 59/61 then-open PR heads already ancestors,
+including CI #8; do not bulk merge those heads again. PR #9 provider/auth/config/
+assets/legacy-URL migration and PR #2 Parts plan need separate content review.
+Ancestry is not accepted authority, applied SQL, patch parity or live verification.
+
+Actual internal-staff handler/UI fixes now require matching manager/profile/ban
+responses, distinguish partial creation and sign-in-only restriction, scope
+private reads/forms to account/admin/snapshot lifetimes and suppress late results.
+Unknown creation locks controls only within the mounted account scope, not a
+durable ledger. Role/target eligibility, atomic hierarchy, existing-session and
+native/team/chat/storage offboarding remain unresolved; no provisioning or
+revocation success is fabricated. 93 focused tests are included in fresh full
+application 1,333/1,333 across 62 files (100.029s); report checker/full TypeScript/
+changed-file lint/format/diff/primary review/build pass. Fifteen inventory/report/
+release guards and 10 OCR/PDF assets pass separately. Parent 701-tooling evidence
+is unchanged/not rerun. No real-browser/mobile/provider/JWT/SQL acceptance claimed.
+Evidence: `evidence/SEVEN_DAY_INTEGRATION_STAFF_ACKNOWLEDGMENT.md`.
+
+Parent PR #67 exact head `576fb17d` now passed all six CI gates (`38740109605`);
+hosting build `e4ecbe71-54eb-4776-9b31-3f3508d6fece` fails independently.
+Purpose-built check diagnostics expose no text/annotations/root cause; need
+authenticated hosting logs. Wrapper `38740109751` preview step passes but upload
+is configured skipped, migration/production skipped. New candidate head needs
+its own checks. The older sparse output must never be released.
+
+Two fresh Supabase resource/branch metadata reads show canonical project healthy
+on 17.6.1.155, but no separate 365 staging target. The sole default main branch is
+not isolation; its Sep 27 MIGRATIONS_FAILED marker is old metadata, not a new
+failed migration. The separate-hosted-staging question is now superseded by the
+owner clarification above; the pilot shop/test-account question remains open.
+No passwords/keys requested.
+Local Docker CLI exists but Linux engine is unavailable; psql absent on PATH.
+No daemon/image install or paid resource. Safe local work continues meanwhile.
+
+Exact next action: verify existing PR #68's exact latest published head; keep all
+further slices on that branch/PR. Use completed PR #2 source recovery/crosswalk
+without repeating it or adopting future proposals. Complete action-level feature
+acceptance and remaining PR #9 provider/build/MCP/asset/legacy-URL work selectively.
+The inactive native reservation/provider boundary is implemented at `0271fc09`;
+invoice C3.10–C3.12 caller acknowledgments/lifetimes are hardened at `0c23d336`,
+and C3.01/C3.04 list readers plus explicit work-order relationships at `8302c62d`.
+Do not repeat those slices or infer durable/live acceptance. Next safe integrated
+source work is quote-detail private lifetimes and complete source items, then
+C3.02–C3.04 schema-correct current-shop create/conversion bindings and
+acknowledgment tests using the existing real QueryClient/deferred
+SDK harness, while replacing separate writes with authorized atomic commands.
+In parallel, close actual atomic Auth ingress/lease/fenced completion, consent
+and financial/stock writers with isolated transaction/recovery acceptance.
+Distinguish queued/provider-accepted/delivery-confirmed/outcome-unknown states.
+Do not repeat completed signature/planner work,
+wire into the legacy dispatcher or activate the hook. Resolve intended action/
+callback coverage, actual secret/project/sender/Auth-setting ownership and atomic
+consent/suppression policy before deployment. Use
+the pinned 12/5/2 remaining-source ledger
+to prepare a reviewed forward/recovery path; do not repeat completed proof or
+replay history. Establish local synthetic
+API/Auth/storage and production-safe acceptance without a new hosted project.
+Close original-human/fresh
+session-role-tenant/native-team/claim/offboarding/private-object transaction and
+recovery boundaries as the staging integration path, not an endless lab chain.
+Source 404/423 and all baseline/replay/parity/release gates unchanged. Migration
+impact/deployment none; zero live business/Auth mutation, restriction replay,
+history repair, customer message, paid resource, PR merge or duplicate automation.
+Current list slice read only two bounded system-catalog selections on the canonical
+project, no business/Auth rows or private objects. The heartbeat remains active.
+
+Published/attached draft PR #68:
+`https://github.com/Hunting-Fishing/motorsales365/pull/68`, base PR #67 branch
+at `576fb17d`, code `ece7e2a0`, first evidence head `76c5fa41`. First CI
+`38748496533` is running/queued; wrapper `38748496539` preview is in progress,
+migrations/production skipped; Supabase Preview skips because no SQL changed.
+No hosting upload or new-head CI pass is claimed. This publication-record commit
+supersedes the first check head: verify PR #68's exact newest head next. The
+candidate is now pushed; owner plan commit `0aa3fb5` is included. Main and other
+remote branches were not changed. Continue the exact next actions above.
 
 Newest disposable revision/invalidation model: code `c03fede`, branch
 `security/claim-revision-invalidation-model`, based on PR #66 `02cb49f`.

@@ -1,0 +1,334 @@
+// Offline YAML assertions only; no runner, provider, database or network access.
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { load } from "js-yaml";
+
+const workflow = load(
+  readFileSync(new URL("../../.github/workflows/ci.yml", import.meta.url), "utf8"),
+);
+
+test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving latest label", () => {
+  assert.deepEqual(Object.keys(workflow.jobs).sort(), [
+    "build",
+    "lint",
+    "parts-rls",
+    "receipt-ocr-browser",
+    "test",
+    "typecheck",
+  ]);
+  for (const job of Object.values(workflow.jobs)) {
+    assert.equal(job["runs-on"], "ubuntu-24.04");
+    assert.equal(job["continue-on-error"], undefined);
+  }
+  assert.equal(workflow.env.NODE_VERSION, "22");
+  const parts = workflow.jobs["parts-rls"];
+  assert.equal(parts["timeout-minutes"], 25);
+  assert.equal(parts.services, undefined);
+  assert.equal(parts.container, undefined);
+  assert.equal(parts.env, undefined);
+  const install = parts.steps.find(
+    (step) => step.name === "Install native PostgreSQL 17 (ephemeral runner only)",
+  );
+  const replay = parts.steps.find(
+    (step) => step.name === "Run suite (--local replay of supabase/migrations)",
+  );
+  const cleanup = parts.steps.find(
+    (step) => step.name === "Clean private PostgreSQL cluster (always)",
+  );
+  assert.ok(install && replay && cleanup);
+  assert.equal(install.if, undefined);
+  assert.equal(replay.if, undefined);
+  assert.equal(cleanup.if, "always()");
+  assert.equal(install["continue-on-error"], undefined);
+  assert.equal(replay["continue-on-error"], undefined);
+  assert.equal(cleanup["continue-on-error"], undefined);
+  assert.equal(install["timeout-minutes"], 5);
+  assert.equal(cleanup["timeout-minutes"], 2);
+  assert.match(install.run, /https:\/\/www\.postgresql\.org\/media\/keys\/ACCC4CF8\.asc/);
+  assert.match(
+    install.run,
+    /signed-by=\/usr\/share\/postgresql-common\/pgdg\/apt\.postgresql\.org\.asc/,
+  );
+  assert.match(install.run, /https:\/\/apt\.postgresql\.org\/pub\/repos\/apt noble-pgdg main/);
+  assert.match(install.run, /postgresql-17 postgresql-client-17/);
+  assert.match(install.run, /create_main_cluster = false/);
+  assert.match(replay.run, /mktemp -d "\$parts_temp_base\/parts-rls\.XXXXXX"/);
+  assert.match(replay.run, /PGPORT=55432 PGCONNECT_TIMEOUT=5/);
+  assert.match(replay.run, /export PGHOST="\$parts_pg_root\/socket"/);
+  assert.match(replay.run, /--auth-local=trust --auth-host=reject/);
+  assert.match(replay.run, /--set=listen_addresses= /);
+  assert.doesNotMatch(replay.run, /listen_addresses=''/);
+  assert.match(replay.run, /unix_socket_permissions=0700/);
+  assert.match(replay.run, /pg_ctl .* -w -t 30 start/);
+  assert.match(replay.run, /pg_isready -d postgres -t 5/);
+  assert.match(replay.run, /SHOW server_version_num/);
+  assert.match(replay.run, /\^17\[0-9\]\{4\}\$/);
+  assert.match(replay.run, /SHOW data_directory/);
+  assert.match(replay.run, /SHOW unix_socket_directories/);
+  assert.match(replay.run, /SHOW listen_addresses/);
+  assert.match(replay.run, /SELECT rolsuper FROM pg_roles/);
+  assert.match(
+    replay.run,
+    /unset DATABASE_URL PGSERVICE PGSERVICEFILE PGHOSTADDR PGPASSWORD PGOPTIONS/,
+  );
+  assert.match(replay.run, /trap cleanup_parts_cluster EXIT/);
+  assert.match(replay.run, /-m fast -w -t 15 stop/);
+  assert.match(replay.run, /-m immediate -w -t 15 stop/);
+  assert.match(
+    replay.run,
+    /bash scripts\/test-parts-rls-adversarial\.sh --local 2>&1 \| tee parts-rls\.log/,
+  );
+  assert.match(replay.run, /SKIP\.\*parts adversarial RLS suite/);
+  assert.match(replay.run, /Suite skipped unexpectedly.*exit 1/);
+  assert.doesNotMatch(replay.run, /skipping\.|exit 0/);
+  assert.match(cleanup.run, /realpath -e "\$PARTS_PG_ROOT"/);
+  assert.match(cleanup.run, /case "\$parts_pg_root" in "\$parts_temp_base"\/parts-rls\.\*/);
+  assert.match(cleanup.run, /test "\$\(dirname "\$parts_pg_root"\)" = "\$parts_temp_base"/);
+  assert.match(cleanup.run, /\^parts-rls\\\.\[A-Za-z0-9\]\{6\}\$/);
+  assert.match(cleanup.run, /-m fast -w -t 15 stop/);
+  assert.match(cleanup.run, /-m immediate -w -t 15 stop/);
+  assert.match(cleanup.run, /cp "\$parts_pg_root\/server\.log" parts-rls-server\.log/);
+  assert.match(cleanup.run, /rm -rf -- "\$parts_pg_root"/);
+  const quote = parts.steps.find(
+    (step) =>
+      step.name === "Locked quote transaction and independent sessions (native PostgreSQL 17)",
+  );
+  const quoteCleanup = parts.steps.find(
+    (step) => step.name === "Clean private quote PostgreSQL cluster (always)",
+  );
+  assert.ok(quote && quoteCleanup);
+  assert.equal(quote.run, "bash scripts/ci/run-native-quote-postgres.sh --run");
+  assert.equal(quote.if, undefined);
+  assert.equal(quote["continue-on-error"], undefined);
+  assert.equal(quote["timeout-minutes"], 5);
+  assert.equal(quoteCleanup.run, "bash scripts/ci/run-native-quote-postgres.sh --cleanup");
+  assert.equal(quoteCleanup.if, "always()");
+  assert.equal(quoteCleanup["continue-on-error"], undefined);
+  assert.equal(quoteCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(quote) > parts.steps.indexOf(cleanup));
+  assert.ok(parts.steps.indexOf(quoteCleanup) > parts.steps.indexOf(quote));
+  const recovery = parts.steps.find(
+    (step) =>
+      step.name === "Synthetic database dump and second-cluster restore (native PostgreSQL 17)",
+  );
+  const recoveryCleanup = parts.steps.find(
+    (step) => step.name === "Clean private recovery PostgreSQL clusters (always)",
+  );
+  assert.ok(recovery && recoveryCleanup);
+  assert.equal(recovery.run, "bash scripts/ci/run-native-recovery-postgres.sh --run");
+  assert.equal(recovery.if, undefined);
+  assert.equal(recovery["continue-on-error"], undefined);
+  assert.equal(recovery["timeout-minutes"], 7);
+  assert.equal(recoveryCleanup.run, "bash scripts/ci/run-native-recovery-postgres.sh --cleanup");
+  assert.equal(recoveryCleanup.if, "always()");
+  assert.equal(recoveryCleanup["continue-on-error"], undefined);
+  assert.equal(recoveryCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(recovery) > parts.steps.indexOf(quoteCleanup));
+  assert.ok(parts.steps.indexOf(recoveryCleanup) > parts.steps.indexOf(recovery));
+  const expense = parts.steps.find(
+    (step) =>
+      step.name === "Receipt expense operation and independent sessions (native PostgreSQL 17)",
+  );
+  const expenseCleanup = parts.steps.find(
+    (step) => step.name === "Clean private expense PostgreSQL cluster (always)",
+  );
+  assert.ok(expense && expenseCleanup);
+  assert.equal(expense.run, "bash scripts/ci/run-native-expense-postgres.sh --run");
+  assert.equal(expense.if, undefined);
+  assert.equal(expense["continue-on-error"], undefined);
+  assert.equal(expense["timeout-minutes"], 5);
+  assert.equal(expenseCleanup.run, "bash scripts/ci/run-native-expense-postgres.sh --cleanup");
+  assert.equal(expenseCleanup.if, "always()");
+  assert.equal(expenseCleanup["continue-on-error"], undefined);
+  assert.equal(expenseCleanup["timeout-minutes"], 2);
+  assert.ok(parts.steps.indexOf(expense) > parts.steps.indexOf(recoveryCleanup));
+  assert.ok(parts.steps.indexOf(expenseCleanup) > parts.steps.indexOf(expense));
+  const stockMatches = parts.steps.filter(
+    (step) => step.name === "Mixed inquiry and B2B independent sessions (native PostgreSQL 17)",
+  );
+  const stockCleanupMatches = parts.steps.filter(
+    (step) => step.name === "Clean private mixed-stock PostgreSQL cluster (always)",
+  );
+  assert.equal(stockMatches.length, 1);
+  assert.equal(stockCleanupMatches.length, 1);
+  const [stock] = stockMatches;
+  const [stockCleanup] = stockCleanupMatches;
+  assert.equal(stock.run, "bash scripts/ci/run-native-mixed-stock-postgres.sh --run");
+  assert.equal(stock.if, undefined);
+  assert.equal(stock["continue-on-error"], undefined);
+  assert.equal(stock["timeout-minutes"], 5);
+  assert.equal(stock.shell, "bash");
+  assert.equal(stockCleanup.run, "bash scripts/ci/run-native-mixed-stock-postgres.sh --cleanup");
+  assert.equal(stockCleanup.if, "always()");
+  assert.equal(stockCleanup["continue-on-error"], undefined);
+  assert.equal(stockCleanup["timeout-minutes"], 2);
+  assert.equal(stockCleanup.shell, "bash");
+  assert.ok(parts.steps.indexOf(stock) > parts.steps.indexOf(expenseCleanup));
+  assert.ok(parts.steps.indexOf(stockCleanup) > parts.steps.indexOf(stock));
+  const nodeSetup = parts.steps.filter((step) => step.uses === "actions/setup-node@v4");
+  assert.equal(nodeSetup.length, 1);
+  assert.equal(nodeSetup[0].with["node-version"], "${{ env.NODE_VERSION }}");
+  assert.equal(nodeSetup[0].if, undefined);
+  assert.ok(parts.steps.indexOf(nodeSetup[0]) < parts.steps.indexOf(quote));
+  assert.doesNotMatch(JSON.stringify(parts), /docker|postgres:17|secrets\.|systemctl start/i);
+});
+
+test("native commerce route suites stay explicit, single-worker and never quarantined", () => {
+  assert.equal(workflow.jobs.test["timeout-minutes"], 25);
+  const steps = workflow.jobs.test.steps;
+  const expected = [
+    [
+      "Retained expense and journal composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-posting-fixture.test.mjs",
+    ],
+    [
+      "Expense operation request and reported-posting contract (offline, never quarantined)",
+      "node --test scripts/vehicle-receipts/expense-operation-contract.test.mjs",
+    ],
+    [
+      "Locked receipt expense transaction candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-operation-candidate.test.mjs",
+    ],
+    [
+      "Locked single draft receipt line candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-edit-candidate.test.mjs",
+    ],
+    [
+      "Native expense source parity and runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/expense-native-source.test.mjs scripts/ci/native-expense-postgres.test.mjs scripts/ci/run-native-expense-postgres.test.mjs",
+    ],
+    [
+      "Native draft-line source parity and cohort guards (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/vehicle-receipts/draft-line-native-source.test.mjs scripts/ci/native-draft-line-postgres.test.mjs",
+    ],
+    [
+      "Full staff claim and native roster bridge composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/full-native-staff-bridge-composition.test.mjs",
+    ],
+    [
+      "Native invoice read lifetimes and financial acknowledgments (never quarantined)",
+      "npx vitest run src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-list.test.tsx --maxWorkers=1",
+    ],
+    [
+      "Native quote and work-order list read lifetimes (never quarantined)",
+      "npx vitest run src/components/shop-manager/quote-list.test.tsx src/components/shop-manager/work-order-list.test.tsx src/components/shop-manager/work-order-detail.test.tsx --maxWorkers=1",
+    ],
+    [
+      "Native commerce test and pinned CI runner guards (offline, never quarantined)",
+      "node --test scripts/ci/native-commerce-ci.test.mjs",
+    ],
+    [
+      "Native quote detail private lifetimes and conversion interlock (never quarantined)",
+      "npx vitest run src/components/shop-manager/quote-detail.test.tsx --maxWorkers=1",
+    ],
+    [
+      "Native quote and work-order creation callers (never quarantined)",
+      "npx vitest run src/components/shop-manager/quote-create.test.tsx src/components/shop-manager/work-order-create.test.tsx --maxWorkers=1",
+    ],
+    [
+      "Locked atomic quote candidate (offline SQL, synthetic roles, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/native-quote-create-transaction.test.mjs",
+    ],
+    [
+      "Native quote PostgreSQL runner safety (offline, never quarantined)",
+      "node --test scripts/ci/native-quote-postgres.test.mjs",
+    ],
+    [
+      "Native PostgreSQL recovery runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/native-recovery-postgres.test.mjs scripts/ci/run-native-recovery-postgres.test.mjs",
+    ],
+    [
+      "Native customer callers and receipt entry lifetimes (never quarantined)",
+      "npx vitest run src/lib/native-request-caller.server.test.ts src/lib/customer-detail.functions.test.ts src/lib/customer-commercial.functions.test.ts src/lib/customer-communications.functions.test.ts src/components/vehicle-receipt-panel.test.tsx src/lib/vehicle-receipts.test.ts --maxWorkers=1",
+    ],
+    [
+      "Retail lead assignment caller and private lifetimes (never quarantined)",
+      "npx vitest run src/lib/leads.functions.test.ts 'src/routes/dashboard.team.leads_.$id.test.tsx' --maxWorkers=1",
+    ],
+    [
+      "Receipt read DTO and caller contracts (never quarantined)",
+      "npx vitest run src/lib/vehicle-receipt-read-contract.test.ts src/lib/vehicle-receipts.functions.test.ts src/lib/private-receipt-url.server.test.ts src/lib/vehicle-receipt-expense-contract.test.ts src/lib/vehicle-receipt-installation-contract.test.ts src/lib/native-command-caller.server.test.ts --maxWorkers=1",
+    ],
+    [
+      "Owned receipt command ingress and middleware custody (never quarantined)",
+      "npx vitest run src/lib/receipt-command-ingress.server.test.ts src/lib/receipt-command-middleware.server.test.ts --maxWorkers=1",
+    ],
+    [
+      "Native Auth session catalog privacy and dependencies (offline, never quarantined)",
+      "node --test scripts/ci/auth-session-catalog-review.test.mjs",
+    ],
+    [
+      "Auth provider migration-version provenance (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/auth-provider-migration-review.test.mjs",
+    ],
+    [
+      "Buddy delivery handoff contract (offline, never quarantined)",
+      "npx vitest run src/lib/buddy-delivery-contract.test.ts --maxWorkers=1",
+    ],
+    [
+      "Mixed inquiry and B2B stock reservation candidate (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-candidate.test.mjs",
+    ],
+    [
+      "Mixed stock native-source and actual B2B writer composition (memory-only, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-native-source.test.mjs scripts/parts-stock/mixed-reservation-order-source.test.mjs",
+    ],
+    [
+      "Native mixed-stock runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/native-mixed-stock-postgres.test.mjs scripts/ci/run-native-mixed-stock-postgres.test.mjs",
+    ],
+    [
+      "Selected stock writer frontier (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs",
+    ],
+    [
+      "Selected stock catalog and body fingerprints (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/stock-writer-catalog-review.test.mjs scripts/ci/stock-writer-catalog-runtime.test.mjs scripts/ci/stock-writer-catalog-evidence.test.mjs scripts/ci/stock-writer-body-correspondence.test.mjs",
+    ],
+    [
+      "Independent Workers build source freeze (offline, never quarantined)",
+      "node --test scripts/ci/independent-workers-build.test.mjs",
+    ],
+  ];
+  for (const [name, command] of expected) {
+    const matches = steps.filter((step) => step.name === name);
+    assert.equal(matches.length, 1);
+    assert.equal(matches[0].run, command);
+    assert.equal(matches[0].if, undefined);
+    assert.equal(matches[0]["continue-on-error"], undefined);
+  }
+});
+
+test("manual stock memory candidate uses existing OCR runner headroom without weakening gates", () => {
+  const job = workflow.jobs["receipt-ocr-browser"];
+  assert.equal(job["timeout-minutes"], 15);
+  assert.equal(job.if, undefined);
+  assert.equal(job["continue-on-error"], undefined);
+  const name = "Manual stock adjustment transaction candidate (memory-only, never quarantined)";
+  const command =
+    "node --test --test-concurrency=1 scripts/parts-stock/manual-adjustment-candidate.test.mjs";
+  const allSteps = Object.values(workflow.jobs).flatMap((value) => value.steps);
+  assert.equal(allSteps.filter((step) => step.name === name).length, 1);
+  assert.equal(allSteps.filter((step) => step.run === command).length, 1);
+  const matches = job.steps.filter((step) => step.name === name);
+  assert.equal(matches.length, 1);
+  const [step] = matches;
+  assert.equal(step.run, command);
+  assert.equal(step.if, undefined);
+  assert.equal(step["continue-on-error"], undefined);
+  assert.equal(step["timeout-minutes"], 2);
+  const install = job.steps.findIndex((value) => value.run === "${{ env.NPM_CI }}");
+  const browser = job.steps.findIndex(
+    (value) => value.run === "npx playwright install --with-deps chromium",
+  );
+  const ocr = job.steps.findIndex((value) => value.run === "npm run test:receipt-ocr:browser");
+  assert.ok(install >= 0 && job.steps.indexOf(step) > install);
+  assert.ok(browser > job.steps.indexOf(step) && ocr > browser);
+  assert.equal(job.steps[browser].if, undefined);
+  assert.equal(job.steps[ocr].if, undefined);
+  assert.equal(job.steps[browser]["continue-on-error"], undefined);
+  assert.equal(job.steps[ocr]["continue-on-error"], undefined);
+  assert.equal(workflow.jobs.test["timeout-minutes"], 25);
+  assert.equal(workflow.jobs["parts-rls"]["timeout-minutes"], 25);
+});

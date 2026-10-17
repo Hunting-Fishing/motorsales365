@@ -1,5 +1,21 @@
 # CI/CD for 365 MotorSales
 
+## Complete public asset gate 2026 10 15
+
+On the integrated candidate (`75b2304f`, draft PR #68), CI packaging and both
+Actions uploads run `node scripts/ci/verify-release-assets.mjs`. It requires a
+complete, non-sparse checkout and verifies every tracked public file against its
+Git blob and copied build bytes. Unexpected roots, missing/altered/link files,
+unreviewed asset exclusions and unsupported LFS pointers reject. Preview also
+runs the existing Worker identity/target/OCR/PDF checks before uploading.
+
+The local checkout now includes all 214 tracked public files and a fresh build
+passes both checks. Earlier sparse artifacts must never deploy. This does not
+enable Actions deployment, change production/migration approvals or control the
+independent Workers Builds integration/manual Wrangler commands. Full artifact,
+staging, private-data/recovery and owner approval gates remain required. Details:
+`evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
+
 ## Release-safety continuation — 2026-10-15
 
 The `security/staff-authority-release-gates` review branch freezes automatic

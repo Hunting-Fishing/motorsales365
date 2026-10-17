@@ -1,13 +1,15 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getCustomerCommercialSnapshot } from "./customer-commercial.functions";
+import { NATIVE_CALLER_AUTH_WAIT_MS } from "./native-request-caller.server";
 import type {
   CustomerCommercialInvoice,
   CustomerCommercialKind,
   CustomerCommercialQuote,
 } from "./customer-commercial";
 
-// Mocked handler/builder contracts only: no actual authentication middleware,
-// JWT, HTTP, PostgREST, RLS, live rows, catalog parity or DB cancellation proof.
+// Actual handler/caller guard with synthetic Auth/builder contracts only. No
+// authentication middleware/JWT, live Auth, HTTP/PostgREST, RLS, session
+// revocation, original-human/native authority or production parity is proved.
 const mocks = vi.hoisted(() => ({
   middleware: { name: "requireSupabaseAuth" },
   methods: [] as unknown[],
@@ -58,6 +60,7 @@ const otherCustomer = uuid(3);
 const failure = "Could not load this customer's commercial snapshot. Refresh and try again.";
 const invalid = "Invalid customer commercial snapshot request.";
 const changed = "Account changed. Refresh before loading this customer's commercial history.";
+const token = "fixture.access.token";
 const projections = {
   invoices: "id,customer_id,date,due_date,status,total,created_at",
   quotes: "id,customer_id,quote_number,created_at,expiry_date,status,total_amount",
@@ -133,6 +136,9 @@ function client({
   });
   const native = { from };
   return {
+    auth: {
+      getUser: vi.fn((_token: string): Promise<unknown> => Promise.resolve(authResponse())),
+    },
     schema: vi.fn((_name: string) => native),
     from,
     native,
@@ -144,8 +150,49 @@ function client({
   };
 }
 function context(supabase: ReturnType<typeof client>, userId: unknown = accountId) {
-  return { supabase, userId };
+  return {
+    supabase,
+    userId,
+    claims: { sub: accountId, role: "authenticated", is_anonymous: false },
+  };
 }
+function authResponse() {
+  return {
+    data: { user: { id: accountId, role: "authenticated", is_anonymous: false } },
+    error: null,
+  };
+}
+function currentRequest() {
+  return { signal: controller.signal, headers: new Headers({ authorization: `Bearer ${token}` }) };
+}
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((accept, decline) => {
+    resolve = accept;
+    reject = decline;
+  });
+  return { promise, resolve, reject };
+}
+const callerMutations = {
+  client: (callerContext: ReturnType<typeof context>) => {
+    callerContext.supabase = client();
+  },
+  claims: (callerContext: ReturnType<typeof context>) => {
+    callerContext.claims = { ...callerContext.claims };
+  },
+  subject: (callerContext: ReturnType<typeof context>) => {
+    callerContext.claims.sub = otherCustomer;
+  },
+  role: (callerContext: ReturnType<typeof context>) => {
+    callerContext.claims.role = "service_role";
+  },
+  getUser: (callerContext: ReturnType<typeof context>) => {
+    const original = callerContext.supabase.auth.getUser;
+    callerContext.supabase.auth.getUser = vi.fn((suppliedToken: string) => original(suppliedToken));
+    expect(callerContext.supabase.auth.getUser).not.toBe(original);
+  },
+};
 async function call(input: unknown, callerContext: unknown) {
   return (
     getCustomerCommercialSnapshot as unknown as (args: {
@@ -160,7 +207,11 @@ function assertNoFallback(caller: ReturnType<typeof client>) {
   expect(mocks.browser).not.toHaveBeenCalled();
 }
 function assertCustomerGate(caller: ReturnType<typeof client>) {
+  expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
   expect(caller.schema).toHaveBeenCalledExactlyOnceWith("shop_manager");
+  expect(caller.auth.getUser.mock.invocationCallOrder[0]).toBeLessThan(
+    caller.schema.mock.invocationCallOrder[0],
+  );
   expect(caller.operations.filter((o) => o.table === "customers")).toEqual([
     { table: "customers", method: "select", args: ["id"] },
     { table: "customers", method: "eq", args: ["id", customerId] },
@@ -184,8 +235,9 @@ function assertList(caller: ReturnType<typeof client>, kind: CustomerCommercialK
 beforeEach(() => {
   vi.clearAllMocks();
   controller = new AbortController();
-  mocks.getRequest.mockReturnValue({ signal: controller.signal });
+  mocks.getRequest.mockReturnValue(currentRequest());
 });
+afterEach(() => vi.useRealTimers());
 
 describe("authenticated customer commercial snapshot handler", () => {
   it("registers POST and the existing authentication middleware", () => {
@@ -205,6 +257,7 @@ describe("authenticated customer commercial snapshot handler", () => {
     ]) {
       const caller = client();
       await expect(call(input, context(caller))).rejects.toThrow(invalid);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
       expect(caller.schema).not.toHaveBeenCalled();
       expect(caller.dispatches).toEqual([]);
       assertNoFallback(caller);
@@ -216,6 +269,7 @@ describe("authenticated customer commercial snapshot handler", () => {
       const caller = client();
       const callerContext = actor === undefined ? undefined : context(caller, actor);
       await expect(call(request(), callerContext)).rejects.toThrow(changed);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
       expect(caller.schema).not.toHaveBeenCalled();
       expect(caller.from).not.toHaveBeenCalled();
       assertNoFallback(caller);
@@ -226,6 +280,7 @@ describe("authenticated customer commercial snapshot handler", () => {
     controller.abort(new Error("PRIVATE reason"));
     const caller = client();
     await expect(call(request(), context(caller))).rejects.toThrow(failure);
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
     expect(caller.schema).not.toHaveBeenCalled();
     expect(caller.dispatches).toEqual([]);
     assertNoFallback(caller);
@@ -235,7 +290,7 @@ describe("authenticated customer commercial snapshot handler", () => {
     const firstContext = context(first);
     mocks.getRequest.mockImplementationOnce(() => {
       firstContext.userId = uuid(998);
-      return { signal: controller.signal };
+      return currentRequest();
     });
     await expect(call(request(), firstContext)).rejects.toThrow(failure);
     expect(first.schema).not.toHaveBeenCalled();
@@ -249,6 +304,193 @@ describe("authenticated customer commercial snapshot handler", () => {
     expect(second.from).not.toHaveBeenCalled();
     expect(second.dispatches).toEqual([]);
   });
+  it.each([
+    undefined,
+    null,
+    {},
+    { sub: "not-uuid", role: "authenticated" },
+    { sub: otherCustomer, role: "authenticated" },
+    { sub: accountId, role: "anon" },
+    { sub: accountId, role: "service_role" },
+    { sub: accountId, role: "admin" },
+    { sub: accountId, role: "authenticated", is_anonymous: true },
+  ])(
+    "rejects missing/malformed/mismatched verified claims before request/Auth/native access: %j",
+    async (claims) => {
+      const caller = client();
+      await expect(call(request(), { ...context(caller), claims })).rejects.toThrow(failure);
+      expect(mocks.getRequest).not.toHaveBeenCalled();
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  it.each([
+    null,
+    "",
+    "Basic private",
+    "bearer fixture.access.token",
+    "Bearer  fixture.access.token",
+    "Bearer opaque-token",
+    "Bearer fixture.access.token,second",
+  ])(
+    "rejects malformed Bearer authorization before Auth/native access: %j",
+    async (authorization) => {
+      mocks.getRequest.mockReturnValue({
+        signal: controller.signal,
+        headers: { get: () => authorization },
+      });
+      const caller = client();
+      await expect(call(request(), context(caller))).rejects.toThrow(failure);
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  for (const [name, mutate] of Object.entries(callerMutations)) {
+    it(`rejects captured ${name} replacement inside getRequest before Auth/native access`, async () => {
+      const caller = client();
+      const callerContext = context(caller);
+      const originalGetUser = caller.auth.getUser;
+      mocks.getRequest.mockImplementationOnce(() => {
+        mutate(callerContext);
+        return currentRequest();
+      });
+      await expect(call(request(), callerContext)).rejects.toThrow(failure);
+      expect(originalGetUser).not.toHaveBeenCalled();
+      expect(callerContext.supabase.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(callerContext.supabase.schema).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+      assertNoFallback(callerContext.supabase);
+    });
+    it(`rejects captured ${name} replacement during Auth before native binding`, async () => {
+      const pending = deferred<unknown>();
+      const caller = client();
+      const callerContext = context(caller);
+      const originalGetUser = caller.auth.getUser;
+      originalGetUser.mockReturnValue(pending.promise);
+      const result = call(request("quotes"), callerContext);
+      expect(originalGetUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.schema).not.toHaveBeenCalled();
+      mutate(callerContext);
+      pending.resolve(authResponse());
+      await expect(result).rejects.toThrow(failure);
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(callerContext.supabase.schema).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(callerContext.supabase.from).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+      assertNoFallback(callerContext.supabase);
+    });
+    it(`rechecks captured ${name} immediately after native schema binding`, async () => {
+      const caller = client();
+      const callerContext = context(caller);
+      const originalGetUser = caller.auth.getUser;
+      caller.schema.mockImplementationOnce(() => {
+        mutate(callerContext);
+        return caller.native;
+      });
+      await expect(call(request(), callerContext)).rejects.toThrow(failure);
+      expect(originalGetUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(callerContext.supabase.from).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+      assertNoFallback(callerContext.supabase);
+    });
+  }
+  it.each([
+    undefined,
+    null,
+    {},
+    { data: null, error: null },
+    { data: { user: null }, error: null },
+    { data: { user: { id: "not-uuid" } }, error: null },
+    { data: { user: { id: otherCustomer } }, error: null },
+    { data: { user: { id: accountId, is_anonymous: true } }, error: null },
+    { data: { user: { id: accountId, role: "service_role" } }, error: null },
+    { data: { user: { id: accountId } }, error: { message: `PRIVATE ${token}` } },
+  ])(
+    "rejects unavailable/error/anonymous/mismatched current Auth users with no native dispatch: %j",
+    async (response) => {
+      const caller = client();
+      caller.auth.getUser.mockResolvedValue(response);
+      await expect(call(request(), context(caller))).rejects.toThrow(failure);
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.from).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  it.each(["throw", "reject"] as const)(
+    "masks an Auth %s without a private cause/token, retry or fallback",
+    async (mode) => {
+      const caller = client();
+      caller.auth.getUser.mockImplementation(() => {
+        if (mode === "throw") throw new Error(`PRIVATE Auth ${token}`);
+        return Promise.reject(new Error(`PRIVATE Auth ${token}`));
+      });
+      const error = await call(request(), context(caller)).catch((value: unknown) => value);
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toBe(failure);
+      expect(Object.prototype.hasOwnProperty.call(error, "cause")).toBe(false);
+      expect(String(error)).not.toContain(token);
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  it("rejects a request-header change during Auth without native dispatch", async () => {
+    const pending = deferred<unknown>();
+    const liveRequest = currentRequest();
+    mocks.getRequest.mockReturnValue(liveRequest);
+    const caller = client();
+    caller.auth.getUser.mockReturnValue(pending.promise);
+    const result = call(request(), context(caller));
+    liveRequest.headers.set("authorization", "Bearer another.access.token");
+    pending.resolve(authResponse());
+    await expect(result).rejects.toThrow(failure);
+    expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.dispatches).toEqual([]);
+    assertNoFallback(caller);
+  });
+  for (const stop of ["abort", "timeout"] as const) {
+    it(`${stop}: bounds the Auth wait and ignores both late settlements with no native dispatch`, async () => {
+      vi.useFakeTimers();
+      for (const late of ["resolve", "reject"] as const) {
+        controller = new AbortController();
+        mocks.getRequest.mockReturnValue(currentRequest());
+        const pending = deferred<unknown>();
+        const caller = client();
+        caller.auth.getUser.mockReturnValue(pending.promise);
+        const removeListener = vi.spyOn(controller.signal, "removeEventListener");
+        const result = call(request(), context(caller));
+        const assertion = expect(result).rejects.toThrow(failure);
+        if (stop === "abort") controller.abort(new Error(`PRIVATE ${token}`));
+        else await vi.advanceTimersByTimeAsync(NATIVE_CALLER_AUTH_WAIT_MS);
+        await assertion;
+        if (late === "resolve") pending.resolve(authResponse());
+        else pending.reject(new Error(`PRIVATE late Auth ${token}`));
+        await Promise.resolve();
+        expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+        expect(caller.schema).not.toHaveBeenCalled();
+        expect(caller.from).not.toHaveBeenCalled();
+        expect(caller.dispatches).toEqual([]);
+        expect(removeListener).toHaveBeenCalledExactlyOnceWith("abort", expect.any(Function));
+        expect(vi.getTimerCount()).toBe(0);
+        assertNoFallback(caller);
+      }
+    });
+  }
 
   for (const kind of ["invoices", "quotes"] as const) {
     const row = () => (kind === "invoices" ? invoice() : quote());
@@ -265,6 +507,88 @@ describe("authenticated customer commercial snapshot handler", () => {
       assertList(caller, kind);
       expect(caller.from.mock.calls).toEqual([["customers"], [kind]]);
     });
+    it(`${kind}: waits for exactly one explicit-token current-user lookup before any native binding`, async () => {
+      const pending = deferred<unknown>();
+      const caller = client({ list: { data: [row()], error: null } });
+      caller.auth.getUser.mockImplementation(function (this: unknown, suppliedToken: string) {
+        expect(this).toBe(caller.auth);
+        expect(suppliedToken).toBe(token);
+        return pending.promise;
+      });
+      const result = call(request(kind), context(caller));
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      pending.resolve(authResponse());
+      await expect(result).resolves.toEqual({
+        kind,
+        available: true,
+        rows: [row()],
+        hasMore: false,
+      });
+      assertList(caller, kind);
+    });
+    it(`${kind}: tolerates absent anonymous metadata without claiming original-human authority`, async () => {
+      const caller = client({ list: { data: [row()], error: null } });
+      caller.auth.getUser.mockResolvedValue({ data: { user: { id: accountId } }, error: null });
+      await expect(
+        call(request(kind), {
+          ...context(caller),
+          claims: { sub: accountId, role: "authenticated" },
+        }),
+      ).resolves.toEqual({ kind, available: true, rows: [row()], hasMore: false });
+      assertList(caller, kind);
+    });
+    for (const [name, mutate] of Object.entries(callerMutations)) {
+      for (const stage of ["primary", "list"] as const) {
+        it(`${kind}: rejects captured ${name} loss during pending ${stage} before any next dispatch/private return`, async () => {
+          const pending = deferred<Result>();
+          const caller = client({
+            primary:
+              stage === "primary" ? pending.promise : { data: { id: customerId }, error: null },
+            list: stage === "list" ? pending.promise : { data: [row()], error: null },
+          });
+          const callerContext = context(caller);
+          const originalGetUser = caller.auth.getUser;
+          const result = call(request(kind), callerContext);
+          const expectedDispatches = stage === "primary" ? ["customers"] : ["customers", kind];
+          await vi.waitFor(() => expect(caller.dispatches).toEqual(expectedDispatches));
+          mutate(callerContext);
+          pending.resolve({
+            data: stage === "primary" ? { id: customerId } : [row()],
+            error: null,
+          });
+          await expect(result).rejects.toThrow(failure);
+          expect(caller.dispatches).toEqual(expectedDispatches);
+          expect(originalGetUser).toHaveBeenCalledExactlyOnceWith(token);
+          if (callerContext.supabase !== caller) {
+            expect(callerContext.supabase.schema).not.toHaveBeenCalled();
+            expect(callerContext.supabase.from).not.toHaveBeenCalled();
+          }
+          assertNoFallback(caller);
+          assertNoFallback(callerContext.supabase);
+        });
+        it(`${kind}: rejects captured ${name} loss immediately before ${stage} lazy dispatch`, async () => {
+          const caller = client({
+            onOperation: (table, method) => {
+              if (
+                (stage === "primary" && table === "customers" && method === "maybeSingle") ||
+                (stage === "list" && table === kind && method === "abortSignal")
+              ) {
+                mutate(callerContext);
+              }
+            },
+          });
+          const callerContext = context(caller);
+          const originalGetUser = caller.auth.getUser;
+          await expect(call(request(kind), callerContext)).rejects.toThrow(failure);
+          expect(caller.dispatches).toEqual(stage === "primary" ? [] : ["customers"]);
+          expect(originalGetUser).toHaveBeenCalledExactlyOnceWith(token);
+          assertNoFallback(caller);
+          assertNoFallback(callerContext.supabase);
+        });
+      }
+    }
     it(`${kind}: distinguishes visible-empty from unavailable without a child dispatch`, async () => {
       const visible = client();
       await expect(call(request(kind), context(visible))).resolves.toEqual({
@@ -434,7 +758,7 @@ describe("authenticated customer commercial snapshot handler", () => {
       await expect(call(request(kind), context(stopped))).rejects.toThrow(failure);
       assertList(stopped, kind);
       controller = new AbortController();
-      mocks.getRequest.mockReturnValue({ signal: controller.signal });
+      mocks.getRequest.mockReturnValue(currentRequest());
       const changedCaller = client({
         list: { data: [row()], error: null },
         onList: () => {

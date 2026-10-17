@@ -24,10 +24,13 @@ function sqlArray(sql: string, name: string): string[] {
 }
 
 function walk(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const full = join(dir, name);
-    if (statSync(full).isDirectory()) return walk(full);
-    return /\.(ts|tsx)$/.test(name) ? [full] : [];
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = join(dir, entry.name);
+    // Avoid a separate filesystem stat for every entry. Follow symlinked
+    // directories exactly as before so this does not narrow source coverage.
+    if (entry.isDirectory() || (entry.isSymbolicLink() && statSync(full).isDirectory()))
+      return walk(full);
+    return /\.(ts|tsx)$/.test(entry.name) ? [full] : [];
   });
 }
 

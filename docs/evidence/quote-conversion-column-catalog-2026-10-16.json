@@ -1,0 +1,65 @@
+{
+  "formatVersion": 1,
+  "mode": "read-only-selected-system-catalog",
+  "project": "wjxaajgvddtrxxtocxen",
+  "observedOnAsiaManila": "2026-10-16",
+  "repositoryHeadAtObservation": "86c10c1d2777031be0786acc97e57dbbee049688",
+  "checkoutHadUncommittedImplementation": true,
+  "scope": "Only selected column names/types/nullability on two native work-order child tables. No business/Auth rows, stored-function bodies, private objects or server files; no SQL write or schema change.",
+  "query": "SELECT a.attrelid::regclass::text AS table_name, a.attname AS column_name, pg_catalog.format_type(a.atttypid, a.atttypmod) AS data_type, a.attnotnull AS not_null FROM pg_catalog.pg_attribute AS a WHERE a.attrelid IN ('shop_manager.work_order_job_lines'::regclass, 'shop_manager.work_order_parts'::regclass) AND a.attnum > 0 AND NOT a.attisdropped AND a.attname IN ('name','part_name','hours','estimated_hours','labor_rate','total','total_amount','price','customer_price','quantity','part_type') ORDER BY table_name, column_name LIMIT 25;",
+  "rows": [
+    {
+      "table_name": "shop_manager.work_order_job_lines",
+      "column_name": "estimated_hours",
+      "data_type": "numeric",
+      "not_null": false
+    },
+    {
+      "table_name": "shop_manager.work_order_job_lines",
+      "column_name": "labor_rate",
+      "data_type": "numeric",
+      "not_null": false
+    },
+    {
+      "table_name": "shop_manager.work_order_job_lines",
+      "column_name": "name",
+      "data_type": "text",
+      "not_null": true
+    },
+    {
+      "table_name": "shop_manager.work_order_job_lines",
+      "column_name": "total_amount",
+      "data_type": "numeric",
+      "not_null": false
+    },
+    {
+      "table_name": "shop_manager.work_order_parts",
+      "column_name": "customer_price",
+      "data_type": "numeric(10,2)",
+      "not_null": true
+    },
+    {
+      "table_name": "shop_manager.work_order_parts",
+      "column_name": "part_name",
+      "data_type": "text",
+      "not_null": true
+    },
+    {
+      "table_name": "shop_manager.work_order_parts",
+      "column_name": "part_type",
+      "data_type": "text",
+      "not_null": true
+    },
+    {
+      "table_name": "shop_manager.work_order_parts",
+      "column_name": "quantity",
+      "data_type": "integer",
+      "not_null": true
+    }
+  ],
+  "finding": "Current quote conversion sends job-line hours/total rather than estimated_hours/total_amount and part name/price/total rather than part_name/customer_price, omitting required part_type. Requested names absent from the returned rows were not columns in these observed tables; this is not a full column inventory. No conversion was executed.",
+  "limits": [
+    "Column metadata and source mismatch only; no full schema/default/trigger/ACL/API/RLS/transaction behavior established.",
+    "Actual quote detail/create/conversion and authorized atomic money/stock/recovery remain unfinished; no production repair, baseline/replay or release approval."
+  ]
+}

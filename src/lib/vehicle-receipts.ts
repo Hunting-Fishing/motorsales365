@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const RECEIPT_DISCARD_UNAVAILABLE =
+  "Draft removal is temporarily unavailable until recovery is verified. Keep this draft and its original file.";
+
 export const PART_CATEGORIES = {
   suspension: "Suspension",
   brakes: "Brakes",
@@ -39,6 +42,34 @@ export const receiptLineSchema = z.object({
   reviewed: z.boolean().default(false),
 });
 export type ReceiptLine = z.infer<typeof receiptLineSchema>;
+const receiptEntryFields = {
+  vendor: z.string().trim().max(200).nullable(),
+  purchasedOn: receiptDate.nullable(),
+  currency: z.string().regex(/^[A-Z]{3}$/),
+  total: z.number().nonnegative().max(99999999).nullable(),
+  items: z.array(receiptLineSchema).min(1).max(100),
+  confirm: z.boolean(),
+};
+function reviewReceiptEntry(
+  entry: { confirm: boolean; purchasedOn: string | null; items: ReceiptLine[] },
+  ctx: z.RefinementCtx,
+) {
+  if (
+    entry.confirm &&
+    (!entry.purchasedOn ||
+      entry.items.some((item) => !item.reviewed || !item.category || item.quantity === null))
+  )
+    ctx.addIssue({
+      code: "custom",
+      message: "Set the purchase date and review the name, category and quantity of every item.",
+    });
+}
+// The editor validates before creating a draft; the server retains the same
+// field bounds/transforms/review predicate and additionally requires its ID.
+export const receiptEntrySchema = z.object(receiptEntryFields).superRefine(reviewReceiptEntry);
+export const receiptSaveSchema = z
+  .object({ id: z.string().uuid(), ...receiptEntryFields })
+  .superRefine(reviewReceiptEntry);
 export const receiptExtractionSchema = z.object({
   vendor: z.string().trim().max(200).nullable(),
   purchased_on: receiptDate.nullable(),

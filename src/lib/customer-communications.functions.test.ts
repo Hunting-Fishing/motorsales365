@@ -1,9 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getCustomerCommunicationsSnapshot } from "./customer-communications.functions";
 import type { CustomerCommunication } from "./customer-communications";
+import { NATIVE_CALLER_AUTH_WAIT_MS } from "./native-request-caller.server";
 
-// Handler/builder contracts with synthetic payloads only. The real middleware,
-// JWT, HTTP, PostgREST, RLS, catalog, business rows and DB cancellation are not tested.
+// Actual handler/caller guard with synthetic Auth/builder payloads only. Real
+// middleware/JWT, live Auth/HTTP/PostgREST/RLS, session revocation, native-shop
+// authority, original-human identity and database cancellation are not tested.
 const mocks = vi.hoisted(() => ({
   middleware: { name: "requireSupabaseAuth" },
   methods: [] as unknown[],
@@ -54,6 +56,7 @@ const otherCustomer = uuid(3);
 const failure = "Could not load this customer's communications snapshot. Refresh and try again.";
 const invalid = "Invalid customer communications snapshot request.";
 const changed = "Account changed. Refresh before loading this customer's communications.";
+const token = "fixture.access.token";
 const projection = "id,customer_id,type,direction,subject,content,date,staff_member_name,status";
 const row = (n = 10): CustomerCommunication => ({
   id: uuid(n),
@@ -116,6 +119,15 @@ function client({
   });
   const native = { from };
   return {
+    auth: {
+      getUser: vi.fn(
+        (_token: string): Promise<unknown> =>
+          Promise.resolve({
+            data: { user: { id: accountId, role: "authenticated", is_anonymous: false } },
+            error: null,
+          }),
+      ),
+    },
     schema: vi.fn((_name: string) => native),
     from,
     native,
@@ -127,7 +139,23 @@ function client({
   };
 }
 function context(supabase: ReturnType<typeof client>, userId: unknown = accountId) {
-  return { supabase, userId };
+  return {
+    supabase,
+    userId,
+    claims: { sub: accountId, role: "authenticated", is_anonymous: false },
+  };
+}
+function currentRequest() {
+  return { signal: controller.signal, headers: new Headers({ authorization: `Bearer ${token}` }) };
+}
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((accept, decline) => {
+    resolve = accept;
+    reject = decline;
+  });
+  return { promise, resolve, reject };
 }
 async function call(input: unknown, callerContext: unknown) {
   return (
@@ -143,6 +171,7 @@ function assertNoFallback(caller: ReturnType<typeof client>) {
   expect(mocks.browser).not.toHaveBeenCalled();
 }
 function assertCustomerGate(caller: ReturnType<typeof client>) {
+  expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
   expect(caller.schema).toHaveBeenCalledExactlyOnceWith("shop_manager");
   expect(caller.operations.filter((o) => o.table === "customers")).toEqual([
     { table: "customers", method: "select", args: ["id"] },
@@ -172,8 +201,9 @@ function assertList(caller: ReturnType<typeof client>) {
 beforeEach(() => {
   vi.clearAllMocks();
   controller = new AbortController();
-  mocks.getRequest.mockReturnValue({ signal: controller.signal });
+  mocks.getRequest.mockReturnValue(currentRequest());
 });
+afterEach(() => vi.useRealTimers());
 
 describe("authenticated customer communications snapshot handler", () => {
   it("registers POST and the existing authentication middleware", () => {
@@ -241,11 +271,291 @@ describe("authenticated customer communications snapshot handler", () => {
     }
     expect(mocks.getRequest).not.toHaveBeenCalled();
   });
+  it("waits for exactly one explicit-token current-user lookup before any native binding", async () => {
+    const pending = deferred<unknown>();
+    const caller = client({ list: { data: [row()], error: null } });
+    caller.auth.getUser.mockReturnValue(pending.promise);
+    const result = call(request(), context(caller));
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.dispatches).toEqual([]);
+    pending.resolve({ data: { user: { id: accountId } }, error: null });
+    await expect(result).resolves.toEqual({ available: true, rows: [row()], hasMore: false });
+    assertList(caller);
+  });
+  it.each([
+    undefined,
+    null,
+    {},
+    { sub: "not-uuid", role: "authenticated" },
+    { sub: otherCustomer, role: "authenticated" },
+    { sub: accountId, role: "service_role" },
+    { sub: accountId, role: "anon" },
+    { sub: accountId, role: "authenticated", is_anonymous: true },
+    { sub: accountId, role: "authenticated", is_anonymous: "false" },
+  ])(
+    "rejects unsupported verified claims before request/Auth/native access: %j",
+    async (claims) => {
+      const caller = client();
+      await expect(call(request(), { ...context(caller), claims })).rejects.toThrow(failure);
+      expect(mocks.getRequest).not.toHaveBeenCalled();
+      expect(caller.auth.getUser).not.toHaveBeenCalled();
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  it.each([
+    null,
+    "",
+    "Basic PRIVATE",
+    "Bearer opaque",
+    "Bearer fixture.access.token,second",
+    "bearer fixture.access.token",
+    "Bearer fixture.access.token PRIVATE",
+  ])("rejects malformed Bearer input before Auth/native access: %j", async (authorization) => {
+    mocks.getRequest.mockReturnValue({
+      signal: controller.signal,
+      headers: { get: () => authorization },
+    });
+    const caller = client();
+    await expect(call(request(), context(caller))).rejects.toThrow(failure);
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
+    expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.dispatches).toEqual([]);
+    assertNoFallback(caller);
+  });
+  it.each([
+    undefined,
+    null,
+    {},
+    { data: null, error: null },
+    { data: { user: null }, error: null },
+    { data: { user: { id: "not-uuid" } }, error: null },
+    { data: { user: { id: otherCustomer } }, error: null },
+    { data: { user: { id: accountId, is_anonymous: true } }, error: null },
+    { data: { user: { id: accountId, is_anonymous: "false" } }, error: null },
+    { data: { user: { id: accountId, role: "anon" } }, error: null },
+    { data: { user: { id: accountId, role: "service_role" } }, error: null },
+    { data: { user: { id: accountId } }, error: { message: `PRIVATE ${token}` } },
+  ])(
+    "rejects an unconfirmed current Auth response without native dispatch: %j",
+    async (response) => {
+      const caller = client();
+      caller.auth.getUser.mockResolvedValue(response);
+      await expect(call(request(), context(caller))).rejects.toThrow(failure);
+      expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+      expect(caller.schema).not.toHaveBeenCalled();
+      expect(caller.dispatches).toEqual([]);
+      assertNoFallback(caller);
+    },
+  );
+  it("masks rejected Auth errors without a private token, cause or alternate reader", async () => {
+    const caller = client();
+    caller.auth.getUser.mockRejectedValue(new Error(`PRIVATE Auth transport ${token}`));
+    const error = await call(request(), context(caller)).catch((value: unknown) => value);
+    expect(error).toBeInstanceOf(Error);
+    expect((error as Error).message).toBe(failure);
+    expect(Object.prototype.hasOwnProperty.call(error, "cause")).toBe(false);
+    expect(String(error)).not.toContain(token);
+    expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+    expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.dispatches).toEqual([]);
+    assertNoFallback(caller);
+  });
+
+  for (const field of [
+    "claims",
+    "client",
+    "authObject",
+    "authMethod",
+    "subject",
+    "role",
+    "anonymous",
+  ] as const) {
+    it.each([
+      "request",
+      "schema",
+      "primary-build",
+      "primary-await",
+      "list-build",
+      "list-await",
+    ] as const)(
+      `rejects captured ${field} loss at %s before downstream dispatch or return`,
+      async (stage) => {
+        const replacement = client();
+        const caller = client({
+          list: { data: [row()], error: null },
+          onPrimary: () => {
+            if (stage === "primary-await") changeBoundary();
+          },
+          onList: () => {
+            if (stage === "list-await") changeBoundary();
+          },
+          onOperation: (table, method) => {
+            if (stage === "primary-build" && table === "customers" && method === "maybeSingle")
+              changeBoundary();
+            if (
+              stage === "list-build" &&
+              table === "customer_communications" &&
+              method === "abortSignal"
+            )
+              changeBoundary();
+          },
+        });
+        const callerContext = context(caller);
+        const originalGetUser = caller.auth.getUser;
+        function changeBoundary() {
+          if (field === "claims") callerContext.claims = { ...callerContext.claims };
+          if (field === "client") callerContext.supabase = replacement;
+          if (field === "authObject") caller.auth = { ...caller.auth };
+          if (field === "authMethod") {
+            caller.auth.getUser = vi.fn((suppliedToken: string) => originalGetUser(suppliedToken));
+            expect(caller.auth.getUser).not.toBe(originalGetUser);
+          }
+          if (field === "subject") callerContext.claims.sub = otherCustomer;
+          if (field === "role") callerContext.claims.role = "service_role";
+          if (field === "anonymous") callerContext.claims.is_anonymous = true;
+        }
+        if (stage === "request") {
+          mocks.getRequest.mockImplementationOnce(() => {
+            changeBoundary();
+            return currentRequest();
+          });
+        }
+        if (stage === "schema") {
+          caller.schema.mockImplementationOnce(() => {
+            changeBoundary();
+            return caller.native;
+          });
+        }
+        await expect(call(request(), callerContext)).rejects.toThrow(failure);
+        expect(originalGetUser).toHaveBeenCalledTimes(stage === "request" ? 0 : 1);
+        if (stage !== "request") expect(originalGetUser).toHaveBeenCalledWith(token);
+        expect(caller.dispatches).toEqual(
+          stage === "list-await"
+            ? ["customers", "customer_communications"]
+            : stage === "primary-await" || stage === "list-build"
+              ? ["customers"]
+              : [],
+        );
+        if (stage === "request") expect(caller.schema).not.toHaveBeenCalled();
+        if (stage === "request" || stage === "schema") expect(caller.from).not.toHaveBeenCalled();
+        if (stage === "primary-await")
+          expect(caller.from).toHaveBeenCalledExactlyOnceWith("customers");
+        expect(replacement.auth.getUser).not.toHaveBeenCalled();
+        expect(replacement.schema).not.toHaveBeenCalled();
+        expect(replacement.dispatches).toEqual([]);
+        assertNoFallback(caller);
+        assertNoFallback(replacement);
+      },
+    );
+  }
+
+  it.each([
+    "actor",
+    "subject",
+    "role",
+    "anonymous",
+    "claims",
+    "client",
+    "authObject",
+    "authMethod",
+    "authorization",
+    "headers",
+    "headerMethod",
+    "signal",
+  ] as const)("does not bind native schema after %s changes during Auth wait", async (field) => {
+    const pending = deferred<unknown>();
+    const caller = client();
+    const replacement = client();
+    const callerContext = context(caller);
+    const liveRequest = currentRequest();
+    mocks.getRequest.mockReturnValue(liveRequest);
+    caller.auth.getUser.mockReturnValue(pending.promise);
+    const originalGetUser = caller.auth.getUser;
+    const result = call(request(), callerContext);
+    expect(originalGetUser).toHaveBeenCalledExactlyOnceWith(token);
+    if (field === "actor") callerContext.userId = otherCustomer;
+    if (field === "subject") callerContext.claims.sub = otherCustomer;
+    if (field === "role") callerContext.claims.role = "service_role";
+    if (field === "anonymous") callerContext.claims.is_anonymous = true;
+    if (field === "claims") callerContext.claims = { ...callerContext.claims };
+    if (field === "client") callerContext.supabase = replacement;
+    if (field === "authObject") caller.auth = { ...caller.auth };
+    if (field === "authMethod") {
+      caller.auth.getUser = vi.fn((suppliedToken: string) => originalGetUser(suppliedToken));
+      expect(caller.auth.getUser).not.toBe(originalGetUser);
+    }
+    if (field === "authorization")
+      liveRequest.headers.set("authorization", "Bearer another.access.token");
+    if (field === "headers") liveRequest.headers = new Headers(liveRequest.headers);
+    if (field === "headerMethod") {
+      const originalGet = liveRequest.headers.get;
+      liveRequest.headers.get = vi.fn((name: string) =>
+        originalGet.call(liveRequest.headers, name),
+      );
+    }
+    if (field === "signal") liveRequest.signal = new AbortController().signal;
+    pending.resolve({ data: { user: { id: accountId } }, error: null });
+    await expect(result).rejects.toThrow(failure);
+    expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.dispatches).toEqual([]);
+    expect(replacement.auth.getUser).not.toHaveBeenCalled();
+    expect(replacement.schema).not.toHaveBeenCalled();
+    expect(replacement.dispatches).toEqual([]);
+    assertNoFallback(caller);
+    assertNoFallback(replacement);
+  });
+
+  for (const stop of ["abort", "timeout"] as const) {
+    it.each(["resolve", "reject"] as const)(
+      `${stop} bounds Auth wait and ignores late %s without native reads`,
+      async (settlement) => {
+        vi.useFakeTimers();
+        const pending = deferred<unknown>();
+        const caller = client();
+        const removeAbortListener = vi.spyOn(controller.signal, "removeEventListener");
+        caller.auth.getUser.mockReturnValue(pending.promise);
+        const result = call(request(), context(caller));
+        const assertion = expect(result).rejects.toThrow(failure);
+        if (stop === "abort") controller.abort(new Error("PRIVATE cancellation reason"));
+        else {
+          let settled = false;
+          void result.then(
+            () => {
+              settled = true;
+            },
+            () => {
+              settled = true;
+            },
+          );
+          await vi.advanceTimersByTimeAsync(9_999);
+          expect(settled).toBe(false);
+          expect(NATIVE_CALLER_AUTH_WAIT_MS).toBe(10_000);
+          await vi.advanceTimersByTimeAsync(1);
+        }
+        await assertion;
+        if (settlement === "resolve")
+          pending.resolve({ data: { user: { id: accountId } }, error: null });
+        else pending.reject(new Error(`PRIVATE late Auth ${token}`));
+        await Promise.resolve();
+        expect(caller.auth.getUser).toHaveBeenCalledExactlyOnceWith(token);
+        expect(caller.schema).not.toHaveBeenCalled();
+        expect(caller.dispatches).toEqual([]);
+        expect(vi.getTimerCount()).toBe(0);
+        expect(removeAbortListener).toHaveBeenCalledWith("abort", expect.any(Function));
+        removeAbortListener.mockRestore();
+        assertNoFallback(caller);
+      },
+    );
+  }
   it("rejects a pre-aborted request before schema dispatch without exposing its reason", async () => {
     controller.abort(new Error("PRIVATE cancellation reason"));
     const caller = client();
     await expect(call(request(), context(caller))).rejects.toThrow(failure);
     expect(caller.schema).not.toHaveBeenCalled();
+    expect(caller.auth.getUser).not.toHaveBeenCalled();
     expect(caller.dispatches).toEqual([]);
     assertNoFallback(caller);
   });
@@ -289,7 +599,7 @@ describe("authenticated customer communications snapshot handler", () => {
         if (stage === "request") {
           mocks.getRequest.mockImplementationOnce(() => {
             changeBoundary();
-            return { signal: controller.signal };
+            return currentRequest();
           });
         }
         if (stage === "schema") {

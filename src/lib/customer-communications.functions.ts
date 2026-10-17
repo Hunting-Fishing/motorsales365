@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { captureNativeRequestCaller } from "./native-request-caller.server";
 import {
   customerCommunicationsInput,
   customerCommunicationsProjection,
@@ -44,10 +45,13 @@ export const getCustomerCommunicationsSnapshot = createServerFn({ method: "POST"
     // key. Check the validated middleware actor before handler request/schema access.
     assertActor();
     try {
-      const signal = getRequest().signal;
+      const caller = captureNativeRequestCaller(context, data.expectedAccountId);
+      const request = getRequest();
+      const signal = request.signal;
+      const assertCaller = await caller.verify(request);
       function assertReady() {
         assertActor();
-        if (signal.aborted) throw new Error(failure);
+        assertCaller();
       }
       assertReady();
       // Generated types cover public only. Use a narrow adapter over the same

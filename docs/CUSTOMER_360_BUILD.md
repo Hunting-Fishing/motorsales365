@@ -1,5 +1,451 @@
 # Native Customer 360: first delivery slice
 
+## Current delivery authority (17 October 2026)
+
+Private public-stock adjustment now pairs quantity and movement in one statement:
+FIRST12/12 isolated18.6174385s/separate CI guard3/3 in5671.3378ms, no failed SQL
+trial or alternative, lint0/syntax/reviews. Same PR68/subject
+`Prepare private atomic manual stock adjustment`.
+[Exact evidence](evidence/MANUAL_STOCK_ADJUSTMENT_CANDIDATE.md). No CRM app/RPC/grant
+activation. Counter-MAX is a conservative private rule, not approved production
+semantics. Native/public domains remain separate; actual timestamp body parity,
+new native wait/CAS/COMMIT/rollback/all-writer/native authority/durable recovery/
+API/device/owner acceptance remain open. Old native21+8 does not run new SQL.
+
+Owner-authorized scanner repair passes first resumed16/16 in1.5891188s; ONE actual
+sole365 read-only catalog captures29tables501columns193constraints83indexes49policies/
+288triggers57functions, bounded complete/no truncation/failures. Missing throttle
+name/all5flagsFALSE/actual JSON856330B/638be776… and six selected body matches are
+pinned, NOT fullCRM authority/schema/parity. New artifact-validator limits-label
+bug receives ONE correction, final8/8 in385.9347ms; no recapture/query change.
+[Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md). Published01406/same
+draft PR68/comment6228023389 now passes all six own38991316306 Actions; actual
+unit5,036/96 files101.47s0unexpected/quarantined (clipped/final summaries), no
+separate early Linux24 transcript. Native21+8/build/current2,618-object artifact/
+Preview configuration skip already verified, no deployment. Two stock domains/
+broad grants/all-writer/native
+authority/durable recovery/API/device/owner/main/live gates remain open.
+
+Independent source frontier now pins22 files/exact spans and10 public/native
+stock families; final source+CI guard9/9 in217.8239ms, lint0/reviews pass and all
+seven acceptance flags FALSE. Native inventory adjustment/counter/PO/invoice are
+separate from the public14-table selected proof, not fully functioning CRM.
+Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). Historical catalog action STOPPED
+after initial21/22 plus ONE test-only correction again21/22 fails SELECT syntax;
+no hosted query. Owner notified once/async direction asked; local unadmitted
+catalog files awaited changed conditions; owner-authorized01406 publication above
+supersedes that STOP/local-only state. No unchanged retry. Strict authority/
+compatible all-writer/durable recovery/API/device/owner gates precede UI/adoption.
+Parent53c all six38986941600 Actions now pass, actual5,036/96 files70.13s zero
+unexpected/quarantined failures (truncated/final summaries); prior native8/build/
+artifact/Preview skip retained, not repeated/inherited. No app/grant/live/main
+change or fullCRM/marketplace/consumer completion;22 October still at risk.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904/same draft PR68/comment6227396249 now passes actual native
+PG17.11 selected stock8/retained21/Parts247/quote6/terminals/cleanup (untruncated),
+first trial, not fake transport. Own five Actions pass; unit117260493854 running.
+Current build/artifact2,609 objects0missing/Preview skip verified, not deployment.
+Native synthetic-owner mechanics do not establish CRM/native authority or
+current catalog/all-writer/TTL/durable recovery/API/device/owner acceptance.
+Next current unit then those gates before grant/app/UI connection; no fullCRM/
+consumer/main/live claim. Read-back notes join next integrated implementation.
+
+### Closed runner preparation (actual native result above)
+
+Fresh private native mixed-stock runner preparation passes root35/35 offline
+2.5179738s/CI wiring2/2 in74.8001ms, lint0/format/diff/reviews. Four new files
+preserve75 stock setup actions and authored actual three-session waits/both
+commit/rollback orders/visibility/real injected late-FK/full selected graph;
+**first Linux native trial pending**, no local native process. Source-only
+synthetic owner/Auth support is not CRM authority. Same PR68/commit subject
+`Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). Parenta69d all six
+Actions now complete, actual5,036/96 files103.31s zero unexpected/quarantined
+failures (truncated/final summaries); native21 is not stock. Next own-head actual
+native8/cleanup and full gates, then catalog/all-writer/native authority/durable
+recovery/API/device/owner/UI connection. No fullCRM/consumer/main/live acceptance.
+
+### Closed native-source composition checkpoint
+
+Current stock prerequisite now composes the exact retained B2B writer with the
+private inquiry correction and fixed native-source exports. Root parity6/6 in
+2.1367703s plus sequential actual-writer13/13 in10.8898883s pass;49 spans/14
+tables/75 setup actions/30FK preserve the66-action original prefix. Ordinary/
+service execution remains withheld; owner/Auth support is synthetic. Actual
+acceptance/cancel/inverse inquiry availability/late-FK/outer rollback are not
+native concurrent-session or CRM authority acceptance. Wiring2/2 in75.6675ms/
+ESLint0/reviews pass, same PR68, own-head CI separate.
+[Exact evidence](evidence/MIXED_STOCK_NATIVE_SOURCE.md). Next fresh private
+Docker-free PG17 actual-writer sessions/wait/commit/rollback/recheck; no native
+stock process or UI connection yet. All-writer/catalog/native authority/TTL/
+durable outcomes/recovery/device/owner/live and all18+N1–N3 remain open.
+
+### Closed mixed-stock candidate checkpoint
+
+Current independent atomic-stock prerequisite counts both inquiry/B2B holds in
+one private/unapplied INVOKER candidate. Root isolated SQL16/16 in14.6660125s
+reproduces legacy10+8+5=13 and candidate reject5/permit2, with actual selected
+NUMERIC/FK/trigger/denial/rollback controls. Owner/GUC/Auth support is synthetic,
+not CRM/native authority. Mandatory CI/wiring2/2 in93.3995ms and ESLint0 pass;
+source4050ec27 is published in same PR68/comment6226237118. All six own38978627414
+Actions now pass, actual5,036/96 files64.75s zero unexpected/quarantined failures
+(truncated/final summaries). Early memory16 log clipped; retained actual native21
+does not run stock SQL. Current artifact2,599 objects0missing/Preview skip
+verified, not deployment or full recovery. Native-source parity/actual retained
+B2B composition now passes above; independent-session acceptance remains next.
+[Exact selected scope](evidence/MIXED_STOCK_RESERVATION_CANDIDATE.md). No app/
+grants/migration/stock/payment activation. Native independent-session mixed-writer
+proof, all-writer/current catalog/native authority/TTL/durable recovery remain
+before connection; no fullCRM/global no-oversell/consumer ordering completion.
+
+Current Add Part source complements the published Add job line correction:
+twelve fields now have explicit visible-label associations, including Type's
+native combobox trigger. Root18/18 detail DOM tests in30.97s, full normal
+TypeScript, lint0 errors/15 unchanged warnings and independent review pass;
+all prior16 tests and state/pricing/stock/payload/guards/lifetimes retained.
+Same PR68/commit subject `Associate part editor controls with accessible labels`,
+own-head CI separate. Parent7de40ba2 all six38971996346 Actions pass, actual
+5,034/96 files103.93s with zero unexpected/quarantined failures (truncated/final
+summaries). [Exact scope](evidence/SHOP_MANAGER_PART_LABELS.md). This is not real-
+role/browser/device/full-CRM acceptance. Next isolated stock source work closes
+the inquiry-only sum's omission of B2B holds, without activating a writer or
+claiming global no-oversell. Native authority/all-writer/catalog/durable recovery,
+all18+N1–N3/47/12/5/2, stopped actions and22 October risk remain under the board.
+
+### Closed source checkpoints
+
+Independent Add job line accessibility source now binds six visible labels and
+controls using stable IDs; root154/154 three suites41.68s and independent review
+pass, all prior business/privacy/lifetime logic preserved. Normal full TypeScript,
+format/diff and lint0 errors/15 retained warnings pass. Same PR68/commit subject
+`Associate native job-line fields with accessible labels`, own-head CI separate.
+This is not real-role/device/financial or full
+CRM acceptance. Parent0ee7a226 all six Actions pass; actual unit5,032/96 files
+102.10s (truncated/final summaries), zero unexpected/quarantined failures.
+`evidence/SHOP_MANAGER_JOB_LINE_LABELS.md`; current board remains authority,
+Auth source enumeration/QA/hosting stops and22 October risk remain unchanged.
+
+Parent19fd2a7e Auth catalog prerequisite now passes all six Actions; actual unit
+5,008/95 files101.25s (truncated/final summaries), zero unexpected/quarantined
+failures. Independent N3 proposed365 request/offer codec passes24/24/full normal
+TypeScript/CI wiring/review and is unwired, not CRM authority or live ordering/
+dispatch. `evidence/BUDDY_DELIVERY_REQUEST_CONTRACT.md`; current new-head checks
+and strict native transaction/all-writer/durable recovery remain next.
+
+Use [365_DELIVERY_BOARD.md](365_DELIVERY_BOARD.md) for current sequencing and
+CRM/Shop Manager desktop/phone/tablet acceptance. This file retains historical
+source evidence; old "next" statements are not repeated work instructions.
+Source is not fully accepted functionality: quote conversion, native refund/void
+execution, safe draft discard and writable101+ receipts remain unfinished;
+native authority/atomic stock/finance/private originals/recovery/owner/live
+gates remain. Published source4fea1607/evidence0fbec296 now passes actual selected
+native PG17 draft-line waits/CAS/outer transaction/rollback/scope/faults/cleanup,
+all18 expense/draft markers, job117094365266/run38936842687 (untruncated).
+All six Actions pass; unit117094365659 reports4,863/93 files100.43s, zero
+unexpected/quarantined failures (truncated log, final summaries present). No
+application activation, permission, migration or live/native authority acceptance.
+Connected owned original-Bearer receipt-expense ingress passes1231/1231 seven
+suites10.37s/full normal TypeScript and independent review; exact14-other-export/generated/helper/
+dependency preservation verified. Actual SDK composition uses fake HTTP, not a
+live session/native-role proof. `evidence/RECEIPT_EXPENSE_OWNED_INGRESS.md`.
+Owned-ingress publicationfb881504 now passes all six required Actions;
+actual unit117112437695 reports5,008/95 files72.81s, zero unexpected/quarantined
+failures (truncated log, final summaries present). Selected Auth catalog and
+explicit unverified baseline requirements are now integrated; actual sole365
+metadata18 columns/218 attachments/9 functions passes after ONE reviewed bounded
+alternative, not Auth/session/native authority. First incomplete capture retained.
+Local integrated62/62 six suites pass; new-head CI remains separate. Evidence:
+`evidence/AUTH_SESSION_CATALOG_PREREQUISITE.md`. Next reviewed strict session/
+native authority/current catalog/all-writer/durable/API/private-original/recovery
+gates remain before draft editing; no unchanged capture/app test rerun. Dedicated
+QA signup still needs owner handoff; one direct CRM-route alternative redirected
+to login, so this browser action stops until new access. No identity/Terms bypass.
+
+### Historical source checkpoints (superseded sequence)
+
+Source34a90930 adds ONLY private/unapplied one-existing-draft-line transaction
+support for safe101+ review/edit. Full prior receipt/item NUMERIC-text CAS,
+seven-field UPDATE/strict bindings/guards/persisted reread preserves IDs/unseen
+rows/header/provenance/consent/order in the selected graph. Final54/54 four files
+45.847s (20 new), review/format/lint/syntax/diff/214 assets/existing Worker guards
+pass. No app/migration/grant/live/deploy or legacy save change; C1.07/C1.08/R2/R3
+remain unaccepted. Next new-head CI/native PG17 independent sessions then trusted
+authority/all-writer/catalog/durable recovery before handler/dialog connection.
+Parent380 all six Actions pass,4,863/93 files74.31s; earlier bridge per-step markers
+are clipped, not separately verified Linux10/10. API/Auth/private originals/
+owner/pilot/full recovery/release/Cloudflare gates remain. Evidence:
+`evidence/DRAFT_RECEIPT_LINE_TRANSACTION_CANDIDATE.md`.
+
+Sourcef53c8ea8 composes selected full staff/claim/native roster foundation, not
+authority:36 tables/53 functions/41 attachments/no client policies, unchanged
+provider/parent/sequence guards. Final68/68 five suites81.967s, syntax/format/
+lint/review/diff/214 assets/existing-output Worker guards pass. Legacy roster/
+profile IDs preserved, native role-row UUID churn explicit; early chatFK and
+late missing-role rollback scoped separately. Parentb2 all six Actions pass,
+4,863/93 files100.48s, zero unexpected/quarantined failures; new-head composition/
+unit/runtime budget still required. `evidence/FULL_NATIVE_STAFF_BRIDGE_COMPOSITION.md`.
+Next owned ingress/strict session/native-team/role/tenant authority and compatible
+catalog/all-writer/financial/recovery before activation; safe101+ draft edit remains.
+No app/migration/grant/live/deploy/fixture rewrite; owner/GUC remains synthetic.
+
+Publishedb2c0328c is verified on the same draft PR68/main unchanged. All six Actions
+gates pass (38917399787), unit117028294149 reports
+4,863/93 files100.48s, zero unexpected/quarantined failures; truncated/final
+summaries present. Fresh CI build's final
+214 media/Worker/backend/OCR/PDF markers are present in a truncated log; its
+PR-merge bffced3b… COMPLETEtree equals b2c0328c. Actual native117028294367/
+PG17.11 expense markers/cleanup, Parts247/quote/bounded recovery pass;47 replay
+failures remain, tiny48/67/148ms not RTO. Preview log config skip/no upload;
+latest Workersaf30218f… fresh failure cause unverified; no deployment. The f53c8ea8
+checkpoint above supersedes earlier pending unit/bounded-composition steps;
+original-token/session/native-authority/financial/recovery gates remain. Notes join
+next meaningful source slice without docs-only restart.
+
+Source `d4538923` connects strict command session-claim custody to receipt expense
+recording only: same-client observed-token claims/current-user tuple, expiry and
+shared monotonic10s Auth wait; legacy RPC/private transaction/generated middleware
+and reader behavior unchanged. Final978/9784 suites12.65s, full TypeScript,
+review/format/diff/changed-line lint pass;2 retained full-file lint warnings,
+zero errors.214 tracked assets/existing-output Worker/backend/OCR/PDF guards pass,
+not a fresh build or actual Auth/private-storage/financial acceptance. See
+`evidence/RECEIPT_EXPENSE_COMMAND_CUSTODY.md`. New-head CI is separate. Next owned
+ingress/strict session/native authority/full staff-claim-native composition and
+catalog/all-writer/financial/recovery closure before candidate activation; safe
+101+ editing stays open. QA signup still unsubmitted; no SQL/grant/live/deploy.
+
+Published0eae8692 actual native PG17 expense rehearsal passes job116999369392/
+run38908883680, untruncated server170011/ten ordered markers/EXIT+always-cleanup.
+Retry/binding/outer visibility/real account+ledger FK/post-wait drift pass with
+synthetic owner/GUC only, not real Auth/native-shop/private-original/recovery.
+All six Actions gates pass, unit116999369587:4,696/92 files96.87s, zero unexpected/
+quarantined failures; returned unit log truncated with final summaries present.
+Parts247/quote/bounded recovery pass,47 replay failures remain; Preview config
+skip/no upload, latest Workers fresh failure cause unverified. Next
+trusted human/session/shop command admission/current-catalog/all-writer/financial/
+full recovery before connection; safe101+ edit remains. No live/migration/grant/
+deploy. Notes join next source slice; older pending-native statements superseded.
+
+Latest source `7d866ce0` prepares Docker-free native PG17 expense independent
+sessions with exact frozen-source parity and conservative cleanup/reporting.
+Root104/104 (39.882s), no skips/failures, frozen reviews/format/lint/214 assets/
+Worker guards pass. Actual new native result is pending, not human/Auth/private
+storage/financial/restore acceptance; candidate remains private/unapplied. Parent
+92d05890 all six Actions pass,4,696/92 files93.50s, zero unexpected/quarantined
+failures; bounded Parts/quote/recovery pass,47 replay failures remain; Preview
+config skip/no upload, newest Workers cause unverified. Next exact-head native
+server/cohort/cleanup result, then authority/current-catalog/all-writer/account
+phantom/financial/full recovery closure. `evidence/NATIVE_EXPENSE_PG17_REHEARSAL.md`.
+Older next-harness text is superseded; no app/hosted/migration/live change.
+
+Latest source `f7632817`: unapplied private receipt CREATE transaction plus
+full-binding outcome ledger, single retained posting/no legacy adoption,
+post-wait financial row locks/rechecks and exact retry/drift refusal. Local20/20
+(23.724s), combined56/56 (32.361s), frozen reviews/format/lint/214 assets/Worker
+guards pass. No ordinary execute/ledger grant, app connection, migration or live
+change. Native authority/all-writer/account-phantom/financial/restore gates remain.
+Parent50baa80a all six Actions pass, application4,696/92 files92.72s, zero
+unexpected/quarantined failures; returned log truncated with final summaries.
+Native bounded Parts/quote/restore pass,47 replay failures remain; Preview config
+skip/no upload, separate Workers failure fresh cause unverified. Next: native
+PG17 independent sessions/commit visibility/rollback/post-wait drift, then trusted
+authority/current-catalog/full acceptance before connection. See
+`evidence/EXPENSE_OPERATION_TRANSACTION_CANDIDATE.md`; source is not owner/live
+acceptance. Earlier next-transaction entries are superseded. New-head CI separate.
+
+Latest source `10d23d37`: unconnected receipt CREATE operation contract with exact
+money/native receipt bounds/full payload binding and strict reported expense/
+journal/two-line results; no connected writer, SQL, ledger, grant or live change.
+Root36/36 (8.906s:22 pure/12 retained SQL/2 CI guards), review/syntax/format/full
+changed-file ESLint/diff/214 assets/Worker boundaries pass. A fabricated matching
+result still validates; no native authority, durable retry, commit or recovery
+acceptance. Null/fallback vendor intents remain distinct; cohorts are not adopted
+policy or removed scope. Parentde7152df all six Actions pass,4,696/4,696/92 files
+59.03s, zero unexpected/quarantined failures; truncated unit log, final summaries
+present. Bounded native Parts/quote/restore pass,47 replay failures remain;
+Preview confirms config skip/no upload, Workers failure cause unverified and
+Actions runtime warning retained. New exact-head CI is separate. Next: locked
+unapplied owner-only transaction/protected immutable outcome ledger plus native
+authority/current-catalog/financial/all-writer/concurrency/recovery closure before
+connection. Evidence: `evidence/EXPENSE_OPERATION_CONTRACT.md`; older next-
+fixture/contract entries are superseded, owner/live release gates unchanged.
+
+Latest checkpoint,16 October, source `7804bd98`: retained receipt-expense/journal composition
+is implemented as a source-pinned memory-only fixture, same candidate/draft
+PR #68. Local12/12 plus CI-wiring14/14 (8.842s), syntax/format/full changed-file
+ESLint and independent review pass. Selected native constraints/attachments and
+genuine late-FK rollback are retained, not a rewritten financial/native authority
+model. No app writer/migration/grant/live change/deployment. Exact source,
+publication/new-head CI and limitations: `evidence/EXPENSE_POSTING_SOURCE_REHEARSAL.md`.
+
+Expense-read publication `ef1cb798` passes all six Actions gates. Completed Linux
+unit116945850260/run38892723856 confirms4,696/4,696 across92 files (61.59s), zero
+unexpected/quarantined failures (overall log truncated, final summaries present).
+Native Parts247/quote/bounded restore/ACL/RLS/sequence/late-failure rollback/
+cleanup pass;47 replay failures remain. Preview confirms config skip/no upload;
+migrations/production/Supabase Preview skip; newest independent Workers failure
+cause unverified. No current API/native-role/private-original/owner/live acceptance.
+
+Next: unconnected locked atomic exact-money expense/journal command and durable
+payload-bound operation receipt, with legacy conflicts, zero/Cash/AP/tax/reversal,
+current-catalog/native authority and retry/recovery closure before connection.
+Continue other independent scope while real-stack/QA/pilot gates remain open;
+do not repeat completed readers or infer posting from transport acknowledgment.
+Earlier pending-publication/next-read entries below retain history and are
+superseded by this checkpoint.
+
+Expense page read support is implemented at `1953f580`, same candidate/draft PR
+#68. Bound100-row windows, strict native DTOs, exact-query freshness, independent
+errors/retries and amount/tax presentation replace global queries, false empty
+states and a capped MTD total. All three legacy financial mutationFn bodies remain
+byte-identical. Related1,468/1,468 (nine suites,27.59s), strengthened new server/
+contract253/253, UI/panel276/276,294 new cases, review/format/full TypeScript/
+complete build/214 assets/Worker boundaries pass. Lint zero blocking errors, one
+moved legacy any warning/eight retained elsewhere. This is synthetic source/read
+integration, not actual-role/API/private-byte/posting acceptance. No SQL/live/
+deploy. New exact-head publication/CI and receipt-expense/journal composition,
+atomic/durable posting/native authority/recovery remain next. Evidence:
+`evidence/SHOP_EXPENSE_READ_BOUNDARIES.md`.
+
+Published `4af1d906`/same attached draft PR #68 is verified; final214 assets/
+Worker boundaries pass. All six Actions gates pass; completed unit
+`116923466985` confirms application4,402/4,402 across89 files (95.99s), zero
+unexpected/quarantined failures (overall log truncated, final summaries present).
+Actual new native restore/ACL/RLS/sequence/late-
+failure rollback/cleanup pass;47 replay failures remain. Preview config skip/no
+upload and migrations/production/Supabase Preview skip are confirmed. Fresh
+Workers failure cause is unverified. These notes join the next source slice.
+Next: connected account/shop-bound expense reads, whole-baseline/private-original/native authority and
+safe101+ review/edit; do not repeat completed read-only viewing. No live/deploy.
+
+C1.08 source `c8beede8` connects strict separate display-only receipt-line pages
+to the incomplete-receipt viewer, with exact account/target/receipt/parent-version
+and per-mount/page lifetimes. Focused1,542/1,542 across18 suites,241 new cases,
+independent review/format/diff/full TypeScript/lint and fresh complete build/214
+public copies/Worker/backend/OCR/PDF/server checks pass. All prior handlers/editor
+and485 handler/215 panel cases remain. New published-head CI is separate. Safe
+review/edit101+ lines, atomic/native authority and owner/live acceptance remain
+open; no partial-row writer/sharing unlock or SQL/live/deploy. Exact source,
+limitations and next dependencies: `evidence/RECEIPT_COMPLETE_LINE_VIEWER.md`.
+
+Published `75974057` now passes the actual Docker-free synthetic PG17 dump/
+offline-source restore/catalog/ACL/RLS/sequence/late-failure rollback/cleanup
+rehearsal (native job `116912992234`). Parts247/six quote groups pass, 47 replay
+failures retained. All six Actions gates pass at this parent, including application
+4,170/4,170 across87 files (92.02s), zero unexpected/quarantined failures, not new
+C1.08 exact-head proof. Full API/Auth/private-original and production recovery remain
+open. Continue independent C1.08 read-only line viewing, not partial-row writes.
+Evidence: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`. No migration/live/deploy.
+
+R3 snapshot repair `6fb1e895` retains column permission evidence while removing
+an invalid empty ACL-array fallback. Actual `afde5a81` native execution now passes
+identity/pristine/fixture but fails source-access22023, before dump/restore. Final
+offline101/101, syntax/format/diff/review and changed-line lint zero findings pass;
+new repaired native execution is required. No migration, live operation or deploy.
+Next: native recovery, real-stack/private-byte prerequisites and separate read-only
+C1.08 line-window viewing without unlocking partial-row edit/share/write. Evidence:
+`evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+Latest R3 repair `719255fb` fixes a source-confirmed libpq control-file blocker
+consistent with the third native first-read failure. Verified empty private files
+replace `/dev/null` without permitting warnings or relaxing identity/cleanup.
+Offline100/100, review/syntax/format/diff pass; actual repaired native recovery
+is still required. No application migration/live operation or deployment.
+Details: `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+
+Latest R3 diagnostic source `176732c6` retains every identity/pristine condition
+after `e4b316b0` still refuses before fixture/dump/restore. Final offline98/98,
+review/syntax/format/diff/lint pass; new actual Linux checkpoint execution is
+required, not recovery acceptance. Parts247/six quote groups/cleanup still pass.
+Continue real-stack/private-byte prerequisites and separate C1.08 viewing after
+this gate; no partial-row writer is unlocked. Evidence below remains current.
+
+16 October R3 shared dependency: first actual Linux synthetic recovery attempt
+at published `c08c25c8` fails prepare, with retained Parts247/quote six groups and
+cleanup passing. No restore success. Repair source `3393d29a` corrects a definite
+role-settings catalog error and adds fixed bounded failure codes; final offline
+96/96, syntax/format/diff/review and changed-line lint zero findings pass. New
+exact-head native execution remains required, not real API/Auth/private-original
+or production recovery proof. See `evidence/NATIVE_PG17_RECOVERY_REHEARSAL.md`.
+Next: repaired native verification, then real-stack/private-byte recovery and a
+separate read-only C1.08 line-window viewer without unlocking partial-row edit/
+share or changing the100-line replacement writer. No Docker, app migration or
+live operation. QA/native pilot/session and 47 replay failures remain open.
+
+C1.06 source `ee9af3a8` captures installation account/receipt/item/selected vehicle/
+date/odometer intent, checks child/parent preflights and legacy void transport
+acknowledgment, and uses parent-held admission/session/unknown fences with actual
+portal-content cleanup and neutral feedback. Final focused 1,705/1,705 across
+13 suites (32.14s), 247 new cases and all prior 179 panel cases retained; final
+review/format/diff/full TypeScript/offline guards pass; changed-line lint zero
+new findings. Fresh complete build/214 public copies/Worker/backend/OCR/PDF/server
+checks pass with retained warnings; same PR publication joins C1.05, with new
+exact-head CI separately required. Exact checks/publication and diagnosed
+test/lifecycle repairs: `evidence/RECEIPT_INSTALLATION_CALLER_SAFETY.md`.
+No SQL/live change. Native atomic authority, persisted history and durable recovery
+remain unaccepted. Next shared gate is partial synthetic PG17 dump/restore on
+the existing ephemeral Linux host, not full API/Auth/private-file acceptance;
+independent C1.08 full-line viewing and other atomic receipt workflows stay open.
+
+C1.05 source `5ede72c6` (16 October) interlocks all draft removal before
+handler-level business/client/Storage/RPC access. The panel retains a disabled
+accessible control/preservation notice, removes its dispatch path and preserves
+eligible review and every other receipt workflow. Focused synthetic 1,458/1,458
+across 12 suites (29.30s), 43 new cases, all prior 161 panel cases retained;
+independent review/format/diff/full TypeScript/offline guards pass. Changed-line
+lint zero new findings; fresh complete build/214 public copies/Worker/backend/
+OCR/PDF/server checks pass with retained warnings. Same PR publication will join
+connected installation work. Exact verification/publication and remaining gate:
+`evidence/RECEIPT_DISCARD_SAFETY_INTERLOCK.md`. No SQL/live ACL/deployment change.
+Safe discard, durable object/row coordination, original-byte restore and real-role
+acceptance remain unfinished; native direct capabilities are unchanged. Continue
+independent sharing/installation/complete-line viewing, not a silent scope cut.
+
+C1.04 source `5bd1a715` (16 October) adds captured account/receipt/selected-shop
+expense intent, same-client preflight, checked transport acknowledgment and
+neutral current-only feedback. A synchronous per-mount fence/unknown hold
+survives ordinary receipt refresh/paging; other writers/editor/install stay
+unchanged. Focused 1,415/1,415 across 12 suites (28.51s), all 124 prior panel cases
+plus 37 new, review/format/diff/CI guards and final full TypeScript pass.
+Changed-line lint zero new findings and fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server checks pass with retained warnings. Evidence and
+publication: `evidence/RECEIPT_EXPENSE_CALLER_SAFETY.md`. Financial/conflict
+reconciliation, atomic target/native authority and durable recovery remain open;
+the expense reader still uses a legacy unscoped key. Next: C1.05/sharing/install.
+
+Mixed-consent source `1a49acc5` (16 October) adds a temporary receipt-level sharing
+interlock while preserving individual public choices. Both disabled and event
+guards use the full returned items, including category-filtered-out lines. Final
+combined 1,180/1,180 across 11 suites (24.98s), with 15 new cases and all 109 prior
+panel tests unchanged; independent review/format/diff pass. Full TypeScript,
+changed-line lint zero new findings and fresh complete build/214 public copies/
+Worker/backend/OCR/PDF/server boundaries pass, with retained warnings. Exact
+evidence/publication: `evidence/RECEIPT_READ_CONTRACTS.md`. Independent atomic sharing and
+direct/concurrent caller safety remain open, not removed from scope. Next:
+expense/discard row-action safety, exact-money and durable recovery.
+
+Private receipt signing follow-up `39a1ab1e` (16 October): captured account/receipt
+intent, fixed DB-key/canonical URL evidence, generic errors and bounded late-result
+discard are integrated without SQL or live changes. Focused 1,165/1,165 across 11
+suites, full TypeScript and changed-line lint/review/format/CI guards pass;
+packaging/publication are recorded in `evidence/RECEIPT_READ_CONTRACTS.md`.
+Signed URL expiry/revocation and real private-object acceptance remain unverified.
+Next is preservation of mixed per-item consent, then row-action caller/lifetime/
+acknowledgment and atomic exact-money/durable recovery. A success-looking expense
+UUID is not financial reconciliation, and the two existing numeric scales differ.
+
+Latest connected receipt source `f50aaa0d` (16 October): expected-account-bound
+server reads, fixed counted receipt/link pages, complete-item evidence and safe
+new-editor eligibility are integrated with the existing panel. Open editor,
+installation and uncertain-write state survives ordinary paging/refresh.
+Final focused 966/966, full TypeScript, changed-line lint/review/CI guards and fresh
+complete build/214 public assets/Worker boundaries pass with existing warnings.
+`evidence/RECEIPT_READ_CONTRACTS.md` records source/tests/publication and the
+remaining writer, complete-line, private-object and release dependencies. This
+does not establish native authority, atomic snapshots or live acceptance.
+
 This change extends the existing Shop Manager customer detail screen. It does not
 introduce a second CRM database or duplicate customer identity.
 
@@ -1189,3 +1635,409 @@ evidence HEAD `32a7fc9`; first CI `38739987913` started. Hosting build
 `492db7e2-d4ad-40e7-bba7-1d14cdb0b7d7` failed separately, wrapper `38739987914`
 started with migrations/production skipped. Verify the newest publication-record
 HEAD next; this documentation-only commit supersedes the first check head.
+
+## Seven-day integration candidate and staff workflow follow-up (2026-10-15)
+
+Use branch `completion/365-seven-day-integration`, source `ece7e2a0288a9a70be58feeeaefdfe1922fde887`,
+and the owner's `365_SEVEN_DAY_COMPLETION_PLAN.md` (target 22 October, 21:00 Manila).
+The initial `365_RELEASE_ACCEPTANCE_LEDGER.md` distinguishes source inclusion,
+staging, owner and live acceptance. It is not yet an exhaustive action-level map.
+59/61 captured open PR heads are already ancestors, including CI #8; PR #9
+cutover and PR #2 plan need separate content reconciliation, not a bulk merge.
+
+The actual internal-staff view/handlers now confirm precise returned rows/provider
+responses, fence stale private account/admin/snapshot/dialog results, and show
+partial creation/sign-in-only acknowledgments. Unknown creation locks only its
+mounted account scope, not a durable retry ledger. No original-human/fresh-role/
+tenant, trusted team, atomic hierarchy, native provisioning or session-revocation
+acceptance is inferred. Fresh full application 1,333/1,333 across 62 files passes
+(93 new focused included); TypeScript/lint/build/report guards/assets pass as
+bounded in `evidence/SEVEN_DAY_INTEGRATION_STAFF_ACKNOWLEDGMENT.md`.
+
+Parent PR #67 latest `576fb17d` now passed all six CI gates; separate hosting
+failure has no diagnostic text from GitHub. Provider logs/full media and recovery
+remain open. Connected Supabase discovery finds no separate 365 staging target;
+the default main branch is not isolated staging. Owner staging and pilot-account
+questions are open; local Docker Linux engine is unavailable. Safe local work
+continues on selective cutover/action-level inventory and trusted transaction
+dependencies; no paid provisioning or live business request/migration/deploy.
+No SQL/generated middleware changed. Source 404/423, 19 unclassified and all prior
+Customer 360 consent/history/financial/release gates remain open. Reassess actual
+deadline feasibility by Day 2; do not replace full acceptance with test counts.
+
+Published/attached draft PR #68 stacks on PR #67 (`576fb17d`), code `ece7e2a0`,
+first evidence head `76c5fa41`; CI `38748496533` running/queued, wrapper
+`38748496539` preview in progress and migrations/production skipped. No upload,
+new-head pass or live behavior is claimed. This publication-record commit
+supersedes the first check head; verify the PR's exact newest head next.
+
+## Complete local media and upload guard (2026-10-15)
+
+Same integration branch/PR #68, source `75b2304fae26f9572041ff88d3cff86aeeaec5a0`.
+The checkout is now non-sparse and all 214 tracked public files are restored.
+Fresh full build, exact Git/source/copied-public checks and existing Worker/
+OCR/PDF verification pass. 65 new/existing Node release/report/inventory tests
+and 10 asset tests pass; app/SQL source is unchanged. The prior PR head `c5e4bf1a`
+passed all six CI gates; new-head checks remain required. The new fail-closed
+guard runs before CI packaging and both Actions uploads. It does not govern
+independent Workers Builds/raw Wrangler or approve a release. Evidence:
+`evidence/COMPLETE_PUBLIC_ASSET_RELEASE_GUARD.md`.
+
+The owner's staging reply names production project `wjxaajgvddtrxxtocxen`, not
+isolated staging. One follow-up asks about a separate-project cost quote in their
+organization versus a different existing staging project. No target was created
+or reassigned; no costs/charges confirmed. Pilot-account question and migration/
+fresh-authority/native-team/claim/offboarding/private-object/recovery/hosting/
+owner acceptance remain open. Local media completeness is cleared; it is not
+production or consent/history/financial acceptance. No live SQL/business/Auth
+mutation, deployment, restriction replay, paid resource or duplicate automation.
+
+## Native Google handoff and sole hosted backend (2026-10-15)
+
+Owner clarification supersedes the historical staging/cost follow-up above:
+365 uses only hosted project `wjxaajgvddtrxxtocxen`, API
+`https://wjxaajgvddtrxxtocxen.supabase.co`. The 366 AI project is separate and
+untouched. Do not create another hosted target or repeat the cost/project question.
+Prepare isolated local synthetic testing and a reviewed production-safe acceptance
+path; actual API/role/private-storage/transaction/recovery gates still apply.
+Docker Desktop is stopped/unavailable and the observed free RAM was 1.93 GiB;
+no daemon, image download or local Supabase stack was started.
+
+Same integration branch/PR #68, OAuth source `c3f6bb9cc11c46246c0662f2030a3056b2287854`.
+URL/lifetime guard follow-up: `b3acef0e`.
+Login/signup now request native Google authorization from the existing canonical
+365 client, checking callback/provider URL before browser handoff. Duplicate and
+cross-flow form dispatch is fenced; old account/return target/signup-input results
+cannot navigate or toast after their context changes. Required signup details and
+terms plus the existing pending-profile snapshot are preserved. No successful
+authentication, role provisioning or customer/organization identity is inferred
+from generating a URL. See `evidence/NATIVE_GOOGLE_OAUTH_HANDOFF.md` for tests and
+the remaining live provider/session acceptance. This is selective PR #9 adoption,
+not its complete provider/configuration/assets/migration cutover.
+Fresh application suite passes 1,431/1,431 across 65 files (105.08s), including
+98 new OAuth tests; report checker, full TypeScript and changed-line lint pass.
+No live provider/session or Customer 360 identity/role acceptance is inferred.
+Fresh complete build/Worker/214-file Git-source-output checks pass at formatting
+follow-up `8e1be6ac`; release/report/inventory tests65/65 and assets10/10 pass
+separately. Local artifact verification does not authorize upload or release.
+
+Prior exact head `818651fd` passed all six CI gates (`38752315795`); independent
+hosting build `ea623a17-3b0f-4bc0-ba4e-90f939f8a218` failed with no diagnostic
+text. Upload/migrations/production remain skipped. Verify the new publication's
+exact head. Source mapping is still 404/423 with 19 unclassified; no live SQL,
+business/Auth write, provider change, restriction replay, paid resource or deploy.
+Continue remaining PR #9/#2 and action-level migration/feature inventory, then
+trusted actor/fresh role/native-team/claim/offboarding/private-custody/recovery
+acceptance. The pilot shop/test-account question remains open, not repeated.
+
+## Parts and provider reconciliation follow-up (2026-10-15)
+
+Same integration branch/PR #68: `f46b048d` retires the now-unused cloud-auth
+wrapper/dependency, `a420a44d` recovers the 11 missing PR #2 planning documents as
+exact non-authoritative references, `2350e403` adds the typed remaining-source
+ledger and CI guards. Current platform/Parts/RLS/Repair/History control plans
+remain unchanged; draft G2 legal/finance does not replace active G2 security.
+Do not repeat source recovery or treat these proposals as acceptance/authority.
+
+The 19 entries outside exact source correspondence are 12 historical unresolved,
+five recorded-unapplied candidates and two recorded embedded helper executions;
+preserve 404/423 and all release/baseline/replay/parity flags. The two approved
+restrictions must not be replayed. PR #9's legacy media rewrite remains absent,
+outside 423 and unapproved for ingress. Full PR #9 scope is inventoried: 205 rename-
+aware/211 physical paths; broader provider/MCP/assets/email/billing/build/data
+cutover is not adopted. Existing native Google behavior remains unchanged here.
+
+Fresh Node 119/119 (98 new + 21 existing), application 1,431/1,431 across 65 files,
+report checker/full TypeScript/new-guard lint/format/diff pass. Full build/Worker/
+214-file Git-source-output verification passes at `2350e403`. Prior published `06e21a2e`
+passed all six CI gates (`38759812700`); independent hosting build `7f06007f-914b-4484-a3b7-66da30fc8f3b`
+failed with no root-cause diagnostics. Verify the new publication's exact head.
+Evidence: `evidence/PARTS_AND_PROVIDER_RECONCILIATION.md`; minimum Parts acceptance
+groups are in the integrated release ledger. No SQL/business/Auth mutation,
+history repair, restriction replay, provider change, paid resource or deploy.
+Continue action-level acceptance, reviewed forward/recovery planning, bounded
+native email readiness/signature tests and shared fresh authority/atomic writers.
+Sole hosted backend/local test boundary and all Customer360/receipt/consent/
+financial/private-custody/mobile/owner/recovery gates remain unchanged.
+
+## Native email and opt-out acknowledgment boundary (2026-10-16)
+
+Same integration branch/PR #68: verifier `5e5d5f8a`, unsubscribe acknowledgment/UI
+`65475626`. The bounded raw-byte HMAC helper remains unwired and sends nothing;
+133 focused actual-crypto/stream tests pass. The existing unsubscribe handler now
+requires matching suppression evidence before acknowledgment, returns an honest
+consumed-token conflict without reapplying old consent and removes raw diagnostics.
+The page distinguishes HTTP failure/invalid/consumed results, suppresses stale
+responses and acknowledges recorded opt-out rather than guaranteed delivery stop.
+Sixty-two focused handler/page tests and separate independent reviews pass.
+Fresh combined application 1,626/1,626 across 68 files (109.46s), report checker,
+full TypeScript and changed-line lint pass; all 195 new tests included, zero
+quarantine/new lint warnings. `3f829a6b` is a fixture type-only follow-up.
+Fresh full build/Worker/214-file media checks pass at that head; source guards
+103/103 and release/report/inventory/assets75/75 pass (five inventory checks overlap).
+Local artifact verification is not application upload or live acceptance.
+Combined integration results are in `evidence/NATIVE_EMAIL_WEBHOOK_VERIFIER.md`
+and `evidence/UNSUBSCRIBE_ACKNOWLEDGMENTS.md`.
+
+This does not enable Customer 360/reminder/transactional email. Original action/
+tenant/fresh-authority, atomic consent/event/recipient ledgers, secure Auth payload/
+URL mapping, current suppression, backlog/provider acknowledgments and sender/
+project/recovery acceptance remain required. Token-first partial writes and
+bounce/complaint reason overwrite are not repaired. No SQL/provider setting or
+live email/data/Auth write, application upload or additional hosted backend.
+Migration source mapping and approved restrictions remain unchanged.
+
+Prior published exact head `e72553b6` passed all six CI gates (`38764688404`);
+independent hosting build `e96dd8b6-cdb0-4211-bc13-db782a9badfb` failed without
+diagnostic/root-cause text. New publication needs exact-head verification. Next
+implement the nonactivated Auth payload-to-plan adapter and atomic delivery/consent
+contracts, while continuing the shared authority/private-custody/transaction/
+recovery path. Do not promote source tests to production readiness.
+
+## Native Auth command planning and first email (2026-10-16)
+
+Same integration branch/PR #68, source `0dfac563`. The inactive planner validates
+actual verifier-instance provenance, explicit canonical policy, native payload/
+API-base/website callback boundaries and secure current/new recipient/token/hash
+mapping. Phone-only accounts with explicit empty current email receive a bounded
+first-address plan in either configured mode; missing/null fields or partial
+secure pairs do not downgrade policy. Actual HTML/plain-text rendering now has
+correct first-address copy without an empty/from link, while both existing
+recipient halves preserve current-to-new wording.
+
+Plans have immutable stable event/recipient keys and raw-body/policy fingerprints.
+Record compatibility is comparison only, not storage proof, atomic reservation,
+enqueue or exactly-once delivery. Six existing actions are supported; eight other
+documented actions, actual secret/project/provider/Auth settings, callback/cohort
+coverage and consent/suppression/backlog/recovery remain activation gates. No
+Customer 360, reminder or transactional-email authority is inferred.
+
+Focused 352/352 (212 new planner + seven render + 133 existing verifier), fresh full
+application 1,845/1,845 across 70 files (144.15s), report checker/full TypeScript/
+targeted lint/format/diff and independent review pass. Source guards 103/103 and
+release/report/inventory/assets 75/75 pass (five inventory tests overlap); no new
+SQL or live write/provider setting/email/application upload. Artifact and exact-
+head CI/hosting evidence: `evidence/NATIVE_AUTH_EMAIL_PLAN.md`. Continue atomic
+delivery/consent and bounded fake-provider contracts alongside shared fresh
+authority/native-team/private-custody/financial/recovery acceptance. The sole
+hosted 365 backend and approved restrictions remain unchanged.
+Fresh complete build/Worker/backend/OCR/PDF/browser-engine and all 214 tracked
+public Git/source/output checks pass at `0dfac563`, with zero changed-line lint
+errors/warnings. Existing build warnings and wider live acceptance gates remain.
+
+## Native Auth delivery boundaries and financial action inventory (2026-10-16)
+
+Same branch/PR #68, source `0271fc09`: inactive complete-recipient reservation
+commands and exact queued-receipt comparison bind original event/subject/version
+and immutable rendered provider bytes/key/fingerprint. The one-attempt provider
+boundary has explicit injected transport, shared deadline and strict bounded
+acknowledgments. It distinguishes provider acceptance from outcome unknown;
+neither queue comparison nor fake HTTP proves durable storage or delivered mail.
+198 new tests and combined email chain 550/550 pass; independent review/full
+TypeScript/changed-line lint/format/diff pass. No SQL/hook/queue/provider activation,
+live data/Auth write, email send or deploy. Integration/artifact results and
+durable transaction/consent/backlog/recovery gates are in
+`evidence/NATIVE_AUTH_EMAIL_DELIVERY_BOUNDARY.md`.
+
+The release ledger now enumerates C3.01–C3.14 quote/work-order/invoice/payment/
+approval/refund actions. Hardened Customer 360 summaries do not fix the separate
+account-unscoped financial screens. Native payment and inventory-line follow-up
+errors can be ignored; approval labels are not a connected refund executor.
+Next safe source work is C3.10–C3.12 invoice-detail/payment acknowledgment and
+account/target lifetimes, alongside authorized atomic monetary/stock writers,
+fresh authority, private custody and isolated API/storage/recovery acceptance.
+No financial, owner or live acceptance is claimed from this source scan.
+Fresh full application 2,043/2,043 across 72 files (152.91s), full TypeScript and
+report checker pass; all 198 new tests included, zero failures/skips/quarantine.
+Fresh complete build/Worker/backend/OCR/PDF/server-boundary and all 214 tracked
+public Git/source/output checks pass at `0271fc09`, with existing build warnings.
+Local packaging does not satisfy runtime, financial, recovery or owner acceptance.
+
+## Native invoice caller safety (2026-10-16)
+
+Same branch/draft PR #68, source `0c23d336`: invoice list/detail now use signed-in
+account and fresh mounted-view read lifetimes, matching bounded private children,
+visible-row completeness and independent generic retry states. Payment and
+inventory-line writers check exact returned rows and every retained follow-up,
+with conservative numeric/status/stock preflight and a shared mounted-invoice
+uncertainty hold. Account/invoice/editor changes cannot let late results update a
+new draft or start the next write. Current Customer 360 invoice-summary invalidation
+uses its actual account/customer key. Recorded payment entries and header totals
+are not settlement, complete-ledger visibility or reconciliation; former false
+outstanding/stock-success claims are removed.
+
+133/133 focused route/real QueryClient tests (70 detail +63 list, 11.85s), full
+application 2,176/2,176 across 74 files (129.13s), full TypeScript/report checker/
+targeted lint/format/diff and independent review pass. Synthetic SDK acknowledgments
+do not establish actual JWT/RLS/private storage, atomic money/stock/idempotency,
+refund/adjustment/overpayment policy, recovery or phone/owner acceptance. Separate
+financial writes are retained and uncertain holds are not durable across navigation.
+No migration, live financial/Auth mutation, provider activation/email or deploy.
+Verification/artifact/retained-trigger evidence and explicit compatibility gaps:
+`evidence/NATIVE_INVOICE_ACKNOWLEDGMENTS.md`. Continue quote/work-order C3.01–C3.04
+callers and actual authorized atomic writers, not repeated invoice/email proof.
+Fresh complete build/Worker/canonical backend/OCR/PDF/server-boundary and all 214
+tracked public Git/source/output checks pass at `0c23d336`; changed-line lint
+has zero errors/warnings. Source guards 103/103 and release/report/inventory/assets
+75/75 pass (five inventory tests overlap). Build warnings remain; no application
+upload or live acceptance is inferred.
+
+## Native commerce lists and confirmed relationship selection (2026-10-16)
+
+Same branch/draft PR #68, source `8302c62d`: quote and work-order list readers now
+require current signed-in/account/per-mount lifetimes, bounded visible counts,
+generic manual retries and no stale/false-empty private records. Native UUID/
+date/received amount handling is explicit; hidden nullable joins are unavailable,
+not absent. Scoped work-order detail callbacks refresh current-account list
+lifetimes and customer/vehicle histories. Four duplicated relationship names were
+confirmed by read-only system-catalog metadata, and list/detail select explicit
+existing FK hints. No SQL write, relationship removal or business/Auth data read.
+
+138 new list tests (93 quote +45 work-order), focused integration 152/152 including
+14 strengthened existing detail tests (11.03s), full application 2,314/2,314 across
+76 files (124.92s), full TypeScript/report/format checks and independent review
+pass. Six existing CI gates pin an OS family with two offline wiring guards;
+release/migration freezes and provider settings unchanged. Selected column metadata
+also confirms current quote-conversion labor/part payload mismatches and required
+part_type omission. No conversion or live transaction was executed. This remains
+next work alongside quote-detail/creation and original-human/fresh role/shop,
+atomic money/stock/dedupe/recovery acceptance, not a complete financial flow.
+Evidence/limits/next dependency: `evidence/NATIVE_COMMERCE_LIST_LIFETIMES.md` plus
+its two canonical catalog JSON captures. New email modules remain inactive; other
+projects are untouched. No staging/owner/live or whole-schema/replay claim follows.
+Fresh complete build/Worker/canonical backend/OCR/PDF/server boundary and all 214
+tracked public Git/source/output checks pass at `8302c62d`; seven-file changed-line
+lint has zero errors/warnings, with 15 older findings outside changed lines.
+Source guards 103/103, release/report/inventory/assets 75/75 and new CI wiring
+guards 2/2 pass (five inventory tests overlap). Build/accessibility warnings and
+real-role/financial/private-storage/recovery/owner acceptance remain open.
+
+## Quote detail and explicit conversion release blocker (2026-10-16)
+
+Owner's subsequent no-Docker directive is recorded in the primary checklist and
+ledger and the existing follow-up. No Docker will be installed/started/used or
+requested. Docker-free acceptance must retain real-role/API/private-storage/
+transaction/restore gates. Reviewed native-PG17 Parts CI is committed at `166ff0c4`,
+preserving adversarial SQL coverage. Published `bf091dc7` native Linux Parts CI
+passes all 247 assertions on PostgreSQL 17.11 with successful scoped cleanup;
+retained replay's 47 migration failures still prevent whole baseline/replay or
+Supabase API/Auth/private-storage/restore acceptance.
+Do not dispatch older containerized workflows. QA email nomination is received;
+separate standard signup is prepared but credentials/Terms/creation/session and
+trusted synthetic native-shop membership remain pending. Preserve existing
+personal/staff identities; no secrets or personal email in GitHub evidence.
+
+Same candidate/draft PR #68; exact source commit and final checks are in
+`evidence/NATIVE_QUOTE_DETAIL_READINESS.md`. The detail now requires fresh matching
+account/quote primary and item lifetimes, complete bound projections, qualified
+101/100 visible-row counts and independent generic retries. Received numeric/date
+text is preserved without inventing totals, expiry or accounting rules. The
+108 focused tests use the actual route and real QueryClient with synthetic SDK
+responses; TypeScript/lint/format and independent review pass, not actual API/RLS.
+
+The old non-atomic browser conversion dispatch is removed from the unreleased
+candidate; its disabled action explicitly awaits an authorized atomic writer.
+Only current validated already-converted work orders remain navigable. C3.03 is
+unfinished and release-blocking. The retained legacy RPC lacks safe caller/shop/
+retry behavior and compatible shop/part mappings; no legacy reconnection or
+invented inventory/part_type contract. Continue atomic C3.02-C3.04 and financial/
+stock/recovery acceptance rather than repeating list/email reader proofs.
+
+Authenticated hosting logs now identify automatic Bun frozen-lockfile installation
+failure before npm build/upload. A tested source-entrypoint freeze blocks
+WORKERS_CI presence, including ignore-scripts, but is neither install repair nor
+raw-upload protection/release approval. No provider setting/lockfile change,
+SQL/Auth/business write, live restriction, upload/deploy or email activation.
+Local API/private-storage/restore, native authority/claim/team and owner/pilot
+acceptance remain open under the sole hosted 365 backend requirement.
+
+## Native quote and work order creation callers (2026-10-16)
+
+Same branch/draft PR #68, source `bcc25350`: actual creation forms now scope
+choices and draft/write outcomes to the current account/mount, revalidate the
+selected customer/vehicle before dispatch, check complete returned identities/
+values and hold unknown saves without blind resubmission. Quote field/type/tax
+representation mismatches are corrected with exact decimal checks; invalid text
+is rejected before any header save, and abandoned renders no longer abort a valid
+committed save. Quote 84/84, work-order 89/89, combined creation/security 183/183
+(18.68s), full TypeScript, changed-line lint, mandatory CI guards and independent
+review pass. Exact artifact/publication results are in
+`evidence/NATIVE_COMMERCE_CREATION_READINESS.md`.
+
+Quote header/items remain separate writes; selected customer shop metadata is not
+trusted native authority, and mounted locks are not durable retry protocols.
+No SQL/ACL/business/Auth mutation, provider activation, email or deployment. Close
+the authorized atomic C3.02 transaction first, then C3.03–C3.04 with shared fresh
+authority, private-storage/transaction/restore and designated owner acceptance.
+
+## Locked quote transaction and shop intent (2026-10-16)
+
+Source `ad776aa8`, same draft PR #68, adds an unapplied/unconnected quote
+transaction with prior expected-shop intent. PGlite 94/94 and offline CI/safety
+guards 11/11 pass. A separate private native-PG17 concurrency path is implemented
+and passed actual Linux execution/cleanup on publication `2cbf20a4`: native
+PG17.11, six independent-session quote scenario groups and Parts247/247, with
+47 retained replay failures. All six Actions gates pass, including locked quote
+94/94 and application2,595/2,595. No UI hookup or production change;
+trusted authority, durable retry, all-writer scope and real API/storage/recovery/
+owner acceptance remain open. Exact evidence/resumption:
+`evidence/NATIVE_QUOTE_ATOMIC_CANDIDATE.md`.
+
+## Connected caller checks and private receipt opening (2026-10-16)
+
+Source `9a4059bd`, same draft PR #68, adds captured caller/current Auth record
+denial to the existing customer detail reader without changing generated
+middleware or permissions. Private receipt opening now fences late responses
+across account/target/logout/unmount and actual StrictMode cleanup; repeat reads
+are synchronously held, with no mutation refresh or raw error exposure. Critical
+tests192/192, full TypeScript, changed-line lint, mandatory CI guards and independent
+review pass. Fresh complete build/214 public copies/Worker boundaries pass with
+existing warnings. New-head publication/CI is separately
+recorded in `evidence/NATIVE_CALLER_AND_RECEIPT_LIFETIMES.md`.
+
+This is not strict session revocation, original-human/native-shop authorization,
+private-storage or mutation/retry acceptance. Existing receipt list/editor/mutation
+and current-role/session, tenant/team/offboarding, durable financial/stock writers,
+restore and designated pilot/owner gates remain open. No deployment, live SQL/
+Auth/business write, new hosted resource/cost, Docker or provider activation.
+
+## Connected reader and receipt entry follow-up (2026-10-16)
+
+Source `a56480a1`, same draft PR #68: existing commercial/communications handlers
+now add the captured caller/current-user denial guard without changing native
+primary visibility, projections, sort/caps or invoice TEXT values. Receipt entry
+uses shared preflight, a synchronous cross-action latch, committed lifetime fences
+and checked draft/upload/void-save acknowledgments. Unacknowledged writes hold
+the mounted editor without deleting entries or blind retry. An acknowledged
+upload followed by scan failure still supports manual saving to the same draft.
+
+Final critical 533/533, full TypeScript, changed-line lint/review and CI guards
+pass. Fresh complete build/214 public copies/Worker boundaries pass with existing
+warnings. Publication checks are recorded separately in
+`evidence/CUSTOMER_READERS_RECEIPT_ENTRY_SAFETY.md`. Null-save is not proof of
+persisted financial values; path ack is not file-byte provenance. Mounted holds
+do not cancel backend work or survive close/reopen, and new editor in-flight
+StrictMode replay is not specifically tested. Receipt/shop-link read freshness,
+bounded reader/caller contracts, remaining writers and durable retry/recovery are
+next. Native authority and real API/private-storage/restore/pilot/owner acceptance
+remain open. No migration, provider activation or deployment.
+
+## Receipt reads and retail assignment follow up (2026-10-16)
+
+Sources `eb90d15c`/`bd5e4b04`, same draft PR #68. Receipt/link per-mount reads hide
+fetching, paused, failed and invalidated snapshots; current-query admission
+guards preserve open editors, installation drafts and unknown holds through
+ordinary refresh. Auth loading is separate teardown. Existing editor/opener/
+installation bodies are unchanged, receipt101/101 passes.
+
+The existing retail detail binds assignment to prior account/org/lead/assignee,
+strict existing memberships and an exact returned row, with fresh member choices,
+duplicate/stale-callback fences and mounted unknown-outcome holds. Lead151/151
+and final combined703/703 pass; lint/review/CI guards pass. Full integrated
+TypeScript/fresh build/214 assets/Worker boundaries pass with expected warnings.
+Publication evidence is separately recorded in
+`evidence/RECEIPT_PRIVATE_READ_LIFETIMES.md` and
+`evidence/RETAIL_LEAD_ASSIGNMENT_SAFETY.md`. Native authority, server receipt DTO/
+attachment completeness, atomic/durable writers, actual-role/private-storage/
+restore/pilot/owner acceptance and complete retail/recruitment workflows remain
+open. No SQL, signup, provider activation, customer send or deployment.

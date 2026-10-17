@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Loader2,
@@ -87,7 +87,7 @@ async function fetchWorkOrder(id: string): Promise<WorkOrderDetail | null> {
   const { data, error } = await (smSupabase as any)
     .from("work_orders")
     .select(
-      "id, work_order_number, status, priority, service_type, description, customer_complaint, diagnostic_notes, additional_info, urgency_level, estimated_hours, total_cost, initial_mileage, start_time, end_time, created_at, updated_at, customer_id, vehicle_id, customers(first_name,last_name,email,phone), vehicles(year,make,model,license_plate,vin)",
+      "id, work_order_number, status, priority, service_type, description, customer_complaint, diagnostic_notes, additional_info, urgency_level, estimated_hours, total_cost, initial_mileage, start_time, end_time, created_at, updated_at, customer_id, vehicle_id, customers!fk_work_orders_customer(first_name,last_name,email,phone), vehicles!fk_work_orders_vehicle(year,make,model,license_plate,vin)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -266,7 +266,12 @@ function AuthenticatedWorkOrderDetail({ userId, id }: { userId: string; id: stri
       queryKey: ["shop-manager", userId, "work-orders", "detail", id],
       exact: true,
     });
-    // Keep the existing list producer compatible until that route is scoped.
+    // Refresh every lifetime of the current account's list, never another account.
+    void qc.invalidateQueries({
+      queryKey: ["shop-manager", userId, "work-orders", "list"],
+      exact: false,
+    });
+    // Retain the exact older list key for compatibility with prior consumers.
     void qc.invalidateQueries({
       queryKey: ["shop-manager", "work-orders", "list"],
       exact: true,
@@ -864,6 +869,7 @@ function AddJobLineDialog({
   assertCanWrite,
   onWritten,
 }: EditorScope & { nextOrder: number }) {
+  const fieldId = useId();
   const qc = useQueryClient();
   const isMounted = useActiveScope();
   const isCurrent = () => isMounted() && isScopeCurrent();
@@ -926,8 +932,9 @@ function AddJobLineDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Job name *</Label>
+            <Label htmlFor={`${fieldId}-name`}>Job name *</Label>
             <Input
+              id={`${fieldId}-name`}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Oil change"
@@ -935,12 +942,17 @@ function AddJobLineDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Category</Label>
-              <Input value={category} onChange={(e) => setCategory(e.target.value)} />
+              <Label htmlFor={`${fieldId}-category`}>Category</Label>
+              <Input
+                id={`${fieldId}-category`}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Est. hours</Label>
+              <Label htmlFor={`${fieldId}-hours`}>Est. hours</Label>
               <Input
+                id={`${fieldId}-hours`}
                 type="number"
                 step="0.25"
                 value={hours}
@@ -950,8 +962,9 @@ function AddJobLineDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Labor rate ₱/hr</Label>
+              <Label htmlFor={`${fieldId}-rate`}>Labor rate ₱/hr</Label>
               <Input
+                id={`${fieldId}-rate`}
                 type="number"
                 step="0.01"
                 value={rate}
@@ -959,13 +972,17 @@ function AddJobLineDialog({
               />
             </div>
             <div>
-              <Label>Total ₱</Label>
-              <Input value={total ? total.toLocaleString() : ""} readOnly />
+              <Label htmlFor={`${fieldId}-total`}>Total ₱</Label>
+              <Input id={`${fieldId}-total`} value={total ? total.toLocaleString() : ""} readOnly />
             </div>
           </div>
           <div>
-            <Label>Description</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <Label htmlFor={`${fieldId}-description`}>Description</Label>
+            <Textarea
+              id={`${fieldId}-description`}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
           </div>
         </div>
         <DialogFooter>
@@ -992,6 +1009,7 @@ function AddPartDialog({
   assertCanWrite,
   onWritten,
 }: EditorScope) {
+  const partFieldId = useId();
   const qc = useQueryClient();
   const isMounted = useActiveScope();
   const isCurrent = () => isMounted() && isScopeCurrent();
@@ -1053,27 +1071,46 @@ function AddPartDialog({
         </DialogHeader>
         <div className="space-y-3">
           <div>
-            <Label>Part name *</Label>
-            <Input value={partName} onChange={(e) => setPartName(e.target.value)} />
+            <Label htmlFor={`${partFieldId}-name`}>Part name *</Label>
+            <Input
+              id={`${partFieldId}-name`}
+              value={partName}
+              onChange={(e) => setPartName(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label>Part #</Label>
-              <Input value={partNumber} onChange={(e) => setPartNumber(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-number`}>Part #</Label>
+              <Input
+                id={`${partFieldId}-number`}
+                value={partNumber}
+                onChange={(e) => setPartNumber(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Supplier</Label>
-              <Input value={supplier} onChange={(e) => setSupplier(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-supplier`}>Supplier</Label>
+              <Input
+                id={`${partFieldId}-supplier`}
+                value={supplier}
+                onChange={(e) => setSupplier(e.target.value)}
+              />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label>Qty *</Label>
-              <Input type="number" min="1" value={qty} onChange={(e) => setQty(e.target.value)} />
+              <Label htmlFor={`${partFieldId}-quantity`}>Qty *</Label>
+              <Input
+                id={`${partFieldId}-quantity`}
+                type="number"
+                min="1"
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+              />
             </div>
             <div>
-              <Label>Price ₱ *</Label>
+              <Label htmlFor={`${partFieldId}-price`}>Price ₱ *</Label>
               <Input
+                id={`${partFieldId}-price`}
                 type="number"
                 step="0.01"
                 value={price}
@@ -1081,9 +1118,9 @@ function AddPartDialog({
               />
             </div>
             <div>
-              <Label>Type</Label>
+              <Label htmlFor={`${partFieldId}-type`}>Type</Label>
               <Select value={partType} onValueChange={setPartType}>
-                <SelectTrigger>
+                <SelectTrigger id={`${partFieldId}-type`}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
