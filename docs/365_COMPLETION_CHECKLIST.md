@@ -42,6 +42,41 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Current independent source frontier fixes22 whole LF pins/exact spans and10 writer
+families across public/native stock. Final source+CI guard9/9 in217.8239ms, zero
+fail/skip/cancel; syntax/lint0/format/independent review pass. All seven parity/
+authority/durable/oversell/adoption/release flags remain FALSE. Same draft PR68,
+commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). No existing app/SQL/grants/
+migration/hosted/main/deployment change; own-head full gates are separate.
+
+Catalog scanner/capture STOP01:00UTC: initial21/22 then ONE test-only correction
+again21/22 fails on SELECT syntax. No hosted query; three unadmitted probe/test
+files stay local, no further correction/retry/capture unchanged. Owner notified
+once/asked for resumed parser-repair direction. Source-only gate preserves all
+existing mandatory/native/timeout/quarantine coverage. Current correspondence/
+global protocol/native authority/durable recovery remain before grant/app/UI;
+all18+N1–N3/47/12/5/2/stops/device/owner/main/live/22 October risk retained.
+
+Closed parent53c now passes all six38986941600 Actions; actual unit117260493854
+5,036/96 files70.13s, zero unexpected/quarantined failures (truncated/final
+summaries), no cancellation. Prior native8/build/current artifact/Preview skip
+are retained, not repeated or inherited by this source frontier.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904ff945f3842e9d0125b250219736a9ac8/same draft PR68/comment6227396249,
+exact body/title/base/draft/main preserved. Actual own native117260493711 PASSES
+untruncated PG17.11/Parts247/quote6/retained21+new8 exact ordered stock markers/
+both terminals/EXIT+always-cleanup. First trial passes, no new alternative consumed.
+Own build/type/OCR/lint/native pass; unit117260493854 running. Actual build guards/
+current2,609 objects0missing/Preview configuration skip verified, not deployment/
+history or whole recovery. Selected71/122/218ms not full/RTO. Next own unit then
+current catalog/all-writer/native authority/TTL/durable outcomes/recovery before
+grant/app connection. Notes join next implementation, no docs-only cancellation.
+
+### Closed runner preparation (actual native result above)
+
 Fresh native mixed-stock runner now has35/35 offline checks2.5179738s plus CI
 wiring2/2 in74.8001ms, zero fail/skip/cancel; lint0/format/diff/reviews pass.
 Four new files preserve all seven previous stock sources and75 setup actions.

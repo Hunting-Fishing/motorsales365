@@ -2,6 +2,34 @@
 
 ## Current delivery authority (17 October 2026)
 
+Independent source frontier now pins22 files/exact spans and10 public/native
+stock families; final source+CI guard9/9 in217.8239ms, lint0/reviews pass and all
+seven acceptance flags FALSE. Native inventory adjustment/counter/PO/invoice are
+separate from the public14-table selected proof, not fully functioning CRM.
+Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). Current catalog action STOPPED
+after initial21/22 plus ONE test-only correction again21/22 fails SELECT syntax;
+no hosted query. Owner notified once/async direction asked; local unadmitted
+catalog files await changed conditions, no second repair/retry. Strict authority/
+compatible all-writer/durable recovery/API/device/owner gates precede UI/adoption.
+Parent53c all six38986941600 Actions now pass, actual5,036/96 files70.13s zero
+unexpected/quarantined failures (truncated/final summaries); prior native8/build/
+artifact/Preview skip retained, not repeated/inherited. No app/grant/live/main
+change or fullCRM/marketplace/consumer completion;22 October still at risk.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904/same draft PR68/comment6227396249 now passes actual native
+PG17.11 selected stock8/retained21/Parts247/quote6/terminals/cleanup (untruncated),
+first trial, not fake transport. Own five Actions pass; unit117260493854 running.
+Current build/artifact2,609 objects0missing/Preview skip verified, not deployment.
+Native synthetic-owner mechanics do not establish CRM/native authority or
+current catalog/all-writer/TTL/durable recovery/API/device/owner acceptance.
+Next current unit then those gates before grant/app/UI connection; no fullCRM/
+consumer/main/live claim. Read-back notes join next integrated implementation.
+
+### Closed runner preparation (actual native result above)
+
 Fresh private native mixed-stock runner preparation passes root35/35 offline
 2.5179738s/CI wiring2/2 in74.8001ms, lint0/format/diff/reviews. Four new files
 preserve75 stock setup actions and authored actual three-session waits/both

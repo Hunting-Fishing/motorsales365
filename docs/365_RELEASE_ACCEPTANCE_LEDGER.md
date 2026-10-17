@@ -10,6 +10,40 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Independent selected source frontier now freezes22 whole LF pins/exact spans and
+10 writer families across public/native stock; final source+CI wiring9/9 in
+217.8239ms, zero fail/skip/cancel, syntax/lint0/format/independent review pass.
+All seven parity/authority/durable/oversell/adoption/release flags remain FALSE.
+Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact source and stopped catalog prerequisite](evidence/STOCK_WRITER_FRONTIER.md).
+P1/PA3/PA5/C3/N1/N2 remain unaccepted; direct edits, invoices/native stock/counter/
+PO, receive/return/cascade writers cannot be omitted from the atomic protocol.
+
+Catalog scanner/capture STOP01:00UTC after initial21/22 and ONE correction again
+21/22 fails SELECT syntax; SQL unchanged/no hosted query, three probe/test files
+remain local/unadmitted. Owner notified once/async resumed-repair direction asked;
+no second guessed repair/capture mechanism/unchanged rerun. Source-only mandatory
+gate preserves prior native/adversarial/transaction/quarantine/budget coverage.
+Parent53c all six38986941600 Actions now pass; actual5,036/96 files70.13s, zero
+unexpected/quarantined failures (truncated/final summaries), no cancellation.
+Prior native8/artifact/Preview skip retained, not inherited; own-head gates are
+separate. No workflow/grant/app/migration/main/hosted/live acceptance advances.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904ff945f3842e9d0125b250219736a9ac8/same draft PR68/comment6227396249,
+exact body/title/base/draft/main preserved. First own native117260493711 PASSES:
+untruncated PG17.11/Parts247/quote6/retained21+new8 exact ordered stock vector,
+both terminals/closed phase/EXIT+always-cleanup. No new alternative consumed.
+Own build/type/OCR/lint/native pass, unit117260493854 running. Actual build/current
+2,609-object artifact/Preview configuration skip verified; selected71/122/218ms
+not full/RTO/history recovery. Selected native stock mechanics only: P1/PA3/N1/N2
+still require current catalog/all-writer/native authority/TTL/durable unknown
+outcome/API/private Storage/whole recovery and app/owner/live acceptance. No
+grant/app/migration/live changes; notes join next implementation, not unit restart.
+
+### Closed runner preparation (actual native result above)
+
 Current native mixed-stock runner preparation passes root35/35 offline2.5179738s
 and CI wiring2/2 in74.8001ms, zero fail/skip/cancel, lint0/format/diff/reviews.
 Four new files/unchanged stock sources/75-action fixture author genuine three-PID

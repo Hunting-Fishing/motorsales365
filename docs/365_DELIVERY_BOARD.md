@@ -12,7 +12,69 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
-**Current slice: fresh native mixed-stock runner, first Linux trial pending.**
+**Independent selected writer frontier implemented.** Fixed22 whole LF source
+pins/exact selected spans cover10 families across public business stock and the
+separate native Shop Manager stock domain. All seven readiness/authority/parity/
+oversell/recovery flags stay FALSE. Final source+CI wiring9/9 in217.8239ms, zero
+fail/skip/cancel, syntax/ESLint0/format and independent review pass. Mandatory
+serialized source-only CI gate preserves existing coverage. Same draft PR68;
+commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence and stop register](evidence/STOCK_WRITER_FRONTIER.md).
+This closes selected source inventory only, not current catalog/all writers or
+stock/CRM acceptance. Direct edits, invoice deductions, native adjustment/counter/
+PO, shipping/receiving/returns/cascades remain in the compatible atomic protocol;
+no silent public-only stock scope. Next own-head checks and changed-direction
+catalog repair, then current correspondence/native authority/all-writer/durable
+recovery before app/grant adoption. No old native/local-suite rerun.
+
+**Current catalog action STOPPED (17 October, 01:00UTC).** New selected stock
+catalog safety scanner first fails21/22 combined checks because its FROM scanner
+misreads `IS DISTINCT FROM true`. ONE test-only comparison-token correction is
+consumed; the same22-check run again has21 pass/1 fail, now on unqualified
+`SELECT (` syntax. SQL itself is unchanged; all five isolated synthetic catalog
+execution/refusal/foreign-trigger subtests and seven source-frontier tests pass.
+No hosted stock query/capture ran. Do not correct/retry this scanner or use another
+capture mechanism unchanged. Owner notified once and asked asynchronously for
+direction to resume with a reviewed SQL-token/parser repair. Current stock
+catalog verification and dependent all-writer protocol are delayed;22 October
+remains at risk. The unadmitted SQL/static/runtime files stay local for review,
+not in the independent publication. Existing required CI/native/adversarial/
+transaction/quarantine coverage is unchanged; its proposed new unpublished
+catalog gate is not admitted. Independent source-frontier implementation
+continues with its own mandatory offline gate; no catalog pass is invented.
+
+**Parent53c unit dependency is closed.** All six own Actions38986941600 PASS;
+actual unit117260493854 reports5,036/96 files70.13s (returned log truncated/final
+summaries). No cancellation/inherited pass. Previous native8/retained21/build/
+current2,609-object artifact/Preview configuration skip verification is retained,
+not repeated. Selected stock proof is not complete stock/CRM/native authority.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904ff945f3842e9d0125b250219736a9ac8/same draft PR68/comment6227396249;
+exact remote/body/title/non-main base/draft/main preserved. **First actual native
+mixed-stock trial PASSES** at own job117260493711/run38986941600. Untruncated
+PG17.11/server170011 log has all8
+exact ordered stock PASS markers, both terminals, closed phase and EXIT/always-
+cleanup; root compares the full vector to source. Retained Parts247/quote6/expense21
+also pass; old21 vector unchanged. Selected restore71/122/218ms is not full/RTO.
+Own build117260493872/type117260493835/OCR117260493788/lint117260493805/native pass;
+unit117260493854 running, no inherited pass/cancellation. Actual build final214
+media/15OCR/202PDF/server-boundary/canonical Worker+sole365/dry-run verified
+(truncated/final summaries); COMPLETE CI merge06636250d9b806b2c225d915b894de46d4c9be50
+equals candidate tree1b6e015721660d29e5bd3451cb19297c39143368/2,609 current objects
+0missing, not history recovery. Actual untruncated Preview117260493438 config
+skip/no upload; production/migrations/Supabase Preview skip. Workers117260562460
+cause unverified, existing hosting STOP unchanged. New native alternative not
+consumed; initial trial passed. Read-back notes join next implementation, not
+docs-only push cancelling unit. Next current own-head unit, then current stock
+catalog/all-writer/phantom/global ordering/native authority/TTL/durable outcome/
+recovery protocol before any grant/app adoption. Selected mechanics are verified,
+not global no-oversell, trusted native authority or release acceptance. Existing
+follow-up update/read-back preserves exact prompt/identity/schedule/thread/creation;
+no duplicate or paused/completed task claim.
+
+**Closed runner preparation (actual native result above).**
 Four new driver/shell/test files consume only the unchanged75-action stock source.
 Distinct actual writer/waiter/observer PIDs must prove lock barriers, both B2B/
 inquiry COMMIT and ROLLBACK orders, visibility/outer rollback and injected real
@@ -25,9 +87,9 @@ zero fail/skip/cancel; lint0/format/diff/reviews pass. One pre-runtime fault-hel
 REVOKE tightening, no failed SQL/native trial or consumed new alternative.
 Same draft PR68/commit subject `Rehearse mixed stock writers on isolated native PostgreSQL17`.
 [Exact scope, pins and next actual proof](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md).
-Next own-head gates and first actual Linux eight-PASS stock vector/terminals/
-cleanup, under fail-fast. No native stock process ran locally and no native
-result is accepted yet. All prior source/grants/app/migrations stay unchanged;
+The prepared first Linux eight-PASS stock vector/terminals/cleanup is now verified
+above; remaining own-head unit and protocol gates are separate. No native stock
+process ran locally. All prior source/grants/app/migrations stay unchanged;
 current catalog/all-writer/native authority/TTL/durable outcomes/full recovery/
 device/owner/main/live and all18+N1–N3/47/12/5/2/stops remain. Day2 stock still open,
 22 October at risk; normal CI budgets/coverage are not weakened.
@@ -597,12 +659,13 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
    transaction coverage and normal timeouts/quarantine. No Docker, paid resources,
    customer outreach, destructive repair or unreviewed production experiments.
 
-| Stopped/dependent action             | Observed result / alternate budget                                                                                                                                                                                   | Resume condition                                                                                                                                                                          |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authenticated CRM browser acceptance | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                    | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
-| Cloudflare build remediation         | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried. | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
-| Full baseline/replay acceptance      | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                    | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
-| Parent40fd9aee unit log retrieval    | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                    | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
+| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                            | Resume condition                                                                                                                                                                          |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                             | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
+| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.          | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
+| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                             | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
+| Selected stock catalog scanner/capture | Initial21/22 failed DISTINCT/FROM Boolean parsing; ONE test-only correction consumed, alternative21/22 fails SELECT syntax. STOP01:00UTC; no hosted query. Three unadmitted files stay local; independent frontier9/9 passes. | Owner direction/new source/config/access changes condition for reviewed parser repair. No second guessed correction, unchanged rerun or another capture mechanism.                        |
+| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                             | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
 
 Unit log117174018596 at28295c10: initial HTTP502 plus ONE same-tool retry also502
 on2026-10-16T20:34UTC. Retrieval STOPPED and owner notified once. Do not repeat the

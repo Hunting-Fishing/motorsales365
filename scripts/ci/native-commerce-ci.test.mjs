@@ -279,6 +279,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/ci/native-mixed-stock-postgres.test.mjs scripts/ci/run-native-mixed-stock-postgres.test.mjs",
     ],
     [
+      "Selected stock writer frontier (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

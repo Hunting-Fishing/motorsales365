@@ -2,6 +2,39 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Selected writer frontier fixes22 source pins/exact spans and10 families, including
+separate public/native stock. Final source+CI guard9/9 in217.8239ms/lint0/reviews
+pass; all readiness/authority/parity/oversell flags FALSE, no app/grant/live change.
+Same PR68/commit subject `Pin selected stock writer frontier without advancing catalog acceptance`.
+[Exact evidence](evidence/STOCK_WRITER_FRONTIER.md). Direct edits/invoice/native
+adjustment/counter/PO/receive/return/cascades add substantive protocol work, not
+polish or an approved public-only stock subset. Day2 stock/native authority stays
+OPEN and22 October remains at risk, without defensible full-scope forecast.
+
+Current catalog scanner/capture STOP01:00UTC: initial21/22, ONE test-only correction
+again21/22 fails SELECT syntax; no hosted query. Owner notified once/async resumed
+repair direction asked; local probe/test files unadmitted and no second correction
+or alternate capture unchanged. Current catalog/compatible atomic all-writer/
+native authority/durable recovery dependencies are delayed. Parent53c all six
+38986941600 Actions pass, actual5,036/96 files70.13s zero unexpected/quarantined
+failures (truncated/final summaries); completed native8/artifact/Preview evidence
+retained, not repeated/inherited. All18+N1–N3/47/12/5/2/stops/owner/device/main/live
+remain; no scope cut or dates waiving gates.
+
+### Closed native-stock read-back (historical pending statements superseded)
+
+Published53c01904/same PR68/comment6227396249 passes first actual Linux native
+PG17.11 stock8 plus retained21/Parts247/quote6/terminals/cleanup, untruncated log.
+No alternative consumed. Own build/type/OCR/lint/native pass; unit117260493854
+running. Build/current2,609-object artifact/Preview skip verified, not full
+recovery/deployment. This closes the named selected native mixed-writer proof,
+NOT Day2 atomic-stock/native-authority/all-writer/catalog/TTL/durable/recovery
+milestone. Next unit/current protocol gates before grant/app adoption, all scope/
+stops/device/owner/main/live retained;22 October at risk. No unchanged35/2 rerun
+or docs-only push cancelling unit; notes join next implementation.
+
+### Closed runner preparation (actual native result above)
+
 Fresh native mixed-stock runner preparation is implemented: root35/35 offline
 2.5179738s/CI wiring2/2 in74.8001ms, lint0/format/diff/reviews; first actual Linux
 native three-session stock trial is pending. Four new files preserve75 fixed

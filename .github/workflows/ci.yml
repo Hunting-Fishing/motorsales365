@@ -90,6 +90,9 @@ jobs:
       - name: Native mixed-stock runner safety (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/ci/native-mixed-stock-postgres.test.mjs scripts/ci/run-native-mixed-stock-postgres.test.mjs
 
+      - name: Selected stock writer frontier (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db

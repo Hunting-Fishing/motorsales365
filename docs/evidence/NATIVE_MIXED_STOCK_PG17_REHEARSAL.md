@@ -1,9 +1,36 @@
-# Native mixed-stock PG17 rehearsal: runner preparation
+# Native mixed-stock PG17 rehearsal: selected mechanics verified
 
 17 October 2026, Asia/Manila. Same integrated candidate/draft PR68; commit subject
 `Rehearse mixed stock writers on isolated native PostgreSQL17`. Exact source and
-publication are recorded in its PR evidence comment. **Initial status: implemented
-and offline-tested; first genuine Linux native execution is NOT yet observed.**
+publication are recorded in its PR evidence comment. The committed preparation
+initially awaited Linux execution; the actual own-head read-back below closes
+that selected native dependency, not authority, full recovery or release.
+
+## Actual first Linux native trial
+
+Published53c01904ff945f3842e9d0125b250219736a9ac8/same draft PR68/comment6227396249;
+exact remote/body/title/non-main base/draft/main preserved. Own native job
+117260493711/run38986941600 completed SUCCESS with an **untruncated117,653-character log**:
+actual PGDG PostgreSQL/psql17.11, server170011, Parts247, quote6, retained21 ordered
+expense/draft/Auth-user markers and **all8 exact ordered new stock PASS markers**.
+Root compares both whole vectors to frozen source/prior admitted21; no inherited
+stock pass. Native server/private identity, helper and shell terminals, closed
+phase, EXIT and separate always-cleanup all pass. First trial, no failed native
+action or new alternative consumed. Actual selected dump71/restore122/verify218ms
+remains NOT whole recovery/RTO;47 replay failures remain.
+
+All six own Actions38986941600 now pass: completed unit117260493854 reports
+5,036/96 files70.13s, zero unexpected/quarantined failures (returned log truncated,
+final summaries). No cancellation or inherited pass. Actual build final214media/15OCR/202PDF/server-
+boundary/canonical Worker+sole365/dry-run summaries pass (returned log truncated).
+Complete CI merge06636250d9b806b2c225d915b894de46d4c9be50 equals candidate tree
+1b6e015721660d29e5bd3451cb19297c39143368:2,609 current objects0missing, not history
+recovery. Actual untruncated Preview117260493438 configuration skips/no upload;
+production/migrations/Supabase Preview skip. Workers117260562460/build cause
+unverified, existing hosting STOP unchanged. Read-back notes join the next source
+slice, not a docs-only push cancelling this unit or inheriting parent results.
+Existing follow-up update/read-back confirms exact prompt and unchanged identity/
+active schedule/thread/creation, no duplicate. No completion/live claim.
 
 ## Implemented scope and isolation
 
@@ -47,7 +74,7 @@ directory. PID/socket/lock-file/process/readiness absence and phase-group reapin
 precede removal of only the validated unique directory. EXIT/INT/TERM and a
 separate mandatory always-cleanup retain original nonzero failure status.
 
-## Authored native scenarios, not yet executed
+## Native scenarios now observed in the first own-head trial
 
 Distinct writer/waiter/observer backends must be demonstrated by actual PIDs and
 `pg_blocking_pids`, active state and Lock wait type. Poll cadence is not proof.
@@ -121,22 +148,25 @@ artifact/Preview configuration skip are retained, not rerun or inherited. Its
 native21 is expense/receipt, not stock; selected63/79/208ms restore is not full/RTO.
 The parent unit completed before this new source publication; no cancellation.
 
-Next read this slice's exact-head required gates and **first actual Linux native
-stock trial**, complete ordered eight-PASS vector/server/terminals, clean child
-exit and both cleanup paths. On failure diagnose once and try at most ONE safe
+The first actual Linux native stock trial/vector/server/terminals/child closure/
+cleanup is now verified above. Next read the remaining own-head unit result;
+do not rerun unchanged35/2 or completed native/build/artifact/Preview checks.
+Then close current catalog/all-writer/native authority/durable recovery gates.
+On a new failure diagnose once and try at most ONE safe
 evidenced available alternative; if none or it fails, STOP that action and notify
 once with exact stage/evidence/help/schedule impact. No blind rerun, weakened
 checks or second speculative repair. The older recovery PID alternative remains
 consumed; if that old source-stop failure recurs, its STOP rule still applies.
 
-Even a successful selected native trial does not close current catalog/all direct
+This successful selected native trial does not close current catalog/all direct
 or legacy writers/phantoms/global lock/deadlock ordering, native session/team/
 role/tenant authority, configured TTL/revocation, durable operations/idempotency/
 unknown-outcome reconciliation, API/private Storage or whole restore. Split
 `adjustBusinessInventory` remains; no global no-oversell/consumer ordering/fullCRM/
 device/owner/main-ready/live claim. No migration/grant/app/hosting/Buddy/366 change
 or deployment. All18+N1–N3/47 replay failures/12 historical/five unapplied/two
-recorded classifications and existing Auth-source/QA/hosting stops remain. Day2
+recorded classifications and existing Auth-source/QA/hosting stops remain. Global
+default ACLs and managed Auth are not certified by this selected graph. Day2
 atomic stock is open;22 October remains at risk, not a verified full-scope forecast.
 
 Supabase/Postgres guidance shaped least-privilege, fresh transaction/lock evidence
