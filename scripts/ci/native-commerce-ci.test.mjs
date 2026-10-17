@@ -144,6 +144,28 @@ test("all six candidate CI gates pin the reviewed Ubuntu family, not a moving la
   assert.equal(expenseCleanup["timeout-minutes"], 2);
   assert.ok(parts.steps.indexOf(expense) > parts.steps.indexOf(recoveryCleanup));
   assert.ok(parts.steps.indexOf(expenseCleanup) > parts.steps.indexOf(expense));
+  const stockMatches = parts.steps.filter(
+    (step) => step.name === "Mixed inquiry and B2B independent sessions (native PostgreSQL 17)",
+  );
+  const stockCleanupMatches = parts.steps.filter(
+    (step) => step.name === "Clean private mixed-stock PostgreSQL cluster (always)",
+  );
+  assert.equal(stockMatches.length, 1);
+  assert.equal(stockCleanupMatches.length, 1);
+  const [stock] = stockMatches;
+  const [stockCleanup] = stockCleanupMatches;
+  assert.equal(stock.run, "bash scripts/ci/run-native-mixed-stock-postgres.sh --run");
+  assert.equal(stock.if, undefined);
+  assert.equal(stock["continue-on-error"], undefined);
+  assert.equal(stock["timeout-minutes"], 5);
+  assert.equal(stock.shell, "bash");
+  assert.equal(stockCleanup.run, "bash scripts/ci/run-native-mixed-stock-postgres.sh --cleanup");
+  assert.equal(stockCleanup.if, "always()");
+  assert.equal(stockCleanup["continue-on-error"], undefined);
+  assert.equal(stockCleanup["timeout-minutes"], 2);
+  assert.equal(stockCleanup.shell, "bash");
+  assert.ok(parts.steps.indexOf(stock) > parts.steps.indexOf(expenseCleanup));
+  assert.ok(parts.steps.indexOf(stockCleanup) > parts.steps.indexOf(stock));
   const nodeSetup = parts.steps.filter((step) => step.uses === "actions/setup-node@v4");
   assert.equal(nodeSetup.length, 1);
   assert.equal(nodeSetup[0].with["node-version"], "${{ env.NODE_VERSION }}");
@@ -251,6 +273,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
     [
       "Mixed stock native-source and actual B2B writer composition (memory-only, never quarantined)",
       "node --test --test-concurrency=1 scripts/parts-stock/mixed-reservation-native-source.test.mjs scripts/parts-stock/mixed-reservation-order-source.test.mjs",
+    ],
+    [
+      "Native mixed-stock runner safety (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/native-mixed-stock-postgres.test.mjs scripts/ci/run-native-mixed-stock-postgres.test.mjs",
     ],
     [
       "Independent Workers build source freeze (offline, never quarantined)",

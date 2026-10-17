@@ -6,6 +6,25 @@ commit/publication is recorded in the PR evidence comment. This slice prepares
 faithful source inputs and executes sequential isolated SQL tests. It does not
 start native PostgreSQL, connect an application writer or change hosted data.
 
+Publisheda69d291886659d0ee2ef2d52de2b72207f478521/same draft PR68/comment6226732481;
+exact remote/body/title/non-main base/draft/main read-back passes. Own38982570784
+all six Actions PASS; actual unit1172465786435,036/96 files103.31s zero unexpected/
+quarantined failures (truncated/final summaries). Early native-source6/order13
+transcript clipped, not separately observed Linux19. Publication hold clears
+without cancellation/inherited passes.
+Actual own untruncated native117246578586 has PG17.11/server170011/Parts247/quote6/
+all21 ordered expense/draft/Auth-user markers/both terminators/EXIT+always-cleanup,
+full vector exactly equals retained21; NOT stock SQL. Selected63/79/208ms not
+full/RTO. Actual build final214media/15OCR/202PDF/server-boundary/canonical Worker+
+sole365/dry-run summaries pass (truncated/final summaries); COMPLETE CI merge
+f03364aa107cdbcf378f7dd69babb6b748b7c941 equals candidate tree
+89d9694be1e99d63db71494b3d63a84427b2022f/2,604 current objects0missing, not history
+recovery. Actual Preview117246578960 skips configuration/no upload; production/
+migrations/Supabase Preview skip. Workers117246620673 failure cause unverified,
+existing hosting STOP unchanged. Existing follow-up update/read-back preserves
+exact prompt/identity/schedule/thread/creation. These notes join next integrated
+implementation, not a docs-only push cancelling unit or inherited parent passes.
+
 ## Implemented and actually tested
 
 `buildMixedReservationNativeSource()` is a fixed, frozen, no-options export of
@@ -99,12 +118,22 @@ notes join implementation, not a docs-only push cancelling a running unit.
 
 First read this slice's own exact-head mandatory CI; never inherit405's passes.
 Then build a bounded Docker-free **fresh private PG17 cluster** runner consuming
-these fixed inputs, with owned process/cluster identity, loopback-only operation,
+these fixed inputs, with owned process/cluster identity, private Unix-socket-only operation,
 no hosted access and mandatory cleanup. Prove independent actual B2B/candidate
 sessions, observed lock wait/blocker identities, commit/rollback/rechecks and
 inverse mixed-writer ordering. Do not reuse the expense harness's admission
 bypass, a conflicting existing database or raw inserted holds as actual-writer
 proof. No native mixed-stock process/session ran in this slice.
+
+Bounded read-only next-runner inspection identified useful owned-directory/PID/
+PG17/private-socket startup and genuine blocker-observation patterns in the
+quote runner. Its server is Unix-socket-only (TCP disabled), not a loopback TCP
+listener. Do not copy its older cleanup/session settlement wholesale: the new
+stock runner must verify final process/socket absence and await child closure,
+and must not transfer quote-specific authenticated grants or Auth GUCs. Prefer
+four non-overlapping new runner/shell/test files and a dedicated root/environment/
+port, consuming only the stock source export. This inspection ran no process,
+database, test or dispatch and is not native acceptance.
 
 Selected source/owner/GUC support is not current catalog, original-human session
 or native role/tenant authority. All direct/legacy writers, phantoms, global lock

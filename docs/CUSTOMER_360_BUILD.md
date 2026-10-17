@@ -2,6 +2,21 @@
 
 ## Current delivery authority (17 October 2026)
 
+Fresh private native mixed-stock runner preparation passes root35/35 offline
+2.5179738s/CI wiring2/2 in74.8001ms, lint0/format/diff/reviews. Four new files
+preserve75 stock setup actions and authored actual three-session waits/both
+commit/rollback orders/visibility/real injected late-FK/full selected graph;
+**first Linux native trial pending**, no local native process. Source-only
+synthetic owner/Auth support is not CRM authority. Same PR68/commit subject
+`Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). Parenta69d all six
+Actions now complete, actual5,036/96 files103.31s zero unexpected/quarantined
+failures (truncated/final summaries); native21 is not stock. Next own-head actual
+native8/cleanup and full gates, then catalog/all-writer/native authority/durable
+recovery/API/device/owner/UI connection. No fullCRM/consumer/main/live acceptance.
+
+### Closed native-source composition checkpoint
+
 Current stock prerequisite now composes the exact retained B2B writer with the
 private inquiry correction and fixed native-source exports. Root parity6/6 in
 2.1367703s plus sequential actual-writer13/13 in10.8898883s pass;49 spans/14

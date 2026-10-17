@@ -2,6 +2,21 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Fresh native mixed-stock runner preparation is implemented: root35/35 offline
+2.5179738s/CI wiring2/2 in74.8001ms, lint0/format/diff/reviews; first actual Linux
+native three-session stock trial is pending. Four new files preserve75 fixed
+setup actions and existing stock sources; no app/grant/migration/live activation.
+Same PR68/commit subject `Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). Parenta69d all six
+Actions complete, actual5,036/96 files103.31s zero unexpected/quarantined failures
+(truncated/final summaries). Next own-head actual8 ordered native PASS/terminals/
+cleanup, under one-alternative fail-fast; not inherited old expense21 or fake
+transport. Day2 stock/native authority/all-writer/catalog/TTL/durable outcomes/
+full recovery milestone remains open; normal CI budgets and all18+N1–N3/stops/
+47/12/5/2/device/owner/main/live remain,22 October still at risk without forecast.
+
+### Closed native-source composition checkpoint
+
 Native stock source parity and unchanged actual B2B writer composition now pass
 root6/6 in2.1367703s and13/13 in10.8898883s, zero fail/skip/cancel. Fixed exports
 retain66 original actions; extension49 spans/14 tables/75 actions/30FK covers

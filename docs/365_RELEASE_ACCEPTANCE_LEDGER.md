@@ -10,6 +10,33 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Current native mixed-stock runner preparation passes root35/35 offline2.5179738s
+and CI wiring2/2 in74.8001ms, zero fail/skip/cancel, lint0/format/diff/reviews.
+Four new files/unchanged stock sources/75-action fixture author genuine three-PID
+actual-writer wait/COMMIT/ROLLBACK/visibility/late-FK and complete14-table graph
+proof with private PG17/socket/control/process cleanup. First actual Linux native
+trial and own-head gates are pending; fake transport/pure Bash is not SQL/session
+acceptance. Same PR68/commit subject
+`Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). P1/PA3/N1/N2 remain
+unaccepted through current catalog/all-writer/native authority/TTL/durable unknown
+outcome/API/private Storage/whole recovery and UI gates. No app/migration/grant/
+hosted change or fullCRM/main/live claim; all18+N1–N3/47/12/5/2/stops remain.
+
+### Closed native-source composition checkpoint
+
+Publisheda69d291886659d0ee2ef2d52de2b72207f478521/same draft PR68/comment6226732481,
+exact body/title/base/draft/main preserved. Own38982570784 all six Actions PASS;
+actual unit1172465786435,036/96 files103.31s zero unexpected/quarantined failures
+(truncated/final summaries), early native-source6/order13 transcript clipped.
+Publication hold clears without cancellation/inherited passes. Actual untruncated native
+117246578586 PG17.11/Parts247/quote6/retained21 ordered expense proofs/terminators/
+cleanup verified, NOT stock SQL. Selected63/79/208ms not full/RTO; actual build
+guards/current artifact2,604 objects0missing verified, not historical recovery.
+Actual Preview
+configuration skip/no upload. Hosting STOP unchanged; follow-up settings/prompt
+read-back passes. Notes join next implementation, not docs-only unit cancellation.
+
 Current source-only stock prerequisite adds fixed native-source exports and the
 unchanged retained actual B2B transition/event/timestamp composition. Root6/6
 parity2.1367703s and13/13 sequential SQL10.8898883s pass with zero fail/skip/cancel;

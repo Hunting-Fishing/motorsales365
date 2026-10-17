@@ -42,6 +42,32 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Fresh native mixed-stock runner now has35/35 offline checks2.5179738s plus CI
+wiring2/2 in74.8001ms, zero fail/skip/cancel; lint0/format/diff/reviews pass.
+Four new files preserve all seven previous stock sources and75 setup actions.
+Private socket-only PG17 actual three-session wait/COMMIT/ROLLBACK/visibility/
+late-FK/full selected-graph proof is authored, **first Linux trial pending**, not
+accepted from fake transport/pure Bash. Same PR68/commit subject
+`Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact evidence](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md). Next own-head gates/
+actual8 ordered PASS/terminals/EXIT+always-cleanup, no inherited parent results or
+unchanged35/2/app rerun. No app/grant/migration/live activation. Catalog/all-writer/
+native authority/TTL/durable outcomes/recovery/device/owner/main gates remain.
+
+### Closed native-source composition checkpoint
+
+Publisheda69d291886659d0ee2ef2d52de2b72207f478521/same draft PR68/comment6226732481,
+exact body/title/base/draft/main preserved. Own38982570784 all six Actions PASS;
+actual unit1172465786435,036/96 files103.31s zero unexpected/quarantined failures
+(truncated/final summaries), early native-source6/order13 transcript clipped.
+Publication hold clears without cancellation/inherited passes. Actual native117246578586 is
+untruncated PG17.11/Parts247/quote6/retained21 ordered expense markers/terminators/
+cleanup, NOT stock SQL; selected63/79/208ms not full/RTO. Actual build guards and
+complete CI mergef03364aa…=candidate tree89d9694b…/2,604 current objects0missing
+verified, not history recovery. Actual Preview skips/no
+upload; hosting STOP unchanged. Follow-up identity/schedule/thread/creation/
+prompt read-back passes. Notes join next implementation, no docs-only restart.
+
 Native stock source parity and actual retained B2B writer composition now pass
 root6/6 in2.1367703s and13/13 in10.8898883s, zero fail/skip/cancel. Fixed exports
 preserve the66-action core, extend49 spans/14 tables/75 actions/30FK and retain

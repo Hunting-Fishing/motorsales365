@@ -12,6 +12,48 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Current slice: fresh native mixed-stock runner, first Linux trial pending.**
+Four new driver/shell/test files consume only the unchanged75-action stock source.
+Distinct actual writer/waiter/observer PIDs must prove lock barriers, both B2B/
+inquiry COMMIT and ROLLBACK orders, visibility/outer rollback and injected real
+late-event FK23503 with complete14-table/NUMERIC-text/catalog/ACL/settings/sequence
+SHA256 witnesses. Fresh private0700 Unix-socket-only PG17/55437, owned PID/group
+identity/closed children/strict merged transcript/absence-before-cleanup; no old
+expense admission or existing DB reuse. Synthetic owner/Auth support stays false
+as native authority. Root35/35 offline in2.5179738s and CI wiring2/2 in74.8001ms,
+zero fail/skip/cancel; lint0/format/diff/reviews pass. One pre-runtime fault-helper
+REVOKE tightening, no failed SQL/native trial or consumed new alternative.
+Same draft PR68/commit subject `Rehearse mixed stock writers on isolated native PostgreSQL17`.
+[Exact scope, pins and next actual proof](evidence/NATIVE_MIXED_STOCK_PG17_REHEARSAL.md).
+Next own-head gates and first actual Linux eight-PASS stock vector/terminals/
+cleanup, under fail-fast. No native stock process ran locally and no native
+result is accepted yet. All prior source/grants/app/migrations stay unchanged;
+current catalog/all-writer/native authority/TTL/durable outcomes/full recovery/
+device/owner/main/live and all18+N1–N3/47/12/5/2/stops remain. Day2 stock still open,
+22 October at risk; normal CI budgets/coverage are not weakened.
+
+### Closed native-source composition checkpoint
+
+Publisheda69d291886659d0ee2ef2d52de2b72207f478521/same draft PR68/comment6226732481;
+exact remote/prior64,364-character body/title/non-main base/draft/main preserved.
+Own38982570784 all six Actions now PASS; actual unit117246578643 has5,036/96 files
+103.31s, zero unexpected/quarantined failures (returned log truncated/final
+summaries). Early native-source6/order13 transcript is clipped, not separately
+observed Linux19. Publication hold clears without cancellation/inherited passes.
+Actual own untruncated native117246578586
+proves PG17.11/server170011/Parts247/quote6/all21 ordered expense markers/both
+terminators/EXIT+always-cleanup, exact vector equals retained21; NOT stock SQL.
+Selected63/79/208ms not full/RTO.
+Actual build final214media/15OCR/202PDF/server-boundary/canonical Worker+sole365/
+dry-run summaries pass (truncated/final summaries); COMPLETE CI merge
+f03364aa107cdbcf378f7dd69babb6b748b7c941 equals candidate tree
+89d9694be1e99d63db71494b3d63a84427b2022f/2,604 current objects0missing, not history
+recovery. Actual Preview117246578960 configuration skip/
+no upload; production/migrations/Supabase Preview skip. Workers117246620673 cause
+unverified, hosting STOP unchanged. Follow-up updated/read back in place with
+exact prompt/identity/schedule/thread/creation preserved. Read-back notes join
+the next implementation, no docs-only push cancelling unit or unchanged reruns.
+
 **Current integrated slice: native stock source parity and actual B2B composition.**
 Fixed exports preserve the original66 setup actions and add eight exact retained
 writer/event/timestamp spans:49 total spans/14 tables/75 setup actions/30 real FKs.
