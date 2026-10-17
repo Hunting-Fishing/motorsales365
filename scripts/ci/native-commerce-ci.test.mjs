@@ -283,6 +283,10 @@ test("native commerce route suites stay explicit, single-worker and never quaran
       "node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs",
     ],
     [
+      "Selected stock catalog and body fingerprints (offline, never quarantined)",
+      "node --test --test-concurrency=1 scripts/ci/stock-writer-catalog-review.test.mjs scripts/ci/stock-writer-catalog-runtime.test.mjs scripts/ci/stock-writer-catalog-evidence.test.mjs scripts/ci/stock-writer-body-correspondence.test.mjs",
+    ],
+    [
       "Independent Workers build source freeze (offline, never quarantined)",
       "node --test scripts/ci/independent-workers-build.test.mjs",
     ],

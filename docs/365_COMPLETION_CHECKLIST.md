@@ -42,6 +42,19 @@ Security reconciliation branch: `completion/365-security`.
 
 ## Current resumption order (2026-10-17)
 
+Owner explicitly authorized reviewed scanner repair after the recorded STOP.
+First resumed16/16 in1.5891188s/SQLc604084f…/lint0/review pass. ONE actual sole365
+pg_catalog read at01:11:13.137905UTC/server170006 captures29tables501columns/
+193constraints83indexes49policies288triggers57functions, bounded complete/no
+truncation/failures. Missing throttle name remains/all5flagsFALSE. Actual JSON
+856330B/638be776… and six selected retained LF-body matches pinned, not whole
+schema/ACL/all-writer parity. New artifact-validator7/8 limits-label extraction
+failure uses ONE reviewed test-only correction, final8/8 in385.9347ms; no query/
+artifact change or recapture. [Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
+Local source/body gate awaits6a9 unit completion before push. Broad grants,
+separate stock numeric domains, compatible atomic protocol/native authority/
+durable recovery/API/device/owner/main/live gates and22 October risk remain.
+
 Current independent source frontier fixes22 whole LF pins/exact spans and10 writer
 families across public/native stock. Final source+CI guard9/9 in217.8239ms, zero
 fail/skip/cancel; syntax/lint0/format/independent review pass. All seven parity/

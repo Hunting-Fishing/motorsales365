@@ -10,6 +10,18 @@ closure without counting B2B inventory or Buddy source as live integration.
 
 ## Candidate and status rules
 
+Owner-authorized scanner resumption passes16/16 in1.5891188s. ONE sole365 metadata
+capture now pins29tables501columns193constraints83indexes49policies288triggers/
+57functions/server170006/01:11:13.137905UTC, bounded complete/no truncation/failures.
+Missing throttle name/all5flagsFALSE and six selected LF body matches/actual JSON
+856330B/638be776… are explicit, not whole schema/ACL/baseline adoption. New
+artifact-validator7/8 limits-key error receives ONE test-only correction; final
+8/8 in385.9347ms, query/artifact unchanged/no recapture.
+[Exact scope and findings](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
+Local gate ready, publication waits6a9 unit without cancellation. P1/PA3/PA5/C3/
+N1/N2 still require all-writer atomic/native authority/grant containment/durable
+recovery/API/device/owner acceptance. No workflow/grant/main/live advancement.
+
 Independent selected source frontier now freezes22 whole LF pins/exact spans and
 10 writer families across public/native stock; final source+CI wiring9/9 in
 217.8239ms, zero fail/skip/cancel, syntax/lint0/format/independent review pass.

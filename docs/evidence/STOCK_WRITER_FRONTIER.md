@@ -66,6 +66,12 @@ Frozen LF source pins:
 
 ## Catalog action STOPPED; no hosted capture
 
+This is the original source-only publication checkpoint. Subsequent direct owner
+authorization resumed the fixed lexical repair, now passing16/16 with ONE actual
+read-only capture; see [the current catalog prerequisite](STOCK_WRITER_CATALOG_PREREQUISITE.md).
+The original failure/consumed alternative below is preserved, not an active stop
+after that explicit resumption. No automatic unchanged retry occurred.
+
 The proposed local `stock-writer-catalog-review.sql` is one fixed pg_catalog-only
 SELECT over29 requested relations/33 function-name families and three fixed
 roles, returning bounded fingerprints/effective privileges, never application,

@@ -12,6 +12,28 @@ any acceptance criterion or silently remove scope.
 
 ## Current verified position and feasibility
 
+**Owner-authorized scanner repair/capture is now complete locally.** Direct owner
+reply `Authorize reviewed scanner repair` changed the stopped condition. Fresh
+full-token diagnosis identified only reservedSELECT; one reviewed fixed lexical
+repair adds exact15-token/immutableSQLpin/nested-ingress controls. First resumed
+16/16 in1.5891188s, syntax/lint0/review pass; SQLc604084f… unchanged. ONE actual
+sole365 pg_catalog read at2026-10-17T01:11:13.137905UTC/server170006 captures29
+relations/501columns/193constraints/83indexes/49policies/288triggers/57functions,
+reader12/roles3/368discoveryfunctions; complete bounded metadata/nontruncated0
+failures. All29 tables exist, requested throttle_network_part_inquiry absent;
+allRequestedObjectsPresent=false/all5 acceptance flags FALSE. Actual formatted
+JSON856330LF B/638be776… pinned; actual object equivalence checked. Six selected
+LF body hashes match retained source, NOT full schema/ACL/baseline/all-writer
+parity. Public/native numeric domains and broad effective stock grants remain
+explicit adoption/authority/containment/recovery gates; no live permissions or
+stock writes changed. [Exact capture and limits](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
+Original STOP/consumed alternative below remains historical; no automatic retry
+or second capture occurred. Current6a9 own five Actions pass/unit117268130186
+running: preserve it, commit locally if ready but do not push/cancel. Current
+catalog slice is not published/accepted from parent CI; next compatible global
+stock/authority/durable/recovery protocol before grants/app/UI. All scope/stops/
+47/12/5/2/owner/device/main/live and22 October risk remain.
+
 **Independent selected writer frontier implemented.** Fixed22 whole LF source
 pins/exact selected spans cover10 families across public business stock and the
 separate native Shop Manager stock domain. All seven readiness/authority/parity/
@@ -27,7 +49,7 @@ no silent public-only stock scope. Next own-head checks and changed-direction
 catalog repair, then current correspondence/native authority/all-writer/durable
 recovery before app/grant adoption. No old native/local-suite rerun.
 
-**Current catalog action STOPPED (17 October, 01:00UTC).** New selected stock
+**Historical catalog STOP (17 October, 01:00UTC; resumed only by owner above).** New selected stock
 catalog safety scanner first fails21/22 combined checks because its FROM scanner
 misreads `IS DISTINCT FROM true`. ONE test-only comparison-token correction is
 consumed; the same22-check run again has21 pass/1 fail, now on unqualified
@@ -659,13 +681,14 @@ unapproved smaller MVP, feature disablement counted as completion or date guaran
    transaction coverage and normal timeouts/quarantine. No Docker, paid resources,
    customer outreach, destructive repair or unreviewed production experiments.
 
-| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                            | Resume condition                                                                                                                                                                          |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                             | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
-| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.          | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
-| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                             | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
-| Selected stock catalog scanner/capture | Initial21/22 failed DISTINCT/FROM Boolean parsing; ONE test-only correction consumed, alternative21/22 fails SELECT syntax. STOP01:00UTC; no hosted query. Three unadmitted files stay local; independent frontier9/9 passes. | Owner direction/new source/config/access changes condition for reviewed parser repair. No second guessed correction, unchanged rerun or another capture mechanism.                        |
-| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                             | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
+| Stopped/dependent action               | Observed result / alternate budget                                                                                                                                                                                                                                        | Resume condition                                                                                                                                                                          |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authenticated CRM browser acceptance   | Signup incomplete; one read-only direct-route alternative redirected to login. Alternate consumed; stop and notify in this consolidation handoff.                                                                                                                         | Owner completes dedicated QA login/Terms; verify session and native pilot membership without privilege escalation.                                                                        |
+| Cloudflare build remediation           | Published40fd9aee fails7461bcd9/check117078480110. Exact-head summary plus detail read returned no failure log/annotations; no safe evidence-based remediation alternative. STOPPED and owner notified, not retried.                                                      | Redacted current build error output or newly available permitted diagnostic evidence; then select one authorized safe alternative. No CLI/dashboard log fallback or unchanged redispatch. |
+| Full baseline/replay acceptance        | 47 known failures; no new replay attempted here. Repeated unchanged replay is not an alternative.                                                                                                                                                                         | A specific source/catalog correction or new provenance evidence, with forward/recovery review; no destructive history repair.                                                             |
+| Selected stock catalog scanner/capture | Initial21/22 failed DISTINCT/FROM Boolean parsing; ONE test-only correction consumed, alternative21/22 fails SELECT syntax. STOP01:00UTC; no hosted query. Three unadmitted files stay local; independent frontier9/9 passes.                                             | Owner direction/new source/config/access changes condition for reviewed parser repair. No second guessed correction, unchanged rerun or another capture mechanism.                        |
+| Authorized catalog resumption          | Direct owner reply resumes targeted lexical repair: first16/16, then ONE successful actual read-only metadata capture. New artifact-validator7/8 limits-key error uses ONE correction, final8/8; no recapture or sourceSQL change. Prior stop/budget retained as history. | Selected capture is complete, no unchanged re-query. Current catalog/body/ACL/full-schema/compatible stock/authority/recovery adoption gates remain separate.                             |
+| Parent40fd9aee unit log retrieval      | Initial + one retry returned HTTP502; log read stopped. New completion status now verifies all six Actions success; no fresh parent count/runtime. Publication hold cleared without cancellation.                                                                         | Parent log need not be retried. Publish existing source and read its separate new-head native result under the same fail-fast rule; no CLI/dashboard fallback.                            |
 
 Unit log117174018596 at28295c10: initial HTTP502 plus ONE same-tool retry also502
 on2026-10-16T20:34UTC. Retrieval STOPPED and owner notified once. Do not repeat the

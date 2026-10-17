@@ -2,6 +2,17 @@
 
 ## Consolidated execution baseline (17 October 2026)
 
+Direct owner authorization resumed the stopped scanner: first16/16 in1.5891188s
+and ONE sole365 read-only capture pin29tables501columns193constraints83indexes/
+49policies288triggers57functions, bounded complete/no truncation/failures. Missing
+throttle name/all5flagsFALSE/six selected body matches do not close provenance.
+New artifact-validator limits-key error uses ONE correction, final8/8 in385.9347ms;
+no query/artifact change/recapture. [Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md).
+Local source/gates wait6a9 unit before push. Broad grants/two stock quantity models
+and compatible all-writer/native authority/durable recovery remain substantive
+Day2 work, not polish. All scope/47/12/5/2/hosting/QA/device/owner/main/live and
+22 October risk retained; no full-scope forecast or scope cut.
+
 Selected writer frontier fixes22 source pins/exact spans and10 families, including
 separate public/native stock. Final source+CI guard9/9 in217.8239ms/lint0/reviews
 pass; all readiness/authority/parity/oversell flags FALSE, no app/grant/live change.

@@ -2,6 +2,16 @@
 
 ## Current delivery authority (17 October 2026)
 
+Owner-authorized scanner repair passes first resumed16/16 in1.5891188s; ONE actual
+sole365 read-only catalog captures29tables501columns193constraints83indexes49policies/
+288triggers57functions, bounded complete/no truncation/failures. Missing throttle
+name/all5flagsFALSE/actual JSON856330B/638be776… and six selected body matches are
+pinned, NOT fullCRM authority/schema/parity. New artifact-validator limits-label
+bug receives ONE correction, final8/8 in385.9347ms; no recapture/query change.
+[Exact evidence](evidence/STOCK_WRITER_CATALOG_PREREQUISITE.md). Local catalog/body
+gate waits6a9 unit before push. Two stock domains/broad grants/all-writer/native
+authority/durable recovery/API/device/owner/main/live gates remain open.
+
 Independent source frontier now pins22 files/exact spans and10 public/native
 stock families; final source+CI guard9/9 in217.8239ms, lint0/reviews pass and all
 seven acceptance flags FALSE. Native inventory adjustment/counter/PO/invoice are

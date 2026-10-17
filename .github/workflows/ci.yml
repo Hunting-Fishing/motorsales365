@@ -93,6 +93,9 @@ jobs:
       - name: Selected stock writer frontier (offline, never quarantined)
         run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
 
+      - name: Selected stock catalog and body fingerprints (offline, never quarantined)
+        run: node --test --test-concurrency=1 scripts/ci/stock-writer-catalog-review.test.mjs scripts/ci/stock-writer-catalog-runtime.test.mjs scripts/ci/stock-writer-catalog-evidence.test.mjs scripts/ci/stock-writer-body-correspondence.test.mjs
+
       - name: Receipt and installed-component database regressions
         run: |
           npm run test:vehicle-receipts:db
