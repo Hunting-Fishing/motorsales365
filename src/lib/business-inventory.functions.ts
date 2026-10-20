@@ -203,40 +203,16 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     )[0];
   });
 
+/**
+ * Fail closed until the transactional, tenant-authorized stock operation is
+ * connected. The former movement-insert/read/absolute-update sequence could
+ * leave an orphan movement or lose concurrent quantity changes.
+ */
 export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { itemId: string; businessId: string; delta: number; reason?: string }) => d)
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: isMember } = await supabase.rpc("is_business_member", {
-      _user: userId,
-      _business: data.businessId,
-    });
-    if (!isMember) throw new Error("Forbidden");
-
-    // Log movement
-    const { error: movErr } = await supabase.from("business_inventory_movements").insert({
-      item_id: data.itemId,
-      business_id: data.businessId,
-      delta: data.delta,
-      reason: data.reason ?? null,
-      actor_id: userId,
-    });
-    if (movErr) throw movErr;
-
-    // Adjust qty_on_hand
-    const { data: cur } = await supabase
-      .from("business_inventory_items")
-      .select("qty_on_hand")
-      .eq("id", data.itemId)
-      .maybeSingle();
-    const newQty = Number(cur?.qty_on_hand ?? 0) + Number(data.delta);
-    const { error: updErr } = await supabase
-      .from("business_inventory_items")
-      .update({ qty_on_hand: newQty })
-      .eq("id", data.itemId);
-    if (updErr) throw updErr;
-    return { ok: true, qty_on_hand: newQty };
+  .handler(async () => {
+    throw new Error("Manual stock adjustment is temporarily unavailable pending atomic inventory integration");
   });
 
 export const deleteBusinessInventoryItem = createServerFn({ method: "POST" })
