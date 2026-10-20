@@ -1191,6 +1191,20 @@ function InventoryForm(props: InventoryProps & { close: () => void }) {
       const lineTotal = amountNumber(totalUnits);
       const priceAmount = amountNumber(priceUnits);
       const unitCost = amountNumber(costUnits);
+      // Refuse a known unsupported 101st line before any invoice mutation.
+      // This is a preflight, not an atomic concurrency guarantee.
+      const existing = childRead<Record<string, unknown>>(
+        await invoiceDb
+          .from("invoice_items")
+          .select("id,invoice_id,total", { count: "exact" })
+          .eq("invoice_id", invoiceId)
+          .order("id")
+          .limit(DISPLAY_LIMIT + 1),
+        invoiceId,
+      );
+      if (!existing.complete || existing.rows.length >= DISPLAY_LIMIT)
+        throw new FinancialWriteUncertain();
+      ack.check();
       props.beginWrite();
       try {
         const inserted = receipt(
