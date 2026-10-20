@@ -234,3 +234,9 @@ it("closing the dialog retains an unresolved operation for review", async () => 
   expect(await screen.findByRole("button", { name: "Review stock request" })).toBeInTheDocument();
   expect(sessionStorage.getItem(stockPendingKey(a, b))).not.toBeNull();
 });
+it("an idle inventory page mounts without a selected item or network request", () => {
+  show({ selected: null });
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(state.submit).not.toHaveBeenCalled();
+  expect(state.inspect).not.toHaveBeenCalled();
+});

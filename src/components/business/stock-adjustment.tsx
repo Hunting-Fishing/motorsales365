@@ -162,7 +162,8 @@ function ScopedStockAdjustment({ accountId, businessId, selected, onClose, onCha
   }
   const resolved = result?.status === "completed" || result?.status === "rejected";
   const target = pending?.itemId ?? selected?.id;
-  const title = selected?.id === target ? selected.name : `Item ${target ?? "unavailable"}`;
+  const title =
+    selected && selected.id === target ? selected.name : `Item ${target ?? "unavailable"}`;
   const open = selected !== null || recoveryOpen;
   return (
     <>

@@ -75,7 +75,10 @@ export function parseStockRequest(value: unknown): StockRequest {
     typeof value.reason !== "string" ||
     !value.reason.trim() ||
     value.reason.length > 500 ||
-    /[\u0000-\u001f\u007f]/.test(value.reason)
+    Array.from(value.reason).some((character) => {
+      const code = character.charCodeAt(0);
+      return code < 32 || code === 127;
+    })
   )
     throw new Error("Enter a reason of 1–500 characters without control characters.");
   const quantity = stockQuantity(value.expectedQuantity);

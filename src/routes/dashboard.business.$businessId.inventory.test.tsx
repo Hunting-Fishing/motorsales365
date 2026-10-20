@@ -89,7 +89,7 @@ function show(client = new QueryClient({ defaultOptions: { queries: { retry: fal
   const view = () => (
     <QueryClientProvider client={client}>
       <Page />
-    </QueryClientProvider>,
+    </QueryClientProvider>
   );
   const ui = render(view());
   return { rerender: () => ui.rerender(view()), client };
