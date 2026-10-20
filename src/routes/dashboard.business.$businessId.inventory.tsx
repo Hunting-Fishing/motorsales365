@@ -3,22 +3,10 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  Plus,
-  Package,
-  Trash2,
-  Pencil,
-  Minus,
-  Plus as PlusIcon,
-  AlertTriangle,
-  Radio,
-  Search,
-  Link2,
-} from "lucide-react";
+import { Plus, Package, Trash2, Pencil, AlertTriangle, Radio, Search, Link2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
-  adjustBusinessInventory,
   deleteBusinessInventoryItem,
   getCanonicalLinkCapability,
   linkBusinessInventoryCanonicalPart,
@@ -49,6 +37,10 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { InventoryItemFormDialog } from "@/components/business/inventory-item-form";
+import {
+  BusinessStockAdjustment,
+  type StockItemSnapshot,
+} from "@/components/business/stock-adjustment";
 
 export const Route = createFileRoute("/dashboard/business/$businessId/inventory")({
   component: InventoryPage,
@@ -77,7 +69,6 @@ function AccountInventoryPage({
   const lifetime = useId();
   const qc = useQueryClient();
   const loadFn = useServerFn(listBusinessInventory);
-  const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
   const inquiriesFn = useServerFn(listShopInquiries);
   const capabilityFn = useServerFn(getCanonicalLinkCapability);
@@ -159,6 +150,7 @@ function AccountInventoryPage({
     };
   }, [businessId, qc]);
 
+  const [stockItem, setStockItem] = useState<StockItemSnapshot | null>(null);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [inventorySearch, setInventorySearch] = useState("");
@@ -208,17 +200,6 @@ function AccountInventoryPage({
       toast.error(e?.message || "Could not update canonical link");
     } finally {
       setLinking(false);
-    }
-  }
-
-  async function adjust(itemId: string, delta: number) {
-    try {
-      await adjustFn({
-        data: { itemId, businessId, delta, reason: delta > 0 ? "Restock" : "Used" },
-      });
-      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
     }
   }
 
@@ -392,23 +373,17 @@ function AccountInventoryPage({
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => adjust(it.id, -1)}
-                    aria-label="Decrease"
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
                   <div className="w-14 text-center font-semibold">{Number(it.qty_on_hand)}</div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => adjust(it.id, 1)}
-                    aria-label="Increase"
-                  >
-                    <PlusIcon className="h-3 w-3" />
-                  </Button>
+                  {canManage ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label={`Adjust stock for ${it.name}`}
+                      onClick={() => setStockItem(it)}
+                    >
+                      Adjust stock
+                    </Button>
+                  ) : null}
                   <span className="text-xs text-muted-foreground ml-1">{it.unit}</span>
                 </div>
                 {capability.data?.allowed && (
@@ -442,6 +417,15 @@ function AccountInventoryPage({
         })}
       </Card>
 
+      <BusinessStockAdjustment
+        accountId={accountId}
+        businessId={businessId}
+        selected={stockItem}
+        onClose={() => setStockItem(null)}
+        onChanged={() => {
+          void qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+        }}
+      />
       <InventoryItemFormDialog
         open={open}
         onOpenChange={setOpen}

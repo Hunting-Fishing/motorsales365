@@ -37,6 +37,10 @@ vi.mock("@/lib/network-stock.functions", () => ({
   releaseNetworkInquiry: vi.fn(),
   NETWORK_INQUIRY_STATUSES: ["pending"],
 }));
+vi.mock("@/components/business/stock-adjustment", () => ({
+  BusinessStockAdjustment: ({ selected }: { selected: { name: string } | null }) =>
+    selected ? <div role="dialog">Stock correction for {selected.name}</div> : null,
+}));
 vi.mock("@/components/parts/network-exposure-card", () => ({ NetworkExposureCard: () => null }));
 vi.mock("@/components/business/inventory-item-form", () => ({
   InventoryItemFormDialog: ({
@@ -85,7 +89,7 @@ function show(client = new QueryClient({ defaultOptions: { queries: { retry: fal
   const view = () => (
     <QueryClientProvider client={client}>
       <Page />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
   const ui = render(view());
   return { rerender: () => ui.rerender(view()), client };
@@ -173,4 +177,21 @@ it("logout and auth loading immediately hide the inventory", async () => {
   ui.rerender();
   expect(screen.queryByRole("button", { name: "Add item" })).not.toBeInTheDocument();
   await waitFor(() => expect(state.load).toHaveBeenCalledTimes(1));
+});
+
+it("authorized staff opens the stock correction flow instead of dispatching a blind plus/minus write", async () => {
+  show();
+  fireEvent.click(
+    await screen.findByRole("button", { name: "Adjust stock for Account A private stock" }),
+  );
+  expect(screen.getByRole("dialog")).toHaveTextContent(
+    "Stock correction for Account A private stock",
+  );
+  expect(screen.queryByRole("button", { name: "Increase", exact: true })).not.toBeInTheDocument();
+});
+it("ordinary staff does not receive stock adjustment controls", async () => {
+  state.capability.mockResolvedValue({ canManage: false, allowed: false });
+  show();
+  await screen.findByText("Account A private stock");
+  expect(screen.queryByRole("button", { name: /Adjust stock for/ })).not.toBeInTheDocument();
 });

@@ -65,10 +65,10 @@ const sourceSpecs = [
     "publicUI",
     "src/routes/dashboard.business.$businessId.inventory.tsx",
     1,
-    861,
-    "5e1bc94bb4f6721f67d76716c5965e3f593ec86eee7b15f82df10c9c3db674a0",
-    "2cd4261e1d75be7dd6109877781929e28da4ff1261746ef5d05b3c82caa9a7eb",
-    30687,
+    845,
+    "6033e6aa6e36b9f8458db8273834647a854c6d3109b27e066856fe13ebf358e1",
+    "2e63bde68b4ee2926d7f3155170385726c1d66ac73e69b2530c6c0a76356c8f7",
+    30491,
   ],
   [
     "b2bUI",
@@ -214,7 +214,7 @@ const inventorySpecs = [
     ["public"],
     ["upsertBusinessInventoryItem", "adjustBusinessInventory", "deleteBusinessInventoryItem"],
     ["publicApp", "publicUI", "base", "authorityApp"],
-    "Existing-item metadata edits exclude stock counters and canonical-link writes and compare the original updated_at in a tenant-bound UPDATE. Creation and other stock writers remain independent; manual adjustment remains interlocked without writes. Account-scoped UI drafts and expected-account checks guard the selected caller. getClaims is not fresh native authority; direct SQL/RLS, real sessions and global stock recovery remain unaccepted.",
+    "Existing-item metadata edits exclude stock counters and canonical-link writes and compare the original updated_at in a tenant-bound UPDATE. The legacy adjustment export remains interlocked without writes; the route now uses the separately tested business_stock_operation_v1 RPC and durable dialog. Its forward SQL requires the staff boundary and native sessions; deployment is not established by this selected frontier. getClaims alone is not fresh authority; other stock writers, complete direct SQL/RLS and global no-oversell remain unaccepted.",
   ],
   [
     "inquiry-lifecycle",

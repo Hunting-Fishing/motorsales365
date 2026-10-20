@@ -1,0 +1,65 @@
+name: Stock adjustment integration
+on:
+  pull_request:
+    branches:
+      - completion/365-seven-day-integration
+    paths:
+      - src/lib/business-stock-operation*
+      - src/components/business/stock-adjustment*
+      - src/routes/dashboard.business.*.inventory*
+      - scripts/client-release/business-stock*
+      - scripts/client-release/build-business-stock-release.mjs
+      - scripts/client-release/business-staff-boundary.sql
+      - supabase/releases/business-stock-operation-v1.sql
+      - .github/workflows/stock-adjustment-validation.yml
+permissions:
+  contents: read
+jobs:
+  stock-adjustment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual stock dialog, inventory page and retained editor
+        run: npx vitest run src/components/business/stock-adjustment.test.tsx 'src/routes/dashboard.business.$businessId.inventory.test.tsx' src/components/business/inventory-item-form.test.tsx --maxWorkers=1
+      - name: Actual contract, server adapter, authenticated RPC and source pins
+        run: node --test --test-concurrency=1 scripts/client-release/business-stock-contract.test.mjs scripts/client-release/business-stock-operation.test.mjs scripts/parts-stock/writer-frontier.test.mjs
+      - name: Produce forward release SQL without connecting or applying it
+        run: node scripts/client-release/build-business-stock-release.mjs > "$RUNNER_TEMP/business-stock-forward.sql"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: business-stock-forward-sql
+          path: ${{ runner.temp }}/business-stock-forward.sql
+          retention-days: 7
+  native-rpc:
+    needs: stock-adjustment
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install PG17 for a private throwaway cluster
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 https://www.postgresql.org/media/keys/ACCC4CF8.asc --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          printf '\ncreate_main_cluster = false\n' | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-17 postgresql-client-17
+      - name: Public RPC duplicate, rollback, conflicting-intent and stale-stock races
+        run: node scripts/client-release/business-stock-native.mjs
