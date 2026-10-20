@@ -10,13 +10,13 @@ const read = (path) =>
   readFileSync(new URL(`../../${path}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const expectedPins = [
-  ["publicApp", "34712498a61f5bc99d44514c296f7852db29c6565e349e45b18581c33a08849f"],
+  ["publicApp", "67775ae059d2785cc43b9d454d0c2b8a5a8a70b12bb5e952ef033dee730faec6"],
   ["inquiryApp", "cdbcb8e3b8c0e293cc2f007c32783a0ec99dd4bb660fe176110b25f1e080b40a"],
   ["b2bApp", "ab13e2fa5581038f57c0935fda65f58c7203f1c5b3bf273e50e6fd6cdcb6b576"],
   ["publicInvoiceApp", "83da4dead41ebed3aaeb366c1d214264783bc4c2d08dcd91c20e4674cf13bfc6"],
   ["authorityApp", "3c16c38eda5e4213aaac23a16194722ca413ec454aa8006f4b48a7e586f51868"],
   ["schemaApp", "3ca5aa5a40b5393aa9cbe8c1a16ea7a1cf265ac19d3c5590e78b005d72ac41df"],
-  ["publicUI", "bc3bf6a5b10963eefdd4e55873eed332079759b637f767b8a94c81c73c448e1f"],
+  ["publicUI", "5e1bc94bb4f6721f67d76716c5965e3f593ec86eee7b15f82df10c9c3db674a0"],
   ["b2bUI", "af06064d5bcd70ef2a556c43bb6b3b2ad79e2a26552a9a9ae22e427ae7439192"],
   ["nativeAdjustApp", "f57718a4327a98a9508bbbda07c281f9c26b35f3cfe57c8cc0556f1249e3cfba"],
   ["counterApp", "6c3a7e6db00eeed566eb8875c84dc24eb7dd82a625aec3827d4860a63146ca27"],
@@ -64,8 +64,8 @@ test("exact source-span and writer-gap metadata cannot drift silently", () => {
       ].join("\t"),
     )
     .join("\n");
-  assert.equal(hash(sources), "4c1822f1f57338df8671736c03f381f7e11327484768e4ca8728d777beea5c1f");
-  assert.equal(hash(inventory), "8c94ce857ef3d1f2e6a0ccf75b0341f1a0c1ff888622fe276bdf0c52900002a6");
+  assert.equal(hash(sources), "6d1459c623f487884a86bd5f437f52af10a3000f3e85cfb6ec3fd9d7dda6281e");
+  assert.equal(hash(inventory), "3fa793305c9f76ceaf789a531a248d98f30f86b85ea42584b4e5cc028b758675");
 });
 
 test("fixed frontier has exactly eleven app and eleven whole SQL pins", () => {
@@ -121,7 +121,11 @@ test("inventory IDs are unique and evidence remains fixed, complete and detached
 test("gap witnesses preserve each newly exposed writer boundary", () => {
   const result = buildStockWriterFrontier();
   const expected = [
-    ["Absolute on-hand/hold/on-order edits", "interlocked without writes", "getClaims"],
+    [
+      "Existing-item metadata edits exclude stock counters",
+      "interlocked without writes",
+      "getClaims",
+    ],
     ["private mixed-hold candidate", "New UUID", "Auth-to-guest", "unknown-outcome"],
     ["shipping, receiving, transfers, returns, quarantine", "Global multi-item lock/phantom"],
     ["invoice-item triggers deduct/restore", "Combined hold admission"],

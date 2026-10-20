@@ -123,7 +123,14 @@ function fixture(options: { gate?: Reply; costs?: Reply; row?: Reply } = {}) {
   };
 }
 
-const draft = { id: itemA, businessId: businessA, name: "Brake pads" };
+const version = "2026-10-20T12:00:00.123456+00:00";
+const draft = {
+  id: itemA,
+  businessId: businessA,
+  expectedAccountId: userId,
+  expectedUpdatedAt: version,
+  name: "Brake pads",
+};
 
 test("metadata-only updates do not reset stock or publish hidden inventory", async () => {
   const f = fixture();
@@ -133,6 +140,7 @@ test("metadata-only updates do not reset stock or publish hidden inventory", asy
   assert.deepEqual(JSON.parse(JSON.stringify(command.filters)), [
     ["id", itemA],
     ["business_id", businessA],
+    ["updated_at", version],
   ]);
   assert.deepEqual(JSON.parse(JSON.stringify(command.payload)), {
     business_id: businessA,
@@ -144,7 +152,6 @@ test("explicit zero, false and nullable values remain intentional updates", asyn
   const f = fixture();
   await f.invoke("upsertBusinessInventoryItem", {
     ...draft,
-    qty_on_hand: 0,
     price: 0,
     cost: 0,
     active: false,
@@ -153,14 +160,18 @@ test("explicit zero, false and nullable values remain intentional updates", asyn
     location_id: null,
   });
   const payload = f.commands[0].payload as Record<string, unknown>;
-  for (const key of ["qty_on_hand", "price", "cost"]) assert.equal(payload[key], 0);
+  for (const key of ["price", "cost"]) assert.equal(payload[key], 0);
   for (const key of ["active", "network_visible"]) assert.equal(payload[key], false);
   for (const key of ["sku", "location_id"]) assert.equal(payload[key], null);
 });
 
 test("new items retain existing creation defaults", async () => {
   const f = fixture();
-  await f.invoke("upsertBusinessInventoryItem", { businessId: businessA, name: "New part" });
+  await f.invoke("upsertBusinessInventoryItem", {
+    businessId: businessA,
+    expectedAccountId: userId,
+    name: "New part",
+  });
   assert.equal(f.commands[0].method, "insert");
   const payload = f.commands[0].payload as Record<string, unknown>;
   assert.equal(payload.qty_on_hand, 0);
@@ -239,7 +250,13 @@ for (const data of [
   for (const handler of ["upsertBusinessInventoryItem", "deleteBusinessInventoryItem"]) {
     test(`${handler} rejects mismatched acknowledgment ${JSON.stringify(data)}`, async () => {
       const f = fixture({ row: { data, error: null } });
-      await assert.rejects(() => f.invoke(handler, draft), /could not be confirmed/);
+      if (handler === "upsertBusinessInventoryItem" && data === null) {
+        assert.deepEqual(JSON.parse(JSON.stringify(await f.invoke(handler, draft))), {
+          error: "INVENTORY_EDIT_CONFLICT",
+        });
+      } else {
+        await assert.rejects(() => f.invoke(handler, draft), /could not be confirmed/);
+      }
       assert.equal(f.calls.length, 1);
     });
   }
@@ -266,3 +283,59 @@ test("the unresolved manual adjustment interlock never makes a partial write", a
   assert.equal(f.commands.length, 0);
   assert.equal(f.calls.length, 0);
 });
+
+for (const value of [undefined, null, "", "2026-10-20", "bad", "2026-99-99T99:99:99Z"]) {
+  test(`edit rejects missing or invalid opening timestamp ${String(value)}`, async () => {
+    const f = fixture();
+    await assert.rejects(
+      () => f.invoke("upsertBusinessInventoryItem", { ...draft, expectedUpdatedAt: value }),
+      /Reload/,
+    );
+    assert.equal(f.commands.length, 0);
+  });
+}
+for (const patch of [
+  { qty_on_hand: 0 },
+  { qty_on_hand: 99 },
+  { extra: { qty_on_hold: 0 } },
+  { extra: { qty_on_order: 3 } },
+  { catalog_part_id: null },
+]) {
+  test(`metadata edits refuse dedicated transaction fields ${JSON.stringify(patch)}`, async () => {
+    const f = fixture();
+    await assert.rejects(
+      () => f.invoke("upsertBusinessInventoryItem", { ...draft, ...patch }),
+      /dedicated/,
+    );
+    assert.equal(f.commands.length, 0);
+  });
+}
+test("an account switch is rejected before permission or data queries", async () => {
+  const f = fixture();
+  await assert.rejects(
+    () => f.invoke("upsertBusinessInventoryItem", { ...draft, expectedAccountId: businessB }),
+    /Account changed/,
+  );
+  assert.equal(f.calls.length, 0);
+  assert.equal(f.commands.length, 0);
+});
+test("notes persist and explicit null clears them without changing stock", async () => {
+  for (const notes of ["Torque check after 100km", null]) {
+    const f = fixture();
+    await f.invoke("upsertBusinessInventoryItem", { ...draft, notes });
+    const payload = f.commands[0].payload as Record<string, unknown>;
+    assert.equal(payload.notes, notes);
+    for (const key of ["qty_on_hand", "qty_on_hold", "qty_on_order", "catalog_part_id"])
+      assert.equal(Object.hasOwn(payload, key), false);
+  }
+});
+for (const price of [NaN, Infinity, -1, 0.001, "12", 1e20]) {
+  test(`invalid price rejected before writing ${String(price)}`, async () => {
+    const f = fixture();
+    await assert.rejects(
+      () => f.invoke("upsertBusinessInventoryItem", { ...draft, price }),
+      /non-negative/,
+    );
+    assert.equal(f.commands.length, 0);
+  });
+}

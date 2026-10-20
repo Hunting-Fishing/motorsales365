@@ -81,6 +81,9 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     (d: {
       id?: string;
       businessId: string;
+      expectedAccountId: string;
+      expectedUpdatedAt?: string;
+      notes?: string | null;
       sku?: string | null;
       name: string;
       category?: string | null;
@@ -98,13 +101,55 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       extra?: Record<string, any> | null;
     }) => {
       assertInventoryId(d?.businessId);
-      if (d.id !== undefined) assertInventoryId(d.id);
+      assertInventoryId(d?.expectedAccountId);
+      if (d.id !== undefined) {
+        assertInventoryId(d.id);
+        // Use the original server timestamp verbatim: converting to a Date and
+        // back would truncate PostgreSQL microseconds and break the comparison.
+        if (
+          typeof d.expectedUpdatedAt !== "string" ||
+          d.expectedUpdatedAt.length > 40 ||
+          !/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/.test(
+            d.expectedUpdatedAt,
+          ) ||
+          !Number.isFinite(Date.parse(d.expectedUpdatedAt))
+        )
+          throw new Error("Reload this inventory item before editing");
+        if (
+          d.qty_on_hand !== undefined ||
+          d.extra?.qty_on_hold !== undefined ||
+          d.extra?.qty_on_order !== undefined ||
+          d.catalog_part_id !== undefined
+        )
+          throw new Error("Use the dedicated stock or catalogue operation for these fields");
+      }
       if (typeof d.name !== "string" || !d.name.trim()) throw new Error("Name required");
+      if (
+        d.notes !== undefined &&
+        d.notes !== null &&
+        (typeof d.notes !== "string" || d.notes.length > 20_000)
+      )
+        throw new Error("Notes must be 20,000 characters or fewer");
+      for (const value of [d.qty_on_hand, d.cost, d.price, d.reorder_at]) {
+        if (
+          value !== undefined &&
+          value !== null &&
+          (typeof value !== "number" ||
+            !Number.isFinite(value) ||
+            value < 0 ||
+            value > 9_999_999_999.99 ||
+            !/^\d+(?:\.\d{1,2})?$/.test(String(value)))
+        )
+          throw new Error(
+            "Enter a non-negative quantity or amount with at most two decimal places",
+          );
+      }
       return d;
     },
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    if (data.expectedAccountId !== userId) throw new Error("Account changed. Reopen the item.");
     await assertManager(supabase, userId, data.businessId);
 
     if (data.catalog_part_id) {
@@ -174,6 +219,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       business_id: data.businessId,
       sku: data.sku ?? null,
       name: data.name.trim(),
+      notes: data.notes ?? null,
       category: data.category ?? null,
       brand: data.brand ?? null,
       unit: data.unit ?? "pc",
@@ -194,6 +240,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       // optional values that the caller did not include in this patch.
       const optionalFields = [
         "sku",
+        "notes",
         "category",
         "brand",
         "unit",
@@ -221,10 +268,14 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
           .update(writable)
           .eq("id", data.id)
           .eq("business_id", data.businessId)
+          .eq("updated_at", data.expectedUpdatedAt!)
           .select(INVENTORY_MEMBER_SELECT)
-          .single()
+          .maybeSingle()
       : await table.insert(writable).select(INVENTORY_MEMBER_SELECT).single();
     if (error) throw error;
+    // A zero-row guarded update is a known no-write result. Do not silently
+    // rebase and overwrite a colleague's edits, or report that it was saved.
+    if (data.id && row === null) return { error: "INVENTORY_EDIT_CONFLICT" as const };
     if (
       !row ||
       typeof row.id !== "string" ||

@@ -1,0 +1,32 @@
+name: Inventory edit completion checks
+on:
+  pull_request:
+    branches:
+      - completion/365-seven-day-integration
+    paths:
+      - src/lib/business-inventory.functions.ts
+      - src/lib/business-inventory-client-release.test.ts
+      - src/components/business/inventory-item-form*
+      - src/routes/dashboard.business.*.inventory*
+      - scripts/client-release/inventory-metadata.test.mjs
+      - scripts/parts-stock/writer-frontier*
+      - .github/workflows/inventory-edit-validation.yml
+permissions:
+  contents: read
+jobs:
+  inventory-editor:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual editor, account switching, and server handler
+        run: npx vitest run src/lib/business-inventory-client-release.test.ts src/components/business/inventory-item-form.test.tsx 'src/routes/dashboard.business.$businessId.inventory.test.tsx' --maxWorkers=1
+      - name: Retained-table metadata writes and complete stock source pins
+        run: node --test --test-concurrency=1 scripts/client-release/inventory-metadata.test.mjs scripts/parts-stock/writer-frontier.test.mjs
