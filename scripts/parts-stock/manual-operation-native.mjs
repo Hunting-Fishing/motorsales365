@@ -224,6 +224,7 @@ async function run() {
     await observer.command(
       fs.readFileSync(new URL("./manual-operation-candidate.sql", import.meta.url), "utf8"),
     );
+    console.log("PASS native stock operation retained fixture and candidates installed");
     const uuid = (prefix, n) => `${prefix}000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
     const cohort = (n) => ({ item: uuid("32", n), op: uuid("82", n) });
     async function seed(c) {
@@ -234,7 +235,7 @@ async function run() {
     const statement = (c, delta = "2") =>
       `SELECT ${schema}.apply('${ids.actor}','${ids.business}','${c.item}','${c.op}',10,${delta},'Native fixture')`;
     async function begin(s) {
-      await s.command(`BEGIN; SET LOCAL test.user='${ids.actor}';`);
+      await s.command(`BEGIN; SELECT set_config('test.user','${ids.actor}',true);`);
     }
     async function inventory(c) {
       return observer.one(

@@ -36,7 +36,7 @@ jobs:
       - name: Preserve full stock source-integrity checks
         run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
       - name: Stock operation replay and restart recovery (isolated PGlite)
-        run: node --test --test-concurrency=1 scripts/parts-stock/manual-operation-candidate.test.mjs
+        run: node --test --test-concurrency=1 scripts/parts-stock/manual-operation-candidate.test.mjs scripts/parts-stock/manual-operation-native-setup.test.mjs
 
   native-stock-operations:
     name: Native PG17 stock operation concurrency
