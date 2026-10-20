@@ -34,11 +34,11 @@ jobs:
         run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts --maxWorkers=1
       - name: Preserve full stock source-integrity checks
         run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
-      # One bounded copy enables complete offline validation rather than source
-      # excerpts. Contains tracked public source and installed test dependencies,
-      # not .git, runner configuration, environment values or hosted data.
-      - name: Prepare one-time offline validation bundle
-        if: github.run_number == 2 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
+      # The initial all-dependency archive failed before upload. This single
+      # reduced alternative keeps the same size ceiling and tests. It includes
+      # source text and three test tools, NOT a deployable application artifact.
+      - name: Prepare reduced offline validation bundle
+        if: github.run_number == 3 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
         shell: bash
         env:
           CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
@@ -46,22 +46,51 @@ jobs:
           set -euo pipefail
           out="$RUNNER_TEMP/client-validation-bundle"
           mkdir -m 700 "$out"
-          git archive --format=tar HEAD | gzip -3 > "$out/repository.tar.gz"
-          tar --exclude='node_modules/.cache' -cf - node_modules | gzip -3 > "$out/dependencies.tar.gz"
+          python3 - <<'PY'
+          import os, pathlib, subprocess, tarfile
+          root = pathlib.Path.cwd()
+          out = pathlib.Path(os.environ['RUNNER_TEMP']) / 'client-validation-bundle'
+          suffixes = {'.ts','.tsx','.js','.jsx','.mjs','.cjs','.json','.sql','.yml','.yaml','.css','.md','.html','.sh','.txt','.toml','.jsonc'}
+          names = {'.gitignore','.gitattributes','.prettierrc','.prettierignore'}
+          process = subprocess.Popen(['git','archive','--format=tar','HEAD'], stdout=subprocess.PIPE)
+          count = 0
+          with tarfile.open(fileobj=process.stdout, mode='r|') as source, tarfile.open(out/'source-text.tar.gz', 'w:gz', compresslevel=3) as target:
+              for item in source:
+                  path = pathlib.PurePosixPath(item.name)
+                  if path.is_absolute() or '..' in path.parts:
+                      raise RuntimeError('Invalid tracked source path')
+                  if not item.isfile() or path.name.startswith('.env'):
+                      continue
+                  if path.suffix not in suffixes and path.name not in names:
+                      continue
+                  target.addfile(item, source.extractfile(item))
+                  count += 1
+          if process.wait() != 0 or count < 1000:
+              raise RuntimeError('Incomplete source-text capture')
+          with tarfile.open(out/'test-tools.tar.gz', 'w:gz', compresslevel=3) as archive:
+              for relative in ['node_modules/@electric-sql/pglite','node_modules/typescript','node_modules/prettier']:
+                  path = root / relative
+                  if not (path/'package.json').is_file():
+                      raise RuntimeError('Required installed test tool missing')
+                  archive.add(path, arcname=relative)
+          print('Captured source-text files:', count)
+          PY
           total=$(du -cb "$out"/*.tar.gz | tail -1 | cut -f1)
+          printf 'Compressed validation bytes=%s\n' "$total"
           test "$total" -le 367001600
           {
             printf 'candidate=%s\n' "$CANDIDATE_SHA"
             printf 'checkout=%s\n' "$(git rev-parse HEAD)"
             printf 'tree=%s\n' "$(git rev-parse HEAD^{tree})"
+            printf 'scope=tracked source text and selected tools; excludes media and environment files; not deployable\n'
             printf 'node=%s\n' "$(node --version)"
             printf 'npm=%s\n' "$(npm --version)"
           } > "$out/manifest.txt"
-          (cd "$out" && sha256sum repository.tar.gz dependencies.tar.gz manifest.txt > SHA256SUMS)
+          (cd "$out" && sha256sum source-text.tar.gz test-tools.tar.gz manifest.txt > SHA256SUMS)
           cat "$out/manifest.txt"
           cat "$out/SHA256SUMS"
       - name: Upload one-day offline validation bundle
-        if: github.run_number == 2 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
+        if: github.run_number == 3 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
         uses: actions/upload-artifact@v4
         with:
           name: client-validation-bundle
