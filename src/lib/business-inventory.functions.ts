@@ -8,10 +8,7 @@ import {
 } from "@/lib/security/restricted-columns";
 
 function assertInventoryId(value: unknown): asserts value is string {
-  if (
-    typeof value !== "string" ||
-    !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value)
-  )
+  if (typeof value !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value))
     throw new Error("Invalid inventory identifier");
 }
 

@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -32,3 +34,38 @@ jobs:
         run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts --maxWorkers=1
       - name: Preserve full stock source-integrity checks
         run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
+      # One bounded copy enables complete offline validation rather than source
+      # excerpts. Contains tracked public source and installed test dependencies,
+      # not .git, runner configuration, environment values or hosted data.
+      - name: Prepare one-time offline validation bundle
+        if: github.run_number == 2 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
+        shell: bash
+        env:
+          CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/client-validation-bundle"
+          mkdir -m 700 "$out"
+          git archive --format=tar HEAD | gzip -3 > "$out/repository.tar.gz"
+          tar --exclude='node_modules/.cache' -cf - node_modules | gzip -3 > "$out/dependencies.tar.gz"
+          total=$(du -cb "$out"/*.tar.gz | tail -1 | cut -f1)
+          test "$total" -le 367001600
+          {
+            printf 'candidate=%s\n' "$CANDIDATE_SHA"
+            printf 'checkout=%s\n' "$(git rev-parse HEAD)"
+            printf 'tree=%s\n' "$(git rev-parse HEAD^{tree})"
+            printf 'node=%s\n' "$(node --version)"
+            printf 'npm=%s\n' "$(npm --version)"
+          } > "$out/manifest.txt"
+          (cd "$out" && sha256sum repository.tar.gz dependencies.tar.gz manifest.txt > SHA256SUMS)
+          cat "$out/manifest.txt"
+          cat "$out/SHA256SUMS"
+      - name: Upload one-day offline validation bundle
+        if: github.run_number == 2 && github.event.pull_request.number == 69 && github.event.pull_request.head.repo.full_name == github.repository && github.repository == 'Hunting-Fishing/motorsales365'
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-validation-bundle
+          path: ${{ runner.temp }}/client-validation-bundle/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1

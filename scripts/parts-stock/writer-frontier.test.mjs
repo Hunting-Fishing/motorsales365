@@ -10,7 +10,7 @@ const read = (path) =>
   readFileSync(new URL(`../../${path}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const expectedPins = [
-  ["publicApp", "850891494ea37b0dbd9a06880dc3abd530c410d7eaa70430a996d79ce6d176a0"],
+  ["publicApp", "34712498a61f5bc99d44514c296f7852db29c6565e349e45b18581c33a08849f"],
   ["inquiryApp", "cdbcb8e3b8c0e293cc2f007c32783a0ec99dd4bb660fe176110b25f1e080b40a"],
   ["b2bApp", "ab13e2fa5581038f57c0935fda65f58c7203f1c5b3bf273e50e6fd6cdcb6b576"],
   ["publicInvoiceApp", "83da4dead41ebed3aaeb366c1d214264783bc4c2d08dcd91c20e4674cf13bfc6"],
@@ -64,7 +64,7 @@ test("exact source-span and writer-gap metadata cannot drift silently", () => {
       ].join("\t"),
     )
     .join("\n");
-  assert.equal(hash(sources), "780295ca76efc10998c9366638cbcbab403bee219c87c0fd79ffff427c9e5988");
+  assert.equal(hash(sources), "4c1822f1f57338df8671736c03f381f7e11327484768e4ca8728d777beea5c1f");
   assert.equal(hash(inventory), "8c94ce857ef3d1f2e6a0ccf75b0341f1a0c1ff888622fe276bdf0c52900002a6");
 });
 

@@ -209,7 +209,10 @@ for (const value of [1, "true", [], {}]) {
   test(`cost gate ${JSON.stringify(value)} denies the private-cost RPC`, async () => {
     const f = fixture({ costs: { data: value, error: null } });
     await f.invoke("upsertBusinessInventoryItem", draft);
-    assert.equal(f.calls.some(({ name }) => name === "get_business_inventory_costs"), false);
+    assert.equal(
+      f.calls.some(({ name }) => name === "get_business_inventory_costs"),
+      false,
+    );
   });
 }
 
