@@ -92,6 +92,44 @@ export function buildStaffLifecycleRepair() {
     "  INSERT INTO shop_manager.shops(",
     offboarding + "  INSERT INTO shop_manager.shops(",
   );
+  // Membership maintenance must not silently switch an account away from a
+  // different selected shop. The conflict predicate runs under the upsert lock,
+  // so an absent-row race cannot overwrite a concurrently created other binding.
+  native = replaceOnce(
+    native,
+    "  INSERT INTO shop_manager.profiles(id,user_id,email,first_name,last_name,shop_id,job_title,department,has_auth_account)",
+    "  INSERT INTO shop_manager.profiles AS selected_profile(id,user_id,email,first_name,last_name,shop_id,job_title,department,has_auth_account)",
+  );
+  native = replaceOnce(
+    native,
+    "department=EXCLUDED.department,has_auth_account=true,updated_at=now();",
+    `department=EXCLUDED.department,has_auth_account=true,updated_at=now()
+  WHERE selected_profile.shop_id IS NULL OR selected_profile.shop_id=v_shop_id
+  RETURNING id INTO v_profile_id;
+  IF NOT FOUND THEN
+    -- A valid other-shop binding is an intentional no-op, not a failed switch.
+    -- A suppressed same-shop/missing-profile write is an error, not success.
+    PERFORM 1 FROM shop_manager.profiles
+      WHERE user_id=_user_id AND shop_id IS NOT NULL AND shop_id<>v_shop_id FOR UPDATE;
+    IF FOUND THEN RETURN; END IF;
+    RAISE EXCEPTION USING ERRCODE='55000', MESSAGE='Staff lifecycle binding unconfirmed';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM shop_manager.profiles
+    WHERE id=v_profile_id AND user_id=_user_id AND shop_id=v_shop_id) THEN
+    RAISE EXCEPTION USING ERRCODE='55000', MESSAGE='Staff lifecycle binding unconfirmed';
+  END IF;`,
+  );
+  native = replaceOnce(
+    native,
+    "  INSERT INTO shop_manager.user_roles(user_id,role_id) VALUES(_user_id,v_role_id) ON CONFLICT(user_id,role_id) DO NOTHING;",
+    `  INSERT INTO shop_manager.user_roles(user_id,role_id) VALUES(_user_id,v_role_id) ON CONFLICT(user_id,role_id) DO NOTHING;
+  IF NOT EXISTS (SELECT 1 FROM shop_manager.user_roles WHERE user_id=_user_id AND role_id=v_role_id)
+    OR EXISTS (SELECT 1 FROM shop_manager.user_roles ur JOIN shop_manager.roles r ON r.id=ur.role_id
+      WHERE ur.user_id=_user_id AND ur.role_id<>v_role_id
+        AND r.name::text IN ('owner','manager','dispatch','truck_driver','technician','office_admin','other_staff')) THEN
+    RAISE EXCEPTION USING ERRCODE='55000', MESSAGE='Staff lifecycle role binding unconfirmed';
+  END IF;`,
+  );
   const preflight = `DO $$ BEGIN
     IF to_regnamespace('client_business_access_candidate') IS NULL THEN
       RAISE EXCEPTION USING ERRCODE='55000', MESSAGE='Staff boundary prerequisite missing';

@@ -41,7 +41,7 @@ jobs:
       - name: Stock operation replay and restart recovery (isolated PGlite)
         run: node --test --test-concurrency=1 scripts/parts-stock/manual-operation-candidate.test.mjs scripts/parts-stock/manual-operation-native-setup.test.mjs
       - name: Multi-business staff authority and deactivation (isolated PGlite)
-        run: node --test --test-concurrency=1 scripts/client-release/business-staff-boundary.test.mjs scripts/client-release/business-staff-lifecycle.test.mjs
+        run: node --test --test-concurrency=1 scripts/client-release/business-staff-boundary.test.mjs scripts/client-release/business-staff-lifecycle.test.mjs scripts/client-release/business-staff-selection.test.mjs
 
   native-stock-operations:
     name: Native PG17 stock operation concurrency
