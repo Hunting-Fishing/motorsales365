@@ -187,7 +187,9 @@ test("transport, SQL and mismatched responses cannot report completion or leak d
 test("control characters are refused and ordinary Unicode reasons remain valid", () => {
   for (const code of [0, 9, 10, 13, 31, 127])
     assert.throws(() =>
-      contract.parseStockRequest(request({ reason: `Count${String.fromCharCode(code)}correction` })),
+      contract.parseStockRequest(
+        request({ reason: `Count${String.fromCharCode(code)}correction` }),
+      ),
     );
   assert.equal(
     contract.parseStockRequest(request({ reason: "  Count correction — verified  " })).reason,
