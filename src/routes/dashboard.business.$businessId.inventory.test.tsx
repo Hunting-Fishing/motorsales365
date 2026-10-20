@@ -187,7 +187,7 @@ it("authorized staff opens the stock correction flow instead of dispatching a bl
   expect(screen.getByRole("dialog")).toHaveTextContent(
     "Stock correction for Account A private stock",
   );
-  expect(screen.queryByRole("button", { name: "Increase", exact: true })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /^Increase$/ })).not.toBeInTheDocument();
 });
 it("ordinary staff does not receive stock adjustment controls", async () => {
   state.capability.mockResolvedValue({ canManage: false, allowed: false });

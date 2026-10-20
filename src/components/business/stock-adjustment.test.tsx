@@ -229,7 +229,7 @@ it("closing the dialog retains an unresolved operation for review", async () => 
   await enter();
   fireEvent.click(screen.getByRole("button", { name: "Record adjustment" }));
   await screen.findByText(/not confirmed/);
-  fireEvent.click(screen.getByRole("button", { name: "Close and keep request", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: /^Close and keep request$/ }));
   ui.rerender(<BusinessStockAdjustment {...ui.props} selected={null} />);
   expect(await screen.findByRole("button", { name: "Review stock request" })).toBeInTheDocument();
   expect(sessionStorage.getItem(stockPendingKey(a, b))).not.toBeNull();
