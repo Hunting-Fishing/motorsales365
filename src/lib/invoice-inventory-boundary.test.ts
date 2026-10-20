@@ -35,9 +35,11 @@ const limits = ast.statements.flatMap((node) =>
 );
 assert.equal(limits.length, 1);
 const classes = ast.statements.filter(
-  (node) => ts.isClassDeclaration(node) && node.name?.text === "FinancialWriteUncertain",
+  (node) =>
+    ts.isClassDeclaration(node) &&
+    ["FinancialWriteUncertain", "InvoiceLineLimitReached"].includes(node.name?.text ?? ""),
 );
-assert.equal(classes.length, 1);
+assert.equal(classes.length, 2);
 const forms = ast.statements.filter(
   (node): node is ts.FunctionDeclaration =>
     ts.isFunctionDeclaration(node) && node.name?.text === "InventoryForm",
@@ -62,7 +64,7 @@ assert.equal(mutations.length, 1);
 const executable = [
   `const ${limits[0].getText(ast)};`,
   ...declarations,
-  classes[0].getText(ast),
+  ...classes.map((node) => node.getText(ast)),
   `globalThis.runMutation = ${mutations[0].initializer.getText(ast)};`,
 ].join("\n");
 const compiled = ts.transpileModule(executable, {
@@ -220,7 +222,14 @@ test("99 to 100 lines succeeds and recalculates the subtotal and total", async (
 for (const count of [100, 101]) {
   test(`${count} existing lines rejects before any write or write admission`, async () => {
     const f = fixture(count);
-    await assert.rejects(() => f.run());
+    await assert.rejects(
+      () => f.run(),
+      (error: Error) => {
+        assert.notEqual(error.constructor.name, "FinancialWriteUncertain");
+        if (count === 100) assert.equal(error.constructor.name, "InvoiceLineLimitReached");
+        return true;
+      },
+    );
     assert.equal(f.writes.length, 0);
     assert.equal(f.started(), 0);
     assert.equal(f.stored.length, count);

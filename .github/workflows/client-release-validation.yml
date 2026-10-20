@@ -11,6 +11,7 @@ on:
       - src/lib/invoice-inventory-boundary.test.ts
       - src/routes/_authenticated/workspace.invoices.$id.tsx
       - src/components/shop-manager/invoice-detail.test.tsx
+      - src/components/shop-manager/invoice-capacity.test.tsx
       - scripts/parts-stock/writer-frontier.mjs
       - scripts/parts-stock/writer-frontier.test.mjs
       - .github/workflows/client-release-validation.yml
@@ -34,7 +35,7 @@ jobs:
           cache: npm
       - run: npm ci --legacy-peer-deps --no-audit --no-fund
       - name: Actual handler and invoice mutation regressions
-        run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts src/components/shop-manager/invoice-detail.test.tsx --maxWorkers=1
+        run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-capacity.test.tsx --maxWorkers=1
       - name: Preserve full stock source-integrity checks
         run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
       - name: Stock operation replay and restart recovery (isolated PGlite)
