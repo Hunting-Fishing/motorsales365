@@ -10,11 +10,11 @@ const sourceSpecs = [
   [
     "publicApp",
     "src/lib/business-inventory.functions.ts",
-    70,
-    287,
-    "16551e1d1c51977a8a60043374e2fc8d803e1e144bed65d012716e341c9592c6",
-    "bd43af2cb2f2fec0364ca9e317190c5af8cbc45b69530ff95a5da155dfe7d96c",
-    10203,
+    1,
+    319,
+    "850891494ea37b0dbd9a06880dc3abd530c410d7eaa70430a996d79ce6d176a0",
+    "e0fa304a9577fdee795e980f170fd5d6a36033c39eb57618207915b42046cd79",
+    11264,
   ],
   [
     "inquiryApp",
@@ -214,7 +214,7 @@ const inventorySpecs = [
     ["public"],
     ["upsertBusinessInventoryItem", "adjustBusinessInventory", "deleteBusinessInventoryItem"],
     ["publicApp", "publicUI", "base", "authorityApp"],
-    "Absolute on-hand/hold/on-order edits and split movement/read/update compete independently; read error/affected-row and supplied-business bindings are incomplete in the adjustment adapter. getClaims is not fresh native authority; current SQL/RLS may separately restrict access.",
+    "Absolute on-hand/hold/on-order edits still compete independently. The manual adjustment adapter is interlocked without writes; metadata-only updates preserve omitted fields, permission replies require true without error, and deletion requires exact item/business acknowledgment. getClaims is not fresh native authority; atomic stock, direct SQL/RLS and durable recovery remain unaccepted.",
   ],
   [
     "inquiry-lifecycle",

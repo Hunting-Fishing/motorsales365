@@ -1,0 +1,34 @@
+name: Client release regression checks
+
+# Read-only supplemental checks. Existing full CI/release gates remain mandatory.
+on:
+  pull_request:
+    branches:
+      - completion/365-seven-day-integration
+    paths:
+      - src/lib/business-inventory.functions.ts
+      - src/lib/business-inventory-client-release.test.ts
+      - src/lib/invoice-inventory-boundary.test.ts
+      - src/routes/_authenticated/workspace.invoices.$id.tsx
+      - scripts/parts-stock/writer-frontier.mjs
+      - scripts/parts-stock/writer-frontier.test.mjs
+      - .github/workflows/client-release-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  client-regressions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual handler and invoice mutation regressions
+        run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts --maxWorkers=1
+      - name: Preserve full stock source-integrity checks
+        run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs

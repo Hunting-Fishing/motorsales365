@@ -7,6 +7,14 @@ import {
   type InventoryCostRow,
 } from "@/lib/security/restricted-columns";
 
+function assertInventoryId(value: unknown): asserts value is string {
+  if (
+    typeof value !== "string" ||
+    !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value)
+  )
+    throw new Error("Invalid inventory identifier");
+}
+
 /**
  * Cost, supplier and markup are readable only by owners, managers and
  * assistant managers (column privileges + get_business_inventory_costs RPC).
@@ -22,7 +30,7 @@ async function loadInventoryCosts(
     { _user: userId, _business: businessId },
   );
   if (gateError) throw gateError;
-  if (!canViewCosts) return { canViewCosts: false, costs: [] };
+  if (canViewCosts !== true) return { canViewCosts: false, costs: [] };
   const { data: costs, error } = await supabase.rpc("get_business_inventory_costs", {
     _business_id: businessId,
     _item_ids: itemIds ?? null,
@@ -32,24 +40,27 @@ async function loadInventoryCosts(
 }
 
 async function assertManager(supabase: any, userId: string, businessId: string) {
-  const { data: ok } = await supabase.rpc("has_business_role", {
+  const { data: ok, error } = await supabase.rpc("has_business_role", {
     _user: userId,
     _business: businessId,
     _role: "manager",
   });
-  if (!ok) throw new Error("Forbidden");
+  if (error || ok !== true) throw new Error("Forbidden");
 }
 
 export const listBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { businessId: string }) => d)
+  .inputValidator((d: { businessId: string }) => {
+    assertInventoryId(d?.businessId);
+    return d;
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: isMember } = await supabase.rpc("is_business_member", {
+    const { data: isMember, error: memberError } = await supabase.rpc("is_business_member", {
       _user: userId,
       _business: data.businessId,
     });
-    if (!isMember) throw new Error("Forbidden");
+    if (memberError || isMember !== true) throw new Error("Forbidden");
 
     const { data: rows, error } = await (supabase as any)
       .from("business_inventory_items")
@@ -89,7 +100,9 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       catalog_part_id?: string | null;
       extra?: Record<string, any> | null;
     }) => {
-      if (!d.name?.trim()) throw new Error("Name required");
+      assertInventoryId(d?.businessId);
+      if (d.id !== undefined) assertInventoryId(d.id);
+      if (typeof d.name !== "string" || !d.name.trim()) throw new Error("Name required");
       return d;
     },
   )
@@ -179,6 +192,28 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       catalog_part_id: data.catalog_part_id ?? null,
       ...extra,
     };
+    if (data.id) {
+      // Metadata-only edits must not reset stock, publish hidden stock, or erase
+      // optional values that the caller did not include in this patch.
+      const optionalFields = [
+        "sku",
+        "category",
+        "brand",
+        "unit",
+        "qty_on_hand",
+        "reorder_at",
+        "cost",
+        "price",
+        "location",
+        "location_id",
+        "active",
+        "network_visible",
+        "catalog_part_id",
+      ] as const;
+      for (const field of optionalFields) {
+        if (data[field] === undefined) delete payload[field];
+      }
+    }
     // assertManager above == can_view_business_inventory_costs, so the caller
     // may write cost data. Separate insert/update paths are required: an
     // upsert (ON CONFLICT DO UPDATE ... EXCLUDED.cost) needs SELECT on cost.
@@ -193,6 +228,13 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
           .single()
       : await table.insert(writable).select(INVENTORY_MEMBER_SELECT).single();
     if (error) throw error;
+    if (
+      !row ||
+      typeof row.id !== "string" ||
+      row.business_id !== data.businessId ||
+      (data.id !== undefined && row.id !== data.id)
+    )
+      throw new Error("Inventory change could not be confirmed. Refresh before retrying.");
     const { canViewCosts, costs } = await loadInventoryCosts(supabase, userId, data.businessId, [
       row.id,
     ]);
@@ -212,17 +254,31 @@ export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { itemId: string; businessId: string; delta: number; reason?: string }) => d)
   .handler(async () => {
-    throw new Error("Manual stock adjustment is temporarily unavailable pending atomic inventory integration");
+    throw new Error(
+      "Manual stock adjustment is temporarily unavailable pending atomic inventory integration",
+    );
   });
 
 export const deleteBusinessInventoryItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; businessId: string }) => d)
+  .inputValidator((d: { id: string; businessId: string }) => {
+    assertInventoryId(d?.id);
+    assertInventoryId(d?.businessId);
+    return d;
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
-    const { error } = await supabase.from("business_inventory_items").delete().eq("id", data.id);
+    const { data: deleted, error } = await supabase
+      .from("business_inventory_items")
+      .delete()
+      .eq("id", data.id)
+      .eq("business_id", data.businessId)
+      .select("id,business_id")
+      .single();
     if (error) throw error;
+    if (!deleted || deleted.id !== data.id || deleted.business_id !== data.businessId)
+      throw new Error("Inventory deletion could not be confirmed. Refresh before retrying.");
     return { ok: true };
   });
 
