@@ -149,7 +149,7 @@ try {
     const a = query(transaction(r, { sleep: true, rollback: mode === "rollback" }), appA);
     await observe(() =>
       json(
-        `SELECT COALESCE(bool_or(wait_event='PgSleep'),false) FROM pg_stat_activity WHERE application_name='${appA}';`,
+        `SELECT to_jsonb(COALESCE(bool_or(wait_event='PgSleep'),false)) FROM pg_stat_activity WHERE application_name='${appA}';`,
       ),
     );
     const other = {
@@ -162,7 +162,7 @@ try {
     const b = query(transaction(other), appB);
     await observe(() =>
       json(
-        `SELECT EXISTS(SELECT 1 FROM pg_stat_activity x,pg_stat_activity y WHERE x.application_name='${appB}' AND y.application_name='${appA}' AND x.wait_event_type='Lock' AND y.pid=ANY(pg_blocking_pids(x.pid)));`,
+        `SELECT to_jsonb(EXISTS(SELECT 1 FROM pg_stat_activity x,pg_stat_activity y WHERE x.application_name='${appB}' AND y.application_name='${appA}' AND x.wait_event_type='Lock' AND y.pid=ANY(pg_blocking_pids(x.pid))));`,
       ),
     );
     const first = await a,
