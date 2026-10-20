@@ -194,8 +194,10 @@ describe("native stock adjustment", () => {
     fill();
     fireEvent.click(screen.getByRole("button", { name: "Record adjustment" }));
     await screen.findByText(/result is unconfirmed/);
-    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    fireEvent.click(screen.getByText("Close", { selector: "button" }));
+    expect(f.closed).toHaveBeenCalledTimes(1);
     f.rerender(<ShopStockAdjustment {...f.props} selected={null} />);
+    expect(screen.queryByRole("dialog")).toBeNull();
     expect(sessionStorage.getItem(shopStockPendingKey(a, shop))).not.toBeNull();
     expect(screen.getByRole("button", { name: "Review stock request" })).toBeVisible();
   });
