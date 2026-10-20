@@ -82,11 +82,11 @@ const sourceSpecs = [
   [
     "nativeAdjustApp",
     "src/routes/_authenticated/workspace.inventory.$id.tsx",
-    282,
-    340,
-    "f57718a4327a98a9508bbbda07c281f9c26b35f3cfe57c8cc0556f1249e3cfba",
-    "33e6bacf2d81231dffdf5f96eaf3b07a6b56e2d80974541a544f220dd9cfbf63",
-    15362,
+    1,
+    312,
+    "77c2d6b2271786902280852d5ea72b21d8d9bb6d4f4c86f7458a91d863942a07",
+    "1b452faaa141b0aabd2622c55c0fd093ea7bb66ca1bcba8755f93768124b5490",
+    12277,
   ],
   [
     "counterApp",
@@ -261,9 +261,9 @@ const inventorySpecs = [
   [
     "native-manual-adjustment",
     ["shop_manager"],
-    ["AdjustStockDialog"],
+    ["getShopStockItem", "submitShopStockAdjustment", "ShopStockAdjustment"],
     ["nativeAdjustApp", "schemaApp"],
-    "Cached currentQty produces an absolute native quantity, after a separate inventory_transactions insert. No shared transaction/CAS, fresh native admission or durable outcome receipt is established by this browser path; it is outside the public 14-table rehearsal.",
+    "The native route uses the authenticated shop_stock_item_v1 reader and shop_stock_operation_v1 adjustment with account/shop-scoped recovery. The new transaction validates management membership, selected employee profile/shift, stock CAS and the retained operational audit. Its forward package is unapplied, and other native writers, historical authority, signed-API acceptance and global stock compatibility remain open. Native integer stock remains separate from the public 14-table decimal-stock rehearsal.",
   ],
   [
     "native-counter-sale",

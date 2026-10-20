@@ -18,7 +18,7 @@ const expectedPins = [
   ["schemaApp", "3ca5aa5a40b5393aa9cbe8c1a16ea7a1cf265ac19d3c5590e78b005d72ac41df"],
   ["publicUI", "6033e6aa6e36b9f8458db8273834647a854c6d3109b27e066856fe13ebf358e1"],
   ["b2bUI", "af06064d5bcd70ef2a556c43bb6b3b2ad79e2a26552a9a9ae22e427ae7439192"],
-  ["nativeAdjustApp", "f57718a4327a98a9508bbbda07c281f9c26b35f3cfe57c8cc0556f1249e3cfba"],
+  ["nativeAdjustApp", "77c2d6b2271786902280852d5ea72b21d8d9bb6d4f4c86f7458a91d863942a07"],
   ["counterApp", "6c3a7e6db00eeed566eb8875c84dc24eb7dd82a625aec3827d4860a63146ca27"],
   ["nativePOApp", "4631f5aa24ea77e7cd8fffd75f588f399e9743e49447d77940bba32b5bcd064c"],
   ["base", "69afe9112531bd75d0bc68d4b31461d9e1c9aae41337ebdf79e6f40056447d62"],
@@ -64,8 +64,8 @@ test("exact source-span and writer-gap metadata cannot drift silently", () => {
       ].join("\t"),
     )
     .join("\n");
-  assert.equal(hash(sources), "8d38449a299166cf7093d6e86f99bdc88c15011b24a304c9b131560f350eed90");
-  assert.equal(hash(inventory), "adc2fba34ce2c93b8b219981ddc626744bc4f5f23406a88d0e07771f7dbf5662");
+  assert.equal(hash(sources), "e66a6ab90d9432e7d6a7c9f911dfbdbf03ea5544e07c1762922b4e979d41ed07");
+  assert.equal(hash(inventory), "7242fb3597859d8a14c545d3b5d7d12cf3cb4e3eb7415cb1bb12ee4b39b64348");
 });
 
 test("fixed frontier has exactly eleven app and eleven whole SQL pins", () => {
@@ -129,7 +129,7 @@ test("gap witnesses preserve each newly exposed writer boundary", () => {
     ["private mixed-hold candidate", "New UUID", "Auth-to-guest", "unknown-outcome"],
     ["shipping, receiving, transfers, returns, quarantine", "Global multi-item lock/phantom"],
     ["invoice-item triggers deduct/restore", "Combined hold admission"],
-    ["Cached currentQty", "separate inventory_transactions", "public 14-table"],
+    ["authenticated shop_stock_item_v1", "retained operational audit", "public 14-table"],
     ["cost/role patches dynamically rewrite", "Applied body/patch correspondence"],
     ["received_quantity", "separate requests", "Inventory posting triggers"],
     ["integer quantity casts and GREATEST clamps", "journal implementation are not pinned"],
