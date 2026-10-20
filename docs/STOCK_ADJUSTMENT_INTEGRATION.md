@@ -33,38 +33,43 @@ suppressed/retargeted writes abort rather than report success.
 ## Forward deployment package, not applied
 
 The historical migration replay remains frozen and unchanged. Generate the
-single staff-boundary + stock-RPC transaction with:
+complete staff-boundary + staff-lifecycle + stock-RPC transaction with:
 
 ```sh
-node scripts/client-release/build-business-stock-release.mjs > business-stock-forward.sql
+node scripts/client-release/build-business-stock-staging-release.mjs > business-stock-forward.sql
 ```
 
-The builder verifies the unchanged reviewed staff-boundary blob, emits SQL only,
-and never connects to a database. The focused workflow publishes that SQL as an
-artifact after its checks. It must be validated against a staging clone and
-registered in the agreed forward migration process before production application.
-It intentionally stops on existing objects or a missing boundary; it does not
-silently overwrite an existing rollout. Preserve outcome rows and history on any
-rollback; a code rollback must not delete successful operation receipts.
+This supersedes the older two-component deployment artifact. The original
+`build-business-stock-release.mjs` remains for isolated component tests only.
+The complete package must also retain staff deactivation and selected-shop
+preservation repairs. See `docs/evidence/STOCK_STAGING_PACKAGE.md` for the
+composed tests, generated digest, suspension procedure and hosted activation gates.
+
+The builder verifies the unchanged reviewed staff-boundary blob and retained
+lifecycle source, emits SQL only, and never connects to a database. The focused
+workflow publishes the complete package after its checks. It must be validated
+against a staging clone and registered in the agreed forward migration process
+before production application. It stops on existing objects or incompatible
+prerequisites rather than silently overwriting an existing rollout. Preserve
+outcomes and history on rollback; never delete successful operation receipts.
 
 ## Verification and limits
 
-Before publication, 18 actual-contract/server-adapter tests and 12 actual SQL
-groups passed locally (30 total). SQL uses retained selected inventory/roster
-source in fresh disposable PGlite databases. Positive JWT claims are synthetic
-SQL inputs, not proof of hosted signature verification. The combined forward
-transaction also installs and executes successfully in that fixture.
+Before initial publication, 18 actual-contract/server-adapter tests and 12 actual
+SQL groups passed locally. Later exact-head checks and the composed staging
+package checks are recorded in the PR and the evidence note above. SQL uses
+retained selected inventory/roster source in disposable PGlite databases. Positive
+JWT claims are synthetic SQL inputs, not proof of hosted signature verification.
 
-Twelve actual dialog tests and seven inventory-page tests are added, together
-with the retained metadata-editor tests. A separate PostgreSQL17 job runs four
-independent-session public-RPC races using authenticated SQL roles, observed
-blocking PIDs, one final movement and reconnect recovery. These jobs and the
-full TypeScript/lint/build suite require their own exact-head results; local SQL
-success is not a substitute. All existing CI/migration/production gates remain.
+The actual dialog and inventory-page tests retain the metadata-editor tests.
+A separate PostgreSQL17 job runs four independent-session public-RPC races using
+authenticated SQL roles, observed blocking PIDs, one final movement and reconnect
+recovery. These jobs and full TypeScript/lint/build checks require their own
+exact-head results. All existing CI/migration/production gates remain.
 
 The old interlocked adjustment export is no longer used by this page. The new
 route and endpoint are connected, but the endpoint cannot work on a database
-until its forward SQL and prerequisite boundary are installed. No hosted SQL
+until its complete forward SQL and prerequisites are installed. No hosted SQL
 write, production deployment or main merge accompanies this source checkpoint.
 
 Other legacy stock/financial writers, historical membership provenance, service
