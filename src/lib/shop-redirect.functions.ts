@@ -26,6 +26,46 @@ function applyTag(url: string, network: any): string {
   return url;
 }
 
+async function monetizeMarketplaceUrl(url: string, network: any): Promise<string> {
+  const slug = String(network?.slug ?? "").toLowerCase();
+
+  // Lazada direct Affiliate Open API is the preferred path when configured.
+  // It returns a tracked promotion URL bound to the 365 affiliate account.
+  if (slug === "lazada") {
+    try {
+      const { trackLazadaUrl } = await import("@/lib/lazada-affiliate.server");
+      const tracked = await trackLazadaUrl(url);
+      if (tracked.configured && tracked.promotionUrl) return tracked.promotionUrl;
+    } catch {
+      // Fall through to other configured tracking strategies.
+    }
+  }
+
+  // Explicit per-network tag/deeplink configuration wins over a fallback
+  // affiliate network. This lets the admin choose a direct merchant account.
+  const explicitlyTagged = applyTag(url, network);
+  if (explicitlyTagged !== url) return explicitlyTagged;
+
+  // Shopee does not have an equivalent direct helper in this project yet.
+  // Involve Asia is already wired server-side and can monetize approved
+  // Shopee/Lazada offers with a tracked deeplink.
+  if (
+    (slug === "shopee" || slug === "lazada") &&
+    process.env.INVOLVE_ASIA_API_KEY_NAME &&
+    process.env.INVOLVE_ASIA_API_SECRET
+  ) {
+    try {
+      const { generateInvolveAsiaDeeplink } = await import("@/lib/involve-asia.server");
+      const tracked = await generateInvolveAsiaDeeplink(url);
+      if (tracked && tracked !== url) return tracked;
+    } catch {
+      // Fail open: the buyer still reaches the merchant.
+    }
+  }
+
+  return explicitlyTagged;
+}
+
 export const resolveShopRedirect = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
@@ -52,7 +92,7 @@ export const resolveShopRedirect = createServerFn({ method: "POST" })
     const { data: links } = await supabaseAdmin
       .from("shop_product_links")
       .select(
-        "url, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)",
+        "url, revenue_score, commission_rate_pct, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)",
       )
       .eq("product_id", data.productId);
 
@@ -60,7 +100,7 @@ export const resolveShopRedirect = createServerFn({ method: "POST" })
     const pick = candidates.find((l: any) => l.network?.slug === data.networkSlug) ?? candidates[0];
     if (!pick) return { url: null };
 
-    const finalUrl = applyTag(pick.url, pick.network);
+    const finalUrl = await monetizeMarketplaceUrl(pick.url, pick.network);
 
     try {
       const vid = data.visitorId;
