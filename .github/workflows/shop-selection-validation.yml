@@ -1,0 +1,84 @@
+name: Multi-business shop selection
+on:
+  pull_request:
+    branches:
+      - completion/365-seven-day-integration
+    paths:
+      - src/lib/shop-selection*
+      - src/components/shop-manager/shop-switcher*
+      - src/routes/_authenticated/workspace.tsx
+      - scripts/client-release/shop-selection*
+      - scripts/client-release/build-shop-selection-release.mjs
+      - scripts/client-release/shop-stock-fixture.mjs
+      - supabase/releases/shop-selection*.sql
+      - .github/workflows/shop-selection-validation.yml
+permissions:
+  contents: read
+jobs:
+  selection:
+    name: Shop picker, permissions and recovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual workspace picker and existing stock dialogs
+        run: npx vitest run src/components/shop-manager/shop-switcher.test.tsx src/components/shop-manager/stock-adjustment.test.tsx --maxWorkers=1
+      - name: Actual contracts and transactional selection
+        run: node --test --test-concurrency=1 scripts/client-release/shop-selection-contract.test.mjs scripts/client-release/shop-selection.test.mjs
+      - name: Compose unapplied cumulative staging package
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/shop-selection-staging"
+          mkdir -m 700 "$out"
+          node scripts/client-release/build-shop-selection-release.mjs > "$out/shop-selection-forward.sql"
+          cp supabase/releases/shop-selection-suspend-v1.sql "$out/"
+          cp docs/SHOP_SELECTION_BUILD.md "$out/"
+          cd "$out"
+          sha256sum shop-selection-forward.sql shop-selection-suspend-v1.sql SHOP_SELECTION_BUILD.md > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shop-selection-staging-package
+          path: ${{ runner.temp }}/shop-selection-staging/
+          if-no-files-found: error
+          retention-days: 7
+  native-selection:
+    name: Native PG17 shop selection races
+    needs: selection
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install PostgreSQL 17 on disposable runner
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          printf '\ncreate_main_cluster = false\n' \
+            | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-17 postgresql-client-17
+          /usr/lib/postgresql/17/bin/postgres --version
+      - name: Independent-session duplicate, conflict, busy-work and expiry checks
+        timeout-minutes: 3
+        run: node scripts/client-release/shop-selection-native.mjs
