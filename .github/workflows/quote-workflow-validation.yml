@@ -1,0 +1,86 @@
+name: Quote approval and work-order conversion
+on:
+  pull_request:
+    branches: [completion/365-seven-day-integration]
+    paths:
+      - src/lib/quote-workflow*
+      - src/components/shop-manager/quote-workflow*
+      - src/components/shop-manager/quote-detail.test.tsx
+      - src/routes/_authenticated/workspace.quotes.$id.tsx
+      - scripts/client-release/quote-workflow*
+      - scripts/client-release/native-client-harness.mjs
+      - scripts/client-release/build-quote-workflow-release.mjs
+      - supabase/releases/quote-workflow*.sql
+      - .github/workflows/quote-workflow-validation.yml
+permissions:
+  contents: read
+jobs:
+  quote-workflow:
+    name: Quote UI, authorization, conversion and recovery
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual quote detail and new review dialog
+        run: npx vitest run src/components/shop-manager/quote-detail.test.tsx src/components/shop-manager/quote-workflow.test.tsx --maxWorkers=1
+      - name: Actual contracts and release packaging
+        run: node --test --test-concurrency=1 scripts/client-release/quote-workflow-contract.test.mjs scripts/client-release/quote-workflow-release.test.mjs
+      - name: Authenticated-role SQL conversion and rollback
+        run: node --test --test-concurrency=1 scripts/client-release/quote-workflow.test.mjs
+      - name: Compose unapplied cumulative staging SQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/quote-workflow-staging"
+          mkdir -m 700 "$out"
+          node scripts/client-release/build-quote-workflow-release.mjs > "$out/quote-workflow-forward.sql"
+          cp supabase/releases/quote-workflow-suspend-v1.sql "$out/"
+          cp docs/QUOTE_WORKFLOW_COMPLETION.md "$out/"
+          cd "$out"
+          sha256sum quote-workflow-forward.sql quote-workflow-suspend-v1.sql QUOTE_WORKFLOW_COMPLETION.md > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quote-workflow-staging-package
+          path: ${{ runner.temp }}/quote-workflow-staging/
+          retention-days: 7
+          if-no-files-found: error
+  native-quote-workflow:
+    name: Native PG17 quote conversion races
+    needs: quote-workflow
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install PostgreSQL 17 on disposable runner
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          printf '\ncreate_main_cluster = false\n' \
+            | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends postgresql-17 postgresql-client-17
+          /usr/lib/postgresql/17/bin/postgres --version
+      - name: Independent-session duplicate, rollback, item-edit and expiry checks
+        timeout-minutes: 3
+        run: node scripts/client-release/quote-workflow-native.mjs

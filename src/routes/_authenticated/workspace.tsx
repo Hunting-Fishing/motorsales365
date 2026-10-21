@@ -1,6 +1,11 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { WorkspaceShopSwitcher } from "@/components/shop-manager/shop-switcher";
 
-/** Layout route for the Shop Manager workspace. Dashboard lives in workspace.index.tsx. */
+/** The switch boundary discards former-shop forms and cache after confirmation. */
 export const Route = createFileRoute("/_authenticated/workspace")({
-  component: () => <Outlet />,
+  component: () => (
+    <WorkspaceShopSwitcher>
+      <Outlet />
+    </WorkspaceShopSwitcher>
+  ),
 });

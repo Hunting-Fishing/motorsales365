@@ -10,11 +10,11 @@ const sourceSpecs = [
   [
     "publicApp",
     "src/lib/business-inventory.functions.ts",
-    70,
-    287,
-    "16551e1d1c51977a8a60043374e2fc8d803e1e144bed65d012716e341c9592c6",
-    "bd43af2cb2f2fec0364ca9e317190c5af8cbc45b69530ff95a5da155dfe7d96c",
-    10203,
+    1,
+    367,
+    "67775ae059d2785cc43b9d454d0c2b8a5a8a70b12bb5e952ef033dee730faec6",
+    "8069f61fc8227aacbb854615dce3398ea5861a070670100dccaa48649463624b",
+    13423,
   ],
   [
     "inquiryApp",
@@ -64,11 +64,11 @@ const sourceSpecs = [
   [
     "publicUI",
     "src/routes/dashboard.business.$businessId.inventory.tsx",
-    189,
-    585,
-    "bc3bf6a5b10963eefdd4e55873eed332079759b637f767b8a94c81c73c448e1f",
-    "d03916cbfea4515c60f6eaa8c60d3c9e9d7f7aaac4ffce5023acad25b5ada420",
-    29444,
+    1,
+    845,
+    "6033e6aa6e36b9f8458db8273834647a854c6d3109b27e066856fe13ebf358e1",
+    "2e63bde68b4ee2926d7f3155170385726c1d66ac73e69b2530c6c0a76356c8f7",
+    30491,
   ],
   [
     "b2bUI",
@@ -82,11 +82,11 @@ const sourceSpecs = [
   [
     "nativeAdjustApp",
     "src/routes/_authenticated/workspace.inventory.$id.tsx",
-    282,
-    340,
-    "f57718a4327a98a9508bbbda07c281f9c26b35f3cfe57c8cc0556f1249e3cfba",
-    "33e6bacf2d81231dffdf5f96eaf3b07a6b56e2d80974541a544f220dd9cfbf63",
-    15362,
+    1,
+    312,
+    "77c2d6b2271786902280852d5ea72b21d8d9bb6d4f4c86f7458a91d863942a07",
+    "1b452faaa141b0aabd2622c55c0fd093ea7bb66ca1bcba8755f93768124b5490",
+    12277,
   ],
   [
     "counterApp",
@@ -214,7 +214,7 @@ const inventorySpecs = [
     ["public"],
     ["upsertBusinessInventoryItem", "adjustBusinessInventory", "deleteBusinessInventoryItem"],
     ["publicApp", "publicUI", "base", "authorityApp"],
-    "Absolute on-hand/hold/on-order edits and split movement/read/update compete independently; read error/affected-row and supplied-business bindings are incomplete in the adjustment adapter. getClaims is not fresh native authority; current SQL/RLS may separately restrict access.",
+    "Existing-item metadata edits exclude stock counters and canonical-link writes and compare the original updated_at in a tenant-bound UPDATE. The legacy adjustment export remains interlocked without writes; the route now uses the separately tested business_stock_operation_v1 RPC and durable dialog. Its forward SQL requires the staff boundary and native sessions; deployment is not established by this selected frontier. getClaims alone is not fresh authority; other stock writers, complete direct SQL/RLS and global no-oversell remain unaccepted.",
   ],
   [
     "inquiry-lifecycle",
@@ -261,9 +261,9 @@ const inventorySpecs = [
   [
     "native-manual-adjustment",
     ["shop_manager"],
-    ["AdjustStockDialog"],
+    ["getShopStockItem", "submitShopStockAdjustment", "ShopStockAdjustment"],
     ["nativeAdjustApp", "schemaApp"],
-    "Cached currentQty produces an absolute native quantity, after a separate inventory_transactions insert. No shared transaction/CAS, fresh native admission or durable outcome receipt is established by this browser path; it is outside the public 14-table rehearsal.",
+    "The native route uses the authenticated shop_stock_item_v1 reader and shop_stock_operation_v1 adjustment with account/shop-scoped recovery. The new transaction validates management membership, selected employee profile/shift, stock CAS and the retained operational audit. Its forward package is unapplied, and other native writers, historical authority, signed-API acceptance and global stock compatibility remain open. Native integer stock remains separate from the public 14-table decimal-stock rehearsal.",
   ],
   [
     "native-counter-sale",

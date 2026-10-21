@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ import {
   listBusinessPartsLocations,
 } from "@/lib/parts-network-operations.functions";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 import { mainCategoriesFor, subcategoriesFor } from "@/data/inventory-taxonomy";
 import { businessKindLabel } from "@/data/business-kinds";
 
@@ -163,21 +164,61 @@ const SECTIONS: { key: SectionKey; label: string; icon: any }[] = [
 
 const RESTRICTED_PLACEHOLDER = "Visible to owners and managers only";
 
-export function InventoryItemFormDialog({
+type InventoryFormProps = {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  businessId: string;
+  readAccountId: string;
+  businessKind?: string | null;
+  editing: any | null;
+  onSaved: () => void;
+};
+
+export function InventoryItemFormDialog(props: InventoryFormProps) {
+  const { user, loading } = useAuth();
+  if (!props.open || !user || loading || user.id !== props.readAccountId) return null;
+  if (props.editing && props.editing.business_id !== props.businessId)
+    return (
+      <Dialog open onOpenChange={props.onOpenChange}>
+        <DialogContent>
+          <p role="alert">
+            This item does not belong to the selected business. Close and reload inventory.
+          </p>
+          <Button onClick={() => props.onOpenChange(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
+    );
+  return (
+    <InventoryItemForm
+      key={`${user.id}:${props.businessId}:${props.editing?.id ?? "new"}`}
+      {...props}
+      accountId={user.id}
+    />
+  );
+}
+
+function InventoryItemForm({
   open,
   onOpenChange,
   businessId,
   businessKind,
-  editing,
+  editing: incomingEditing,
   onSaved,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-  businessId: string;
-  businessKind?: string | null;
-  editing: any | null;
-  onSaved: () => void;
-}) {
+  accountId,
+}: InventoryFormProps & { accountId: string }) {
+  // Keep the opening snapshot for the entire edit. Realtime refreshes must not
+  // replace its version token and silently authorize an outdated draft.
+  const [editing] = useState(() => incomingEditing);
+  const alive = useRef(false);
+  const submitted = useRef(false);
+  const [reviewRequired, setReviewRequired] = useState<string | null>(null);
+  const lifetime = useId();
+  useLayoutEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
   const [section, setSection] = useState<SectionKey>("basic");
   // Cost, supplier and markup are limited to owners/managers. When the list
   // returned the row without them, lock the fields and never send them back.
@@ -188,13 +229,23 @@ export function InventoryItemFormDialog({
   const listLocationsFn = useServerFn(listBusinessPartsLocations);
   const catalogFn = useServerFn(getCanonicalCatalogMatches);
   const locations = useQuery({
-    queryKey: ["business-parts-locations", businessId],
+    queryKey: ["business-parts-locations", businessId, accountId, lifetime],
     queryFn: () => listLocationsFn({ data: { businessId } }),
     enabled: open,
-    staleTime: 60_000,
+    staleTime: 0,
+    gcTime: 0,
+    placeholderData: undefined,
+    retry: false,
   });
   const catalogMatches = useQuery({
-    queryKey: ["inventory-canonical-match", form.manufacturer_part_number, form.name],
+    queryKey: [
+      "inventory-canonical-match",
+      accountId,
+      businessId,
+      lifetime,
+      form.manufacturer_part_number,
+      form.name,
+    ],
     queryFn: () =>
       catalogFn({
         data: {
@@ -204,19 +255,14 @@ export function InventoryItemFormDialog({
       }),
     enabled:
       open && (form.manufacturer_part_number.trim().length >= 3 || form.name.trim().length >= 4),
-    staleTime: 60_000,
+    staleTime: 0,
+    gcTime: 0,
+    placeholderData: undefined,
+    retry: false,
   });
   const selectedCatalogMatch = (catalogMatches.data ?? []).find(
     (match) => match.id === form.catalog_part_id,
   );
-
-  // Reset form whenever the dialog opens or the row changes
-  useMemo(() => {
-    if (open) {
-      setForm(rowToForm(editing));
-      setSection("basic");
-    }
-  }, [open, editing?.id]);
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -246,6 +292,13 @@ export function InventoryItemFormDialog({
   const totalInvValue = costNum;
 
   async function save() {
+    if (!alive.current || submitted.current || reviewRequired) return;
+    if (editing && (!editing.updated_at || editing.business_id !== businessId)) {
+      setReviewRequired(
+        "Reload this item before editing. Its original version could not be confirmed.",
+      );
+      return;
+    }
     if (!form.name.trim()) {
       setSection("basic");
       toast.error("Item name is required");
@@ -256,69 +309,106 @@ export function InventoryItemFormDialog({
       toast.error("Main category is required");
       return;
     }
+    submitted.current = true;
     setSaving(true);
+    let dispatched = false;
     try {
-      const num = (v: string) => (v === "" ? null : Number(v));
-      const res: any = await upsertFn({
-        data: {
-          id: editing?.id,
-          businessId,
-          name: form.name,
-          sku: form.sku || null,
-          category: form.category || form.main_category || null,
-          brand: form.brand || null,
-          catalog_part_id: form.catalog_part_id || null,
-          unit: form.unit || "pc",
-          qty_on_hand: Number(form.qty_on_hand) || 0,
-          reorder_at: num(form.reorder_at),
-          cost: costRestricted ? undefined : num(form.cost),
-          price: num(form.price),
-          location: form.location || null,
-          location_id: form.location_id || null,
-          network_visible: form.network_visible,
-          extra: {
-            barcode: form.barcode || null,
-            manufacturer_part_number: form.manufacturer_part_number || null,
-            main_category: form.main_category || null,
-            status: form.status || "active",
-            manufacturer: form.manufacturer || null,
-            ...(costRestricted ? {} : { supplier: form.supplier || null }),
-            description: form.description || null,
-            ...(costRestricted ? {} : { markup_percentage: num(form.markup_percentage) }),
-            date_purchased: form.date_purchased || null,
-            last_price_update: form.last_price_update || null,
-            qty_on_hold: Number(form.qty_on_hold) || 0,
-            qty_on_order: Number(form.qty_on_order) || 0,
-            min_stock_level: num(form.min_stock_level),
-            max_stock_level: num(form.max_stock_level),
-            weight_lbs: num(form.weight_lbs),
-            dimensions: form.dimensions || null,
-            color: form.color || null,
-            material: form.material || null,
-            model_year: form.model_year === "" ? null : Number(form.model_year),
-            oem_part_number: form.oem_part_number || null,
-            warranty_period: form.warranty_period || null,
-            universal_part: form.universal_part,
-            tax_rate: num(form.tax_rate),
-            environmental_fee: num(form.environmental_fee),
-            core_charge: num(form.core_charge),
-            hazmat_fee: num(form.hazmat_fee),
-            tax_exempt: form.tax_exempt,
-            date_last_ordered: form.date_last_ordered || null,
-            date_last_used: form.date_last_used || null,
-            web_links: form.web_links.filter((l) => l.url.trim()),
-          },
+      const num = (v: string) => {
+        if (!v.trim()) return null;
+        const value = Number(v);
+        if (!Number.isFinite(value) || value < 0)
+          throw new Error("Enter a valid non-negative number");
+        return value;
+      };
+      const data = {
+        id: editing?.id,
+        businessId,
+        expectedAccountId: accountId,
+        ...(editing ? { expectedUpdatedAt: editing.updated_at } : {}),
+        name: form.name,
+        notes: form.notes.trim() || null,
+        sku: form.sku || null,
+        category: form.category || form.main_category || null,
+        brand: form.brand || null,
+        ...(editing ? {} : { catalog_part_id: form.catalog_part_id || null }),
+        unit: form.unit || "pc",
+        ...(editing ? {} : { qty_on_hand: num(form.qty_on_hand) ?? 0 }),
+        reorder_at: num(form.reorder_at),
+        cost: costRestricted ? undefined : num(form.cost),
+        price: num(form.price),
+        location: form.location || null,
+        location_id: form.location_id || null,
+        network_visible: form.network_visible,
+        extra: {
+          barcode: form.barcode || null,
+          manufacturer_part_number: form.manufacturer_part_number || null,
+          main_category: form.main_category || null,
+          status: form.status || "active",
+          manufacturer: form.manufacturer || null,
+          ...(costRestricted ? {} : { supplier: form.supplier || null }),
+          description: form.description || null,
+          ...(costRestricted ? {} : { markup_percentage: num(form.markup_percentage) }),
+          date_purchased: form.date_purchased || null,
+          last_price_update: form.last_price_update || null,
+          // Holds and inbound quantities belong to stock/order transactions,
+          // not metadata edits or a new item's manually entered counters.
+          min_stock_level: num(form.min_stock_level),
+          max_stock_level: num(form.max_stock_level),
+          weight_lbs: num(form.weight_lbs),
+          dimensions: form.dimensions || null,
+          color: form.color || null,
+          material: form.material || null,
+          model_year: form.model_year === "" ? null : Number(form.model_year),
+          oem_part_number: form.oem_part_number || null,
+          warranty_period: form.warranty_period || null,
+          universal_part: form.universal_part,
+          tax_rate: num(form.tax_rate),
+          environmental_fee: num(form.environmental_fee),
+          core_charge: num(form.core_charge),
+          hazmat_fee: num(form.hazmat_fee),
+          tax_exempt: form.tax_exempt,
+          date_last_ordered: form.date_last_ordered || null,
+          date_last_used: form.date_last_used || null,
+          web_links: form.web_links.filter((l) => l.url.trim()),
         },
-      });
+      };
+      if (!alive.current) return;
+      dispatched = true;
+      const res: any = await upsertFn({ data });
+      if (!alive.current) return;
+      if (res?.error === "INVENTORY_EDIT_CONFLICT") {
+        setReviewRequired(
+          "This item changed or is no longer editable. Nothing was saved. Close and reload inventory before editing again.",
+        );
+        return;
+      }
       const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
+      if (!alive.current) return;
       if (handlePlanLimitResult(res, { businessId })) return;
+      if (
+        !res ||
+        res.business_id !== businessId ||
+        typeof res.id !== "string" ||
+        (editing && res.id !== editing.id)
+      )
+        throw new Error("Unconfirmed inventory save");
       toast.success(editing ? "Item updated" : "Item added");
       onSaved();
       onOpenChange(false);
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to save");
+    } catch {
+      if (!alive.current) return;
+      if (dispatched) {
+        setReviewRequired(
+          "The save result could not be confirmed. It may have completed. Close and reload inventory before trying again.",
+        );
+      } else {
+        toast.error("Check the item name and numeric values before saving.");
+      }
     } finally {
-      setSaving(false);
+      if (alive.current) {
+        submitted.current = false;
+        setSaving(false);
+      }
     }
   }
 
@@ -396,6 +486,21 @@ export function InventoryItemFormDialog({
           })}
         </div>
 
+        {reviewRequired ? (
+          <div role="alert" className="mx-6 mt-4 rounded-md border border-destructive p-3 text-sm">
+            <p>{reviewRequired}</p>
+            <Button
+              variant="outline"
+              className="mt-2"
+              onClick={() => {
+                onSaved();
+                onOpenChange(false);
+              }}
+            >
+              Close and reload inventory
+            </Button>
+          </div>
+        ) : null}
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6 bg-background">
           {section === "basic" && (
@@ -431,9 +536,14 @@ export function InventoryItemFormDialog({
                 </Field>
                 <Field
                   label="Canonical catalogue match"
-                  hint="Links this stock row to verified numbers and vehicle fitment without replacing your SKU"
+                  hint={
+                    editing
+                      ? "Use the Catalogue action on the inventory list to change this link."
+                      : "Links this stock row to verified numbers and vehicle fitment without replacing your SKU"
+                  }
                 >
                   <Select
+                    disabled={!!editing || saving || !!reviewRequired}
                     value={form.catalog_part_id || NO_NETWORK_LOCATION}
                     onValueChange={(value) =>
                       set("catalog_part_id", value === NO_NETWORK_LOCATION ? "" : value)
@@ -672,10 +782,18 @@ export function InventoryItemFormDialog({
 
           {section === "inventory" && (
             <Section title="Inventory Management">
+              {editing ? (
+                <p role="note" className="text-sm text-muted-foreground">
+                  Stock quantities are read-only here. Saving item details will not change on-hand,
+                  reserved, or on-order stock.
+                </p>
+              ) : null}
               <Grid3>
                 <Field label="Current Quantity">
                   <Input
                     type="number"
+                    aria-label="Current Quantity"
+                    readOnly={!!editing}
                     value={form.qty_on_hand}
                     onChange={(e) => set("qty_on_hand", e.target.value)}
                   />
@@ -740,6 +858,8 @@ export function InventoryItemFormDialog({
                 <Field label="On Hold" hint="Quantity reserved/on hold">
                   <Input
                     type="number"
+                    aria-label="On Hold"
+                    readOnly={true}
                     value={form.qty_on_hold}
                     onChange={(e) => set("qty_on_hold", e.target.value)}
                   />
@@ -747,6 +867,8 @@ export function InventoryItemFormDialog({
                 <Field label="On Order" hint="Quantity currently on order">
                   <Input
                     type="number"
+                    aria-label="On Order"
+                    readOnly={true}
                     value={form.qty_on_order}
                     onChange={(e) => set("qty_on_order", e.target.value)}
                   />
@@ -1037,7 +1159,7 @@ export function InventoryItemFormDialog({
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button onClick={save} disabled={saving || !form.name.trim()}>
+            <Button onClick={save} disabled={saving || !!reviewRequired || !form.name.trim()}>
               <Save className="h-4 w-4 mr-1" />
               {saving ? "Saving…" : editing ? "Update Item" : "Add Item"}
             </Button>

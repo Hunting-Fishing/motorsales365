@@ -1,25 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  Plus,
-  Package,
-  Trash2,
-  Pencil,
-  Minus,
-  Plus as PlusIcon,
-  AlertTriangle,
-  Radio,
-  Search,
-  Link2,
-} from "lucide-react";
+import { Plus, Package, Trash2, Pencil, AlertTriangle, Radio, Search, Link2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import {
   listBusinessInventory,
-  upsertBusinessInventoryItem,
-  adjustBusinessInventory,
   deleteBusinessInventoryItem,
   getCanonicalLinkCapability,
   linkBusinessInventoryCanonicalPart,
@@ -50,6 +37,10 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { InventoryItemFormDialog } from "@/components/business/inventory-item-form";
+import {
+  BusinessStockAdjustment,
+  type StockItemSnapshot,
+} from "@/components/business/stock-adjustment";
 
 export const Route = createFileRoute("/dashboard/business/$businessId/inventory")({
   component: InventoryPage,
@@ -57,11 +48,27 @@ export const Route = createFileRoute("/dashboard/business/$businessId/inventory"
 
 function InventoryPage() {
   const { businessId } = useParams({ from: "/dashboard/business/$businessId/inventory" });
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (!user || loading) return null;
+  return (
+    <AccountInventoryPage
+      key={`${user.id}:${businessId}`}
+      businessId={businessId}
+      accountId={user.id}
+    />
+  );
+}
+
+function AccountInventoryPage({
+  businessId,
+  accountId,
+}: {
+  businessId: string;
+  accountId: string;
+}) {
+  const lifetime = useId();
   const qc = useQueryClient();
   const loadFn = useServerFn(listBusinessInventory);
-  const upsertFn = useServerFn(upsertBusinessInventoryItem);
-  const adjustFn = useServerFn(adjustBusinessInventory);
   const delFn = useServerFn(deleteBusinessInventoryItem);
   const inquiriesFn = useServerFn(listShopInquiries);
   const capabilityFn = useServerFn(getCanonicalLinkCapability);
@@ -69,13 +76,19 @@ function InventoryPage() {
   const catalogFn = useServerFn(getCanonicalCatalogMatches);
 
   const q = useQuery({
-    queryKey: ["business-inventory", businessId],
-    enabled: !!user?.id,
+    queryKey: ["business-inventory", businessId, accountId, lifetime],
+    staleTime: 0,
+    gcTime: 0,
+    placeholderData: undefined,
+    retry: false,
     queryFn: () => loadFn({ data: { businessId } }),
   });
   const capability = useQuery({
-    queryKey: ["business-canonical-link-capability", businessId, user?.id],
-    enabled: !!user?.id,
+    queryKey: ["business-canonical-link-capability", businessId, accountId, lifetime],
+    staleTime: 0,
+    gcTime: 0,
+    placeholderData: undefined,
+    retry: false,
     queryFn: () => capabilityFn({ data: { businessId } }),
   });
 
@@ -94,8 +107,11 @@ function InventoryPage() {
   });
 
   const inquiries = useQuery({
-    queryKey: ["business-network-inquiries", businessId],
-    enabled: !!user?.id,
+    queryKey: ["business-network-inquiries", businessId, accountId, lifetime],
+    staleTime: 0,
+    gcTime: 0,
+    placeholderData: undefined,
+    retry: false,
     queryFn: () => inquiriesFn({ data: { businessId } }),
   });
 
@@ -134,6 +150,7 @@ function InventoryPage() {
     };
   }, [businessId, qc]);
 
+  const [stockItem, setStockItem] = useState<StockItemSnapshot | null>(null);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
   const [inventorySearch, setInventorySearch] = useState("");
@@ -186,17 +203,6 @@ function InventoryPage() {
     }
   }
 
-  async function adjust(itemId: string, delta: number) {
-    try {
-      await adjustFn({
-        data: { itemId, businessId, delta, reason: delta > 0 ? "Restock" : "Used" },
-      });
-      qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
-    } catch (e: any) {
-      toast.error(e?.message || "Failed");
-    }
-  }
-
   async function handleDelete(id: string) {
     if (!confirm("Delete this item?")) return;
     try {
@@ -208,7 +214,13 @@ function InventoryPage() {
     }
   }
 
-  const rows = q.data ?? [];
+  const rows = q.isSuccess && !q.isFetching ? (q.data ?? []) : [];
+  const canManage =
+    q.isSuccess &&
+    !q.isFetching &&
+    capability.isSuccess &&
+    !capability.isFetching &&
+    capability.data?.canManage === true;
   const normalizedSearch = inventorySearch
     .trim()
     .toLowerCase()
@@ -249,7 +261,7 @@ function InventoryPage() {
             Track straps, dollies, fuel, spare parts, and any other consumables.
           </p>
         </div>
-        {capability.data?.canManage && (
+        {canManage && (
           <Button onClick={openNew}>
             <Plus className="h-4 w-4 mr-1" /> Add item
           </Button>
@@ -269,23 +281,36 @@ function InventoryPage() {
         />
       </div>
 
-      {inquiries.data && inquiries.data.length > 0 && (
-        <Card className="divide-y">
-          <div className="p-4">
-            <p className="font-medium">Network part requests</p>
-            <p className="text-sm text-muted-foreground">
-              Track requests through Pending → Accepted / Rejected → Fulfilled.
-            </p>
-          </div>
-          {inquiries.data.slice(0, 20).map((r: any) => (
-            <InquiryRow key={r.id} row={r} businessId={businessId} />
-          ))}
-        </Card>
-      )}
+      {inquiries.isSuccess &&
+        !inquiries.isFetching &&
+        inquiries.data &&
+        inquiries.data.length > 0 && (
+          <Card className="divide-y">
+            <div className="p-4">
+              <p className="font-medium">Network part requests</p>
+              <p className="text-sm text-muted-foreground">
+                Track requests through Pending → Accepted / Rejected → Fulfilled.
+              </p>
+            </div>
+            {inquiries.data.slice(0, 20).map((r: any) => (
+              <InquiryRow key={r.id} row={r} businessId={businessId} />
+            ))}
+          </Card>
+        )}
 
       <Card className="divide-y">
-        {q.isLoading && <div className="p-4 text-sm text-muted-foreground">Loading…</div>}
-        {!q.isLoading && rows.length === 0 && (
+        {(q.isLoading || q.isFetching) && (
+          <div className="p-4 text-sm text-muted-foreground">Loading…</div>
+        )}
+        {q.isError ? (
+          <div role="alert" className="p-4 text-sm">
+            Inventory could not be loaded.
+            <Button variant="outline" onClick={() => void q.refetch()}>
+              Reload inventory
+            </Button>
+          </div>
+        ) : null}
+        {q.isSuccess && !q.isFetching && rows.length === 0 && (
           <div className="p-6 text-center text-sm text-muted-foreground">
             No inventory yet. Add items you want to track so you never run out.
           </div>
@@ -348,23 +373,17 @@ function InventoryPage() {
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => adjust(it.id, -1)}
-                    aria-label="Decrease"
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
                   <div className="w-14 text-center font-semibold">{Number(it.qty_on_hand)}</div>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => adjust(it.id, 1)}
-                    aria-label="Increase"
-                  >
-                    <PlusIcon className="h-3 w-3" />
-                  </Button>
+                  {canManage ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      aria-label={`Adjust stock for ${it.name}`}
+                      onClick={() => setStockItem(it)}
+                    >
+                      Adjust stock
+                    </Button>
+                  ) : null}
                   <span className="text-xs text-muted-foreground ml-1">{it.unit}</span>
                 </div>
                 {capability.data?.allowed && (
@@ -377,9 +396,14 @@ function InventoryPage() {
                     <Link2 className="mr-1 h-3.5 w-3.5" /> Catalogue
                   </Button>
                 )}
-                {capability.data?.canManage && (
+                {canManage && (
                   <>
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(it)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Edit ${it.name}`}
+                      onClick={() => openEdit(it)}
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(it.id)}>
@@ -393,10 +417,20 @@ function InventoryPage() {
         })}
       </Card>
 
+      <BusinessStockAdjustment
+        accountId={accountId}
+        businessId={businessId}
+        selected={stockItem}
+        onClose={() => setStockItem(null)}
+        onChanged={() => {
+          void qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+        }}
+      />
       <InventoryItemFormDialog
         open={open}
         onOpenChange={setOpen}
         businessId={businessId}
+        readAccountId={accountId}
         businessKind={businessMeta.data ?? null}
         editing={editing}
         onSaved={() => qc.invalidateQueries({ queryKey: ["business-inventory", businessId] })}

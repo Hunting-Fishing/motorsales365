@@ -7,6 +7,11 @@ import {
   type InventoryCostRow,
 } from "@/lib/security/restricted-columns";
 
+function assertInventoryId(value: unknown): asserts value is string {
+  if (typeof value !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value))
+    throw new Error("Invalid inventory identifier");
+}
+
 /**
  * Cost, supplier and markup are readable only by owners, managers and
  * assistant managers (column privileges + get_business_inventory_costs RPC).
@@ -22,7 +27,7 @@ async function loadInventoryCosts(
     { _user: userId, _business: businessId },
   );
   if (gateError) throw gateError;
-  if (!canViewCosts) return { canViewCosts: false, costs: [] };
+  if (canViewCosts !== true) return { canViewCosts: false, costs: [] };
   const { data: costs, error } = await supabase.rpc("get_business_inventory_costs", {
     _business_id: businessId,
     _item_ids: itemIds ?? null,
@@ -32,24 +37,27 @@ async function loadInventoryCosts(
 }
 
 async function assertManager(supabase: any, userId: string, businessId: string) {
-  const { data: ok } = await supabase.rpc("has_business_role", {
+  const { data: ok, error } = await supabase.rpc("has_business_role", {
     _user: userId,
     _business: businessId,
     _role: "manager",
   });
-  if (!ok) throw new Error("Forbidden");
+  if (error || ok !== true) throw new Error("Forbidden");
 }
 
 export const listBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { businessId: string }) => d)
+  .inputValidator((d: { businessId: string }) => {
+    assertInventoryId(d?.businessId);
+    return d;
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: isMember } = await supabase.rpc("is_business_member", {
+    const { data: isMember, error: memberError } = await supabase.rpc("is_business_member", {
       _user: userId,
       _business: data.businessId,
     });
-    if (!isMember) throw new Error("Forbidden");
+    if (memberError || isMember !== true) throw new Error("Forbidden");
 
     const { data: rows, error } = await (supabase as any)
       .from("business_inventory_items")
@@ -73,6 +81,9 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     (d: {
       id?: string;
       businessId: string;
+      expectedAccountId: string;
+      expectedUpdatedAt?: string;
+      notes?: string | null;
       sku?: string | null;
       name: string;
       category?: string | null;
@@ -89,12 +100,56 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       catalog_part_id?: string | null;
       extra?: Record<string, any> | null;
     }) => {
-      if (!d.name?.trim()) throw new Error("Name required");
+      assertInventoryId(d?.businessId);
+      assertInventoryId(d?.expectedAccountId);
+      if (d.id !== undefined) {
+        assertInventoryId(d.id);
+        // Use the original server timestamp verbatim: converting to a Date and
+        // back would truncate PostgreSQL microseconds and break the comparison.
+        if (
+          typeof d.expectedUpdatedAt !== "string" ||
+          d.expectedUpdatedAt.length > 40 ||
+          !/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-]\d{2}:\d{2})$/.test(
+            d.expectedUpdatedAt,
+          ) ||
+          !Number.isFinite(Date.parse(d.expectedUpdatedAt))
+        )
+          throw new Error("Reload this inventory item before editing");
+        if (
+          d.qty_on_hand !== undefined ||
+          d.extra?.qty_on_hold !== undefined ||
+          d.extra?.qty_on_order !== undefined ||
+          d.catalog_part_id !== undefined
+        )
+          throw new Error("Use the dedicated stock or catalogue operation for these fields");
+      }
+      if (typeof d.name !== "string" || !d.name.trim()) throw new Error("Name required");
+      if (
+        d.notes !== undefined &&
+        d.notes !== null &&
+        (typeof d.notes !== "string" || d.notes.length > 20_000)
+      )
+        throw new Error("Notes must be 20,000 characters or fewer");
+      for (const value of [d.qty_on_hand, d.cost, d.price, d.reorder_at]) {
+        if (
+          value !== undefined &&
+          value !== null &&
+          (typeof value !== "number" ||
+            !Number.isFinite(value) ||
+            value < 0 ||
+            value > 9_999_999_999.99 ||
+            !/^\d+(?:\.\d{1,2})?$/.test(String(value)))
+        )
+          throw new Error(
+            "Enter a non-negative quantity or amount with at most two decimal places",
+          );
+      }
       return d;
     },
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    if (data.expectedAccountId !== userId) throw new Error("Account changed. Reopen the item.");
     await assertManager(supabase, userId, data.businessId);
 
     if (data.catalog_part_id) {
@@ -164,6 +219,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       business_id: data.businessId,
       sku: data.sku ?? null,
       name: data.name.trim(),
+      notes: data.notes ?? null,
       category: data.category ?? null,
       brand: data.brand ?? null,
       unit: data.unit ?? "pc",
@@ -179,6 +235,29 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       catalog_part_id: data.catalog_part_id ?? null,
       ...extra,
     };
+    if (data.id) {
+      // Metadata-only edits must not reset stock, publish hidden stock, or erase
+      // optional values that the caller did not include in this patch.
+      const optionalFields = [
+        "sku",
+        "notes",
+        "category",
+        "brand",
+        "unit",
+        "qty_on_hand",
+        "reorder_at",
+        "cost",
+        "price",
+        "location",
+        "location_id",
+        "active",
+        "network_visible",
+        "catalog_part_id",
+      ] as const;
+      for (const field of optionalFields) {
+        if (data[field] === undefined) delete payload[field];
+      }
+    }
     // assertManager above == can_view_business_inventory_costs, so the caller
     // may write cost data. Separate insert/update paths are required: an
     // upsert (ON CONFLICT DO UPDATE ... EXCLUDED.cost) needs SELECT on cost.
@@ -189,10 +268,21 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
           .update(writable)
           .eq("id", data.id)
           .eq("business_id", data.businessId)
+          .eq("updated_at", data.expectedUpdatedAt!)
           .select(INVENTORY_MEMBER_SELECT)
-          .single()
+          .maybeSingle()
       : await table.insert(writable).select(INVENTORY_MEMBER_SELECT).single();
     if (error) throw error;
+    // A zero-row guarded update is a known no-write result. Do not silently
+    // rebase and overwrite a colleague's edits, or report that it was saved.
+    if (data.id && row === null) return { error: "INVENTORY_EDIT_CONFLICT" as const };
+    if (
+      !row ||
+      typeof row.id !== "string" ||
+      row.business_id !== data.businessId ||
+      (data.id !== undefined && row.id !== data.id)
+    )
+      throw new Error("Inventory change could not be confirmed. Refresh before retrying.");
     const { canViewCosts, costs } = await loadInventoryCosts(supabase, userId, data.businessId, [
       row.id,
     ]);
@@ -203,50 +293,40 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     )[0];
   });
 
+/**
+ * Fail closed until the transactional, tenant-authorized stock operation is
+ * connected. The former movement-insert/read/absolute-update sequence could
+ * leave an orphan movement or lose concurrent quantity changes.
+ */
 export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { itemId: string; businessId: string; delta: number; reason?: string }) => d)
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: isMember } = await supabase.rpc("is_business_member", {
-      _user: userId,
-      _business: data.businessId,
-    });
-    if (!isMember) throw new Error("Forbidden");
-
-    // Log movement
-    const { error: movErr } = await supabase.from("business_inventory_movements").insert({
-      item_id: data.itemId,
-      business_id: data.businessId,
-      delta: data.delta,
-      reason: data.reason ?? null,
-      actor_id: userId,
-    });
-    if (movErr) throw movErr;
-
-    // Adjust qty_on_hand
-    const { data: cur } = await supabase
-      .from("business_inventory_items")
-      .select("qty_on_hand")
-      .eq("id", data.itemId)
-      .maybeSingle();
-    const newQty = Number(cur?.qty_on_hand ?? 0) + Number(data.delta);
-    const { error: updErr } = await supabase
-      .from("business_inventory_items")
-      .update({ qty_on_hand: newQty })
-      .eq("id", data.itemId);
-    if (updErr) throw updErr;
-    return { ok: true, qty_on_hand: newQty };
+  .handler(async () => {
+    throw new Error(
+      "Manual stock adjustment is temporarily unavailable pending atomic inventory integration",
+    );
   });
 
 export const deleteBusinessInventoryItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { id: string; businessId: string }) => d)
+  .inputValidator((d: { id: string; businessId: string }) => {
+    assertInventoryId(d?.id);
+    assertInventoryId(d?.businessId);
+    return d;
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
-    const { error } = await supabase.from("business_inventory_items").delete().eq("id", data.id);
+    const { data: deleted, error } = await supabase
+      .from("business_inventory_items")
+      .delete()
+      .eq("id", data.id)
+      .eq("business_id", data.businessId)
+      .select("id,business_id")
+      .single();
     if (error) throw error;
+    if (!deleted || deleted.id !== data.id || deleted.business_id !== data.businessId)
+      throw new Error("Inventory deletion could not be confirmed. Refresh before retrying.");
     return { ok: true };
   });
 

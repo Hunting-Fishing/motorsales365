@@ -1,0 +1,84 @@
+name: Client release regression checks
+
+# Read-only supplemental checks. Existing full CI/release gates remain mandatory.
+on:
+  pull_request:
+    branches:
+      - completion/365-seven-day-integration
+    paths:
+      - src/lib/business-inventory.functions.ts
+      - src/lib/business-inventory-client-release.test.ts
+      - src/lib/invoice-inventory-boundary.test.ts
+      - src/routes/_authenticated/workspace.invoices.$id.tsx
+      - src/components/shop-manager/invoice-detail.test.tsx
+      - src/components/shop-manager/invoice-capacity.test.tsx
+      - scripts/parts-stock/writer-frontier.mjs
+      - scripts/parts-stock/writer-frontier.test.mjs
+      - .github/workflows/client-release-validation.yml
+      - scripts/parts-stock/manual-operation*
+      - scripts/client-release/**
+
+permissions:
+  contents: read
+
+jobs:
+  client-regressions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Actual handler and invoice mutation regressions
+        run: npx vitest run src/lib/business-inventory-client-release.test.ts src/lib/invoice-inventory-boundary.test.ts src/components/shop-manager/invoice-detail.test.tsx src/components/shop-manager/invoice-capacity.test.tsx --maxWorkers=1
+      - name: Preserve full stock source-integrity checks
+        run: node --test --test-concurrency=1 scripts/parts-stock/writer-frontier.test.mjs
+      - name: Stock operation replay and restart recovery (isolated PGlite)
+        run: node --test --test-concurrency=1 scripts/parts-stock/manual-operation-candidate.test.mjs scripts/parts-stock/manual-operation-native-setup.test.mjs
+      - name: Multi-business staff authority and deactivation (isolated PGlite)
+        run: node --test --test-concurrency=1 scripts/client-release/business-staff-boundary.test.mjs scripts/client-release/business-staff-lifecycle.test.mjs scripts/client-release/business-staff-selection.test.mjs
+
+  native-stock-operations:
+    name: Native PG17 stock operation concurrency
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install native PostgreSQL 17 (ephemeral runner only)
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Ubuntu 24.04's built-in PG16 is not the required PG17 server.
+          # Official signed PGDG repository; major is explicit, minor packages float.
+          # https://www.postgresql.org/download/linux/ubuntu/
+          . /etc/os-release
+          test "$ID" = ubuntu && test "$VERSION_CODENAME" = noble
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl --fail --silent --show-error --location --max-time 60 \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            --output /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+          printf '%s\n' 'deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main' \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          # Do not create/start a package-managed main cluster. Only our private
+          # initdb cluster below is used, never a preinstalled runner cluster.
+          printf '\ncreate_main_cluster = false\n' \
+            | sudo tee -a /etc/postgresql-common/createcluster.conf >/dev/null
+          sudo apt-get update -qq
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            postgresql-17 postgresql-client-17
+          /usr/lib/postgresql/17/bin/postgres --version
+          /usr/lib/postgresql/17/bin/psql --version
+      - name: Independent-session commit, rollback, conflict and stale-stock checks
+        timeout-minutes: 3
+        run: node scripts/parts-stock/manual-operation-native.mjs --run

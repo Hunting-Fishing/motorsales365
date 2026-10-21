@@ -599,11 +599,22 @@ function AuthenticatedInvoiceDetail({ userId, id }: { userId: string; id: string
                   <AddFromInventoryDialog
                     key={snapshot}
                     {...scope}
+                    canWrite={scope.canWrite && allItems.length < DISPLAY_LIMIT}
                     invoiceStatus={data.status}
                     customerId={data.customer_id}
                   />
                 </CardHeader>
                 <CardContent className="p-0">
+                  {itemsQ.isSuccess &&
+                  !itemsQ.isFetching &&
+                  itemsQ.data.complete &&
+                  allItems.length === DISPLAY_LIMIT ? (
+                    <p role="status" className="px-6 pb-4 text-sm text-muted-foreground">
+                      This invoice has reached the 100-line editor limit. Adding another line is
+                      unavailable. Payment entry still follows the invoice balance and status
+                      checks.
+                    </p>
+                  ) : null}
                   {itemsQ.isError ? (
                     <ReadFailure label="line items" retry={() => void itemsQ.refetch()} />
                   ) : !itemsQ.isSuccess || itemsQ.isFetching ? (
@@ -808,6 +819,7 @@ type InvoiceEditorScope = {
   onWritten: () => void;
 };
 class FinancialWriteUncertain extends Error {}
+class InvoiceLineLimitReached extends Error {}
 function receipt(result: DbResult, fields: readonly string[]): Record<string, unknown> {
   const value = row(result.data);
   if (result.error || !value || fields.some((field) => !Object.hasOwn(value, field)))
@@ -839,7 +851,11 @@ function useWriteAcknowledgment(scope: InvoiceEditorScope, close: () => void) {
       if (!isCurrent()) return;
       if (uncertain) scope.onWritten();
       toast.error(
-        uncertain ? UNCERTAIN_WRITE : "Check the invoice and supported values before saving.",
+        uncertain
+          ? UNCERTAIN_WRITE
+          : error instanceof InvoiceLineLimitReached
+            ? "This invoice already has 100 line items. No new line was saved."
+            : "Check the invoice and supported values before saving.",
       );
     },
   };
@@ -1191,6 +1207,20 @@ function InventoryForm(props: InventoryProps & { close: () => void }) {
       const lineTotal = amountNumber(totalUnits);
       const priceAmount = amountNumber(priceUnits);
       const unitCost = amountNumber(costUnits);
+      // Refuse a known unsupported 101st line before any invoice mutation.
+      // This is a preflight, not an atomic concurrency guarantee.
+      const existing = childRead<Record<string, unknown>>(
+        await invoiceDb
+          .from("invoice_items")
+          .select("id,invoice_id,total", { count: "exact" })
+          .eq("invoice_id", invoiceId)
+          .order("id")
+          .limit(DISPLAY_LIMIT + 1),
+        invoiceId,
+      );
+      ack.check();
+      if (!existing.complete) throw new Error("Invoice line completeness is unconfirmed");
+      if (existing.rows.length >= DISPLAY_LIMIT) throw new InvoiceLineLimitReached();
       props.beginWrite();
       try {
         const inserted = receipt(
