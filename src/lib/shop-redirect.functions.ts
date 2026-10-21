@@ -92,7 +92,7 @@ export const resolveShopRedirect = createServerFn({ method: "POST" })
     const { data: links } = await supabaseAdmin
       .from("shop_product_links")
       .select(
-        "url, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)",
+        "url, revenue_score, commission_rate_pct, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)",
       )
       .eq("product_id", data.productId);
 
