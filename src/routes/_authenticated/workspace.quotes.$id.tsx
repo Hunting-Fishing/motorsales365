@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useId, useRef } from "react";
 import { z } from "zod";
-import { Loader2, FileText, ArrowRightCircle } from "lucide-react";
+import { Loader2, FileText } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/hooks/use-auth";
 import { smSupabase } from "@/lib/shop-manager/db";
+import { QuoteWorkflowControl } from "@/components/shop-manager/quote-workflow";
 
 const DISPLAY_LIMIT = 100;
 const FETCH_LIMIT = DISPLAY_LIMIT + 1;
@@ -339,16 +340,14 @@ function FreshQuote({
               </Link>
             </Button>
           ) : (
-            <Button disabled>
-              <ArrowRightCircle aria-hidden="true" className="mr-2 h-4 w-4" />
-              Convert to Work Order
-            </Button>
+            <QuoteWorkflowControl accountId={userId} quoteId={id} onChanged={refreshQuote} />
           )}
         </div>
       </div>
       {!quote.converted_to_work_order_id && (
         <p className="mb-6 text-sm text-muted-foreground">
-          Conversion is unavailable pending the authorized atomic writer.
+          Use the quote review to record customer approval and create a work order. Parts must be
+          allocated separately; conversion does not deduct stock.
         </p>
       )}
       <div className="grid gap-4 sm:grid-cols-3 mb-6">

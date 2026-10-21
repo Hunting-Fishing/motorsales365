@@ -1,6 +1,6 @@
 // Actual route + real QueryClient lifetimes, with synthetic SDK responses only.
 // This does not prove JWT/RLS, API cancellation, native writes or accounting.
-// Conversion is temporarily interlocked pending an authorized atomic writer.
+// Financial actions use a separate fresh authenticated review; no legacy RPC dispatch.
 import React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -30,10 +30,19 @@ const state = vi.hoisted(() => ({
   read: vi.fn(),
   write: vi.fn(),
   rpc: vi.fn(),
+  workflowRead: vi.fn(),
+  workflowChange: vi.fn(),
+  workflowInspect: vi.fn(),
   success: vi.fn(),
   error: vi.fn(),
   warning: vi.fn(),
   navigate: vi.fn(),
+}));
+vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
+vi.mock("@/lib/quote-workflow.functions", () => ({
+  readQuoteWorkflow: (...args: unknown[]) => state.workflowRead(...args),
+  changeQuoteWorkflow: (...args: unknown[]) => state.workflowChange(...args),
+  inspectQuoteWorkflow: (...args: unknown[]) => state.workflowInspect(...args),
 }));
 vi.mock("@/hooks/use-auth", () => ({
   useAuth: () => ({ user: state.userId ? { id: state.userId } : null, loading: state.loading }),
@@ -394,7 +403,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
       expect(await screen.findByText(QUOTE_FAILURE)).toBeInTheDocument();
       expect(state.read).not.toHaveBeenCalled();
       expect(
-        screen.queryByRole("button", { name: "Convert to Work Order" }),
+        screen.queryByRole("button", { name: "Review quote actions" }),
       ).not.toBeInTheDocument();
     },
   );
@@ -558,7 +567,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
     await screen.findByText("Loading quote…");
     expect(screen.queryByText("QUOTE-A private notes")).not.toBeInTheDocument();
     expect(screen.queryByText("Recorded total")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Convert to Work Order" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review quote actions" })).not.toBeInTheDocument();
     expect(reads("quote_items")[0].signal?.aborted).toBe(true);
     await act(async () => oldItems.resolve(result([item("OLD-WITNESS-ITEM")])));
     expect(screen.queryByText("OLD-WITNESS-ITEM")).not.toBeInTheDocument();
@@ -622,7 +631,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
       screen.queryByText("No visible items in this returned snapshot."),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Convert to Work Order" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Review quote actions" })).toBeEnabled();
     await act(async () => pending.resolve(result([item("AFTER-LOADING")])));
     await itemsReady("AFTER-LOADING");
   });
@@ -746,7 +755,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
     expect(
       screen.queryByText("All counted visible items are shown for this snapshot."),
     ).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Convert to Work Order" }));
+    fireEvent.click(screen.getByRole("button", { name: "Review quote actions" }));
   });
 
   it.each([
@@ -799,7 +808,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
     expect(
       screen.getByText(/This item snapshot is incomplete or its completeness is unverified/),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Convert to Work Order" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Review quote actions" })).toBeEnabled();
   });
 
   it("only acknowledges an empty visible snapshot with exact zero count", async () => {
@@ -812,7 +821,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
     expect(
       screen.getByText("All counted visible items are shown for this snapshot."),
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Convert to Work Order" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Review quote actions" })).toBeEnabled();
   });
 
   it.each([null, 9])("shows rows without claiming completeness when count is %j", async (count) => {
@@ -830,7 +839,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
       expect(
         screen.getByText("Showing 1 of 9 visible items in this snapshot."),
       ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Convert to Work Order" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Review quote actions" })).toBeEnabled();
   });
 
   it("preserves received decimal strings and scale instead of rounding financial estimates or quantities", async () => {
@@ -935,19 +944,18 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
   });
 
   it.each(["draft", "approved", "converted", "future-status"])(
-    "has no conversion dispatch even for a fresh complete %s quote",
+    "requires a separate authorized review before dispatch for a fresh complete %s quote",
     async (status) => {
       state.responses[responseKey("quotes")] = result(quote("QUOTE-A", { status }));
       show();
       await itemsReady();
-      const button = screen.getByRole("button", { name: "Convert to Work Order" });
-      expect(button).toBeDisabled();
-      expect(
-        screen.getByText("Conversion is unavailable pending the authorized atomic writer."),
-      ).toBeInTheDocument();
+      const button = screen.getByRole("button", { name: "Review quote actions" });
+      expect(button).toBeEnabled();
       fireEvent.click(button);
       expect(state.write).not.toHaveBeenCalled();
       expect(state.rpc).not.toHaveBeenCalled();
+      expect(state.workflowChange).not.toHaveBeenCalled();
+      expect(state.workflowInspect).not.toHaveBeenCalled();
     },
   );
 
@@ -962,7 +970,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
       "href",
       `/workspace/work-orders/${workOrderId}`,
     );
-    expect(screen.queryByRole("button", { name: "Convert to Work Order" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Review quote actions" })).not.toBeInTheDocument();
     state.responses[responseKey("quotes")] = pending.promise;
     fireEvent.click(screen.getByRole("button", { name: "Refresh quote" }));
     await screen.findByText("Loading quote…");
@@ -972,7 +980,7 @@ describe("Quote detail private reader and candidate-only conversion interlock", 
     );
     await ready();
     expect(screen.queryByRole("link", { name: "Open Work Order →" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Convert to Work Order" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Review quote actions" })).toBeEnabled();
   });
 
   it("redacts the actual route error boundary and exposes a manual reset only while authenticated", () => {
