@@ -30,7 +30,7 @@ FROM tools_parent, (VALUES
   ('recovery-tools', 'Recovery & Roadside Tools', 'Tow straps, recovery gear, jump starters and roadside workshop essentials.', 80)
 ) AS v(slug, name, description, sort_order)
 ON CONFLICT (slug) DO UPDATE
-SET department_slug = COALESCE(public.shop_categories.department_slug, EXCLUDED.department_slug);
+SET department_slug = COALESCE(shop_categories.department_slug, EXCLUDED.department_slug);
 
 -- Curated evergreen tool intents. Each item gets both Shopee and Lazada
 -- destinations. The redirect layer converts them to tracked affiliate URLs
@@ -139,7 +139,7 @@ SELECT
     WHEN 'lazada' THEN 'https://www.lazada.com.ph/catalog/?q=' || replace(d.search_q, ' ', '%20')
   END,
   true,
-  CASE WHEN n.slug = 'lazada' THEN 1 ELSE 1 END,
+  1,
   'account/API pending'
 FROM public.shop_products p
 JOIN (VALUES
@@ -208,4 +208,4 @@ JOIN public.affiliate_networks n ON n.slug IN ('shopee','lazada') AND n.active =
 ON CONFLICT (product_id, network_id) DO UPDATE
 SET url = EXCLUDED.url,
     in_stock = true,
-    commission_source = COALESCE(public.shop_product_links.commission_source, EXCLUDED.commission_source);
+    commission_source = COALESCE(shop_product_links.commission_source, EXCLUDED.commission_source);
