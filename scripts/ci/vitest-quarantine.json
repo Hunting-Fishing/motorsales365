@@ -1,0 +1,8 @@
+{
+  "$comment": [
+    "All 179 application tests pass as of 2026-10-14; no failures are quarantined.",
+    "CI runs the full suite and blocks new failures, load errors, and incomplete reports.",
+    "Fix a failing test instead of adding an exception to this list."
+  ],
+  "tests": []
+}

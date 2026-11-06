@@ -13,7 +13,11 @@ vi.mock("@supabase/supabase-js", () => {
   const client = {
     from: () => ({
       insert: async () => ({ error: null }),
-      update: () => ({ eq: async () => ({ error: null }) }),
+      update: () => ({
+        eq: () => ({
+          select: async () => ({ data: [{ id: "test-user" }], error: null }),
+        }),
+      }),
     }),
     schema: () => ({ from: () => usersQuery }),
     auth: {
@@ -76,9 +80,7 @@ async function post(body: unknown) {
   return { status: res.status, json };
 }
 
-function fieldsWithError(
-  errors: { field: string; message: string }[] | undefined,
-): string[] {
+function fieldsWithError(errors: { field: string; message: string }[] | undefined): string[] {
   return (errors ?? []).map((e) => e.field);
 }
 
@@ -177,25 +179,19 @@ describe("POST /api/public/auth/signup — server-side validation", () => {
     });
 
     it("rejects when business_address lacks a building/unit number", async () => {
-      const { status, json } = await post(
-        businessBody({ business_address: "Ortigas Avenue" }),
-      );
+      const { status, json } = await post(businessBody({ business_address: "Ortigas Avenue" }));
       expect(status).toBe(422);
       expect(fieldsWithError(json.errors)).toContain("business_address");
     });
 
     it("rejects when business_postal_code is missing", async () => {
-      const { status, json } = await post(
-        businessBody({ business_postal_code: "" }),
-      );
+      const { status, json } = await post(businessBody({ business_postal_code: "" }));
       expect(status).toBe(422);
       expect(fieldsWithError(json.errors)).toContain("business_postal_code");
     });
 
     it("rejects a malformed business_postal_code", async () => {
-      const { status, json } = await post(
-        businessBody({ business_postal_code: "@@" }),
-      );
+      const { status, json } = await post(businessBody({ business_postal_code: "@@" }));
       expect(status).toBe(422);
       expect(fieldsWithError(json.errors)).toContain("business_postal_code");
     });

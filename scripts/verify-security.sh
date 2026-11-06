@@ -55,6 +55,12 @@ declare -A EXPECTED=(
   ["can_manage_ads"]="false|true"
   ["current_plan_tier"]="false|true"
   ["is_business_account"]="false|true"
+  ["is_network_publishable_business"]="true|true"
+  ["get_business_network_exposure_reviews"]="false|true"
+  ["get_business_custom_domain_token"]="false|true"
+  ["can_view_business_inventory_costs"]="false|true"
+  ["get_business_inventory_costs"]="false|true"
+  ["accredit_staff_partner"]="false|true"
 )
 
 fail=0

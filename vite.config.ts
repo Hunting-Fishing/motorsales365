@@ -6,6 +6,18 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
+import { resolve } from "node:path";
+
+// Vite normalizes Windows roots to forward slashes. The legacy MCP plugin
+// compares that root against native paths using path.sep; pass it a native root
+// without changing Vite's own config. Retire this adapter with PR #9.
+const mcp = mcpPlugin();
+const mcpConfigResolved = mcp.configResolved;
+if (typeof mcpConfigResolved === "function") {
+  mcp.configResolved = function (config) {
+    return mcpConfigResolved.call(this, { ...config, root: resolve(config.root) });
+  };
+}
 
 // Stamp every build with a unique id so the service worker can bust its
 // offline cache on each deploy without us editing public/sw.js by hand.
@@ -38,6 +50,6 @@ export default defineConfig({
       // Persist pre-bundled deps across restarts.
       holdUntilCrawlEnd: false,
     },
-    plugins: [mcpPlugin()],
+    plugins: [mcp],
   },
 });

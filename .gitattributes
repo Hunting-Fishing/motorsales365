@@ -1,0 +1,2 @@
+# Keep source and shell scripts consistent between Windows workstations and CI.
+* text=auto eol=lf

@@ -1,5 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  INVENTORY_MEMBER_SELECT,
+  mergeInventoryCosts,
+  sanitizeInventoryCostWrite,
+  type InventoryCostRow,
+} from "@/lib/security/restricted-columns";
+
+/**
+ * Cost, supplier and markup are readable only by owners, managers and
+ * assistant managers (column privileges + get_business_inventory_costs RPC).
+ */
+async function loadInventoryCosts(
+  supabase: any,
+  userId: string,
+  businessId: string,
+  itemIds?: string[],
+): Promise<{ canViewCosts: boolean; costs: InventoryCostRow[] }> {
+  const { data: canViewCosts, error: gateError } = await supabase.rpc(
+    "can_view_business_inventory_costs",
+    { _user: userId, _business: businessId },
+  );
+  if (gateError) throw gateError;
+  if (!canViewCosts) return { canViewCosts: false, costs: [] };
+  const { data: costs, error } = await supabase.rpc("get_business_inventory_costs", {
+    _business_id: businessId,
+    _item_ids: itemIds ?? null,
+  });
+  if (error) throw error;
+  return { canViewCosts: true, costs: (costs ?? []) as InventoryCostRow[] };
+}
 
 async function assertManager(supabase: any, userId: string, businessId: string) {
   const { data: ok } = await supabase.rpc("has_business_role", {
@@ -21,15 +51,20 @@ export const listBusinessInventory = createServerFn({ method: "POST" })
     });
     if (!isMember) throw new Error("Forbidden");
 
-    const { data: rows, error } = await supabase
+    const { data: rows, error } = await (supabase as any)
       .from("business_inventory_items")
       .select(
-        "*, business_inventory_locations:location_id(name,code), parts_catalog:catalog_part_id(id,title,manufacturer,manufacturer_part_number,catalog_status,active), business_part_cross_references(part_number,number_type,supplier_name,active)",
+        `${INVENTORY_MEMBER_SELECT}, business_inventory_locations:location_id(name,code), parts_catalog:catalog_part_id(id,title,manufacturer,manufacturer_part_number,catalog_status,active), business_part_cross_references(part_number,number_type,supplier_name,active)`,
       )
       .eq("business_id", data.businessId)
       .order("name", { ascending: true });
     if (error) throw error;
-    return rows ?? [];
+    const { canViewCosts, costs } = await loadInventoryCosts(supabase, userId, data.businessId);
+    return mergeInventoryCosts(
+      (rows ?? []) as Array<{ id: string } & Record<string, any>>,
+      costs,
+      canViewCosts,
+    );
   });
 
 export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
@@ -125,8 +160,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       }
     }
 
-    const payload = {
-      id: data.id,
+    const payload: Record<string, any> = {
       business_id: data.businessId,
       sku: data.sku ?? null,
       name: data.name.trim(),
@@ -135,7 +169,8 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       unit: data.unit ?? "pc",
       qty_on_hand: data.qty_on_hand ?? 0,
       reorder_at: data.reorder_at ?? null,
-      cost: data.cost ?? null,
+      // undefined = leave the stored value alone (see sanitizeInventoryCostWrite)
+      cost: data.cost === undefined && data.id ? undefined : (data.cost ?? null),
       price: data.price ?? null,
       location: data.location ?? null,
       location_id: data.location_id ?? null,
@@ -144,13 +179,28 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
       catalog_part_id: data.catalog_part_id ?? null,
       ...extra,
     };
-    const { data: row, error } = await (supabase as any)
-      .from("business_inventory_items")
-      .upsert(payload)
-      .select("*")
-      .single();
+    // assertManager above == can_view_business_inventory_costs, so the caller
+    // may write cost data. Separate insert/update paths are required: an
+    // upsert (ON CONFLICT DO UPDATE ... EXCLUDED.cost) needs SELECT on cost.
+    const writable = sanitizeInventoryCostWrite(payload, true);
+    const table = (supabase as any).from("business_inventory_items");
+    const { data: row, error } = data.id
+      ? await table
+          .update(writable)
+          .eq("id", data.id)
+          .eq("business_id", data.businessId)
+          .select(INVENTORY_MEMBER_SELECT)
+          .single()
+      : await table.insert(writable).select(INVENTORY_MEMBER_SELECT).single();
     if (error) throw error;
-    return row;
+    const { canViewCosts, costs } = await loadInventoryCosts(supabase, userId, data.businessId, [
+      row.id,
+    ]);
+    return mergeInventoryCosts(
+      [row as { id: string } & Record<string, any>],
+      costs,
+      canViewCosts,
+    )[0];
   });
 
 export const adjustBusinessInventory = createServerFn({ method: "POST" })

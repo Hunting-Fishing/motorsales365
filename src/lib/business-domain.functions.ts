@@ -24,6 +24,11 @@ const domainSchema = z
   .transform((v) => v.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/+$/, ""))
   .refine((v) => /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/.test(v), "Invalid domain");
 
+/**
+ * Custom domains are managed by the owner and manager-level staff (the same
+ * people who may read the DNS verification token). Other staff roles are
+ * rejected here instead of failing later in the database.
+ */
 async function assertEditor(supabase: any, userId: string, businessId: string) {
   const { data: biz } = await supabase
     .from("businesses")
@@ -32,13 +37,21 @@ async function assertEditor(supabase: any, userId: string, businessId: string) {
     .maybeSingle();
   if (!biz) throw new Error("Business not found");
   if (biz.owner_id === userId) return;
-  const { data: staff } = await supabase
-    .from("business_staff")
-    .select("role")
-    .eq("business_id", businessId)
-    .eq("user_id", userId)
-    .maybeSingle();
-  if (!staff) throw new Error("Forbidden");
+  const { data: isManager } = await supabase.rpc("has_business_role", {
+    _user: userId,
+    _business: businessId,
+    _role: "manager",
+  });
+  if (!isManager) throw new Error("Forbidden");
+}
+
+/** The verification token is not selectable by API roles; read it via the gated RPC. */
+async function readVerifyToken(supabase: any, businessId: string): Promise<string | null> {
+  const { data, error } = await supabase.rpc("get_business_custom_domain_token", {
+    _business_id: businessId,
+  });
+  if (error) throw new Error(error.message);
+  return (data as string | null) ?? null;
 }
 
 function mintToken() {
@@ -54,11 +67,17 @@ export const getBusinessCustomDomain = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     await assertEditor(context.supabase, context.userId, data.businessId);
-    const { data: biz } = await context.supabase
+    const { data: row } = await context.supabase
       .from("businesses")
-      .select("id, slug, custom_domain, custom_domain_status, custom_domain_verify_token, custom_domain_verified_at")
+      .select("id, slug, custom_domain, custom_domain_status, custom_domain_verified_at")
       .eq("id", data.businessId)
       .maybeSingle();
+    const biz = row
+      ? {
+          ...row,
+          custom_domain_verify_token: await readVerifyToken(context.supabase, data.businessId),
+        }
+      : null;
     return {
       business: biz,
       verifyHost: biz?.custom_domain ? `${VERIFY_HOST_PREFIX}.${biz.custom_domain}` : null,
@@ -130,11 +149,13 @@ export const verifyBusinessCustomDomain = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertEditor(context.supabase, context.userId, data.businessId);
 
-    const { data: biz } = await context.supabase
+    const { data: row } = await context.supabase
       .from("businesses")
-      .select("id, custom_domain, custom_domain_verify_token")
+      .select("id, custom_domain")
       .eq("id", data.businessId)
       .maybeSingle();
+    const token = row ? await readVerifyToken(context.supabase, data.businessId) : null;
+    const biz = row ? { ...row, custom_domain_verify_token: token } : null;
     if (!biz?.custom_domain || !biz?.custom_domain_verify_token) {
       throw new Error("No domain connected yet");
     }
@@ -151,10 +172,15 @@ export const verifyBusinessCustomDomain = createServerFn({ method: "POST" })
       return { ok: false, error: `TXT at ${host} did not match the verification token`, records };
     }
 
-    const { error } = await context.supabase
+    // Only the platform may mark a domain verified (DB trigger
+    // guard_business_custom_domain_verification). The caller was authorized
+    // above and the TXT record matched, so write with the service role, pinned
+    // to the domain that was actually checked.
+    const { error } = await supabaseAdmin
       .from("businesses")
       .update({ custom_domain_status: "verified", custom_domain_verified_at: new Date().toISOString() })
-      .eq("id", data.businessId);
+      .eq("id", data.businessId)
+      .eq("custom_domain", biz.custom_domain);
     if (error) throw new Error(error.message);
     return { ok: true, records };
   });

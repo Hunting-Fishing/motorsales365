@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { upsertBusinessInventoryItem } from "@/lib/business-inventory.functions";
+import { isInventoryCostRestricted } from "@/lib/security/restricted-columns";
 import {
   getCanonicalCatalogMatches,
   listBusinessPartsLocations,
@@ -160,6 +161,8 @@ const SECTIONS: { key: SectionKey; label: string; icon: any }[] = [
   { key: "additional", label: "Additional", icon: FileText },
 ];
 
+const RESTRICTED_PLACEHOLDER = "Visible to owners and managers only";
+
 export function InventoryItemFormDialog({
   open,
   onOpenChange,
@@ -176,6 +179,9 @@ export function InventoryItemFormDialog({
   onSaved: () => void;
 }) {
   const [section, setSection] = useState<SectionKey>("basic");
+  // Cost, supplier and markup are limited to owners/managers. When the list
+  // returned the row without them, lock the fields and never send them back.
+  const costRestricted = isInventoryCostRestricted(editing);
   const [form, setForm] = useState<FormState>(() => rowToForm(editing));
   const [saving, setSaving] = useState(false);
   const upsertFn = useServerFn(upsertBusinessInventoryItem);
@@ -265,7 +271,7 @@ export function InventoryItemFormDialog({
           unit: form.unit || "pc",
           qty_on_hand: Number(form.qty_on_hand) || 0,
           reorder_at: num(form.reorder_at),
-          cost: num(form.cost),
+          cost: costRestricted ? undefined : num(form.cost),
           price: num(form.price),
           location: form.location || null,
           location_id: form.location_id || null,
@@ -276,9 +282,9 @@ export function InventoryItemFormDialog({
             main_category: form.main_category || null,
             status: form.status || "active",
             manufacturer: form.manufacturer || null,
-            supplier: form.supplier || null,
+            ...(costRestricted ? {} : { supplier: form.supplier || null }),
             description: form.description || null,
-            markup_percentage: num(form.markup_percentage),
+            ...(costRestricted ? {} : { markup_percentage: num(form.markup_percentage) }),
             date_purchased: form.date_purchased || null,
             last_price_update: form.last_price_update || null,
             qty_on_hold: Number(form.qty_on_hold) || 0,
@@ -526,7 +532,8 @@ export function InventoryItemFormDialog({
                   <Input
                     value={form.supplier}
                     onChange={(e) => set("supplier", e.target.value)}
-                    placeholder="Enter supplier name"
+                    placeholder={costRestricted ? RESTRICTED_PLACEHOLDER : "Enter supplier name"}
+                    disabled={costRestricted}
                   />
                 </Field>
                 <Field label="Brand">
@@ -604,7 +611,8 @@ export function InventoryItemFormDialog({
                     step="0.01"
                     value={form.cost}
                     onChange={(e) => set("cost", e.target.value)}
-                    placeholder="500.00"
+                    placeholder={costRestricted ? RESTRICTED_PLACEHOLDER : "500.00"}
+                    disabled={costRestricted}
                   />
                 </Field>
                 <Field label="Sell Price Per Unit" hint="Price per unit (e.g., per lb, per piece)">
@@ -624,7 +632,8 @@ export function InventoryItemFormDialog({
                     step="0.1"
                     value={form.markup_percentage}
                     onChange={(e) => set("markup_percentage", e.target.value)}
-                    placeholder="50.0"
+                    placeholder={costRestricted ? RESTRICTED_PLACEHOLDER : "50.0"}
+                    disabled={costRestricted}
                   />
                 </Field>
                 <Field label="Cost Per Unit" hint="Calculated: Total Cost ÷ Quantity">

@@ -36,8 +36,7 @@ const signOutLocal = vi.fn().mockResolvedValue({ error: null });
 
 const rolesTable = () => ({
   select: () => ({
-    eq: () =>
-      Promise.resolve({ data: [{ role: "user" }], error: null }),
+    eq: () => Promise.resolve({ data: [{ role: "user" }], error: null }),
   }),
 });
 const profilesTable = () => ({
@@ -66,12 +65,18 @@ vi.mock("@/integrations/supabase/client", () => ({
         },
         error: null,
       }),
+      refreshSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
       signOut: vi.fn((opts?: { scope?: string }) => {
         if (opts?.scope === "local") return signOutLocal();
         return Promise.resolve({ error: null });
       }),
       onAuthStateChange: (cb: AuthListener) => {
         listeners.push(cb);
+        queueMicrotask(() =>
+          cb("INITIAL_SESSION", {
+            user: { id: "u1", email: "u@x.com", user_metadata: {} },
+          }),
+        );
         return {
           data: {
             subscription: {
@@ -159,8 +164,6 @@ describe("auth — unexpected SIGNED_OUT surfaces toast + Try again flow", () =>
     // 4) Navigation went to /auth?next=<encoded current path+search>.
     expect(assignSpy).toHaveBeenCalledTimes(1);
     const target = assignSpy.mock.calls[0][0] as string;
-    expect(target).toBe(
-      `/auth?next=${encodeURIComponent("/dashboard/listings?filter=active")}`,
-    );
+    expect(target).toBe(`/auth?next=${encodeURIComponent("/dashboard/listings?filter=active")}`);
   });
 });
