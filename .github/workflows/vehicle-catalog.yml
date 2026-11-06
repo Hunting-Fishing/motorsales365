@@ -10,6 +10,7 @@ on:
       - 'scripts/vehicle-catalog/**'
       - 'supabase/migrations/*vehicle*'
       - 'supabase/migrations/*catalog*'
+      - 'supabase/functions/catalog-import-ingress/**'
       - '.github/workflows/vehicle-catalog.yml'
   workflow_dispatch:
 permissions:
@@ -27,6 +28,6 @@ jobs:
       # Existing lockfile uses Zod 4 while zod-adapter advertises a Zod 3 peer.
       # Preserve the locked dependency graph used by the app.
       - run: npm ci --legacy-peer-deps
-      - run: node --test scripts/vehicle-catalog/providers.test.mjs scripts/vehicle-catalog/database.test.mjs scripts/vehicle-catalog/sync.test.mjs scripts/vehicle-catalog/queue.test.mjs
+      - run: node --test scripts/vehicle-catalog/providers.test.mjs scripts/vehicle-catalog/database.test.mjs scripts/vehicle-catalog/sync.test.mjs scripts/vehicle-catalog/queue.test.mjs scripts/vehicle-catalog/oidc.test.mjs
       - run: npx vitest run src/components/vehicle-picker.test.tsx src/components/engine-cc-field.test.tsx
       - run: npm run build

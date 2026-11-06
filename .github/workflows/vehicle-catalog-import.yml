@@ -9,6 +9,7 @@ on:
       - '.github/workflows/vehicle-catalog-import.yml'
 permissions:
   contents: read
+  id-token: write
 concurrency:
   group: vehicle-catalog-import
   cancel-in-progress: false
@@ -23,12 +24,9 @@ jobs:
         with:
           node-version: '22'
       - name: Check importer logic
-        run: node --test scripts/vehicle-catalog/providers.test.mjs scripts/vehicle-catalog/sync.test.mjs
+        run: node --test scripts/vehicle-catalog/providers.test.mjs scripts/vehicle-catalog/sync.test.mjs scripts/vehicle-catalog/oidc.test.mjs
       - name: Cache and stage a bounded batch
         run: node scripts/vehicle-catalog/sync.mjs
         env:
           API_NINJAS_API_KEY: ${{ secrets.API_NINJAS_API_KEY }}
           DATAANDAPIS_API_KEY: ${{ secrets.DATAANDAPIS_API_KEY }}
-          TARGET_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TARGET_SUPABASE_SERVICE_ROLE_KEY }}
-          LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY }}
-          CATALOG_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.CATALOG_SUPABASE_SERVICE_ROLE_KEY }}

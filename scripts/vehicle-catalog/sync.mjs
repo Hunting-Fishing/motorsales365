@@ -2,17 +2,18 @@ import { createHash } from 'node:crypto';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 import { normalizeMotorcycle } from './providers.mjs';
+import { createOidcDatabase } from './oidc.mjs';
 
 export const projectUrl = 'https://wjxaajgvddtrxxtocxen.supabase.co';
 export function databaseKey(env) {
- const candidates=[env.CATALOG_SUPABASE_SERVICE_ROLE_KEY,env.TARGET_SUPABASE_SERVICE_ROLE_KEY,env.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY].filter(Boolean);
+ const candidates=[env.CATALOG_SUPABASE_SERVICE_ROLE_KEY,env.TARGET_SUPABASE_SERVICE_ROLE_KEY,env.LOVABLE_SOURCE_SUPABASE_SERVICE_ROLE_KEY].filter(Boolean).map(key=>key.trim());
  if(!candidates.length) throw new Error('Database credential is missing');
  // Check the destination before ever transmitting an existing privileged credential.
  for(const key of candidates) {
  if(key.startsWith('eyJ')) {
-  let claims; try { claims=JSON.parse(Buffer.from(key.split('.')[1],'base64url')); } catch { throw new Error('Invalid database credential'); }
+  let claims; try { claims=JSON.parse(Buffer.from(key.split('.')[1],'base64url')); } catch { continue; }
   if(claims.ref==='wjxaajgvddtrxxtocxen'&&claims.role==='service_role') return key;
- } else if(key===env.CATALOG_SUPABASE_SERVICE_ROLE_KEY&&key.startsWith('sb_secret_')) return key;
+ } else if(key===env.CATALOG_SUPABASE_SERVICE_ROLE_KEY?.trim()&&key.startsWith('sb_secret_')) return key;
  }
  throw new Error('Database credential belongs to a different project or role');
 }
@@ -91,7 +92,12 @@ export async function syncProvider({provider,key,db,fetchImpl=fetch,wait=sleep,l
  }
 }
 export async function main(env=process.env) {
- const db=createDatabase(databaseKey(env));
+ if(env.GITHUB_ACTIONS==='true') {
+  const denied=await fetch(projectUrl+'/functions/v1/catalog-import-ingress',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(20000)});
+  if(denied.status!==401)throw new Error('Ingress authentication check failed');
+  console.log(JSON.stringify({ingress:'unauthenticated requests denied'}));
+ }
+ const db=env.GITHUB_ACTIONS==='true'?createOidcDatabase(env):createDatabase(databaseKey(env));
  // Connectivity is checked before any provider quota is consumed.
  await db('vehicle_catalog_import_controls?select=source_key&limit=1');
  for(const [provider,name] of [['api-ninjas','API_NINJAS_API_KEY'],['dataandapis','DATAANDAPIS_API_KEY']]) {
@@ -99,5 +105,9 @@ export async function main(env=process.env) {
  }
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
- main().catch(()=>{console.error('Import stopped. Check database credential/project and private import status; secrets were not logged.');process.exitCode=1;});
+ main().catch(error=>{
+  const allowed=['Database credential is missing','Database credential belongs to a different project or role'];
+  const reason=allowed.includes(error.message)||/^Database HTTP \d{3}$/.test(error.message)?error.message:'Connectivity or importer failure';
+  console.error(`Import stopped: ${reason}. Secrets were not logged.`);process.exitCode=1;
+ });
 }
