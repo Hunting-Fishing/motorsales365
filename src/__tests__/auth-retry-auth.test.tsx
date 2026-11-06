@@ -60,6 +60,11 @@ vi.mock("@/integrations/supabase/client", () => ({
       }),
       onAuthStateChange: (cb: AuthListener) => {
         listeners.push(cb);
+        queueMicrotask(() =>
+          cb("INITIAL_SESSION", {
+            user: { id: "user-123", email: "t@example.com", user_metadata: {} },
+          }),
+        );
         return {
           data: {
             subscription: {
@@ -135,9 +140,7 @@ describe("retryAuth", () => {
     expect(result.current.authError).toBeNull();
     expect(result.current.loading).toBe(false);
     // 3) Redirect to /auth with preserved next param.
-    expect(assignSpy).toHaveBeenCalledWith(
-      expect.stringContaining("/auth?next=%2Fdashboard"),
-    );
+    expect(assignSpy).toHaveBeenCalledWith(expect.stringContaining("/auth?next=%2Fdashboard"));
 
     // 4) Pending role retry timer was cancelled: no further roles calls
     //    should fire even after the original ~1s backoff elapses.

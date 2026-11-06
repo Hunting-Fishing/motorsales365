@@ -18,7 +18,9 @@ describe("business and Associate role boundaries", () => {
     expect(businesses).toContain("Not a 365 Associate");
     expect(businesses).toContain("Join Associate Network");
     expect(workspace).toContain("Not a 365 Associate · Apply");
-    expect(workspace).toContain('associateApproved={associateQ.data === "approved"}');
+    expect(workspace).toContain('associateQ.data?.status === "approved"');
+    expect(workspace).toContain("associateQ.data?.access_enabled === true");
+    expect(workspace).toContain("!associateQ.data?.offboarded_at");
   });
 
   it("keeps Associate operations unavailable until approval", () => {
@@ -26,13 +28,17 @@ describe("business and Associate role boundaries", () => {
     const operations = read("src/lib/parts-network-operations.functions.ts");
     expect(sidebar).toContain('m.id === "parts_operations" && !associateApproved');
     expect(operations).toContain("assertApprovedAssociate(context.supabase, data.businessId)");
-    expect(operations).toContain('data?.status !== "approved"');
+    expect(operations).toContain('supabase.rpc("is_active_associate"');
+    expect(operations).toContain("_business_id: businessId");
+    expect(operations).toContain("if (!data)");
   });
 
   it("limits staff administration to managers and protects the owner", () => {
     const staff = read("src/lib/business-staff.functions.ts");
     expect(staff).toContain("await assertManager(supabase, userId, data.businessId)");
-    expect(staff).toContain("The business owner already has full access and cannot be added as staff");
+    expect(staff).toContain(
+      "The business owner already has full access and cannot be added as staff",
+    );
     expect(staff).toContain('.eq("business_id", data.businessId)');
     expect(staff).toContain('title: "Business owner"');
   });
