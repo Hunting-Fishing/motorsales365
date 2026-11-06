@@ -6,7 +6,9 @@ The owner confirmed on 6 November 2026 that API Ninjas and Data & APIs credentia
 
 GitHub Actions workflow **Import Asian vehicle catalogue** runs on the main branch, on manual dispatch, and daily at 02:17 UTC / 10:17 Asia/Manila. GitHub scheduling can be delayed. A change to the import workflow on main also starts one bounded run. A single concurrency group prevents overlapping runs. Pull requests cannot start the credential-bearing job.
 
-Keys are read from `API_NINJAS_API_KEY` and `DATAANDAPIS_API_KEY` secrets. They are sent only in headers to their corresponding official API. The database destination is fixed to the existing 365 Motor Sales Supabase project. Existing target/source database JWTs are checked for this exact project reference and service role before use. A future opaque database key must be explicitly set as `CATALOG_SUPABASE_SERVICE_ROLE_KEY`. Keys and response bodies are never printed or uploaded to public GitHub artifacts.
+Keys are read from `API_NINJAS_API_KEY` and `DATAANDAPIS_API_KEY` secrets. They are sent only in headers to their corresponding official API. GitHub authenticates to the catalogue ingress using a short-lived OIDC token. The ingress verifies the RS256 signature using GitHub's public keys, audience, expiry, owner/repository IDs, main branch, exact import workflow path and allowed event. Both documented legacy/immutable subject formats are bound to this repository. No database key is provided to GitHub's import job.
+
+The ingress only permits the two catalogue RPCs, a connectivity query and restricted failure-status updates. It cannot read customer tables or the raw response cache, increase budgets or enable a paused provider. Its server-side database key never leaves Supabase. The platform's Supabase-JWT check is disabled only for this new endpoint because its own GitHub OIDC verification runs before every operation. Missing or invalid identity returns 401. Local administrative use of sync.mjs still accepts a project-checked database key. Secrets and response bodies are never printed or uploaded to public GitHub artifacts.
 
 ## Initial pace
 
@@ -50,4 +52,4 @@ Setting `enabled=false` for a provider pauses subsequent reservations without de
 
 ## Validation
 
-Node tests cover destination checks, decimal CC, pagination, unknown-year handling, Retry-After, quota stops and safe transaction payloads. PGlite tests exercise the actual schema/RPCs, public-access denial, concurrent-request guard, budgets including failures, atomic rollback, duplicate/repeated pages and resume checkpoints. The existing full-build workflow includes these tests.
+Node tests cover destination checks, decimal CC, pagination, unknown-year handling, Retry-After, quota stops and safe transaction payloads. Real RSA signatures test OIDC acceptance and rejection of forged, expired, wrong-audience, wrong-repository and wrong-workflow tokens. Operation tests reject customer-table reads and budget changes. PGlite tests exercise the actual schema/RPCs, public-access denial, concurrent-request guard, budgets including failures, atomic rollback, duplicate/repeated pages and resume checkpoints. The existing full-build workflow includes these tests.

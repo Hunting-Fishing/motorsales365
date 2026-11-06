@@ -1,1 +1,5 @@
 project_id = "wjxaajgvddtrxxtocxen"
+
+[functions.catalog-import-ingress]
+# GitHub OIDC is verified in the handler before any operation.
+verify_jwt = false
