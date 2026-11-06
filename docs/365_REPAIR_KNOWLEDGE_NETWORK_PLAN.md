@@ -6,6 +6,8 @@
 **Prepared:** 2026-08-05  
 **Last expanded:** 2026-08-06 — global provider acquisition and vendor outreach
 
+> **Related Parts program:** See [`365_PARTS_PROGRAM_INDEX.md`](./365_PARTS_PROGRAM_INDEX.md) for Parts-program control and reading order. The Repair Knowledge Network owns repair data and technician workflow; the Parts specifications own commerce, availability, export, and regional market operation.
+
 ## 1. Executive decision
 
 365 should **not** attempt to copy or mirror ChiltonLibrary, ALLDATA, Mitchell 1, ProDemand, HaynesPro, or another subscription database. Those services contain copyrighted and licensed material, and their normal subscriptions do not authorize creation of a competing database.
