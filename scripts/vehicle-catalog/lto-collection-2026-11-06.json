@@ -1,0 +1,686 @@
+{
+  "run_url": "https://github.com/Hunting-Fishing/motorsales365/actions/runs/42221446517",
+  "artifact_url": "https://github.com/Hunting-Fishing/motorsales365/actions/runs/42221446517/artifacts/13503582328",
+  "summary": {
+    "documents": 14,
+    "downloaded": 13,
+    "with_cc": 5,
+    "errors": 1
+  },
+  "results": [
+    {
+      "source": {
+        "id": "6781",
+        "make": "Rusi",
+        "model": "Macho TC150",
+        "document": "VDM-2024-4050",
+        "issued_on": "2024-12-10",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JYJZ0QE8X2SX1ED64K91FF2E.pdf",
+        "sha256": "f4695327888193d5e4bc4bb664061a266c4b61907067ceb9f4d4ee1a3b4abb6a",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 00 sa",
+        "cylinder_line": "No. of Cylinder Fws haat ‘ ONE (1)",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": false,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-4050",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JYJZ0QE8X2SX1ED64K91FF2E.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Macho TC150",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-4050; document issued 2024-12-10. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "6780",
+        "make": "Rusi",
+        "model": "Macho TC125",
+        "document": "VDM-2024-4049",
+        "issued_on": "2024-12-10",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JYJYXT5AE2HW4A7GKH4CX795.pdf",
+        "sha256": "775f8f794de56a5d8bab2562d222599cbd821c0ac8094f7de28b8a8e6192b95b",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement | i es Ne",
+        "cylinder_line": "No. ofCylinder Bi ONE (Aye",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": false,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-4049",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JYJYXT5AE2HW4A7GKH4CX795.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Macho TC125",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-4049; document issued 2024-12-10. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "6100",
+        "make": "Rusi",
+        "model": "Adventure X 150i",
+        "document": "VDM-2024-2883",
+        "issued_on": "2024-09-10",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JWMXH7KSXK7439FE7KEK09N8.pdf",
+        "sha256": "de44bc0c2695d5a48dfce0e0f32b6a13afaf9c2b42638cb632dbde0ae57ce1b4",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": "gasoline",
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement | [Dis em °C] CE",
+        "cylinder_line": "Number of Cylinder Sarees ONE (1) © eae",
+        "fuel_line": "Fuel Type as SC GASOLINE pte leeel",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-2883",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JWMXH7KSXK7439FE7KEK09N8.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Adventure X 150i",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-2883; document issued 2024-09-10. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "6101",
+        "make": "Rusi",
+        "model": "Sparkle 150i",
+        "document": "VDM-2024-2884",
+        "issued_on": "2024-09-10",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JWMXMW6XCMSA341A5WG32GER.pdf",
+        "sha256": "a11eee1f99e7d9bba6635dad53a009ac3627a65d2591227dbf827d7c9cd6870d",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement | 9A CO",
+        "cylinder_line": "Number of Cylinder ee = SONE DF",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-2884",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JWMXMW6XCMSA341A5WG32GER.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Sparkle 150i",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-2884; document issued 2024-09-10. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "5842",
+        "make": "Rusi",
+        "model": "Flash 150i X",
+        "document": "VDM-2024-3019",
+        "issued_on": "2024-10-21",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JWDG5FVP409ZKN3FEKJS9ZX2.pdf",
+        "sha256": "0c716a6fd05195f74182bb9c68aad831c13469d4d6a2a9ec186663b492014673",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": 149.4,
+        "cylinders": null,
+        "fuel": "gasoline",
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 149.4 CC",
+        "cylinder_line": "No. of Cylinder oe. a ONE) sgh",
+        "fuel_line": "Fuel Type GASOLINE",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": true
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-3019",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JWDG5FVP409ZKN3FEKJS9ZX2.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Flash 150i X",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": "149.4cc, gasoline",
+        "engine_code": null,
+        "engine_cc": 149.4,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-3019; document issued 2024-10-21. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "7227",
+        "make": "Rusi",
+        "model": "Flame 150X",
+        "document": "VDM-2025-4111",
+        "issued_on": "2025-01-16",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01K2EPHF10THXPWJCHB0YAVFAX.pdf",
+        "sha256": "6e56b869b5cf2763b4195537a87d5ea0235997f12d1380b6c37f9a614bb77bdf",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "",
+        "cylinder_line": "",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2025-4111",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01K2EPHF10THXPWJCHB0YAVFAX.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Rusi",
+        "model": "Flame 150X",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2025-4111; document issued 2025-01-16. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "5845",
+        "make": "Motorstar",
+        "model": "XGJ500GY",
+        "document": "VDM-2024-2922",
+        "issued_on": "2024-09-20",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JWDG809VD41326V0BBPB1FJN.pdf",
+        "sha256": "c3f7688032a749460619580e8b5ebe6c2ab39dcb95bf402c1d2398a9559a57ef",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 9 7",
+        "cylinder_line": "",
+        "fuel_line": "Fuel Type oo ee",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-2922",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JWDG809VD41326V0BBPB1FJN.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Motorstar",
+        "model": "XGJ500GY",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-2922; document issued 2024-09-20. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "4931",
+        "make": "Motorstar",
+        "model": "Easyride 150P FI",
+        "document": "VDM-2024-2830",
+        "issued_on": "2024-08-13",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JW5508G0GGK3JAGEY60HCDSQ.pdf",
+        "sha256": "dd48f4dfb6fee1519762279e638cb96c273e70e44e5a11c73b7978eb8374d709",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": "gasoline",
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement ie <2 ER 598020 (Ga 5 eae",
+        "cylinder_line": "Number of Cylinder aa es ONE (1)",
+        "fuel_line": "Fuel Type ___ GASOLINE",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-2830",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JW5508G0GGK3JAGEY60HCDSQ.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Motorstar",
+        "model": "Easyride 150P FI",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-2830; document issued 2024-08-13. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "7785",
+        "make": "Skygo",
+        "model": "SG400",
+        "document": "VDM-2025-4219",
+        "issued_on": "2025-02-18",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01K6Y6ZP9GM5X1ZK3CD7N6X2TC.pdf",
+        "sha256": "0077d9060105baae4644730e76186a9e1a38dd518b63f3cf63b4d9120e92164b",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": 378,
+        "cylinders": 2,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 378 CC",
+        "cylinder_line": "Number of Cylinder TWO (2",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": true
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2025-4219",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01K6Y6ZP9GM5X1ZK3CD7N6X2TC.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Skygo",
+        "model": "SG400",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": "378cc, 2-cylinder",
+        "engine_code": null,
+        "engine_cc": 378,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2025-4219; document issued 2025-02-18. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "4526",
+        "make": "Skygo",
+        "model": "SG200A",
+        "document": "VDM-2025-4345",
+        "issued_on": "2025-04-02",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JVP2XDST4428TG16H608TGT5.pdf",
+        "sha256": "c4244560aa9220b0500ed7b00eda68ebe0f730def3eba9a1a63735ed62352910",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": 198,
+        "cylinders": 1,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 198 CC",
+        "cylinder_line": "Number of Cylinder ONE (1",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": true
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2025-4345",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JVP2XDST4428TG16H608TGT5.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Skygo",
+        "model": "SG200A",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": "198cc, 1-cylinder",
+        "engine_code": null,
+        "engine_cc": 198,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2025-4345; document issued 2025-04-02. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "7958",
+        "make": "Skygo",
+        "model": "SG175R",
+        "document": "VDM-2025-4280",
+        "issued_on": "2025-03-11",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01K87V34S7ZD5HN7Z5JTQF3SZV.pdf",
+        "sha256": "d4040a68b7f10b5b6a881c99eaa7550dc5edd5ad6810efd3ee169b8af06df146",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": 169.7,
+        "cylinders": 1,
+        "fuel": "gasoline",
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 169.7 CC",
+        "cylinder_line": "Number of Cylinder ONE (1",
+        "fuel_line": "Fuel Type GASOLINE",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": true
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2025-4280",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01K87V34S7ZD5HN7Z5JTQF3SZV.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Skygo",
+        "model": "SG175R",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": "169.7cc, 1-cylinder, gasoline",
+        "engine_code": null,
+        "engine_cc": 169.7,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2025-4280; document issued 2025-03-11. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "8115",
+        "make": "Motoposh",
+        "model": "Vintage 170",
+        "document": "VDM-2025-4356",
+        "issued_on": "2025-04-10",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01K9XKQGEWE3SGBQ0XD4JA2CS3.pdf",
+        "sha256": "4b3e134eb2ddc59f1544b0bd990e1e09cc3783e97626f3828742f068b161dd2b",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": 168.9,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "Piston Displacement 168.9 CC",
+        "cylinder_line": "Number of Cylinder___",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": true,
+        "model_seen": true,
+        "displacement_seen": true
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2025-4356",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01K9XKQGEWE3SGBQ0XD4JA2CS3.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Motoposh",
+        "model": "Vintage 170",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": "168.9cc",
+        "engine_code": null,
+        "engine_cc": 168.9,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2025-4356; document issued 2025-04-10. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "4081",
+        "make": "Motoposh",
+        "model": "EVO170",
+        "document": "VDM-2024-2594",
+        "issued_on": "2024-04-11",
+        "pdf_url": "https://naro.law.upd.edu.ph/storage/01JTMVPEDJAE84XQQPN7A3G491.pdf",
+        "sha256": "a7adbb839c671c47312205bcfe82e48a31de1e22aa8d0b651e853d6fb81d4fc7",
+        "extraction": "ocr"
+      },
+      "facts": {
+        "displacement_cc": null,
+        "cylinders": null,
+        "fuel": null,
+        "model_year": null
+      },
+      "evidence": {
+        "displacement_line": "",
+        "cylinder_line": "No. of Cylinder CHET EEO RZ - FOUR (4 a",
+        "fuel_line": "",
+        "model_year_line": ""
+      },
+      "validation": {
+        "make_seen": false,
+        "model_seen": false,
+        "displacement_seen": false
+      },
+      "entry": {
+        "source_key": "lto-ph",
+        "external_id": "VDM-2024-2594",
+        "source_url": "https://naro.law.upd.edu.ph/storage/01JTMVPEDJAE84XQQPN7A3G491.pdf",
+        "observed_on": "2026-11-06",
+        "category": "motorcycle",
+        "market": "PH",
+        "make": "Motoposh",
+        "model": "EVO170",
+        "aliases": [],
+        "year_start": null,
+        "year_end": null,
+        "year_verified": false,
+        "engine_label": null,
+        "engine_code": null,
+        "engine_cc": null,
+        "nominal_cc": null,
+        "trim": null,
+        "chassis_code": null,
+        "status": "review",
+        "notes": "LTO VDM-2024-2594; document issued 2024-04-11. Approval date is not model year. Machine-extracted specifications require review. No engine code inferred from displacement or serial numbers."
+      }
+    },
+    {
+      "source": {
+        "id": "lto-4639",
+        "make": "Rusi",
+        "model": "Force 150",
+        "document": "VDM-2025-4639",
+        "issued_on": "2025-08-28",
+        "pdf_url": "https://lto.gov.ph/wp-content/uploads/2025/09/MC-VDM-2025-4639.pdf"
+      },
+      "error": "Source HTTP 403"
+    }
+  ]
+}
