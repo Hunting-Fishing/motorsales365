@@ -1,0 +1,36 @@
+name: Collect Philippine motorcycle source documents
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vehicle-catalog-lto.yml'
+permissions:
+  contents: read
+concurrency:
+  group: vehicle-catalog-lto
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.repository == 'Hunting-Fishing/motorsales365' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test extraction rules
+        run: node --test scripts/vehicle-catalog/lto.test.mjs
+      - name: Install PDF and OCR tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr
+      - name: Download and extract bounded official-source batch
+        run: node scripts/vehicle-catalog/lto.mjs
+      - name: Preserve source documents and review records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: philippine-motorcycle-source-documents
+          path: catalog-source-cache/
+          retention-days: 90
+          if-no-files-found: warn
