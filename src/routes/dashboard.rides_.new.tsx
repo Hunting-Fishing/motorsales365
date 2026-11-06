@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EngineCcField } from "@/components/engine-cc-field";
 import { VehiclePicker } from "@/components/vehicle-picker";
 import { useServerFn } from "@tanstack/react-start";
 import { createRide } from "@/lib/rides.functions";
@@ -24,12 +25,15 @@ function NewRidePage() {
     model: "",
     engine: "",
   });
+  const [engineCc, setEngineCc] = useState("");
   const [trim, setTrim] = useState("");
   const [busy, setBusy] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return toast.error("Give your ride a name");
+    if (!v.make.trim() || !v.model.trim()) return toast.error("Choose or type a make and model");
+    if (engineCc && (!Number.isFinite(Number(engineCc)) || Number(engineCc) <= 0 || Number(engineCc) > 100000)) return toast.error("Enter a valid engine size in CC");
     setBusy(true);
     try {
       const res = await create({
@@ -40,6 +44,7 @@ function NewRidePage() {
           model: v.model || null,
           trim: trim || null,
           engine: v.engine || null,
+          engine_cc: engineCc ? Number(engineCc) : null,
           vehicle_type: vehicleType,
         },
       });
@@ -77,7 +82,7 @@ function NewRidePage() {
               type="button"
               variant={vehicleType === t ? "default" : "outline"}
               size="sm"
-              onClick={() => setVehicleType(t)}
+              onClick={() => { setVehicleType(t); setV({ year: v.year, make: "", model: "", engine: "" }); setEngineCc(""); setTrim(""); }}
               className="w-full sm:w-auto"
             >
               {t === "car" ? "Car / SUV / Truck" : "Motorcycle"}
@@ -93,12 +98,13 @@ function NewRidePage() {
         engine={v.engine}
         onChange={setV}
       />
+      <EngineCcField value={engineCc} onChange={setEngineCc} />
       <div className="space-y-2">
         <Label>Trim (optional)</Label>
         <Input
           value={trim}
           onChange={(e) => setTrim(e.target.value)}
-          placeholder="e.g. Type R, Sport, GR"
+          placeholder={vehicleType === "motorcycle" ? "e.g. Standard, ABS (leave blank if unknown)" : "e.g. Type R, Sport, GR"}
         />
       </div>
       <FormFeedbackLink formId="ride-create" />
@@ -110,3 +116,4 @@ function NewRidePage() {
     </form>
   );
 }
+

@@ -27,21 +27,26 @@ export const Route = createFileRoute("/dashboard/rides")({
 function MyRidesPage() {
   const { user } = useAuth();
   const [rides, setRides] = useState<any[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const publish = useServerFn(publishRide);
   const removeRide = useServerFn(deleteRide);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {
-    if (!user) return;
+    if (!user) { setLoading(false); return; }
     setLoading(true);
-    const { data } = await (supabase as any)
-      .from("rides")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    setRides(data ?? []);
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const { data, error } = await (supabase as any).from("rides")
+        .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+      if (error) throw error;
+      setRides(data ?? []);
+    } catch (error: any) {
+      setLoadError(error.message || "Could not load your rides.");
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     load(); /* eslint-disable-next-line */
@@ -88,6 +93,8 @@ function MyRidesPage() {
       </div>
       {loading ? (
         <p className="text-muted-foreground">Loading…</p>
+      ) : loadError ? (
+        <div role="alert" className="space-y-3 rounded-xl border p-4"><p>{loadError}</p><Button onClick={load}>Retry loading rides</Button></div>
       ) : rides.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-12 text-center">
           <h2 className="font-display text-lg font-semibold">No rides yet</h2>
@@ -127,6 +134,7 @@ function MyRidesPage() {
                       Edit
                     </Link>
                   </Button>
+                  <Button asChild size="sm"><Link to="/dashboard/rides/$id/edit" params={{ id: r.id }} search={{ tab: "receipts" }}>Receipts & history</Link></Button>
                   <Button
                     size="sm"
                     variant="outline"
@@ -191,3 +199,4 @@ function MyRidesPage() {
     </div>
   );
 }
+

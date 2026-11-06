@@ -4212,7 +4212,10 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
       "TC 125",
       "TC 200",
       "TC 250",
-      "Rouser",
+      "Surf",
+      "Royal 125",
+      "Gamma 200",
+      "RFI 175",
       "TC Pro 250",
       "Sport",
       "Pony",
@@ -4551,7 +4554,7 @@ const MAKE_FIRST_YEAR: Partial<Record<VehicleCategory, Record<string, number>>> 
     Aprilia: 1968,
     Vespa: 1946,
     Lambretta: 1947,
-    Rusi: 2002,
+    // RUSI's company founding date is not evidence of first motorcycle production.
     Motorstar: 2003,
     Skygo: 2005,
     Racal: 2005,
@@ -4633,11 +4636,12 @@ export function getMakesForYear(category: VehicleCategory, year: number | undefi
   });
 }
 
-/** Year-dropdown options (newest first, down to 1920 for vintage/classic). */
+/** Year-dropdown options (newest first, down to 1885 for vintage vehicles). */
 export function getYearOptions(): number[] {
   const current = new Date().getFullYear();
   const next = current + 1;
   const years: number[] = [];
-  for (let y = next; y >= 1920; y--) years.push(y);
+  for (let y = next; y >= 1885; y--) years.push(y);
   return years;
 }
+
