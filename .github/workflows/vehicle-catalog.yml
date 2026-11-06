@@ -1,0 +1,32 @@
+name: Vehicle catalogue and rides
+on:
+  pull_request:
+    paths:
+      - 'src/components/vehicle-picker*'
+      - 'src/components/engine-cc-field*'
+      - 'src/hooks/use-vehicle-catalog*'
+      - 'src/lib/rides.functions.ts'
+      - 'src/routes/dashboard.rides*'
+      - 'scripts/vehicle-catalog/**'
+      - 'supabase/migrations/*vehicle*'
+      - 'supabase/migrations/*catalog*'
+      - '.github/workflows/vehicle-catalog.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # Existing lockfile uses Zod 4 while zod-adapter advertises a Zod 3 peer.
+      # Preserve the locked dependency graph used by the app.
+      - run: npm ci --legacy-peer-deps
+      - run: node --test scripts/vehicle-catalog/providers.test.mjs scripts/vehicle-catalog/database.test.mjs
+      - run: npx vitest run src/components/vehicle-picker.test.tsx src/components/engine-cc-field.test.tsx
+      - run: npm run build

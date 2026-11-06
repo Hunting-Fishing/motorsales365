@@ -1,3 +1,4 @@
+import { EngineCcField } from "@/components/engine-cc-field";
 import { VehicleReceiptPanel } from "@/components/vehicle-receipt-panel";
 import { VehicleHistoryTimeline } from "@/components/vehicle-history-timeline";
 import { listMyVehicles } from "@/lib/vehicles.functions";
@@ -27,6 +28,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { linkRideToListing, publishRide } from "@/lib/rides.functions";
 
 export const Route = createFileRoute("/dashboard/rides_/$id/edit")({
+  validateSearch: (search: Record<string, unknown>): { tab?: "receipts" } => ({
+    tab: search.tab === "receipts" ? "receipts" : undefined,
+  }),
   component: EditRidePage,
 });
 
@@ -46,6 +50,7 @@ const MOD_CATEGORIES = [
 
 function EditRidePage() {
   const { id } = Route.useParams();
+  const { tab } = Route.useSearch();
   const { user } = useAuth();
   const navigate = useNavigate();
   const publish = useServerFn(publishRide);
@@ -132,6 +137,7 @@ function EditRidePage() {
   if (loading || !ride) return <p className="text-muted-foreground">Loading…</p>;
 
   const saveDetails = async () => {
+    if (ride.engine_cc != null && (!Number.isFinite(Number(ride.engine_cc)) || Number(ride.engine_cc) <= 0 || Number(ride.engine_cc) > 100000)) return toast.error("Enter a valid engine size in CC");
     const { error } = await (supabase as any)
       .from("rides")
       .update({
@@ -142,6 +148,7 @@ function EditRidePage() {
         trim: ride.trim,
         color: ride.color,
         engine: ride.engine,
+        engine_cc: ride.engine_cc == null ? null : Number(ride.engine_cc),
         transmission: ride.transmission,
         drivetrain: ride.drivetrain,
         mileage_km: ride.mileage_km,
@@ -295,7 +302,7 @@ function EditRidePage() {
 
       <h1 className="font-display text-2xl font-bold">{ride.name}</h1>
 
-      <Tabs defaultValue="details">
+      <Tabs defaultValue={tab ?? "details"}>
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="photos">Photos ({photos.length})</TabsTrigger>
@@ -351,7 +358,7 @@ function EditRidePage() {
               ["year", "Year"],
               ["make", "Make"],
               ["model", "Model"],
-              ["trim", "Trim"],
+              ["trim", "Trim (optional)"],
               ["color", "Color"],
               ["transmission", "Transmission"],
               ["drivetrain", "Drivetrain"],
@@ -375,6 +382,7 @@ function EditRidePage() {
               </div>
             ))}
             <RideEngineField ride={ride} setRide={setRide} />
+            <EngineCcField value={ride.engine_cc == null ? "" : String(ride.engine_cc)} onChange={(v) => setRide({ ...ride, engine_cc: v || null })} />
           </div>
           <div className="space-y-1">
             <Label>The story</Label>
@@ -696,7 +704,7 @@ function RideEngineField({ ride, setRide }: { ride: any; setRide: (r: any) => vo
         <div className="flex gap-2">
           <Input
             value={current}
-            placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+            placeholder={cat === "motorcycle" ? "e.g. 125cc, 4-stroke, carbureted" : "e.g. 2.4L Diesel (2GD-FTV)"}
             onChange={(e) => setRide({ ...ride, engine: e.target.value })}
           />
           {engines.length > 0 && (
@@ -747,3 +755,4 @@ function RideEngineField({ ride, setRide }: { ride: any; setRide: (r: any) => vo
     </div>
   );
 }
+

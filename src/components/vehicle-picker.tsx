@@ -21,6 +21,7 @@ import {
   type VehicleCategory,
 } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
+import { useVehicleCatalog } from "@/hooks/use-vehicle-catalog";
 import { normalize } from "@/lib/fuzzy";
 import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
@@ -153,6 +154,11 @@ function Combo({
                   </CommandItem>
                 );
               })}
+              {showAdd && options.some(o => normalize(o).startsWith(normalize(trimmed))) && (
+                <CommandItem value={`custom ${trimmed}`} forceMount onSelect={() => commit(trimmed)}>
+                  <Plus className="mr-2 h-4 w-4" />{addLabel}: “{trimmed}”
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>
@@ -167,6 +173,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
   const [engineCustom, setEngineCustom] = React.useState(false);
 
   const yearNum = year && /^\d{4}$/.test(year) ? parseInt(year, 10) : undefined;
+  const catalogue = useVehicleCatalog(category, yearNum, make, model);
   const yearOptions = React.useMemo(() => getYearOptions().map((y) => String(y)), []);
 
   const filteredMakes = React.useMemo(
@@ -175,49 +182,39 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
   );
   const makeNames = React.useMemo(
     () =>
-      filteredMakes
-        .map((m) => m.make)
+      [...new Set([...filteredMakes.map((m) => m.make), ...catalogue.data.makes])]
         .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
-    [filteredMakes],
+    [filteredMakes, catalogue.data.makes],
   );
 
   const modelOptions = React.useMemo(
     () =>
       make
-        ? [...getModelsForYear(category, make, yearNum)].sort((a, b) =>
+        ? [...new Set([...getModelsForYear(category, make, yearNum), ...catalogue.data.models])].sort((a, b) =>
             a.localeCompare(b, undefined, { sensitivity: "base" }),
           )
         : [],
-    [category, make, yearNum],
+    [category, make, yearNum, catalogue.data.models],
   );
 
   const engineOptions = React.useMemo(
-    () => getEnginesFor(category, make, model, yearNum),
-    [category, make, model, yearNum],
+    () => [...new Map([...getEnginesFor(category, make, model, yearNum), ...catalogue.data.engines].map(e => [e.label, e])).values()],
+    [category, make, model, yearNum, catalogue.data.engines],
   );
 
   const isOtherMake = make.toLowerCase() === "other";
   const isOtherModel = model.toLowerCase() === "other";
 
-  // When year changes, drop a model that's no longer valid for that year.
-  React.useEffect(() => {
-    if (!yearNum || !make || !model) return;
-    if (!modelOptions.some((m) => m.toLowerCase() === model.toLowerCase())) {
-      onChange({ year, make, model: "", engine: "" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [yearNum]);
-
-  // Drop stale engine when its label is no longer offered (unless user is
-  // typing a custom value).
-  React.useEffect(() => {
-    if (engineCustom) return;
-    if (!engine) return;
-    if (engineOptions.length && !engineOptions.some((e) => e.label === engine)) {
-      onChange({ year, make, model, engine: "" });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [make, model, yearNum]);
+  // Clear a known incompatible option only when the user changes the year.
+  // Imported/custom values must survive mounting and background catalogue refreshes.
+  const changeYear = (nextYear: string) => {
+    const nextYearNum = /^\d{4}$/.test(nextYear) ? Number(nextYear) : undefined;
+    const knownModel = getModelsForYear(category, make, yearNum).includes(model);
+    const nextModel = knownModel && !getModelsForYear(category, make, nextYearNum).includes(model) ? "" : model;
+    const knownEngine = getEnginesFor(category, make, model, yearNum).some(e => e.label === engine);
+    const nextEngine = !nextModel || (knownEngine && !getEnginesFor(category, make, nextModel, nextYearNum).some(e => e.label === engine)) ? "" : engine;
+    onChange({ year: nextYear, make, model: nextModel, engine: nextEngine });
+  };
 
   if (otherMode) {
     return (
@@ -253,7 +250,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
         <Input
           value={engine ?? ""}
           onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
-          placeholder="Engine (optional, e.g. 2.4L Diesel)"
+          placeholder={category === "motorcycle" ? "Engine (optional, e.g. 125cc 4-stroke)" : "Engine (optional, e.g. 2.4L Diesel)"}
         />
       </div>
     );
@@ -284,7 +281,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
             emptyText="No years"
             addLabel="Use year"
             optionCounts={yearCounts}
-            onSelect={(v) => onChange({ year: v, make, model, engine })}
+            onSelect={changeYear}
           />
         </div>
 
@@ -383,7 +380,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
             <div className="flex gap-2">
               <Input
                 value={engine ?? ""}
-                placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+                placeholder={category === "motorcycle" ? "e.g. 125cc 4-stroke, carbureted" : "e.g. 2.4L Diesel (2GD-FTV)"}
                 onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
               />
               {engineOptions.length > 0 && (
@@ -423,9 +420,11 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
         </div>
       )}
 
+      {catalogue.failed && <p role="status" className="text-xs text-muted-foreground">Additional catalogue data is unavailable. You can still choose from the list or type your vehicle.</p>}
+      {catalogue.data.hasUnverifiedYears && <p className="text-xs text-muted-foreground">Some local models have no documented year range. Confirm the year and engine against your vehicle records; listed CC may be a nominal size.</p>}
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          Can't find your vehicle? Just type it — we'll add it to your listing.
+          Can't find your vehicle? Type its make, model or engine to save your own details.
         </p>
         <button
           type="button"
@@ -438,3 +437,4 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
     </div>
   );
 }
+

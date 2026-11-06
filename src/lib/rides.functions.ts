@@ -5,11 +5,12 @@ import { slugify, randomSuffix } from "./rides.server";
 
 const CreateInput = z.object({
   name: z.string().min(1).max(120),
-  year: z.number().int().min(1900).max(2100).optional().nullable(),
+  year: z.number().int().min(1885).max(2100).optional().nullable(),
   make: z.string().max(60).optional().nullable(),
   model: z.string().max(80).optional().nullable(),
   trim: z.string().max(60).optional().nullable(),
   engine: z.string().max(120).optional().nullable(),
+  engine_cc: z.number().positive().max(100000).optional().nullable(),
   vehicle_type: z
     .enum(["car", "truck", "suv", "van", "motorcycle", "scooter", "atv", "utv", "boat", "other"])
     .default("car"),
@@ -45,6 +46,7 @@ export const createRide = createServerFn({ method: "POST" })
         model: data.model ?? null,
         trim: data.trim ?? null,
         engine: data.engine ?? null,
+        engine_cc: data.engine_cc ?? null,
         vehicle_type: data.vehicle_type,
         status: "draft",
       } as never)
@@ -183,3 +185,4 @@ export const deleteRide = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
